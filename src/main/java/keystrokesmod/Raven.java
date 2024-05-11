@@ -15,7 +15,7 @@ import keystrokesmod.utility.profile.Profile;
 import keystrokesmod.utility.profile.ProfileManager;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.client.ClientCommandHandler;
-import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -41,7 +41,7 @@ public class Raven {
     public static ScriptManager scriptManager;
     public static Profile currentProfile;
     public static BadPacketsHandler badPacketsHandler;
-    private boolean loaded = false;
+    private final boolean loaded = false;
 
     public Raven() {
         moduleManager = new ModuleManager();
@@ -51,12 +51,12 @@ public class Raven {
     public void init(FMLInitializationEvent e) {
         Runtime.getRuntime().addShutdownHook(new Thread(ex::shutdown));
         ClientCommandHandler.instance.registerCommand(new keystrokeCommand());
-        FMLCommonHandler.instance().bus().register(this);
-        FMLCommonHandler.instance().bus().register(new DebugInfoRenderer());
-        FMLCommonHandler.instance().bus().register(new CPSCalculator());
-        FMLCommonHandler.instance().bus().register(new KeySrokeRenderer());
-        FMLCommonHandler.instance().bus().register(new Ping());
-        FMLCommonHandler.instance().bus().register(badPacketsHandler = new BadPacketsHandler());
+        MinecraftForge.EVENT_BUS.register(this);
+        MinecraftForge.EVENT_BUS.register(new DebugInfoRenderer());
+        MinecraftForge.EVENT_BUS.register(new CPSCalculator());
+        MinecraftForge.EVENT_BUS.register(new KeySrokeRenderer());
+        MinecraftForge.EVENT_BUS.register(new Ping());
+        MinecraftForge.EVENT_BUS.register(badPacketsHandler = new BadPacketsHandler());
         Reflection.getFields();
         Reflection.getMethods();
         moduleManager.register();
@@ -68,44 +68,41 @@ public class Raven {
         profileManager.loadProfile("default");
         Reflection.setKeyBindings();
         scriptManager.loadScripts();
-        scriptManager.loadScripts();
     }
 
     @SubscribeEvent
     public void onTick(ClientTickEvent e) {
-        if (e.phase == Phase.END) {
-            if (Utils.nullCheck()) {
-                if (Reflection.sendMessage) {
-                    Utils.sendMessage("&cThere was an error, relaunch the game.");
-                    Reflection.sendMessage = false;
+        if (e.phase == Phase.END && Utils.nullCheck()) {
+            if (Reflection.sendMessage) {
+                Utils.sendMessage("&cThere was an error, relaunch the game.");
+                Reflection.sendMessage = false;
+            }
+            for (Module module : getModuleManager().getModules()) {
+                if (mc.currentScreen == null && module.canBeEnabled()) {
+                    module.keybind();
+                } else if (mc.currentScreen instanceof ClickGui) {
+                    module.guiUpdate();
                 }
-                for (Module module : getModuleManager().getModules()) {
-                    if (mc.currentScreen == null && module.canBeEnabled()) {
-                        module.keybind();
-                    } else if (mc.currentScreen instanceof ClickGui) {
-                        module.guiUpdate();
-                    }
 
-                    if (module.isEnabled()) {
-                        module.onUpdate();
-                    }
-                }
-                for (Profile profile : Raven.profileManager.profiles) {
-                    if (mc.currentScreen == null) {
-                        profile.getModule().keybind();
-                    }
-                }
-                for (Module module : Raven.scriptManager.scripts.values()) {
-                    if (mc.currentScreen == null) {
-                        module.keybind();
-                    }
+                if (module.isEnabled()) {
+                    module.onUpdate();
                 }
             }
-
-            if (isKeyStrokeConfigGuiToggled) {
-                isKeyStrokeConfigGuiToggled = false;
-                mc.displayGuiScreen(new KeyStrokeConfigGui());
+            for (Profile profile : Raven.profileManager.profiles) {
+                if (mc.currentScreen == null) {
+                    profile.getModule().keybind();
+                }
             }
+            for (Module module : Raven.scriptManager.scripts.values()) {
+                if (mc.currentScreen == null) {
+                    module.keybind();
+                }
+            }
+        }
+
+        if (isKeyStrokeConfigGuiToggled) {
+            isKeyStrokeConfigGuiToggled = false;
+            mc.displayGuiScreen(new KeyStrokeConfigGui());
         }
     }
 

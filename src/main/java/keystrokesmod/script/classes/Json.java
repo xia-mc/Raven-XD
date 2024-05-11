@@ -49,7 +49,10 @@ public class Json {
     }
 
     public Json object(String name) {
-        return new Json(this.jsonObject == null ? null : this.jsonObject.get(name).getAsJsonObject(), 0);
+        if (this.jsonObject == null || this.jsonObject.get(name) == null) {
+            return new Json(null, 0);
+        }
+        return new Json(this.jsonObject.get(name).getAsJsonObject(), 0);
     }
 
     public Json object() {

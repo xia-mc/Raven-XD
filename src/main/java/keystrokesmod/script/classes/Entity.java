@@ -234,10 +234,10 @@ public class Entity {
     }
 
     public boolean isOnLadder() {
-        int i = MathHelper.floor_double(entity.posX);
-        int j = MathHelper.floor_double(entity.posY - 0.20000000298023224D);
-        int k = MathHelper.floor_double(entity.posZ);
-        BlockPos blockpos = new BlockPos(i, j, k);
+        int posX = MathHelper.floor_double(entity.posX);
+        int posY = MathHelper.floor_double(entity.posY - 0.20000000298023224D);
+        int posZ = MathHelper.floor_double(entity.posZ);
+        BlockPos blockpos = new BlockPos(posX, posY, posZ);
         Block block1 = Minecraft.getMinecraft().theWorld.getBlockState(blockpos).getBlock();
         return block1 instanceof BlockLadder && !entity.onGround;
     }

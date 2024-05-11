@@ -112,3 +112,5 @@ jar {
         )
     }
 }
+
+setLibsDirName("C:\\Users\\mccm9\\AppData\\Roaming\\.minecraft\\mods")
