@@ -6,9 +6,9 @@ import keystrokesmod.utility.Commands;
 import keystrokesmod.utility.Timer;
 
 public class CommandLine extends Module {
-    public static boolean a = false;
-    public static boolean b = false;
-    public static Timer an;
+    public static boolean isEnable = false;
+    public static boolean isDisable = false;
+    public static Timer animationTimer;
     public static ButtonSetting animate;
 
     public CommandLine() {
@@ -18,15 +18,15 @@ public class CommandLine extends Module {
 
     public void onEnable() {
         Commands.setccs();
-        a = true;
-        b = false;
-        (an = new Timer(500.0F)).start();
+        isEnable = true;
+        isDisable = false;
+        (animationTimer = new Timer(500.0F)).start();
     }
 
     public void onDisable() {
-        b = true;
-        if (an != null) {
-            an.start();
+        isDisable = true;
+        if (animationTimer != null) {
+            animationTimer.start();
         }
 
         Commands.od();
