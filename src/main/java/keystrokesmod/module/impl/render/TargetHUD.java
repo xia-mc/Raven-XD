@@ -18,6 +18,8 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 import java.awt.*;
 
+import static keystrokesmod.utility.RenderUtils.jelloRender;
+
 public class TargetHUD extends Module {
     private DescriptionSetting description;
     private SliderSetting theme;
@@ -82,7 +84,11 @@ public class TargetHUD extends Module {
             return;
         }
         if (KillAura.target != null) {
-            RenderUtils.renderEntity(KillAura.target, 2, 0.0, 0.0, Theme.getGradient((int) theme.getInput(), 0), false);
+            EntityLivingBase target = KillAura.target;
+
+            Color color = new Color(255, 255, 255, 128);
+
+            jelloRender(target, target, color);
         }
     }
 

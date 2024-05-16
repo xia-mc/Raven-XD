@@ -17,10 +17,29 @@ import net.minecraft.util.BlockPos;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
+import java.lang.reflect.Field;
 
 public class RenderUtils {
     private static Minecraft mc = Minecraft.getMinecraft();
     public static boolean ring_c = false;
+    private static float renderPartialTicks = 0.0f;
+
+    static {
+        try {
+            Field timerField = Minecraft.class.getDeclaredField("timer");
+            timerField.setAccessible(true);
+            Timer timer = (Timer) timerField.get(Minecraft.getMinecraft());
+            Field renderPartialTicksField = Timer.class.getDeclaredField("renderPartialTicks");
+            renderPartialTicksField.setAccessible(true);
+            renderPartialTicks = renderPartialTicksField.getFloat(timer);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static float getRenderPartialTicks() {
+        return renderPartialTicks;
+    }
 
     public static void renderBlock(BlockPos blockPos, int color, boolean outline, boolean shade) {
         renderBox(blockPos.getX(), blockPos.getY(), blockPos.getZ(), color, outline, shade);
@@ -102,6 +121,78 @@ public class RenderUtils {
             s += Utils.rnd(h, 3);
         }
         mc.fontRendererObj.drawString(s, (float)(scaledResolution.getScaledWidth() / 2 - mc.fontRendererObj.getStringWidth(s) / 2), (float)(scaledResolution.getScaledHeight() / 2 + 15), n, false);
+    }
+
+    public static void jelloRender(Entity e, EntityLivingBase target, Color color) {
+        int drawTime = (int) (System.currentTimeMillis() % 2000);
+        boolean drawMode = drawTime > 1000;
+        float drawPercent = drawTime / 1000f;
+
+        if (!drawMode) {
+            drawPercent = 1 - drawPercent;
+        } else {
+            drawPercent -= 1;
+        }
+
+        drawPercent = drawPercent * 2;
+
+        if (drawPercent < 1) {
+            drawPercent = 0.5f * drawPercent * drawPercent * drawPercent;
+        } else {
+            float f = drawPercent - 2;
+            drawPercent = 0.5f * (f * f * f + 2);
+        }
+
+        Minecraft mc = Minecraft.getMinecraft();
+        mc.entityRenderer.disableLightmap();
+        GL11.glPushMatrix();
+        GL11.glDisable(GL11.GL_TEXTURE_2D);
+        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        GL11.glEnable(GL11.GL_LINE_SMOOTH);
+        GL11.glEnable(GL11.GL_BLEND);
+
+        GL11.glDisable(GL11.GL_DEPTH_TEST);
+        GL11.glDisable(GL11.GL_CULL_FACE);
+        GL11.glShadeModel(GL11.GL_SMOOTH);
+        mc.entityRenderer.disableLightmap();
+
+        double radius = target.width;
+        double height = target.height + 0.1;
+
+        double x = e.lastTickPosX + (target.posX - target.lastTickPosX) * getRenderPartialTicks() - mc.getRenderManager().viewerPosX;
+        double y = (e.lastTickPosY + (target.posY - target.lastTickPosY) * getRenderPartialTicks() - mc.getRenderManager().viewerPosY) + height * drawPercent;
+        double z = e.lastTickPosZ + (target.posZ - target.lastTickPosZ) * getRenderPartialTicks() - mc.getRenderManager().viewerPosZ;
+        double eased = (height / 3) * ((drawPercent > 0.5) ? 1 - drawPercent : drawPercent) * ((drawMode) ? -1 : 1);
+
+        for (int segments = 0; segments < 360; segments += 5) {
+
+            double x1 = x - Math.sin(segments * Math.PI / 180F) * radius;
+            double z1 = z + Math.cos(segments * Math.PI / 180F) * radius;
+            double x2 = x - Math.sin((segments - 5) * Math.PI / 180F) * radius;
+            double z2 = z + Math.cos((segments - 5) * Math.PI / 180F) * radius;
+
+            GL11.glBegin(GL11.GL_QUADS);
+            GL11.glColor4f(color.getRed() / 255.0f, color.getGreen() / 255.0f, color.getBlue() / 255.0f, 0.0f);
+            GL11.glVertex3d(x1, y + eased, z1);
+            GL11.glVertex3d(x2, y + eased, z2);
+            GL11.glColor4f(color.getRed() / 255.0f, color.getGreen() / 255.0f, color.getBlue() / 255.0f, color.getAlpha() / 255.0f);
+            GL11.glVertex3d(x2, y, z2);
+            GL11.glVertex3d(x1, y, z1);
+            GL11.glEnd();
+            GL11.glBegin(GL11.GL_LINE_LOOP);
+            GL11.glVertex3d(x2, y, z2);
+            GL11.glVertex3d(x1, y, z1);
+            GL11.glEnd();
+        }
+
+        GL11.glEnable(GL11.GL_CULL_FACE);
+        GL11.glShadeModel(GL11.GL_FLAT);
+        GL11.glColor4f(1f, 1f, 1f, 1f);
+        GL11.glEnable(GL11.GL_DEPTH_TEST);
+        GL11.glDisable(GL11.GL_LINE_SMOOTH);
+        GL11.glDisable(GL11.GL_BLEND);
+        GL11.glEnable(GL11.GL_TEXTURE_2D);
+        GL11.glPopMatrix();
     }
 
     public static void renderEntity(Entity e, int type, double expand, double shift, int color, boolean damage) {
@@ -516,10 +607,10 @@ public class RenderUtils {
     }
 
     public static void drawRoundedGradientOutlinedRectangle(float n, float n2, float n3, float n4, final float n5, final int n6, final int n7, final int n8) { // credit to the creator of raven b4
-        n *= 2.0;
-        n2 *= 2.0;
-        n3 *= 2.0;
-        n4 *= 2.0;
+        n *= 2.0F;
+        n2 *= 2.0F;
+        n3 *= 2.0F;
+        n4 *= 2.0F;
         GL11.glPushAttrib(1);
         GL11.glScaled(0.5, 0.5, 0.5);
         GL11.glEnable(3042);

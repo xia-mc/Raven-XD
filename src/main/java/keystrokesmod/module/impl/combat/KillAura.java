@@ -126,8 +126,12 @@ public class KillAura extends Module {
         }
         if (target != null && rotationMode.getInput() == 2) {
             float[] rotations = RotationUtils.getRotations(target, mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch);
-            mc.thePlayer.rotationYaw = rotations[0];
-            mc.thePlayer.rotationPitch = rotations[1];
+            if (rotations != null) {
+                mc.thePlayer.rotationYaw = rotations[0];
+            }
+            if (rotations != null) {
+                mc.thePlayer.rotationPitch = rotations[1];
+            }
         }
     }
 
@@ -208,8 +212,12 @@ public class KillAura extends Module {
         setTarget();
         if (target != null && rotationMode.getInput() == 1) {
             float[] rotations = RotationUtils.getRotations(target, e.getYaw(), e.getPitch());
-            e.setYaw(rotations[0]);
-            e.setPitch(rotations[1]);
+            if (rotations != null) {
+                e.setYaw(rotations[0]);
+            }
+            if (rotations != null) {
+                e.setPitch(rotations[1]);
+            }
         }
         if (autoBlockMode.getInput() == 2 && block.get() && Utils.holdingSword()) {
             mc.thePlayer.sendQueue.addToSendQueue(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem % 8 + 1));
@@ -229,7 +237,7 @@ public class KillAura extends Module {
         if (!Utils.nullCheck() || !blinking) {
             return;
         }
-        Packet packet = e.getPacket();
+        Packet<?> packet = e.getPacket();
         if (packet.getClass().getSimpleName().startsWith("S")) {
             return;
         }
@@ -481,7 +489,7 @@ public class KillAura extends Module {
 
     public void gd() {
         double c = aps.getInput() + 0.4D * this.rand.nextDouble();
-        long d = (long) ((int) Math.round(1000.0D / c));
+        long d = (int) Math.round(1000.0D / c);
         if (System.currentTimeMillis() > this.k) {
             if (!this.n && this.rand.nextInt(100) >= 85) {
                 this.n = true;
