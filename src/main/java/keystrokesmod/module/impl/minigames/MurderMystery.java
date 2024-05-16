@@ -18,9 +18,9 @@ import java.util.Iterator;
 import java.util.List;
 
 public class MurderMystery extends Module {
-    private ButtonSetting a;
-    private ButtonSetting b;
-    private ButtonSetting c;
+    private final ButtonSetting a;
+    private final ButtonSetting b;
+    private final ButtonSetting c;
     private final List<EntityPlayer> murderers = new ArrayList();
     private final List<EntityPlayer> detectives = new ArrayList();
     private final String c1 = "MURDER";

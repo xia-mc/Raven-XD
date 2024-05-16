@@ -8,9 +8,9 @@ import keystrokesmod.utility.Utils;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class LatencyAlerts extends Module {
-    private DescriptionSetting description;
-    private SliderSetting interval;
-    private SliderSetting highLatency;
+    private final DescriptionSetting description;
+    private final SliderSetting interval;
+    private final SliderSetting highLatency;
     private long lastPacket;
     private long lastAlert;
     public LatencyAlerts() {

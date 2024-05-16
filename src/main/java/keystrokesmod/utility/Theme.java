@@ -48,7 +48,7 @@ public enum Theme {
             if (firstGradient != null && secondGradient != null) {
                 return new int[]{firstGradient.getRGB(), secondGradient.getRGB()};
             } else {
-                return new int[]{Utils.getChroma(2, (long) 0), Utils.getChroma(2, (long) 0)};
+                return new int[]{Utils.getChroma(2, 0), Utils.getChroma(2, 0)};
             }
         }
         return new int[]{0, 0};

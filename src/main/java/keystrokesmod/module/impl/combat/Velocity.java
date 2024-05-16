@@ -13,9 +13,9 @@ import org.lwjgl.input.Keyboard;
 public class Velocity extends Module {
     public static SliderSetting horizontal;
     public static SliderSetting vertical;
-    private SliderSetting chance;
-    private ButtonSetting onlyWhileTargeting;
-    private ButtonSetting disableS;
+    private final SliderSetting chance;
+    private final ButtonSetting onlyWhileTargeting;
+    private final ButtonSetting disableS;
 
     public Velocity() {
         super("Velocity", Module.category.combat, 0);

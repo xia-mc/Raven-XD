@@ -17,15 +17,15 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.lwjgl.opengl.GL11;
 
 public class Nametags extends Module { // skidded from raven source code as well
-    private SliderSetting yOffset;
-    private SliderSetting scale;
-    private ButtonSetting autoScale;
-    private ButtonSetting drawRect;
-    private ButtonSetting showHealth;
-    private ButtonSetting showInvis;
-    private ButtonSetting removeTags;
-    private ButtonSetting renderFriends;
-    private ButtonSetting renderEnemies;
+    private final SliderSetting yOffset;
+    private final SliderSetting scale;
+    private final ButtonSetting autoScale;
+    private final ButtonSetting drawRect;
+    private final ButtonSetting showHealth;
+    private final ButtonSetting showInvis;
+    private final ButtonSetting removeTags;
+    private final ButtonSetting renderFriends;
+    private final ButtonSetting renderEnemies;
 
     public Nametags() {
         super("Nametags", Module.category.render, 0);
@@ -116,8 +116,8 @@ public class Nametags extends Module { // skidded from raven source code as well
                 getWorldRenderer.begin(7, DefaultVertexFormats.POSITION_COLOR);
                 getWorldRenderer.pos(-n10 - 1, -1 + n9, 0.0).color(n11, n12, 0.0f, 0.25f).endVertex();
                 getWorldRenderer.pos(-n10 - 1, 8 + n9, 0.0).color(n11, n12, 0.0f, 0.25f).endVertex();
-                getWorldRenderer.pos(n10 + 1, (double) (8 + n9), 0.0).color(n11, n12, 0.0f, 0.25f).endVertex();
-                getWorldRenderer.pos(n10 + 1, (double) (-1 + n9), 0.0).color(n11, n12, 0.0f, 0.25f).endVertex();
+                getWorldRenderer.pos(n10 + 1, 8 + n9, 0.0).color(n11, n12, 0.0f, 0.25f).endVertex();
+                getWorldRenderer.pos(n10 + 1, -1 + n9, 0.0).color(n11, n12, 0.0f, 0.25f).endVertex();
                 getInstance.draw();
             }
             GlStateManager.enableTexture2D();

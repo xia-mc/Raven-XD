@@ -18,21 +18,21 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import java.awt.*;
 
 public class PlayerESP extends Module {
-    private DescriptionSetting types;
-    private SliderSetting red;
-    private SliderSetting green;
-    private SliderSetting blue;
-    private SliderSetting expand;
-    private SliderSetting xShift;
-    private ButtonSetting rainbow;
-    private ButtonSetting showInvis;
-    private ButtonSetting redOnDamage;
-    private ButtonSetting box;
-    private ButtonSetting shaded;
-    private ButtonSetting twoD;
-    private ButtonSetting health;
-    private ButtonSetting arrow;
-    private ButtonSetting ring;
+    private final DescriptionSetting types;
+    private final SliderSetting red;
+    private final SliderSetting green;
+    private final SliderSetting blue;
+    private final SliderSetting expand;
+    private final SliderSetting xShift;
+    private final ButtonSetting rainbow;
+    private final ButtonSetting showInvis;
+    private final ButtonSetting redOnDamage;
+    private final ButtonSetting box;
+    private final ButtonSetting shaded;
+    private final ButtonSetting twoD;
+    private final ButtonSetting health;
+    private final ButtonSetting arrow;
+    private final ButtonSetting ring;
     private int rgb_c = 0;
 
     public PlayerESP() {

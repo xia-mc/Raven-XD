@@ -15,18 +15,18 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class LongJump extends Module {
-    private SliderSetting mode;
-    private SliderSetting horizontalSpeed;
-    private SliderSetting verticalSpeed;
-    private SliderSetting boostTicks;
-    private ButtonSetting invertYaw;
+    private final SliderSetting mode;
+    private final SliderSetting horizontalSpeed;
+    private final SliderSetting verticalSpeed;
+    private final SliderSetting boostTicks;
+    private final ButtonSetting invertYaw;
     private int lastSlot = -1;
     private int ticks = -1;
     private boolean setSpeed;
     public static boolean stopModules;
     private boolean placed;
     private int waitTicks;
-    private String[] modes = new String[]{"Fireball", "AutoFireball"};
+    private final String[] modes = new String[]{"Fireball", "AutoFireball"};
     public LongJump() {
         super("Long Jump", category.movement);
         this.registerSetting(mode = new SliderSetting("Mode", modes, 0));

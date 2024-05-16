@@ -25,18 +25,18 @@ import java.util.List;
 import java.util.TimerTask;
 
 public class Xray extends Module {
-    private SliderSetting range;
-    private SliderSetting rate;
-    private ButtonSetting iron;
-    private ButtonSetting gold;
-    private ButtonSetting diamond;
-    private ButtonSetting emerald;
-    private ButtonSetting lapis;
-    private ButtonSetting redstone;
-    private ButtonSetting coal;
-    private ButtonSetting spawner;
-    private ButtonSetting obsidian;
-    private List<BlockPos> blocks = new ArrayList<>();
+    private final SliderSetting range;
+    private final SliderSetting rate;
+    private final ButtonSetting iron;
+    private final ButtonSetting gold;
+    private final ButtonSetting diamond;
+    private final ButtonSetting emerald;
+    private final ButtonSetting lapis;
+    private final ButtonSetting redstone;
+    private final ButtonSetting coal;
+    private final ButtonSetting spawner;
+    private final ButtonSetting obsidian;
+    private final List<BlockPos> blocks = new ArrayList<>();
     private long lastCheck = 0;
 
     public Xray() {

@@ -9,7 +9,9 @@ import java.awt.*;
 import java.io.IOException;
 
 public class Manager extends Module {
-    private ButtonSetting loadProfiles, openFolder, createProfile;
+    private final ButtonSetting loadProfiles;
+    private final ButtonSetting openFolder;
+    private final ButtonSetting createProfile;
 
     public Manager() {
         super("Manager", category.profiles);

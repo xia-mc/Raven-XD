@@ -32,19 +32,19 @@ import java.awt.*;
 
 public class BedAura extends Module {
     public SliderSetting mode;
-    private SliderSetting breakSpeed;
-    private SliderSetting fov;
-    private SliderSetting range;
-    private SliderSetting rate;
+    private final SliderSetting breakSpeed;
+    private final SliderSetting fov;
+    private final SliderSetting range;
+    private final SliderSetting rate;
     public ButtonSetting allowAutoBlock;
     public ButtonSetting allowKillAura;
-    private ButtonSetting breakBlockAbove;
+    private final ButtonSetting breakBlockAbove;
     public ButtonSetting groundSpoof;
-    private ButtonSetting onlyWhileVisible;
-    private ButtonSetting renderOutline;
-    private ButtonSetting sendAnimations;
-    private ButtonSetting silentSwing;
-    private String[] modes = new String[]{"Legit", "Instant", "Swap"};
+    private final ButtonSetting onlyWhileVisible;
+    private final ButtonSetting renderOutline;
+    private final ButtonSetting sendAnimations;
+    private final ButtonSetting silentSwing;
+    private final String[] modes = new String[]{"Legit", "Instant", "Swap"};
     private BlockPos[] bedPos;
     public float breakProgress;
     private int currentSlot = -1;
@@ -54,11 +54,11 @@ public class BedAura extends Module {
     private long lastCheck = 0;
     public boolean stopAutoblock;
     private int outlineColor = new Color(226, 65, 65).getRGB();
-    private int breakTickDelay = 5;
+    private final int breakTickDelay = 5;
     private int ticksAfterBreak = 0;
     private boolean delayStart;
     public double lastProgress;
-    private int defaultOutlineColor = new Color(226, 65, 65).getRGB();
+    private final int defaultOutlineColor = new Color(226, 65, 65).getRGB();
 
     public BedAura() {
         super("BedAura", category.player, 0);

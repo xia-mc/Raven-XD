@@ -7,12 +7,12 @@ import keystrokesmod.utility.Utils;
 import org.lwjgl.input.Keyboard;
 
 public class BHop extends Module {
-    private SliderSetting mode;
+    private final SliderSetting mode;
     public static SliderSetting speed;
-    private ButtonSetting waterDisable;
-    private ButtonSetting sneakDisable;
-    private ButtonSetting stopMotion;
-    private String[] modes = new String[]{"Strafe", "Ground"};
+    private final ButtonSetting waterDisable;
+    private final ButtonSetting sneakDisable;
+    private final ButtonSetting stopMotion;
+    private final String[] modes = new String[]{"Strafe", "Ground"};
     public boolean hopping;
 
     public BHop() {

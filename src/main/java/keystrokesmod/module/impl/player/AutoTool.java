@@ -10,10 +10,10 @@ import net.minecraft.util.MovingObjectPosition;
 import org.lwjgl.input.Mouse;
 
 public class AutoTool extends Module {
-    private SliderSetting hoverDelay;
-    private ButtonSetting rightDisable;
-    private ButtonSetting requireMouse;
-    private ButtonSetting swap;
+    private final SliderSetting hoverDelay;
+    private final ButtonSetting rightDisable;
+    private final ButtonSetting requireMouse;
+    private final ButtonSetting swap;
     private int previousSlot = -1;
     private int ticksHovered;
     private BlockPos currentBlock;

@@ -11,9 +11,9 @@ import java.io.IOException;
 import java.net.URI;
 
 public class Manager extends Module {
-    private ButtonSetting loadScripts;
-    private ButtonSetting openFolder;
-    private ButtonSetting viewDocumentation;
+    private final ButtonSetting loadScripts;
+    private final ButtonSetting openFolder;
+    private final ButtonSetting viewDocumentation;
     private long lastLoad;
     public final String documentationURL = "https://blowsy.gitbook.io/raven";
     public Manager() {

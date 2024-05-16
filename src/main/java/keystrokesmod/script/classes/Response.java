@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 
 public class Response {
-    private HttpURLConnection connection;
+    private final HttpURLConnection connection;
 
     protected Response(HttpURLConnection connection) {
         this.connection = connection;

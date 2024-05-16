@@ -3,9 +3,9 @@ package keystrokesmod.utility.profile;
 import keystrokesmod.module.Module;
 
 public class Profile {
-    private Module module;
+    private final Module module;
     private int bind = 0;
-    private String profileName;
+    private final String profileName;
 
     public Profile(String profileName, int bind) {
         this.profileName = profileName;

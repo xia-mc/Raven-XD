@@ -4,7 +4,7 @@ import net.minecraft.client.network.NetworkPlayerInfo;
 import net.minecraft.scoreboard.ScorePlayerTeam;
 
 public class NetworkPlayer {
-    private NetworkPlayerInfo networkPlayerInfo;
+    private final NetworkPlayerInfo networkPlayerInfo;
     protected NetworkPlayer(NetworkPlayerInfo networkPlayerInfo) {
         this.networkPlayerInfo = networkPlayerInfo;
     }

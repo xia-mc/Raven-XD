@@ -15,10 +15,10 @@ import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class BreakProgress extends Module {
-    private SliderSetting mode;
-    private ButtonSetting manual;
-    private ButtonSetting bedAura;
-    private String[] modes = new String[]{"Percentage", "Second", "Decimal"};
+    private final SliderSetting mode;
+    private final ButtonSetting manual;
+    private final ButtonSetting bedAura;
+    private final String[] modes = new String[]{"Percentage", "Second", "Decimal"};
     private float progress;
     private BlockPos block;
     private String progressStr;
@@ -55,7 +55,7 @@ public class BreakProgress extends Module {
     private void setProgress() {
         switch ((int) mode.getInput()) {
             case 0: {
-                this.progressStr = (int) (100.0 * (this.progress / 1.0)) + "%";
+                this.progressStr = (int) (100.0 * (this.progress)) + "%";
                 break;
             }
             case 1: {

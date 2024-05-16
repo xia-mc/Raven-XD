@@ -14,8 +14,8 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 public class SliderComponent extends Component {
-    private SliderSetting sliderSetting;
-    private ModuleComponent moduleComponent;
+    private final SliderSetting sliderSetting;
+    private final ModuleComponent moduleComponent;
     private int o;
     private int x;
     private int y;

@@ -11,7 +11,7 @@ import net.minecraft.util.BlockPos;
 import java.util.*;
 
 public class World {
-    private Minecraft mc = Minecraft.getMinecraft();
+    private final Minecraft mc = Minecraft.getMinecraft();
 
     public Block getBlockAt(int x, int y, int z) {
         net.minecraft.block.Block block = BlockUtils.getBlock(new BlockPos(x, y, z));

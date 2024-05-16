@@ -7,10 +7,10 @@ import net.minecraft.client.settings.KeyBinding;
 import org.lwjgl.input.Keyboard;
 
 public class KeyStrokeKeyRenderer {
-    private Minecraft a = Minecraft.getMinecraft();
-    private KeyBinding keyBinding;
-    private int c;
-    private int d;
+    private final Minecraft a = Minecraft.getMinecraft();
+    private final KeyBinding keyBinding;
+    private final int c;
+    private final int d;
     private boolean e = true;
     private long f = 0L;
     private int g = 255;

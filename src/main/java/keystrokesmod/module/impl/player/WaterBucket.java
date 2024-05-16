@@ -20,8 +20,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class WaterBucket extends Module {
     //private ButtonSetting pickup;
-    private ButtonSetting silentAim;
-    private ButtonSetting switchToItem;
+    private final ButtonSetting silentAim;
+    private final ButtonSetting switchToItem;
 
     public WaterBucket() {
         super("Water bucket", category.player, 0);

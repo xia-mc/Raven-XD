@@ -219,7 +219,7 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
         this.prevTimeInPortal = this.timeInPortal;
         if (this.inPortal) {
             if (this.mc.currentScreen != null && !this.mc.currentScreen.doesGuiPauseGame()) {
-                this.mc.displayGuiScreen((GuiScreen) null);
+                this.mc.displayGuiScreen(null);
             }
 
             if (this.timeInPortal == 0.0F) {
@@ -310,11 +310,11 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
 
         if (this.capabilities.isFlying && this.isCurrentViewEntity()) {
             if (this.movementInput.sneak) {
-                this.motionY -= (double) (this.capabilities.getFlySpeed() * 3.0F);
+                this.motionY -= this.capabilities.getFlySpeed() * 3.0F;
             }
 
             if (this.movementInput.jump) {
-                this.motionY += (double) (this.capabilities.getFlySpeed() * 3.0F);
+                this.motionY += this.capabilities.getFlySpeed() * 3.0F;
             }
         }
 

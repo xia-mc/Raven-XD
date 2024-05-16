@@ -13,7 +13,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent;
 import java.awt.*;
 
 public class DebugInfoRenderer extends net.minecraft.client.gui.Gui {
-    private static Minecraft mc = Minecraft.getMinecraft();
+    private static final Minecraft mc = Minecraft.getMinecraft();
 
     @SubscribeEvent
     public void onRenderTick(RenderTickEvent ev) {

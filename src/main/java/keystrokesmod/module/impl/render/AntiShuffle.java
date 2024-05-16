@@ -5,7 +5,7 @@ import keystrokesmod.module.setting.impl.DescriptionSetting;
 
 public class AntiShuffle extends Module {
     public static DescriptionSetting a;
-    private static String c = "§k";
+    private static final String c = "§k";
 
     public AntiShuffle() {
         super("AntiShuffle", Module.category.render, 0);

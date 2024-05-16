@@ -12,9 +12,9 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class NoFall extends Module {
     public SliderSetting mode;
-    private SliderSetting minFallDistance;
-    private ButtonSetting ignoreVoid;
-    private String[] modes = new String[]{"Spoof", "Extra", "NoGround"};
+    private final SliderSetting minFallDistance;
+    private final ButtonSetting ignoreVoid;
+    private final String[] modes = new String[]{"Spoof", "Extra", "NoGround"};
 
     public NoFall() {
         super("NoFall", category.player);

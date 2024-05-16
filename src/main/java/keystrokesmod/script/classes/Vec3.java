@@ -16,10 +16,7 @@ public class Vec3 {
         if (this == vector2) {
             return true;
         }
-        else if (this.x == vector2.x && this.y == vector2.y && this.z == vector2.z) {
-            return true;
-        }
-        return false;
+        else return this.x == vector2.x && this.y == vector2.y && this.z == vector2.z;
     }
 
     public Vec3 offset(double x, double y, double z) {

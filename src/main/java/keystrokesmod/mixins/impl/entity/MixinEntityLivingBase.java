@@ -29,11 +29,11 @@ public abstract class MixinEntityLivingBase extends Entity {
         super(worldIn);
     }
 
-    private final Map<Integer, PotionEffect> activePotionsMap = Maps.<Integer, PotionEffect>newHashMap();
+    private final Map<Integer, PotionEffect> activePotionsMap = Maps.newHashMap();
 
     @Shadow
     public PotionEffect getActivePotionEffect(Potion potionIn) {
-        return (PotionEffect) this.activePotionsMap.get(Integer.valueOf(potionIn.id));
+        return this.activePotionsMap.get(Integer.valueOf(potionIn.id));
     }
 
     @Shadow
@@ -106,13 +106,13 @@ public abstract class MixinEntityLivingBase extends Entity {
         this.motionY = jumpEvent.getMotionY();
 
         if (this.isPotionActive(Potion.jump)) {
-            this.motionY += (double) ((float) (this.getActivePotionEffect(Potion.jump).getAmplifier() + 1) * 0.1F);
+            this.motionY += (float) (this.getActivePotionEffect(Potion.jump).getAmplifier() + 1) * 0.1F;
         }
 
         if (this.isSprinting()) {
             float f = jumpEvent.getYaw() * 0.017453292F;
-            this.motionX -= (double) (MathHelper.sin(f) * 0.2F);
-            this.motionZ += (double) (MathHelper.cos(f) * 0.2F);
+            this.motionX -= MathHelper.sin(f) * 0.2F;
+            this.motionZ += MathHelper.cos(f) * 0.2F;
         }
 
         this.isAirBorne = true;

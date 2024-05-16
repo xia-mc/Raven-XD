@@ -20,14 +20,14 @@ import java.awt.*;
 
 public class Freecam extends Module {
     public static SliderSetting speed;
-    private ButtonSetting disableOnDamage;
-    private ButtonSetting showArm;
-    private ButtonSetting allowDigging;
-    private ButtonSetting allowInteracting;
-    private ButtonSetting allowPlacing;
+    private final ButtonSetting disableOnDamage;
+    private final ButtonSetting showArm;
+    private final ButtonSetting allowDigging;
+    private final ButtonSetting allowInteracting;
+    private final ButtonSetting allowPlacing;
     public static EntityOtherPlayerMP freeEntity = null;
     private int[] lcc = new int[]{Integer.MAX_VALUE, 0};
-    private float[] sAng = new float[]{0.0F, 0.0F};
+    private final float[] sAng = new float[]{0.0F, 0.0F};
 
     public Freecam() {
         super("Freecam", Module.category.player, 0);

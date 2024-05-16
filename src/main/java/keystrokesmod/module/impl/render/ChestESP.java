@@ -14,8 +14,13 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import java.awt.*;
 
 public class ChestESP extends Module {
-    private SliderSetting red, green, blue;
-    private ButtonSetting rainbow, outline, shade, disableIfOpened;
+    private final SliderSetting red;
+    private final SliderSetting green;
+    private final SliderSetting blue;
+    private final ButtonSetting rainbow;
+    private final ButtonSetting outline;
+    private final ButtonSetting shade;
+    private final ButtonSetting disableIfOpened;
 
     public ChestESP() {
         super("ChestESP", Module.category.render, 0);

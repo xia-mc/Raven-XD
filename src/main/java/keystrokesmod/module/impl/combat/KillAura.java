@@ -32,31 +32,31 @@ import static net.minecraft.util.EnumFacing.DOWN;
 
 public class KillAura extends Module {
     public static EntityLivingBase target;
-    private SliderSetting aps;
+    private final SliderSetting aps;
     public SliderSetting autoBlockMode;
-    private SliderSetting fov;
-    private SliderSetting attackRange;
-    private SliderSetting swingRange;
-    private SliderSetting blockRange;
-    private SliderSetting rotationMode;
-    private SliderSetting sortMode;
-    private SliderSetting switchDelay;
-    private SliderSetting targets;
-    private ButtonSetting targetInvis;
-    private ButtonSetting disableInInventory;
-    private ButtonSetting disableWhileBlocking;
-    private ButtonSetting disableWhileMining;
-    private ButtonSetting fixSlotReset;
-    private ButtonSetting hitThroughBlocks;
-    private ButtonSetting ignoreTeammates;
+    private final SliderSetting fov;
+    private final SliderSetting attackRange;
+    private final SliderSetting swingRange;
+    private final SliderSetting blockRange;
+    private final SliderSetting rotationMode;
+    private final SliderSetting sortMode;
+    private final SliderSetting switchDelay;
+    private final SliderSetting targets;
+    private final ButtonSetting targetInvis;
+    private final ButtonSetting disableInInventory;
+    private final ButtonSetting disableWhileBlocking;
+    private final ButtonSetting disableWhileMining;
+    private final ButtonSetting fixSlotReset;
+    private final ButtonSetting hitThroughBlocks;
+    private final ButtonSetting ignoreTeammates;
     public ButtonSetting manualBlock;
-    private ButtonSetting requireMouseDown;
-    private ButtonSetting silentSwing;
-    private ButtonSetting weaponOnly;
-    private String[] autoBlockModes = new String[]{"Manual", "Vanilla", "Post", "Interact", "Fake", "Partial"};
-    private String[] rotationModes = new String[]{"None", "Silent", "Lock view"};
-    private String[] sortModes = new String[]{"Health", "Hurttime", "Distance", "Yaw"};
-    private List<EntityLivingBase> availableTargets = new ArrayList<>();
+    private final ButtonSetting requireMouseDown;
+    private final ButtonSetting silentSwing;
+    private final ButtonSetting weaponOnly;
+    private final String[] autoBlockModes = new String[]{"Manual", "Vanilla", "Post", "Interact", "Fake", "Partial"};
+    private final String[] rotationModes = new String[]{"None", "Silent", "Lock view"};
+    private final String[] sortModes = new String[]{"Health", "Hurttime", "Distance", "Yaw"};
+    private final List<EntityLivingBase> availableTargets = new ArrayList<>();
     public AtomicBoolean block = new AtomicBoolean();
     private long lastSwitched = System.currentTimeMillis();
     private boolean switchTargets;
@@ -76,7 +76,7 @@ public class KillAura extends Module {
     public boolean blinking;
     public boolean lag;
     public boolean rmbDown;
-    private ConcurrentLinkedQueue<Packet> blinkedPackets = new ConcurrentLinkedQueue<>();
+    private final ConcurrentLinkedQueue<Packet> blinkedPackets = new ConcurrentLinkedQueue<>();
 
 
     public KillAura() {
@@ -447,10 +447,7 @@ public class KillAura extends Module {
         if (!Utils.nullCheck()) {
             return false;
         }
-        if (mc.thePlayer.isDead) {
-            return false;
-        }
-        return true;
+        return !mc.thePlayer.isDead;
     }
 
     private boolean settingCondition() {
@@ -463,10 +460,7 @@ public class KillAura extends Module {
         else if (isMining() && disableWhileMining.isToggled()) {
             return false;
         }
-        else if (mc.currentScreen != null && disableInInventory.isToggled()) {
-            return false;
-        }
-        return true;
+        else return mc.currentScreen == null || !disableInInventory.isToggled();
     }
 
     private boolean isMining() {

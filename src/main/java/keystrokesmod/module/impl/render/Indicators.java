@@ -26,16 +26,16 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Indicators extends Module {
-    private ButtonSetting renderArrows;
-    private ButtonSetting renderPearls;
-    private ButtonSetting renderFireballs;
-    private ButtonSetting renderPlayers;
-    private SliderSetting radius;
-    private ButtonSetting renderItem;
-    private ButtonSetting threatsOnly;
-    private ButtonSetting showInChat;
-    private HashSet<Entity> threats = new HashSet<>();
-    private Map<String, String> lastHeldItems = new ConcurrentHashMap<>();
+    private final ButtonSetting renderArrows;
+    private final ButtonSetting renderPearls;
+    private final ButtonSetting renderFireballs;
+    private final ButtonSetting renderPlayers;
+    private final SliderSetting radius;
+    private final ButtonSetting renderItem;
+    private final ButtonSetting threatsOnly;
+    private final ButtonSetting showInChat;
+    private final HashSet<Entity> threats = new HashSet<>();
+    private final Map<String, String> lastHeldItems = new ConcurrentHashMap<>();
 
     public Indicators() {
         super("Indicators", category.render);

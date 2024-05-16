@@ -14,11 +14,11 @@ import net.minecraftforge.client.event.MouseEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class RodAimbot extends Module {
-    private SliderSetting fov;
-    private SliderSetting predicatedTicks;
-    private SliderSetting distance;
-    private ButtonSetting aimInvis;
-    private ButtonSetting ignoreTeammates;
+    private final SliderSetting fov;
+    private final SliderSetting predicatedTicks;
+    private final SliderSetting distance;
+    private final ButtonSetting aimInvis;
+    private final ButtonSetting ignoreTeammates;
     public static boolean canceled;
     private static EntityPlayer entity;
 

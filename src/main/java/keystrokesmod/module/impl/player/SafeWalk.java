@@ -14,8 +14,8 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.lwjgl.input.Keyboard;
 
 public class SafeWalk extends Module {
-    private SliderSetting shiftDelay;
-    private SliderSetting motion;
+    private final SliderSetting shiftDelay;
+    private final SliderSetting motion;
     public static ButtonSetting shift, blocksOnly, pitchCheck, disableOnForward;
     private boolean isSneaking;
     private long b = 0L;
@@ -122,10 +122,7 @@ public class SafeWalk extends Module {
             if (pitchCheck.isToggled() && mc.thePlayer.rotationPitch < 70) {
                 return false;
             }
-            if (blocksOnly.isToggled() && (mc.thePlayer.getHeldItem() == null || !(mc.thePlayer.getHeldItem().getItem() instanceof ItemBlock))) {
-                return false;
-            }
-            return true;
+            return !blocksOnly.isToggled() || (mc.thePlayer.getHeldItem() != null && mc.thePlayer.getHeldItem().getItem() instanceof ItemBlock);
         }
         return false;
     }

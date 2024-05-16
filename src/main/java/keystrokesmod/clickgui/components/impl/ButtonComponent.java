@@ -12,9 +12,9 @@ import java.awt.*;
 
 public class ButtonComponent extends Component {
     private final int c = (new Color(20, 255, 0)).getRGB();
-    private Module mod;
-    private ButtonSetting buttonSetting;
-    private ModuleComponent p;
+    private final Module mod;
+    private final ButtonSetting buttonSetting;
+    private final ModuleComponent p;
     private int o;
     private int x;
     private int y;

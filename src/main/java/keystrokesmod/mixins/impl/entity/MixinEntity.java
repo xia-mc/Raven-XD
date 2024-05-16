@@ -237,7 +237,7 @@ public abstract class MixinEntity {
                 double d8 = z;
                 AxisAlignedBB axisalignedbb3 = this.getEntityBoundingBox();
                 this.setEntityBoundingBox(axisalignedbb);
-                y = (double) this.stepHeight;
+                y = this.stepHeight;
                 List<AxisAlignedBB> list = this.worldObj.getCollidingBoundingBoxes((Entity) ((Object) this), this.getEntityBoundingBox().addCoord(d3, y, d5));
                 AxisAlignedBB axisalignedbb4 = this.getEntityBoundingBox();
                 AxisAlignedBB axisalignedbb5 = axisalignedbb4.addCoord(d3, 0.0D, d5);
@@ -466,8 +466,8 @@ public abstract class MixinEntity {
             p_moveFlying_2_ *= f;
             float f1 = MathHelper.sin(yaw * 3.1415927F / 180.0F);
             float f2 = MathHelper.cos(yaw * 3.1415927F / 180.0F);
-            this.motionX += (double)(p_moveFlying_1_ * f2 - p_moveFlying_2_ * f1);
-            this.motionZ += (double)(p_moveFlying_2_ * f2 + p_moveFlying_1_ * f1);
+            this.motionX += p_moveFlying_1_ * f2 - p_moveFlying_2_ * f1;
+            this.motionZ += p_moveFlying_2_ * f2 + p_moveFlying_1_ * f1;
         }
 
         if((Object) this == Minecraft.getMinecraft().thePlayer) {

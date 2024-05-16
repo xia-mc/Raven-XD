@@ -26,10 +26,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Blink extends Module {
-    private ButtonSetting initialPosition;
-    private List<Packet> blinkedPackets = new ArrayList<>();
+    private final ButtonSetting initialPosition;
+    private final List<Packet> blinkedPackets = new ArrayList<>();
     private Vec3 pos;
-    private int color = new Color(0, 255, 0).getRGB();
+    private final int color = new Color(0, 255, 0).getRGB();
     public Blink() {
         super("Blink", category.player);
         this.registerSetting(initialPosition = new ButtonSetting("Show initial position", true));

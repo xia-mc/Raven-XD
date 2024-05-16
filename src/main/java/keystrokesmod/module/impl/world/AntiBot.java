@@ -85,14 +85,10 @@ public class AntiBot extends Module {
                 if (unformattedText.length() >= 7 && unformattedText.charAt(2) == '[' && unformattedText.charAt(3) == 'N' && unformattedText.charAt(6) == ']') {
                     return true;
                 }
-                if (entityPlayer.getName().contains(" ")) {
-                    return true;
-                }
+                return entityPlayer.getName().contains(" ");
             } else if (entityPlayer.isInvisible()) {
                 String unformattedText = entityPlayer.getDisplayName().getUnformattedText();
-                if (unformattedText.length() >= 3 && unformattedText.charAt(0) == '§' && unformattedText.charAt(1) == 'c') {
-                    return true;
-                }
+                return unformattedText.length() >= 3 && unformattedText.charAt(0) == '§' && unformattedText.charAt(1) == 'c';
             }
         }
         return false;

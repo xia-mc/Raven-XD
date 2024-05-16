@@ -31,14 +31,14 @@ public class BridgeInfo extends Module {
     public static DescriptionSetting a;
     public static ButtonSetting ep;
     private static final int rgb = (new Color(0, 200, 200)).getRGB();
-    private final String bd = new String("the brid");
-    private final String g1t = new String("Defend!");
-    private final String g2t = new String("Jump in to score!");
-    private final String qt = new String("First player to score 5 goals wins");
-    private final String t1 = new String("Enemy: ");
-    private final String t2 = new String("Distance to goal: ");
-    private final String t3 = new String("Enemy distance to goal: ");
-    private final String t4 = new String("Blocks: ");
+    private final String bd = "the brid";
+    private final String g1t = "Defend!";
+    private final String g2t = "Jump in to score!";
+    private final String qt = "First player to score 5 goals wins";
+    private final String t1 = "Enemy: ";
+    private final String t2 = "Distance to goal: ";
+    private final String t3 = "Enemy distance to goal: ";
+    private final String t4 = "Blocks: ";
     private static int hudX = 5;
     private static int hudY = 70;
     private String en = "";
@@ -51,7 +51,7 @@ public class BridgeInfo extends Module {
 
     public BridgeInfo() {
         super("Bridge Info", Module.category.minigames, 0);
-        this.registerSetting(a = new DescriptionSetting(new String("Only for solos.")));
+        this.registerSetting(a = new DescriptionSetting("Only for solos."));
         this.registerSetting(ep = new ButtonSetting("Edit position", false));
     }
 
@@ -88,12 +88,12 @@ public class BridgeInfo extends Module {
             }
 
             if (this.g1p != null && this.g2p != null) {
-                this.d1 = Utils.rnd(mc.thePlayer.getDistance((double) this.g2p.getX(), (double) this.g2p.getY(), (double) this.g2p.getZ()) - 1.4D, 1);
+                this.d1 = Utils.rnd(mc.thePlayer.getDistance(this.g2p.getX(), this.g2p.getY(), this.g2p.getZ()) - 1.4D, 1);
                 if (this.d1 < 0.0D) {
                     this.d1 = 0.0D;
                 }
 
-                this.d2 = enem == null ? 0.0D : Utils.rnd(enem.getDistance((double) this.g1p.getX(), (double) this.g1p.getY(), (double) this.g1p.getZ()) - 1.4D, 1);
+                this.d2 = enem == null ? 0.0D : Utils.rnd(enem.getDistance(this.g1p.getX(), this.g1p.getY(), this.g1p.getZ()) - 1.4D, 1);
                 if (this.d2 < 0.0D) {
                     this.d2 = 0.0D;
                 }
@@ -183,7 +183,7 @@ public class BridgeInfo extends Module {
     }
 
     static class eh extends GuiScreen {
-        final String a = new String("Enemy: Player123-Distance to goal: 17.2-Enemy distance to goal: 16.3-Blocks: 98");
+        final String a = "Enemy: Player123-Distance to goal: 17.2-Enemy distance to goal: 16.3-Blocks: 98";
         GuiButtonExt rp;
         boolean d = false;
         int miX = 0;
@@ -199,7 +199,7 @@ public class BridgeInfo extends Module {
 
         public void initGui() {
             super.initGui();
-            this.buttonList.add(this.rp = new GuiButtonExt(1, this.width - 90, 5, 85, 20, new String("Reset position")));
+            this.buttonList.add(this.rp = new GuiButtonExt(1, this.width - 90, 5, 85, 20, "Reset position"));
             this.aX = BridgeInfo.hudX;
             this.aY = BridgeInfo.hudY;
         }

@@ -16,22 +16,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Settings extends Module {
-    private DescriptionSetting general;
+    private final DescriptionSetting general;
     public static SliderSetting customCapes;
     public static ButtonSetting weaponAxe;
     public static ButtonSetting weaponRod;
     public static ButtonSetting weaponStick;
     public static ButtonSetting middleClickFriends;
-    private DescriptionSetting rotations;
+    private final DescriptionSetting rotations;
     public static ButtonSetting rotateBody;
     public static ButtonSetting fullBody;
     public static ButtonSetting movementFix;
     public static SliderSetting randomYawFactor;
-    private DescriptionSetting themeColors;
+    private final DescriptionSetting themeColors;
     public static SliderSetting timeMultiplier;
-    private DescriptionSetting profiles;
+    private final DescriptionSetting profiles;
     public static ButtonSetting sendMessage;
-    private String[] capes = new String[]{"None", "Anime", "Aqua", "Green", "Purple", "Red", "White", "Yellow"};
+    private final String[] capes = new String[]{"None", "Anime", "Aqua", "Green", "Purple", "Red", "White", "Yellow"};
     public static List<ResourceLocation> loadedCapes = new ArrayList<>();
 
     public Settings() {

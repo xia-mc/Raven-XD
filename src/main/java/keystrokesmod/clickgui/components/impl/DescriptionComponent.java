@@ -9,11 +9,11 @@ import org.lwjgl.opengl.GL11;
 import java.awt.*;
 
 public class DescriptionComponent extends Component {
-    private DescriptionSetting desc;
-    private ModuleComponent p;
+    private final DescriptionSetting desc;
+    private final ModuleComponent p;
     private int o;
-    private int x;
-    private int y;
+    private final int x;
+    private final int y;
 
     public DescriptionComponent(DescriptionSetting desc, ModuleComponent b, int o) {
         this.desc = desc;

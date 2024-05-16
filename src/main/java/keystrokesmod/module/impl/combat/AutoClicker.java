@@ -28,7 +28,7 @@ import java.lang.reflect.Method;
 import java.util.Random;
 
 public class AutoClicker extends Module {
-    private DescriptionSetting bestWithDelayRemover;
+    private final DescriptionSetting bestWithDelayRemover;
     public SliderSetting minCPS;
     public SliderSetting maxCPS;
     public SliderSetting jitter;
@@ -203,7 +203,7 @@ public class AutoClicker extends Module {
 
     public void gd() {
         double c = Utils.getRandomValue(minCPS, maxCPS, this.rand) + 0.4D * this.rand.nextDouble();
-        long d = (long) ((int) Math.round(1000.0D / c));
+        long d = (int) Math.round(1000.0D / c);
         if (System.currentTimeMillis() > this.k) {
             if (!this.n && this.rand.nextInt(100) >= 85) {
                 this.n = true;

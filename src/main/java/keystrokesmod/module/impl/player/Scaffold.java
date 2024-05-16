@@ -27,21 +27,21 @@ import java.util.Iterator;
 import java.util.Map;
 
 public class Scaffold extends Module { // from b4 :)
-    private SliderSetting forward;
-    private SliderSetting diagonal;
-    private SliderSetting rotation;
-    private SliderSetting fastScaffold;
-    private ButtonSetting autoSwap;
-    private ButtonSetting fastOnRMB;
-    private ButtonSetting highlightBlocks;
+    private final SliderSetting forward;
+    private final SliderSetting diagonal;
+    private final SliderSetting rotation;
+    private final SliderSetting fastScaffold;
+    private final ButtonSetting autoSwap;
+    private final ButtonSetting fastOnRMB;
+    private final ButtonSetting highlightBlocks;
     public ButtonSetting safeWalk;
-    private ButtonSetting showBlockCount;
-    private ButtonSetting accelerationCoolDown;
-    private ButtonSetting silentSwing;
+    private final ButtonSetting showBlockCount;
+    private final ButtonSetting accelerationCoolDown;
+    private final ButtonSetting silentSwing;
     private MovingObjectPosition placeBlock;
     private int lastSlot;
-    private String[] rotationModes = new String[]{"None", "Backwards", "Strict"};
-    private String[] fastScaffoldModes = new String[]{"Disabled", "Sprint"};
+    private final String[] rotationModes = new String[]{"None", "Backwards", "Strict"};
+    private final String[] fastScaffoldModes = new String[]{"Disabled", "Sprint"};
     public float placeYaw;
     public float placePitch;
     public int at;
@@ -50,7 +50,7 @@ public class Scaffold extends Module { // from b4 :)
     private int slowTicks;
     public boolean rmbDown;
     private int ticksAccelerated;
-    private Map<BlockPos, Timer> highlight = new HashMap<>();
+    private final Map<BlockPos, Timer> highlight = new HashMap<>();
     public Scaffold() {
         super("Scaffold", category.player);
         this.registerSetting(forward = new SliderSetting("Forward motion", 1.0, 0.5, 1.2, 0.01));

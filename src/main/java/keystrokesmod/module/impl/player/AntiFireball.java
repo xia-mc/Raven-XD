@@ -20,14 +20,14 @@ import org.lwjgl.input.Mouse;
 import java.util.HashSet;
 
 public class AntiFireball extends Module {
-    private SliderSetting fov;
-    private SliderSetting range;
-    private ButtonSetting disableWhileFlying;
-    private ButtonSetting blocksRotate;
-    private ButtonSetting projectileRotate;
+    private final SliderSetting fov;
+    private final SliderSetting range;
+    private final ButtonSetting disableWhileFlying;
+    private final ButtonSetting blocksRotate;
+    private final ButtonSetting projectileRotate;
     public ButtonSetting silentSwing;
     public EntityFireball fireball;
-    private HashSet<Entity> fireballs = new HashSet<>();
+    private final HashSet<Entity> fireballs = new HashSet<>();
     public boolean attack;
 
     public AntiFireball() {
@@ -144,9 +144,6 @@ public class AntiFireball extends Module {
         if (!Utils.nullCheck()) {
             return false;
         }
-        if (mc.thePlayer.capabilities.isFlying && disableWhileFlying.isToggled()) {
-            return false;
-        }
-        return true;
+        return !mc.thePlayer.capabilities.isFlying || !disableWhileFlying.isToggled();
     }
 }

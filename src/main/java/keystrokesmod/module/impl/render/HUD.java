@@ -21,9 +21,9 @@ import java.awt.*;
 import java.io.IOException;
 
 public class HUD extends Module {
-    private DescriptionSetting description;
+    private final DescriptionSetting description;
     public static SliderSetting theme;
-    private ButtonSetting editPosition;
+    private final ButtonSetting editPosition;
     public static ButtonSetting dropShadow;
     public static ButtonSetting alphabeticalSort;
     private static ButtonSetting alignRight;
@@ -129,7 +129,7 @@ public class HUD extends Module {
     }
 
     static class EditScreen extends GuiScreen {
-        final String example = new String("This is an-Example-HUD");
+        final String example = "This is an-Example-HUD";
         GuiButtonExt resetPosition;
         boolean d = false;
         int miX = 0;
@@ -145,7 +145,7 @@ public class HUD extends Module {
 
         public void initGui() {
             super.initGui();
-            this.buttonList.add(this.resetPosition = new GuiButtonExt(1, this.width - 90, 5, 85, 20, new String("Reset position")));
+            this.buttonList.add(this.resetPosition = new GuiButtonExt(1, this.width - 90, 5, 85, 20, "Reset position"));
             this.aX = HUD.hudX;
             this.aY = HUD.hudY;
         }

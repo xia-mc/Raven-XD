@@ -198,11 +198,7 @@ public class CategoryComponent {
             this.x(x - this.xx);
             this.y(y - this.yy);
         }
-        if (overCategory(x, y)) {
-            hovering = true;
-        } else {
-            hovering = false;
-        }
+        hovering = overCategory(x, y);
     }
 
     public boolean i(int x, int y) {

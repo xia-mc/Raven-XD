@@ -136,7 +136,7 @@ public class ModuleManager {
         this.addModule(new Gui());
         this.addModule(new Shaders());
         antiBot.enable();
-        Collections.sort(this.modules, Comparator.comparing(Module::getName));
+        Collections.sort(modules, Comparator.comparing(Module::getName));
     }
 
     public void addModule(Module m) {

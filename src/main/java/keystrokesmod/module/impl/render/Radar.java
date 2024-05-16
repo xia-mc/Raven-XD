@@ -16,10 +16,10 @@ import org.lwjgl.opengl.GL11;
 import java.awt.*;
 
 public class Radar extends Module {
-    private ButtonSetting showGUI;
-    private ButtonSetting tracerLines;
+    private final ButtonSetting showGUI;
+    private final ButtonSetting tracerLines;
     private int scale = 2;
-    private int rectColor = new Color(0, 0, 0, 125).getRGB();
+    private final int rectColor = new Color(0, 0, 0, 125).getRGB();
     public Radar() {
         super("Radar", category.render);
         this.registerSetting(showGUI = new ButtonSetting("Show in GUI", false));
@@ -50,7 +50,7 @@ public class Radar extends Module {
         Gui.drawRect(n - 1, n4, n3 + 1, n4 + 1, -1);
         Gui.drawRect(n - 1, n2, n, n4, -1);
         Gui.drawRect(n3, n2, n3 + 1, n4, -1);
-        RenderUtils.drawPolygon((double)(n3 / 2 + 3), (double)(n2 + 52), 5.0, 3, -1);
+        RenderUtils.drawPolygon(n3 / 2 + 3, n2 + 52, 5.0, 3, -1);
         GL11.glPushMatrix();
         GL11.glEnable(3089);
         GL11.glScissor(n * this.scale, mc.displayHeight - this.scale * 170, n3 * this.scale - this.scale * 5, this.scale * 100);
@@ -78,7 +78,7 @@ public class Radar extends Module {
                     GL11.glLineWidth(0.5f);
                     GL11.glColor3d(1.0, 1.0, 1.0);
                     GL11.glBegin(2);
-                    GL11.glVertex2d((double)(n3 / 2 + 3), (double)(n2 + 52));
+                    GL11.glVertex2d(n3 / 2 + 3, n2 + 52);
                     GL11.glVertex2d((double)(n3 / 2 + 3) - n7, (double)(n2 + 52) - n8);
                     GL11.glEnd();
                     GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);

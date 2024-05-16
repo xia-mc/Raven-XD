@@ -33,8 +33,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
 public class ScriptDefaults {
-    private static Minecraft mc = Minecraft.getMinecraft();
-    private static World world = new World();
+    private static final Minecraft mc = Minecraft.getMinecraft();
+    private static final World world = new World();
     public final Bridge bridge = new Bridge();
     private static final ScheduledExecutorService executor = Executors.newScheduledThreadPool(2);
     protected static Entity player;
@@ -367,7 +367,7 @@ public class ScriptDefaults {
     }
 
     public static class modules {
-        private String superName;
+        private final String superName;
 
         public modules(String superName) {
             this.superName = superName;

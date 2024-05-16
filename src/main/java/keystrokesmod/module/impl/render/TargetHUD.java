@@ -21,10 +21,10 @@ import java.awt.*;
 import static keystrokesmod.utility.RenderUtils.jelloRender;
 
 public class TargetHUD extends Module {
-    private DescriptionSetting description;
-    private SliderSetting theme;
-    private ButtonSetting renderEsp;
-    private ButtonSetting showStatus;
+    private final DescriptionSetting description;
+    private final SliderSetting theme;
+    private final ButtonSetting renderEsp;
+    private final ButtonSetting showStatus;
     private Timer fadeTimer;
     private Timer healthBarTimer = null;
     private EntityLivingBase target;

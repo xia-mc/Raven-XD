@@ -11,12 +11,12 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.lwjgl.input.Mouse;
 
 public class FastMine extends Module { // from b4 src
-    private DescriptionSetting description;
-    private SliderSetting delay;
+    private final DescriptionSetting description;
+    private final SliderSetting delay;
     public SliderSetting multiplier;
-    private SliderSetting mode;
+    private final SliderSetting mode;
     private float lastCurBlockDamageMP;
-    private String[] modes = new String[]{"Pre", "Post", "Increment"};
+    private final String[] modes = new String[]{"Pre", "Post", "Increment"};
 
     public FastMine() {
         super("FastMine", category.player);

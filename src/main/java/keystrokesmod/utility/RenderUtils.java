@@ -20,7 +20,7 @@ import java.awt.*;
 import java.lang.reflect.Field;
 
 public class RenderUtils {
-    private static Minecraft mc = Minecraft.getMinecraft();
+    private static final Minecraft mc = Minecraft.getMinecraft();
     public static boolean ring_c = false;
     private static float renderPartialTicks = 0.0f;
 
@@ -208,7 +208,7 @@ public class RenderUtils {
             GlStateManager.pushMatrix();
             if (type == 3) {
                 GL11.glTranslated(x, y - 0.2D, z);
-                GL11.glRotated((double) (-mc.getRenderManager().playerViewY), 0.0D, 1.0D, 0.0D);
+                GL11.glRotated(-mc.getRenderManager().playerViewY, 0.0D, 1.0D, 0.0D);
                 GlStateManager.disableDepth();
                 GL11.glScalef(0.03F + d, 0.03F + d, 0.03F + d);
                 int outline = Color.black.getRGB();
@@ -235,11 +235,11 @@ public class RenderUtils {
                 int i;
                 if (type == 4) {
                     EntityLivingBase en = (EntityLivingBase) e;
-                    double r = (double) (en.getHealth() / en.getMaxHealth());
+                    double r = en.getHealth() / en.getMaxHealth();
                     int b = (int) (74.0D * r);
                     int hc = r < 0.3D ? Color.red.getRGB() : (r < 0.5D ? Color.orange.getRGB() : (r < 0.7D ? Color.yellow.getRGB() : Color.green.getRGB()));
                     GL11.glTranslated(x, y - 0.2D, z);
-                    GL11.glRotated((double) (-mc.getRenderManager().playerViewY), 0.0D, 1.0D, 0.0D);
+                    GL11.glRotated(-mc.getRenderManager().playerViewY, 0.0D, 1.0D, 0.0D);
                     GlStateManager.disableDepth();
                     GL11.glScalef(0.03F + d, 0.03F + d, 0.03F + d);
                     i = (int) (21.0D + shift * 2.0D);
@@ -260,18 +260,18 @@ public class RenderUtils {
                     float b = (float) (color & 255) / 255.0F;
                     if (type == 5) {
                         GL11.glTranslated(x, y - 0.2D, z);
-                        GL11.glRotated((double) (-mc.getRenderManager().playerViewY), 0.0D, 1.0D, 0.0D);
+                        GL11.glRotated(-mc.getRenderManager().playerViewY, 0.0D, 1.0D, 0.0D);
                         GlStateManager.disableDepth();
                         GL11.glScalef(0.03F + d, 0.03F, 0.03F + d);
                         int base = 1;
                         d2p(0.0D, 95.0D, 10, 3, Color.black.getRGB());
 
                         for (i = 0; i < 6; ++i) {
-                            d2p(0.0D, (double) (95 + (10 - i)), 3, 4, Color.black.getRGB());
+                            d2p(0.0D, 95 + (10 - i), 3, 4, Color.black.getRGB());
                         }
 
                         for (i = 0; i < 7; ++i) {
-                            d2p(0.0D, (double) (95 + (10 - i)), 2, 4, color);
+                            d2p(0.0D, 95 + (10 - i), 2, 4, color);
                         }
 
                         d2p(0.0D, 95.0D, 8, 3, color);
@@ -416,7 +416,7 @@ public class RenderUtils {
             GL11.glLineWidth(lw);
             GL11.glColor4f(r, g, b, a);
             GL11.glBegin(2);
-            GL11.glVertex3d(0.0D, (double) mc.thePlayer.getEyeHeight(), 0.0D);
+            GL11.glVertex3d(0.0D, mc.thePlayer.getEyeHeight(), 0.0D);
             GL11.glVertex3d(x, y, z);
             GL11.glEnd();
             GL11.glDisable(3042);
@@ -458,10 +458,10 @@ public class RenderUtils {
         Tessellator tessellator = Tessellator.getInstance();
         WorldRenderer worldrenderer = tessellator.getWorldRenderer();
         worldrenderer.begin(7, DefaultVertexFormats.POSITION_COLOR);
-        worldrenderer.pos((double) right, (double) top, 0.0D).color(f1, f2, f3, f).endVertex();
-        worldrenderer.pos((double) left, (double) top, 0.0D).color(f1, f2, f3, f).endVertex();
-        worldrenderer.pos((double) left, (double) bottom, 0.0D).color(f5, f6, f7, f4).endVertex();
-        worldrenderer.pos((double) right, (double) bottom, 0.0D).color(f5, f6, f7, f4).endVertex();
+        worldrenderer.pos(right, top, 0.0D).color(f1, f2, f3, f).endVertex();
+        worldrenderer.pos(left, top, 0.0D).color(f1, f2, f3, f).endVertex();
+        worldrenderer.pos(left, bottom, 0.0D).color(f5, f6, f7, f4).endVertex();
+        worldrenderer.pos(right, bottom, 0.0D).color(f5, f6, f7, f4).endVertex();
         tessellator.draw();
         GlStateManager.shadeModel(7424);
         GlStateManager.disableBlend();
@@ -619,19 +619,19 @@ public class RenderUtils {
         GL11.glBegin(9);
         glColor(n6);
         for (int i = 0; i <= 90; i += 3) {
-            final double n9 = (double) (i * 0.017453292f);
+            final double n9 = i * 0.017453292f;
             GL11.glVertex2d((double) (n + n5) + Math.sin(n9) * n5 * -1.0, (double) (n2 + n5) + Math.cos(n9) * n5 * -1.0);
         }
         for (int j = 90; j <= 180; j += 3) {
-            final double n10 = (double) (j * 0.017453292f);
+            final double n10 = j * 0.017453292f;
             GL11.glVertex2d((double) (n + n5) + Math.sin(n10) * n5 * -1.0, (double) (n4 - n5) + Math.cos(n10) * n5 * -1.0);
         }
         for (int k = 0; k <= 90; k += 3) {
-            final double n11 = (double) (k * 0.017453292f);
+            final double n11 = k * 0.017453292f;
             GL11.glVertex2d((double) (n3 - n5) + Math.sin(n11) * n5, (double) (n4 - n5) + Math.cos(n11) * n5);
         }
         for (int l = 90; l <= 180; l += 3) {
-            final double n12 = (double) (l * 0.017453292f);
+            final double n12 = l * 0.017453292f;
             GL11.glVertex2d((double) (n3 - n5) + Math.sin(n12) * n5, (double) (n2 + n5) + Math.cos(n12) * n5);
         }
         GL11.glEnd();
@@ -643,22 +643,22 @@ public class RenderUtils {
             glColor(n7);
         }
         for (int n13 = 0; n13 <= 90; n13 += 3) {
-            final double n14 = (double) (n13 * 0.017453292f);
+            final double n14 = n13 * 0.017453292f;
             GL11.glVertex2d((double) (n + n5) + Math.sin(n14) * n5 * -1.0, (double) (n2 + n5) + Math.cos(n14) * n5 * -1.0);
         }
         for (int n15 = 90; n15 <= 180; n15 += 3) {
-            final double n16 = (double) (n15 * 0.017453292f);
+            final double n16 = n15 * 0.017453292f;
             GL11.glVertex2d((double) (n + n5) + Math.sin(n16) * n5 * -1.0, (double) (n4 - n5) + Math.cos(n16) * n5 * -1.0);
         }
         if (n8 != 0) {
             glColor(n8);
         }
         for (int n17 = 0; n17 <= 90; n17 += 3) {
-            final double n18 = (double) (n17 * 0.017453292f);
+            final double n18 = n17 * 0.017453292f;
             GL11.glVertex2d((double) (n3 - n5) + Math.sin(n18) * n5, (double) (n4 - n5) + Math.cos(n18) * n5);
         }
         for (int n19 = 90; n19 <= 180; n19 += 3) {
-            final double n20 = (double) (n19 * 0.017453292f);
+            final double n20 = n19 * 0.017453292f;
             GL11.glVertex2d((double) (n3 - n5) + Math.sin(n20) * n5, (double) (n2 + n5) + Math.cos(n20) * n5);
         }
         GL11.glEnd();
@@ -687,19 +687,19 @@ public class RenderUtils {
         GL11.glBegin(9);
         glColor(n6);
         for (int i = 0; i <= 90; i += 3) {
-            final double n7 = (double) (i * 0.017453292f);
+            final double n7 = i * 0.017453292f;
             GL11.glVertex2d((double) (n + n5) + Math.sin(n7) * n5 * -1.0, (double) (n2 + n5) + Math.cos(n7) * n5 * -1.0);
         }
         for (int j = 90; j <= 180; j += 3) {
-            final double n8 = (double) (j * 0.017453292f);
+            final double n8 = j * 0.017453292f;
             GL11.glVertex2d((double) (n + n5) + Math.sin(n8) * n5 * -1.0, (double) (n4 - n5) + Math.cos(n8) * n5 * -1.0);
         }
         for (int k = 0; k <= 90; k += 3) {
-            final double n9 = (double) (k * 0.017453292f);
+            final double n9 = k * 0.017453292f;
             GL11.glVertex2d((double) (n3 - n5) + Math.sin(n9) * n5, (double) (n4 - n5) + Math.cos(n9) * n5);
         }
         for (int l = 90; l <= 180; l += 3) {
-            final double n10 = (double) (l * 0.017453292f);
+            final double n10 = l * 0.017453292f;
             GL11.glVertex2d((double) (n3 - n5) + Math.sin(n10) * n5, (double) (n2 + n5) + Math.cos(n10) * n5);
         }
         GL11.glEnd();
@@ -731,22 +731,22 @@ public class RenderUtils {
         GL11.glShadeModel(7425);
         GL11.glBegin(9);
         for (int i = 0; i <= 90; i += 3) {
-            final double n10 = (double) (i * 0.017453292f);
+            final double n10 = i * 0.017453292f;
             GL11.glVertex2d((double) (x + n5) + Math.sin(n10) * n5 * -1.0, (double) (y + n5) + Math.cos(n10) * n5 * -1.0);
         }
         glColor(n7);
         for (int j = 90; j <= 180; j += 3) {
-            final double n11 = (double) (j * 0.017453292f);
+            final double n11 = j * 0.017453292f;
             GL11.glVertex2d((double) (x + n5) + Math.sin(n11) * n5 * -1.0, (double) (y2 - n5) + Math.cos(n11) * n5 * -1.0);
         }
         glColor(n8);
         for (int k = 0; k <= 90; k += 3) {
-            final double n12 = (double) (k * 0.017453292f);
+            final double n12 = k * 0.017453292f;
             GL11.glVertex2d((double) (x2 - n5) + Math.sin(n12) * n5, (double) (y2 - n5) + Math.cos(n12) * n5);
         }
         glColor(n9);
         for (int l = 90; l <= 180; l += 3) {
-            final double n13 = (double) (l * 0.017453292f);
+            final double n13 = l * 0.017453292f;
             GL11.glVertex2d((double) (x2 - n5) + Math.sin(n13) * n5, (double) (y + n5) + Math.cos(n13) * n5);
         }
         GL11.glEnd();

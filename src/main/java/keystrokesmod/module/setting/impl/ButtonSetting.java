@@ -4,7 +4,7 @@ import com.google.gson.JsonObject;
 import keystrokesmod.module.setting.Setting;
 
 public class ButtonSetting extends Setting {
-    private String name;
+    private final String name;
     private boolean isEnabled;
     public boolean isMethodButton;
     private Runnable method;

@@ -59,7 +59,7 @@ public class Utils {
 
     public static List<NetworkPlayerInfo> getTablist() {
         final ArrayList<NetworkPlayerInfo> list = new ArrayList<>(mc.getNetHandler().getPlayerInfoMap());
-        removeDuplicates((ArrayList) list);
+        removeDuplicates(list);
         list.remove(mc.getNetHandler().getPlayerInfo(mc.thePlayer.getUniqueID()));
         return list;
     }
@@ -110,13 +110,8 @@ public class Utils {
         fov *= 0.5;
         final double wrapAngleTo180_double = MathHelper.wrapAngleTo180_double((mc.thePlayer.rotationYaw - RotationUtils.angle(n2, n3)) % 360.0f);
         if (wrapAngleTo180_double > 0.0) {
-            if (wrapAngleTo180_double < fov) {
-                return true;
-            }
-        } else if (wrapAngleTo180_double > -fov) {
-            return true;
-        }
-        return false;
+            return wrapAngleTo180_double < fov;
+        } else return wrapAngleTo180_double > -fov;
     }
 
     public static void sendMessage(String txt) {
@@ -531,23 +526,23 @@ public class Utils {
 
     public static EntityLivingBase raytrace(final int n) {
         Entity entity = null;
-        MovingObjectPosition rayTrace = mc.thePlayer.rayTrace((double)n, 1.0f);
+        MovingObjectPosition rayTrace = mc.thePlayer.rayTrace(n, 1.0f);
         final Vec3 getPositionEyes = mc.thePlayer.getPositionEyes(1.0f);
         final float rotationYaw = mc.thePlayer.rotationYaw;
         final float rotationPitch = mc.thePlayer.rotationPitch;
         final float cos = MathHelper.cos(-rotationYaw * 0.017453292f - 3.1415927f);
         final float sin = MathHelper.sin(-rotationYaw * 0.017453292f - 3.1415927f);
         final float n2 = -MathHelper.cos(-rotationPitch * 0.017453292f);
-        final Vec3 vec3 = new Vec3((double)(sin * n2), (double)MathHelper.sin(-rotationPitch * 0.017453292f), (double)(cos * n2));
+        final Vec3 vec3 = new Vec3(sin * n2, MathHelper.sin(-rotationPitch * 0.017453292f), cos * n2);
         final Vec3 addVector = getPositionEyes.addVector(vec3.xCoord * (double)n, vec3.yCoord * (double)n, vec3.zCoord * (double)n);
         Vec3 vec4 = null;
         final List getEntitiesWithinAABBExcludingEntity = mc.theWorld.getEntitiesWithinAABBExcludingEntity(mc.getRenderViewEntity(), mc.getRenderViewEntity().getEntityBoundingBox().addCoord(vec3.xCoord * (double)n, vec3.yCoord * (double)n, vec3.zCoord * (double)n).expand(1.0, 1.0, 1.0));
-        double n3 = (double)n;
+        double n3 = n;
         for (int i = 0; i < getEntitiesWithinAABBExcludingEntity.size(); ++i) {
             final Entity entity2 = (Entity)getEntitiesWithinAABBExcludingEntity.get(i);
             if (entity2.canBeCollidedWith()) {
                 final float getCollisionBorderSize = entity2.getCollisionBorderSize();
-                final AxisAlignedBB expand = entity2.getEntityBoundingBox().expand((double)getCollisionBorderSize, (double)getCollisionBorderSize, (double)getCollisionBorderSize);
+                final AxisAlignedBB expand = entity2.getEntityBoundingBox().expand(getCollisionBorderSize, getCollisionBorderSize, getCollisionBorderSize);
                 final MovingObjectPosition calculateIntercept = expand.calculateIntercept(getPositionEyes, addVector);
                 if (expand.isVecInside(getPositionEyes)) {
                     if (0.0 < n3 || n3 == 0.0) {
@@ -592,7 +587,7 @@ public class Utils {
         if (d == 0) {
             return (double) Math.round(n);
         } else {
-            double p = Math.pow(10.0D, (double) d);
+            double p = Math.pow(10.0D, d);
             return (double) Math.round(n * p) / p;
         }
     }

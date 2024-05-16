@@ -14,14 +14,14 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 public class ViewPackets extends Module {
-    private ButtonSetting includeCancelled;
-    private ButtonSetting singlePlayer;
-    private ButtonSetting sent;
-    private ButtonSetting ignoreC00;
-    private ButtonSetting ignoreC03;
-    private ButtonSetting compactC03;
-    private ButtonSetting ignoreC0F;
-    private ButtonSetting received;
+    private final ButtonSetting includeCancelled;
+    private final ButtonSetting singlePlayer;
+    private final ButtonSetting sent;
+    private final ButtonSetting ignoreC00;
+    private final ButtonSetting ignoreC03;
+    private final ButtonSetting compactC03;
+    private final ButtonSetting ignoreC0F;
+    private final ButtonSetting received;
     private Packet packet;
     private long tick;
 
@@ -111,7 +111,7 @@ public class ViewPackets extends Module {
             final C08PacketPlayerBlockPlacement c08PacketPlayerBlockPlacement = (C08PacketPlayerBlockPlacement)packet;
             final String string2 = s + "\n&7Item: &b" + ((c08PacketPlayerBlockPlacement.getStack() == null) ? "null" : c08PacketPlayerBlockPlacement.getStack().getItem().getRegistryName().replace("minecraft:", "")) + "\n&7Direction: &b" + c08PacketPlayerBlockPlacement.getPlacedBlockDirection();
             final BlockPos getPosition = c08PacketPlayerBlockPlacement.getPosition();
-            s = string2 + "\n&7Position: &b" + getPosition.getX() + "&7, &b" + getPosition.getY() + "&7, &b" + getPosition.getZ() + "\n&7Offset: &b" + round((double)c08PacketPlayerBlockPlacement.getPlacedBlockOffsetX()) + "&7, &b" + round((double)c08PacketPlayerBlockPlacement.getPlacedBlockOffsetY()) + "&7, &b" + round(c08PacketPlayerBlockPlacement.getPlacedBlockOffsetZ());
+            s = string2 + "\n&7Position: &b" + getPosition.getX() + "&7, &b" + getPosition.getY() + "&7, &b" + getPosition.getZ() + "\n&7Offset: &b" + round(c08PacketPlayerBlockPlacement.getPlacedBlockOffsetX()) + "&7, &b" + round(c08PacketPlayerBlockPlacement.getPlacedBlockOffsetY()) + "&7, &b" + round(c08PacketPlayerBlockPlacement.getPlacedBlockOffsetZ());
         }
         else if (packet instanceof C02PacketUseEntity) {
             final C02PacketUseEntity c02PacketUseEntity = (C02PacketUseEntity)packet;
@@ -153,7 +153,7 @@ public class ViewPackets extends Module {
         }
         else if (packet instanceof C03PacketPlayer) {
             final C03PacketPlayer c03PacketPlayer = (C03PacketPlayer)packet;
-            s = s + "\n&7Position: &b" + round(c03PacketPlayer.getPositionX()) + "&7, &b" + round(c03PacketPlayer.getPositionY()) + "&7, &b" + round(c03PacketPlayer.getPositionZ()) + "\n&7Rotations: &b" + round((double)c03PacketPlayer.getYaw()) + "&7, &b" + round((double)c03PacketPlayer.getPitch()) + "\n&7Ground: " + formatBoolean(c03PacketPlayer.isOnGround()) + "\n&7Moving: " + formatBoolean(c03PacketPlayer.isMoving()) + "\n&7Rotating: " + formatBoolean(c03PacketPlayer.getRotating());
+            s = s + "\n&7Position: &b" + round(c03PacketPlayer.getPositionX()) + "&7, &b" + round(c03PacketPlayer.getPositionY()) + "&7, &b" + round(c03PacketPlayer.getPositionZ()) + "\n&7Rotations: &b" + round(c03PacketPlayer.getYaw()) + "&7, &b" + round(c03PacketPlayer.getPitch()) + "\n&7Ground: " + formatBoolean(c03PacketPlayer.isOnGround()) + "\n&7Moving: " + formatBoolean(c03PacketPlayer.isMoving()) + "\n&7Rotating: " + formatBoolean(c03PacketPlayer.getRotating());
         }
         return s + "\n&7Client tick: &e" + tick;
     }

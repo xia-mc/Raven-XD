@@ -25,11 +25,11 @@ import java.util.List;
 
 public class BedESP extends Module {
     public SliderSetting theme;
-    private SliderSetting range;
-    private SliderSetting rate;
-    private ButtonSetting firstBed;
+    private final SliderSetting range;
+    private final SliderSetting rate;
+    private final ButtonSetting firstBed;
     private BlockPos[] bed = null;
-    private List<BlockPos[]> beds = new ArrayList<>();
+    private final List<BlockPos[]> beds = new ArrayList<>();
     private long lastCheck = 0;
 
     public BedESP() {
@@ -127,7 +127,7 @@ public class BedESP extends Module {
         final float n5 = (e >> 16 & 0xFF) / 255.0f;
         final float n6 = (e >> 8 & 0xFF) / 255.0f;
         final float n7 = (e & 0xFF) / 255.0f;
-        GL11.glColor4d((double) n5, (double) n6, (double) n7, (double) n4);
+        GL11.glColor4d(n5, n6, n7, n4);
         AxisAlignedBB axisAlignedBB;
         if (array[0].getX() != array[1].getX()) {
             if (array[0].getX() > array[1].getX()) {

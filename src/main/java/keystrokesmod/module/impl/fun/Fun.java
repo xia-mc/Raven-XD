@@ -59,11 +59,11 @@ public class Fun {
         public static ButtonSetting b;
         public static ButtonSetting d;
         public static ButtonSetting e;
-        private boolean s = false;
+        private final boolean s = false;
 
         public SlyPort() {
             super("SlyPort", Module.category.fun, 0);
-            this.registerSetting(f = new DescriptionSetting(new String("Teleport behind enemies.")));
+            this.registerSetting(f = new DescriptionSetting("Teleport behind enemies."));
             this.registerSetting(r = new SliderSetting("Range", 6.0D, 2.0D, 15.0D, 1.0D));
             this.registerSetting(e = new ButtonSetting("Aim", true));
             this.registerSetting(b = new ButtonSetting("Play sound", true));
@@ -139,7 +139,7 @@ public class Fun {
             double x = mc.thePlayer.posX - vec.xCoord * 2.0D;
             double y = mc.thePlayer.posY + ((double) mc.thePlayer.getEyeHeight() - 0.2D);
             double z = mc.thePlayer.posZ - vec.zCoord * 2.0D;
-            mc.thePlayer.worldObj.spawnParticle(EnumParticleTypes.FLAME, x, y, z, 0.0D, 0.0D, 0.0D, new int[]{0});
+            mc.thePlayer.worldObj.spawnParticle(EnumParticleTypes.FLAME, x, y, z, 0.0D, 0.0D, 0.0D, 0);
         }
     }
 

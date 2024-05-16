@@ -13,9 +13,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CPSCalculator {
-    private static Minecraft mc = Minecraft.getMinecraft();
-    private static List<Long> a = new ArrayList();
-    private static List<Long> b = new ArrayList();
+    private static final Minecraft mc = Minecraft.getMinecraft();
+    private static final List<Long> a = new ArrayList();
+    private static final List<Long> b = new ArrayList();
     public static long LL = 0L;
     public static long LR = 0L;
 
@@ -58,12 +58,12 @@ public class CPSCalculator {
     }
 
     public static int f() {
-        a.removeIf(o -> (Long) o < System.currentTimeMillis() - 1000L);
+        a.removeIf(o -> o < System.currentTimeMillis() - 1000L);
         return a.size();
     }
 
     public static int i() {
-        b.removeIf(o -> (Long) o < System.currentTimeMillis() - 1000L);
+        b.removeIf(o -> o < System.currentTimeMillis() - 1000L);
         return b.size();
     }
 }

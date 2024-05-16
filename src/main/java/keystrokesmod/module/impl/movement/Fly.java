@@ -11,14 +11,14 @@ import org.apache.commons.lang3.RandomUtils;
 import org.lwjgl.input.Keyboard;
 
 public class Fly extends Module {
-    private SliderSetting mode;
+    private final SliderSetting mode;
     public static SliderSetting horizontalSpeed;
-    private SliderSetting verticalSpeed;
-    private ButtonSetting showBPS;
-    private ButtonSetting stopMotion;
+    private final SliderSetting verticalSpeed;
+    private final ButtonSetting showBPS;
+    private final ButtonSetting stopMotion;
     private boolean d;
     private boolean a = false;
-    private String[] modes = new String[]{"Vanilla", "Fast", "Fast 2"};
+    private final String[] modes = new String[]{"Vanilla", "Fast", "Fast 2"};
 
     public Fly() {
         super("Fly", category.movement);

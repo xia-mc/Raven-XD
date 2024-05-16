@@ -12,8 +12,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import java.util.HashMap;
 
 public class WTap extends Module {
-    private SliderSetting chance;
-    private ButtonSetting playersOnly;
+    private final SliderSetting chance;
+    private final ButtonSetting playersOnly;
     private final HashMap<Integer, Long> targets = new HashMap<>();
     public static boolean stopSprint = false;
     public WTap() {

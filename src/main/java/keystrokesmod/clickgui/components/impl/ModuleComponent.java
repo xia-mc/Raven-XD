@@ -27,7 +27,7 @@ public class ModuleComponent extends Component {
     public Module mod;
     public CategoryComponent categoryComponent;
     public int o;
-    private ArrayList<Component> settings;
+    private final ArrayList<Component> settings;
     public boolean po;
     private boolean hovering;
 
@@ -175,11 +175,7 @@ public class ModuleComponent extends Component {
                 c.drawScreen(x, y);
             }
         }
-        if (ii(x, y)) {
-            hovering = true;
-        } else {
-            hovering = false;
-        }
+        hovering = ii(x, y);
     }
 
     public String getName() {

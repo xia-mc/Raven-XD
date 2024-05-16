@@ -9,14 +9,14 @@ import keystrokesmod.utility.Utils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 public class AimAssist extends Module {
-    private SliderSetting speed;
-    private SliderSetting fov;
-    private SliderSetting distance;
-    private ButtonSetting clickAim;
-    private ButtonSetting weaponOnly;
-    private ButtonSetting aimInvis;
-    private ButtonSetting blatantMode;
-    private ButtonSetting ignoreTeammates;
+    private final SliderSetting speed;
+    private final SliderSetting fov;
+    private final SliderSetting distance;
+    private final ButtonSetting clickAim;
+    private final ButtonSetting weaponOnly;
+    private final ButtonSetting aimInvis;
+    private final ButtonSetting blatantMode;
+    private final ButtonSetting ignoreTeammates;
 
     public AimAssist() {
         super("AimAssist", category.combat, 0);

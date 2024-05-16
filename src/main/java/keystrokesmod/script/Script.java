@@ -80,7 +80,7 @@ public class Script {
                 catch (UnsupportedOperationException ex2) {}
                 list.add(s);
             }
-            boolean success = Raven.scriptManager.compiler.getTask(null, standardFileManager, bp, list, null, Arrays.asList(new ClassObject(this.scriptName, this.codeStr, this.extraLines))).call();
+            boolean success = Raven.scriptManager.compiler.getTask(null, standardFileManager, bp, list, null, Collections.singletonList(new ClassObject(this.scriptName, this.codeStr, this.extraLines))).call();
             if (!success) {
                 this.error = true;
                 return false;

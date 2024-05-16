@@ -6,8 +6,8 @@ import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.utility.Utils;
 
 public class VClip extends Module {
-    private SliderSetting distance;
-    private ButtonSetting sendMessage;
+    private final SliderSetting distance;
+    private final ButtonSetting sendMessage;
 
     public VClip() {
         super("VClip", Module.category.movement, 0);

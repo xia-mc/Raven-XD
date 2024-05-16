@@ -24,24 +24,24 @@ import java.util.List;
 import java.util.Map;
 
 public class InvManager extends Module {
-    private ButtonSetting autoArmor;
-    private SliderSetting autoArmorDelay;
-    private ButtonSetting autoSort;
-    private SliderSetting sortDelay;
-    private ButtonSetting stealChests;
-    private ButtonSetting customChest;
-    private ButtonSetting autoClose;
-    private SliderSetting stealerDelay;
-    private ButtonSetting inventoryCleaner;
-    private ButtonSetting middleClickToClean;
-    private SliderSetting cleanerDelay;
-    private SliderSetting swordSlot;
-    private SliderSetting blocksSlot;
-    private SliderSetting goldenAppleSlot;
-    private SliderSetting projectileSlot;
-    private SliderSetting speedPotionSlot;
-    private SliderSetting pearlSlot;
-    private String[] ignoreItems = {"stick", "flesh", "string", "cake", "mushroom", "flint", "compass", "dyePowder", "feather", "shears", "anvil", "torch", "seeds", "leather", "skull", "record"};
+    private final ButtonSetting autoArmor;
+    private final SliderSetting autoArmorDelay;
+    private final ButtonSetting autoSort;
+    private final SliderSetting sortDelay;
+    private final ButtonSetting stealChests;
+    private final ButtonSetting customChest;
+    private final ButtonSetting autoClose;
+    private final SliderSetting stealerDelay;
+    private final ButtonSetting inventoryCleaner;
+    private final ButtonSetting middleClickToClean;
+    private final SliderSetting cleanerDelay;
+    private final SliderSetting swordSlot;
+    private final SliderSetting blocksSlot;
+    private final SliderSetting goldenAppleSlot;
+    private final SliderSetting projectileSlot;
+    private final SliderSetting speedPotionSlot;
+    private final SliderSetting pearlSlot;
+    private final String[] ignoreItems = {"stick", "flesh", "string", "cake", "mushroom", "flint", "compass", "dyePowder", "feather", "shears", "anvil", "torch", "seeds", "leather", "skull", "record"};
     private int lastStole;
     private int lastSort;
     private int lastArmor;
@@ -448,10 +448,7 @@ public class InvManager extends Module {
         if (itemStack.getItem() instanceof ItemSword && getBestSword(null, (int) swordSlot.getInput()) != slot) {
             return true;
         }
-        if (itemStack.getItem() instanceof ItemArmor && getBestArmor(((ItemArmor) itemStack.getItem()).armorType, null) != slot) {
-            return true;
-        }
-        return false;
+        return itemStack.getItem() instanceof ItemArmor && getBestArmor(((ItemArmor) itemStack.getItem()).armorType, null) != slot;
     }
 
     private int getMostProjectiles(int desiredSlot) {
@@ -504,9 +501,6 @@ public class InvManager extends Module {
             return null;
         }
         ItemStack item = slot.getStack();
-        if (item == null) {
-            return null;
-        }
         return item;
     }
 
@@ -515,9 +509,6 @@ public class InvManager extends Module {
         if (block == null) {
             return false;
         }
-        if (BlockUtils.isInteractable(block) || block instanceof BlockSkull || block instanceof BlockLiquid || block instanceof BlockCactus || block instanceof BlockCarpet || block instanceof BlockTripWire || block instanceof BlockTripWireHook || block instanceof BlockTallGrass || block instanceof BlockFlower || block instanceof BlockFlowerPot || block instanceof BlockSign || block instanceof BlockLadder || block instanceof BlockTorch || block instanceof BlockRedstoneTorch || block instanceof BlockFence || block instanceof BlockPane || block instanceof BlockStainedGlassPane || block instanceof BlockGravel || block instanceof BlockClay || block instanceof BlockSand || block instanceof BlockSoulSand) {
-            return false;
-        }
-        return true;
+        return !BlockUtils.isInteractable(block) && !(block instanceof BlockSkull) && !(block instanceof BlockLiquid) && !(block instanceof BlockCactus) && !(block instanceof BlockCarpet) && !(block instanceof BlockTripWire) && !(block instanceof BlockTripWireHook) && !(block instanceof BlockTallGrass) && !(block instanceof BlockFlower) && !(block instanceof BlockFlowerPot) && !(block instanceof BlockSign) && !(block instanceof BlockLadder) && !(block instanceof BlockTorch) && !(block instanceof BlockRedstoneTorch) && !(block instanceof BlockFence) && !(block instanceof BlockPane) && !(block instanceof BlockStainedGlassPane) && !(block instanceof BlockGravel) && !(block instanceof BlockClay) && !(block instanceof BlockSand) && !(block instanceof BlockSoulSand);
     }
 }

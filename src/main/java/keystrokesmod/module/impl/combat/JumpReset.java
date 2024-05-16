@@ -8,8 +8,8 @@ import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class JumpReset extends Module {
-    private SliderSetting chance;
-    private SliderSetting motion;
+    private final SliderSetting chance;
+    private final SliderSetting motion;
     private boolean jump;
 
     public JumpReset() {

@@ -8,7 +8,7 @@ import org.lwjgl.input.Keyboard;
 
 public class Speed extends Module {
     public static SliderSetting speed;
-    private ButtonSetting strafeOnly;
+    private final ButtonSetting strafeOnly;
 
     public Speed() {
         super("Speed", Module.category.movement, 0);

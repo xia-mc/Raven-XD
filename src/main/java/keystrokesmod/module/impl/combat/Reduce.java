@@ -6,7 +6,7 @@ import keystrokesmod.module.setting.impl.SliderSetting;
 import net.minecraft.entity.Entity;
 
 public class Reduce extends Module {
-    private DescriptionSetting description;
+    private final DescriptionSetting description;
     private static SliderSetting chance;
     private static SliderSetting reduction;
 

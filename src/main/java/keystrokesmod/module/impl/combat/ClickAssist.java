@@ -16,9 +16,16 @@ import org.lwjgl.input.Mouse;
 import java.awt.*;
 
 public class ClickAssist extends Module {
-    private DescriptionSetting description;
-    private SliderSetting chanceLeft, chanceRight;
-    private ButtonSetting rightClick, blocksOnly, weaponOnly, onlyWhileTargeting, aboveCPS, leftClick, disableInCreative;
+    private final DescriptionSetting description;
+    private final SliderSetting chanceLeft;
+    private final SliderSetting chanceRight;
+    private final ButtonSetting rightClick;
+    private final ButtonSetting blocksOnly;
+    private final ButtonSetting weaponOnly;
+    private final ButtonSetting onlyWhileTargeting;
+    private final ButtonSetting aboveCPS;
+    private final ButtonSetting leftClick;
+    private final ButtonSetting disableInCreative;
     private Robot bot;
     private boolean ignNL = false;
     private boolean ignNR = false;

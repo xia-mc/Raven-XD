@@ -16,14 +16,14 @@ import net.minecraft.util.BlockPos;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class NoSlow extends Module {
-    private DescriptionSetting defaultSlowed;
+    private final DescriptionSetting defaultSlowed;
     public static SliderSetting mode;
     public static SliderSetting slowed;
     public static ButtonSetting disableBow;
     public static ButtonSetting disablePotions;
     public static ButtonSetting swordOnly;
     public static ButtonSetting vanillaSword;
-    private String[] modes = new String[]{"Vanilla", "Pre", "Post", "Alpha"};
+    private final String[] modes = new String[]{"Vanilla", "Pre", "Post", "Alpha"};
     private boolean postPlace;
 
     public NoSlow() {

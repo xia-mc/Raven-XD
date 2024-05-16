@@ -8,8 +8,9 @@ import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.utility.Utils;
 
 public class ProfileModule extends Module {
-    private ButtonSetting saveProfile, removeProfile;
-    private Profile profile;
+    private final ButtonSetting saveProfile;
+    private final ButtonSetting removeProfile;
+    private final Profile profile;
     public boolean saved = true;
 
     public ProfileModule(Profile profile, String name, int bind) {

@@ -63,7 +63,7 @@ public class PreMotionEvent extends Event {
 
     public void setYaw(float yaw) {
         this.yaw = yaw;
-        this.setRenderYaw = true;
+        setRenderYaw = true;
     }
 
     public void setPitch(float pitch) {
@@ -79,7 +79,7 @@ public class PreMotionEvent extends Event {
     }
 
     public void setRenderYaw(boolean setRenderYaw) {
-        this.setRenderYaw = setRenderYaw;
+        PreMotionEvent.setRenderYaw = setRenderYaw;
     }
     public boolean isSprinting() {
         return isSprinting;

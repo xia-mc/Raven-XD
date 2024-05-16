@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 public class Json {
-    private JsonObject jsonObject;
+    private final JsonObject jsonObject;
 
     public Json(String jsonString) {
         this.jsonObject = (new JsonParser()).parse(jsonString).getAsJsonObject();

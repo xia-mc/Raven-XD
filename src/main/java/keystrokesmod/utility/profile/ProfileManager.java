@@ -2,6 +2,7 @@ package keystrokesmod.utility.profile;
 
 import com.google.gson.*;
 import keystrokesmod.Raven;
+import keystrokesmod.clickgui.ClickGui;
 import keystrokesmod.clickgui.components.impl.CategoryComponent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
@@ -238,7 +239,7 @@ public class ProfileManager {
                 }
             }
 
-            for (CategoryComponent categoryComponent : Raven.clickGui.categories) {
+            for (CategoryComponent categoryComponent : ClickGui.categories) {
                 if (categoryComponent.categoryName == Module.category.profiles) {
                     categoryComponent.reloadModules(true);
                 }

@@ -20,7 +20,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ItemESP extends Module { // entirely skidded from raven b4 source leak
-    private ButtonSetting renderIron, renderGold;
+    private final ButtonSetting renderIron;
+    private final ButtonSetting renderGold;
 
     public ItemESP() {
         super("ItemESP", category.render);

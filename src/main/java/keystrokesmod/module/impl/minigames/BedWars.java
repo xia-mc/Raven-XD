@@ -20,15 +20,15 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class BedWars extends Module {
     public static ButtonSetting whitelistOwnBed;
-    private ButtonSetting diamondArmor;
-    private ButtonSetting enderPearl;
-    private ButtonSetting obsidian;
-    private ButtonSetting shouldPing;
+    private final ButtonSetting diamondArmor;
+    private final ButtonSetting enderPearl;
+    private final ButtonSetting obsidian;
+    private final ButtonSetting shouldPing;
     private BlockPos spawnPos;
     private boolean check;
     public static boolean outsideSpawn = true;
-    private List<String> armoredPlayer = new ArrayList<>();
-    private Map<String, String> lastHeldMap = new ConcurrentHashMap<>();
+    private final List<String> armoredPlayer = new ArrayList<>();
+    private final Map<String, String> lastHeldMap = new ConcurrentHashMap<>();
 
     public BedWars() {
         super("Bed Wars", category.minigames);

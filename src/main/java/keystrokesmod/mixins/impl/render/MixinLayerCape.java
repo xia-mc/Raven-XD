@@ -44,8 +44,8 @@ public class MixinLayerCape {
             } else {
                 lvt_15_1_ = p_doRenderLayer_1_.prevRenderYawOffset + (p_doRenderLayer_1_.renderYawOffset - p_doRenderLayer_1_.prevRenderYawOffset) * p_doRenderLayer_4_;
             }
-            double lvt_16_1_ = (double)MathHelper.sin(lvt_15_1_ * 3.1415927F / 180.0F);
-            double lvt_18_1_ = (double)(-MathHelper.cos(lvt_15_1_ * 3.1415927F / 180.0F));
+            double lvt_16_1_ = MathHelper.sin(lvt_15_1_ * 3.1415927F / 180.0F);
+            double lvt_18_1_ = -MathHelper.cos(lvt_15_1_ * 3.1415927F / 180.0F);
             float lvt_20_1_ = (float)lvt_11_1_ * 10.0F;
             lvt_20_1_ = MathHelper.clamp_float(lvt_20_1_, -6.0F, 32.0F);
             float lvt_21_1_ = (float)(lvt_9_1_ * lvt_16_1_ + lvt_13_1_ * lvt_18_1_) * 100.0F;

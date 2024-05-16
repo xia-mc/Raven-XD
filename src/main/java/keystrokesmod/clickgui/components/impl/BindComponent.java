@@ -12,7 +12,7 @@ import org.lwjgl.opengl.GL11;
 
 public class BindComponent extends Component {
     private boolean isBinding;
-    private ModuleComponent moduleComponent;
+    private final ModuleComponent moduleComponent;
     private int bind;
     private int x;
     private int y;

@@ -12,13 +12,13 @@ import net.minecraft.network.play.server.S27PacketExplosion;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class AntiKnockback extends Module {
-    private DescriptionSetting description;
-    private SliderSetting horizontal;
-    private SliderSetting vertical;
-    private ButtonSetting cancelExplosion;
-    private ButtonSetting damageBoost;
-    private SliderSetting boostMultiplier;
-    private ButtonSetting groundCheck;
+    private final DescriptionSetting description;
+    private final SliderSetting horizontal;
+    private final SliderSetting vertical;
+    private final ButtonSetting cancelExplosion;
+    private final ButtonSetting damageBoost;
+    private final SliderSetting boostMultiplier;
+    private final ButtonSetting groundCheck;
     public AntiKnockback() {
         super("AntiKnockback", category.combat);
         this.registerSetting(description = new DescriptionSetting("Overrides Velocity."));
