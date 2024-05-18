@@ -22,7 +22,11 @@ public class InvMove extends Module {
             KeyBinding.setKeyBindState(mc.gameSettings.keyBindRight.getKeyCode(), Keyboard.isKeyDown(mc.gameSettings.keyBindRight.getKeyCode()));
             KeyBinding.setKeyBindState(mc.gameSettings.keyBindLeft.getKeyCode(), Keyboard.isKeyDown(mc.gameSettings.keyBindLeft.getKeyCode()));
             KeyBinding.setKeyBindState(mc.gameSettings.keyBindJump.getKeyCode(), Keyboard.isKeyDown(mc.gameSettings.keyBindJump.getKeyCode()));
+            KeyBinding.setKeyBindState(mc.gameSettings.keyBindSprint.getKeyCode(), true);
             EntityPlayerSP var1;
+
+
+
             if (Keyboard.isKeyDown(208) && mc.thePlayer.rotationPitch < 90.0F) {
                 var1 = mc.thePlayer;
                 var1.rotationPitch += 6.0F;
