@@ -18,6 +18,8 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 import java.awt.*;
 
+import static keystrokesmod.utility.RenderUtils.jelloRender;
+
 public class TargetHUD extends Module {
     private DescriptionSetting description;
     private SliderSetting theme;
@@ -84,7 +86,11 @@ public class TargetHUD extends Module {
             return;
         }
         if (KillAura.target != null) {
-            RenderUtils.renderEntity(KillAura.target, 2, 0.0, 0.0, Theme.getGradient((int) theme.getInput(), 0), false);
+            EntityLivingBase target = KillAura.target;
+
+            Color color = new Color(255, 255, 255, 128);
+
+            jelloRender(target, target, color);
         }
     }
 
@@ -103,8 +109,8 @@ public class TargetHUD extends Module {
         final int n9 = n5 + (mc.fontRendererObj.FONT_HEIGHT + 5) - 6 + n2;
         final int n10 = (cd == null) ? 255 : (255 - cd.getValueInt(0, 255, 1));
         if (n10 > 0) {
-            final int n11 = (n10 > 110) ? 110 : n10;
-            final int n12 = (n10 > 210) ? 210 : n10;
+            final int n11 = Math.min(n10, 110);
+            final int n12 = Math.min(n10, 210);
             final int[] array = Theme.getGradients((int) theme.getInput());
             RenderUtils.drawRoundedGradientOutlinedRectangle((float) n6, (float) n7, (float) n8, (float) (n9 + 13), 10.0f, Utils.merge(Color.black.getRGB(), n11), Utils.merge(array[0], n10), Utils.merge(array[1], n10)); // outline
             final int n13 = n6 + 6;

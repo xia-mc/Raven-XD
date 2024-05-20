@@ -8,7 +8,6 @@ import keystrokesmod.clickgui.components.impl.ModuleComponent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.client.CommandLine;
 import keystrokesmod.module.impl.client.Gui;
-import keystrokesmod.module.setting.Setting;
 import keystrokesmod.utility.Commands;
 import keystrokesmod.utility.Timer;
 import keystrokesmod.utility.Utils;
@@ -40,7 +39,7 @@ public class ClickGui extends GuiScreen {
     public static ArrayList<CategoryComponent> categories;
 
     public ClickGui() {
-        categories = new ArrayList();
+        categories = new ArrayList<>();
         int y = 5;
         Module.category[] values;
         int length = (values = Module.category.values()).length;
@@ -58,9 +57,7 @@ public class ClickGui extends GuiScreen {
 
     public void initMain() {
         (this.aT = this.aE = this.aR = new Timer(500.0F)).start();
-        this.sf = Raven.getExecutor().schedule(() -> {
-            (this.aL = new Timer(650.0F)).start();
-        }, 650L, TimeUnit.MILLISECONDS);
+        this.sf = Raven.getExecutor().schedule(() -> (this.aL = new Timer(650.0F)).start(), 650L, TimeUnit.MILLISECONDS);
     }
 
     public void initGui() {
@@ -68,7 +65,7 @@ public class ClickGui extends GuiScreen {
         this.sr = new ScaledResolution(this.mc);
         (this.c = new GuiTextField(1, this.mc.fontRendererObj, 22, this.height - 100, 150, 20)).setMaxStringLength(256);
         this.buttonList.add(this.s = new GuiButtonExt(2, 22, this.height - 70, 150, 20, "Send"));
-        this.s.visible = CommandLine.a;
+        this.s.visible = CommandLine.isEnable;
     }
 
     public void drawScreen(int x, int y, float p) {
@@ -109,17 +106,17 @@ public class ClickGui extends GuiScreen {
         }
 
 
-        if (CommandLine.a) {
+        if (CommandLine.isEnable) {
             if (!this.s.visible) {
                 this.s.visible = true;
             }
 
-            r = CommandLine.animate.isToggled() ? CommandLine.an.getValueInt(0, 200, 2) : 200;
-            if (CommandLine.b) {
+            r = CommandLine.animate.isToggled() ? CommandLine.animationTimer.getValueInt(0, 200, 2) : 200;
+            if (CommandLine.isDisable) {
                 r = 200 - r;
                 if (r == 0) {
-                    CommandLine.b = false;
-                    CommandLine.a = false;
+                    CommandLine.isDisable = false;
+                    CommandLine.isEnable = false;
                     this.s.visible = false;
                 }
             }
@@ -134,21 +131,21 @@ public class ClickGui extends GuiScreen {
             this.s.xPosition = x2;
             this.c.drawTextBox();
             super.drawScreen(x, y, p);
-        } else if (CommandLine.b) {
-            CommandLine.b = false;
+        } else if (CommandLine.isDisable) {
+            CommandLine.isDisable = false;
         }
 
     }
 
     public void mouseClicked(int x, int y, int m) throws IOException {
-        Iterator var4 = categories.iterator();
+        Iterator<CategoryComponent> var4 = categories.iterator();
 
         while (true) {
             CategoryComponent category;
             do {
                 do {
                     if (!var4.hasNext()) {
-                        if (CommandLine.a) {
+                        if (CommandLine.isEnable) {
                             this.c.mouseClicked(x, y, m);
                             super.mouseClicked(x, y, m);
                         }
@@ -156,7 +153,7 @@ public class ClickGui extends GuiScreen {
                         return;
                     }
 
-                    category = (CategoryComponent) var4.next();
+                    category = var4.next();
                     if (category.v(x, y) && !category.i(x, y) && !category.d(x, y) && m == 0) {
                         category.d(true);
                         category.xx = x - category.getX();
@@ -182,9 +179,7 @@ public class ClickGui extends GuiScreen {
 
     public void mouseReleased(int x, int y, int s) {
         if (s == 0) {
-            Iterator<CategoryComponent> iterator = categories.iterator();
-            while (iterator.hasNext()) {
-                CategoryComponent category = iterator.next();
+            for (CategoryComponent category : categories) {
                 category.d(false);
                 if (category.fv() && !category.getModules().isEmpty()) {
                     for (Component module : category.getModules()) {
@@ -200,17 +195,14 @@ public class ClickGui extends GuiScreen {
         if (k == Keyboard.KEY_ESCAPE && !binding()) {
             this.mc.displayGuiScreen(null);
         } else {
-            Iterator<CategoryComponent> iterator = categories.iterator();
-            while (iterator.hasNext()) {
-                CategoryComponent category = iterator.next();
-
+            for (CategoryComponent category : categories) {
                 if (category.fv() && !category.getModules().isEmpty()) {
                     for (Component module : category.getModules()) {
                         module.keyTyped(t, k);
                     }
                 }
             }
-            if (CommandLine.a) {
+            if (CommandLine.isEnable) {
                 String cm = this.c.getText();
                 if (k == 28 && !cm.isEmpty()) {
                     Commands.rCMD(this.c.getText());
