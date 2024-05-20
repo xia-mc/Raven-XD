@@ -7,13 +7,8 @@ import keystrokesmod.utility.BlockUtils;
 import keystrokesmod.utility.RenderUtils;
 import keystrokesmod.utility.Utils;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockBed;
-import net.minecraft.block.properties.IProperty;
-import net.minecraft.block.state.BlockState;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumFacing;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -22,7 +17,6 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.TimerTask;
 
 public class Xray extends Module {
     private final SliderSetting range;
@@ -94,18 +88,11 @@ public class Xray extends Module {
         }
         if (!this.blocks.isEmpty()) {
             Iterator iterator = blocks.iterator();
-
             while (iterator.hasNext()) {
                 BlockPos blockPos = (BlockPos) iterator.next();
                 Block block = BlockUtils.getBlock(blockPos);
                 if (block == null || !canBreak(block)) {
                     iterator.remove();
-                    continue;
-                }
-                if (!iterator.hasNext()) {
-                    break;
-                }
-                if (blockPos == null) {
                     continue;
                 }
                 this.drawBox(blockPos);

@@ -1,9 +1,9 @@
 package keystrokesmod.script;
 
 import keystrokesmod.Raven;
-import keystrokesmod.clickgui.ClickGui;
 import keystrokesmod.clickgui.components.impl.CategoryComponent;
 import keystrokesmod.module.Module;
+import keystrokesmod.script.classes.Entity;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 
@@ -21,7 +21,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class ScriptManager {
-    private final Minecraft mc = Minecraft.getMinecraft();
+    protected static Entity localPlayer;
+    private Minecraft mc = Minecraft.getMinecraft();
     public HashMap<Script, Module> scripts = new LinkedHashMap<>();
     public JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
     public boolean d = true;
@@ -96,7 +97,7 @@ public class ScriptManager {
         for (Module module : this.scripts.values()) {
             module.disable();
         }
-        for (CategoryComponent categoryComponent : ClickGui.categories) {
+        for (CategoryComponent categoryComponent : Raven.clickGui.categories) {
             if (categoryComponent.categoryName == Module.category.scripts) {
                 categoryComponent.reloadModules(false);
             }

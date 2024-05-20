@@ -27,15 +27,20 @@ public class HitBox extends Module {
     public ButtonSetting showHitbox;
     public ButtonSetting playersOnly;
     public ButtonSetting weaponOnly;
-    private static Entity pE;
-    private static MovingObjectPosition mv;
+    private Entity pointedEntity;
+    private MovingObjectPosition mv;
 
     public HitBox() {
-        super("HitBox", Module.category.combat, 0);
-        this.registerSetting(multiplier = new SliderSetting("Multiplier", 1.2, 1.0, 5.0, 0.05));
+        super("HitBox", category.combat, 0);
+        this.registerSetting(multiplier = new SliderSetting("Multiplier", 1.2, 1.0, 5.0, 0.05, "x"));
         this.registerSetting(playersOnly = new ButtonSetting("Players only", true));
         this.registerSetting(showHitbox = new ButtonSetting("Show new hitbox", false));
         this.registerSetting(weaponOnly = new ButtonSetting("Weapon only", false));
+    }
+
+    @Override
+    public String getInfo() {
+        return ((int) multiplier.getInput() == multiplier.getInput() ? (int) multiplier.getInput() + "" : multiplier.getInput()) + multiplier.getInfo();
     }
 
     @SubscribeEvent
@@ -77,10 +82,10 @@ public class HitBox extends Module {
         return multiplier.getInput();
     }
 
-    public static EntityLivingBase getEntity(float partialTicks) {
+    public EntityLivingBase getEntity(float partialTicks) {
         if (mc.getRenderViewEntity() != null && mc.theWorld != null) {
             mc.pointedEntity = null;
-            pE = null;
+            pointedEntity = null;
             double d0 = mc.playerController.extendedReach() ? 6.0 : (ModuleManager.reach.isEnabled() ? Utils.getRandomValue(Reach.min, Reach.max, Utils.getRandom()) : 3.0);
             mv = mc.getRenderViewEntity().rayTrace(d0, partialTicks);
             double d2 = d0;
@@ -105,7 +110,7 @@ public class HitBox extends Module {
                     MovingObjectPosition mop = ax.calculateIntercept(vec3, vec5);
                     if (ax.isVecInside(vec3)) {
                         if (0.0D < d3 || d3 == 0.0D) {
-                            pE = entity;
+                            pointedEntity = entity;
                             vec6 = mop == null ? vec3 : mop.hitVec;
                             d3 = 0.0D;
                         }
@@ -114,11 +119,11 @@ public class HitBox extends Module {
                         if (d4 < d3 || d3 == 0.0D) {
                             if (entity == mc.getRenderViewEntity().ridingEntity && !entity.canRiderInteract()) {
                                 if (d3 == 0.0D) {
-                                    pE = entity;
+                                    pointedEntity = entity;
                                     vec6 = mop.hitVec;
                                 }
                             } else {
-                                pE = entity;
+                                pointedEntity = entity;
                                 vec6 = mop.hitVec;
                                 d3 = d4;
                             }
@@ -127,10 +132,10 @@ public class HitBox extends Module {
                 }
             }
 
-            if (pE != null && (d3 < d2 || mv == null)) {
-                mv = new MovingObjectPosition(pE, vec6);
-                if (pE instanceof EntityLivingBase || pE instanceof EntityItemFrame) {
-                    return (EntityLivingBase) pE;
+            if (pointedEntity != null && (d3 < d2 || mv == null)) {
+                mv = new MovingObjectPosition(pointedEntity, vec6);
+                if (pointedEntity instanceof EntityLivingBase || pointedEntity instanceof EntityItemFrame) {
+                    return (EntityLivingBase) pointedEntity;
                 }
             }
         }

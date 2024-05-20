@@ -131,14 +131,14 @@ public class BedESP extends Module {
         AxisAlignedBB axisAlignedBB;
         if (array[0].getX() != array[1].getX()) {
             if (array[0].getX() > array[1].getX()) {
-                axisAlignedBB = new AxisAlignedBB(n - 1.0, n2, n3, n + 1.0, n2 + 1.0, n3 + 1.0);
+                axisAlignedBB = new AxisAlignedBB(n - 1.0, n2, n3, n + 1.0, n2 + 0.5625F, n3 + 1.0);
             } else {
-                axisAlignedBB = new AxisAlignedBB(n, n2, n3, n + 2.0, n2 + 1.0, n3 + 1.0);
+                axisAlignedBB = new AxisAlignedBB(n, n2, n3, n + 2.0, n2 + 0.5625F, n3 + 1.0);
             }
         } else if (array[0].getZ() > array[1].getZ()) {
-            axisAlignedBB = new AxisAlignedBB(n, n2, n3 - 1.0, n + 1.0, n2 + 1.0, n3 + 1.0);
+            axisAlignedBB = new AxisAlignedBB(n, n2, n3 - 1.0, n + 1.0, n2 + 0.5625F, n3 + 1.0);
         } else {
-            axisAlignedBB = new AxisAlignedBB(n, n2, n3, n + 1.0, n2 + 1.0, n3 + 2.0);
+            axisAlignedBB = new AxisAlignedBB(n, n2, n3, n + 1.0, n2 + 0.5625F, n3 + 2.0);
         }
         RenderUtils.drawBoundingBox(axisAlignedBB, n5, n6, n7);
         GL11.glEnable(3553);

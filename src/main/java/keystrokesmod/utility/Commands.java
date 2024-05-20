@@ -243,7 +243,7 @@ public class Commands {
                 for (Module module : Raven.getModuleManager().getModules()) {
                     String name = module.getName().toLowerCase().replace(" ", "");
                     if (name.equals(args[1].toLowerCase())) {
-                        module.setVisibility(false);
+                        module.setHidden(true);
                         print("&a" + module.getName() + " is now hidden in HUD", 1);
                     }
                 }
@@ -261,7 +261,7 @@ public class Commands {
                 for (Module module : Raven.getModuleManager().getModules()) {
                     String name = module.getName().toLowerCase().replace(" ", "");
                     if (name.equals(args[1].toLowerCase())) {
-                        module.setVisibility(true);
+                        module.setHidden(false);
                         print("&a" + module.getName() + " is now visible in HUD", 1);
                     }
                 }

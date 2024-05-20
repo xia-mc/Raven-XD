@@ -10,7 +10,6 @@ import net.minecraft.network.play.server.S09PacketHeldItemChange;
 import net.minecraft.network.play.server.S0CPacketSpawnPlayer;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 public class BadPacketsHandler { // ensures you don't get banned
     public boolean C08;
@@ -19,16 +18,8 @@ public class BadPacketsHandler { // ensures you don't get banned
     public boolean C09;
     public boolean delayAttack;
     public boolean delay;
+    public int playerSlot = -1;
     public int serverSlot = -1;
-
-    @SubscribeEvent
-    public void onRenderTick(TickEvent.RenderTickEvent ev) {
-        if (!Utils.nullCheck()) {
-            if (ev.phase == TickEvent.Phase.END) {
-                this.serverSlot = -1;
-            }
-        }
-    }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onSendPacket(SendPacketEvent e) {
@@ -49,12 +40,12 @@ public class BadPacketsHandler { // ensures you don't get banned
             C07 = true;
         }
         else if (e.getPacket() instanceof C09PacketHeldItemChange) {
-            if (((C09PacketHeldItemChange) e.getPacket()).getSlotId() == serverSlot) {
+            if (((C09PacketHeldItemChange) e.getPacket()).getSlotId() == playerSlot && ((C09PacketHeldItemChange) e.getPacket()).getSlotId() == serverSlot) {
                 e.setCanceled(true);
                 return;
             }
             C09 = true;
-            serverSlot = ((C09PacketHeldItemChange) e.getPacket()).getSlotId();
+            serverSlot = playerSlot = ((C09PacketHeldItemChange) e.getPacket()).getSlotId();
         }
     }
 
@@ -70,7 +61,7 @@ public class BadPacketsHandler { // ensures you don't get banned
             if (((S0CPacketSpawnPlayer) e.getPacket()).getEntityID() != Minecraft.getMinecraft().thePlayer.getEntityId()) {
                 return;
             }
-            serverSlot = ((S0CPacketSpawnPlayer) e.getPacket()).getCurrentItemID();
+            this.playerSlot = -1;
         }
     }
 

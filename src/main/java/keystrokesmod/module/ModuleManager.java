@@ -37,7 +37,7 @@ public class ModuleManager {
     public static Module hitBox;
     public static Module reach;
     public static BedESP bedESP;
-    public static Module hud;
+    public static HUD hud;
     public static Module timer;
     public static Module fly;
     public static Module wTap;
@@ -74,6 +74,7 @@ public class ModuleManager {
         this.addModule(new AutoTool());
         this.addModule(fly = new Fly());
         this.addModule(new InvMove());
+        this.addModule(new Trajectories());
         this.addModule(potions = new Potions());
         this.addModule(new AutoSwap());
         this.addModule(keepSprint = new KeepSprint());

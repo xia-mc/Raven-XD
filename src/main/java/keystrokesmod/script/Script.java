@@ -25,7 +25,7 @@ public class Script {
 
     public Script(String name) {
         this.name = name;
-        this.scriptName = "sc_" + name.replace(" ", "") + "_" + Utils.generateRandomString(5);
+        this.scriptName = "sc_" + name.replace(" ", "").replace(")", "_").replace("(", "_") + "_" + Utils.generateRandomString(5);
     }
 
     public float[] getFloat(final String s, final Object... array) {
@@ -92,14 +92,6 @@ public class Script {
             return true;
         }
         catch (Exception ex) {
-            Utils.sendDebugMessage("§cRuntime error during script §b" + Utils.extractFileName(name));
-            if (ex.getCause() != null) {
-                Utils.sendDebugMessage(" §7err: §c" + ex.getCause().getClass().getSimpleName());
-            }
-            else {
-                Utils.sendDebugMessage(" §7err: §c" + ex.getClass().getSimpleName());
-            }
-            ex.printStackTrace();
             this.error = true;
             return !error;
         }
@@ -124,8 +116,8 @@ public class Script {
                     return ((boolean)invoke) ? 1 : 0;
                 }
             }
-            catch (IllegalAccessException | InvocationTargetException ex) {
-                ex.printStackTrace();
+            catch (Exception e) {
+                printRunTimeError(e, s);
             }
         }
         return -1;
@@ -174,11 +166,25 @@ public class Script {
                 return true;
             }
             catch (Exception e) {
-                Utils.sendDebugMessage("§cRuntime error during script §b" + Utils.extractFileName(name));
-                Utils.sendDebugMessage(" §7err: §c" + e.getCause().getClass().getSimpleName());
-                Utils.sendDebugMessage(" §7src: §c" + s);
+                printRunTimeError(e, s);
             }
         }
         return false;
+    }
+
+    private int getLine(Exception e, String name) {
+        for (StackTraceElement element : e.getStackTrace()) {
+            if (element.getClassName().equals(name)) {
+                return element.getLineNumber() - extraLines;
+            }
+        }
+        return 0;
+    }
+
+    private void printRunTimeError(Exception e, String methodName) {
+        Utils.sendDebugMessage("§cRuntime error during script §b" + Utils.extractFileName(this.name));
+        Utils.sendDebugMessage(" §7err: §c" + e.getCause().getClass().getSimpleName());
+        Utils.sendDebugMessage(" §7line: §c" + getLine((Exception) e.getCause(), this.scriptName));
+        Utils.sendDebugMessage(" §7src: §c" + methodName);
     }
 }

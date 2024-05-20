@@ -18,7 +18,7 @@ import java.util.List;
 public class Entity {
     public net.minecraft.entity.Entity entity;
     public String type;
-    public int entityId;
+    public int entityID;
 
     public Entity(net.minecraft.entity.Entity entity) {
         this.entity = entity;
@@ -26,7 +26,7 @@ public class Entity {
             return;
         }
         this.type = entity.getClass().getSimpleName();
-        this.entityId = entity.getEntityId();
+        this.entityID = entity.getEntityId();
     }
 
     public boolean allowEditing() {

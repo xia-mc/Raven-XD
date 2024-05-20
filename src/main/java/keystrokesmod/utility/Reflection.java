@@ -2,12 +2,19 @@ package keystrokesmod.utility;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
+import net.minecraft.client.gui.GuiEnchantment;
+import net.minecraft.client.gui.GuiScreenBook;
+import net.minecraft.client.gui.inventory.GuiBrewingStand;
+import net.minecraft.client.gui.inventory.GuiDispenser;
+import net.minecraft.client.gui.inventory.GuiFurnace;
 import net.minecraft.client.multiplayer.PlayerControllerMP;
 import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.entity.projectile.EntityArrow;
+import net.minecraft.inventory.*;
 import net.minecraft.network.play.client.C02PacketUseEntity;
 import net.minecraft.network.play.server.S08PacketPlayerPosLook;
 import net.minecraft.util.ResourceLocation;
@@ -20,8 +27,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class Reflection {
     public static Field button;
@@ -44,11 +50,24 @@ public class Reflection {
     public static Field S08PacketPlayerPosLookYaw;
     public static Field S08PacketPlayerPosLookPitch;
     public static Field C02PacketUseEntityEntityId;
+    public static Field bookContents;
+    public static HashMap<Class, Field> containerInventoryPlayer = new HashMap<>();
+    private static List<Class> containerClasses = new ArrayList<>();
     public static boolean sendMessage = false;
     public static Map<KeyBinding, String> keyBindings = new HashMap<>();
 
     public static void getFields() {
         try {
+
+            containerClasses.add(GuiFurnace.class);
+            containerClasses.add(GuiBrewingStand.class);
+            containerClasses.add(GuiEnchantment.class);
+            containerClasses.add(ContainerHopper.class);
+            containerClasses.add(GuiDispenser.class);
+            containerClasses.add(ContainerWorkbench.class);
+            containerClasses.add(ContainerMerchant.class);
+            containerClasses.add(ContainerHorseInventory.class);
+
             button = MouseEvent.class.getDeclaredField("button");
             buttonstate = MouseEvent.class.getDeclaredField("buttonstate");
             buttons = Mouse.class.getDeclaredField("buttons");
@@ -120,6 +139,18 @@ public class Reflection {
             if (C02PacketUseEntityEntityId != null) {
                 C02PacketUseEntityEntityId.setAccessible(true);
             }
+
+            bookContents = ReflectionHelper.findField(GuiScreenBook.class, "field_175386_A");
+            if (bookContents != null) {
+                bookContents.setAccessible(true);
+            }
+
+            for (Class clazz : containerClasses) {
+                for (Field field : clazz.getDeclaredFields()) {
+                    addToMap(clazz, field);
+                }
+            }
+
         } catch (Exception var2) {
             System.out.println("There was an error, relaunch the game.");
             var2.printStackTrace();
@@ -206,6 +237,15 @@ public class Reflection {
             } catch (IllegalAccessException var4) {
             }
         }
+    }
+
+    private static void addToMap(Class clazz, Field field) {
+        if (field == null || field.getType() != IInventory.class) {
+            return;
+        }
+        field = ReflectionHelper.findField(clazz, field.getName());
+        field.setAccessible(true);
+        containerInventoryPlayer.put(clazz, field);
     }
 
     public static void rightClick() {

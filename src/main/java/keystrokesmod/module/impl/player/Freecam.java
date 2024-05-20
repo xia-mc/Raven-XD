@@ -19,18 +19,18 @@ import org.lwjgl.input.Keyboard;
 import java.awt.*;
 
 public class Freecam extends Module {
-    public static SliderSetting speed;
-    private final ButtonSetting disableOnDamage;
-    private final ButtonSetting showArm;
-    private final ButtonSetting allowDigging;
-    private final ButtonSetting allowInteracting;
-    private final ButtonSetting allowPlacing;
+    public SliderSetting speed;
+    private ButtonSetting disableOnDamage;
+    private ButtonSetting showArm;
+    private ButtonSetting allowDigging;
+    private ButtonSetting allowInteracting;
+    private ButtonSetting allowPlacing;
     public static EntityOtherPlayerMP freeEntity = null;
     private int[] lcc = new int[]{Integer.MAX_VALUE, 0};
-    private final float[] sAng = new float[]{0.0F, 0.0F};
+    private float[] sAng = new float[]{0.0F, 0.0F};
 
     public Freecam() {
-        super("Freecam", Module.category.player, 0);
+        super("Freecam", category.player, 0);
         this.registerSetting(speed = new SliderSetting("Speed", 2.5D, 0.5D, 10.0D, 0.5D));
         this.registerSetting(disableOnDamage = new ButtonSetting("Disable on damage", true));
         this.registerSetting(allowDigging = new ButtonSetting("Allow digging", false));
@@ -64,7 +64,6 @@ public class Freecam extends Module {
         }
 
         this.lcc = new int[]{Integer.MAX_VALUE, 0};
-        int rg = 1;
         int x = mc.thePlayer.chunkCoordX;
         int z = mc.thePlayer.chunkCoordZ;
 
@@ -88,7 +87,6 @@ public class Freecam extends Module {
             freeEntity.rotationYaw = freeEntity.rotationYawHead = mc.thePlayer.rotationYaw;
             freeEntity.rotationPitch = mc.thePlayer.rotationPitch;
             double s = 0.215D * speed.getInput();
-            EntityOtherPlayerMP var10000;
             double rad;
             double dx;
             double dz;
@@ -96,50 +94,40 @@ public class Freecam extends Module {
                 rad = (double) freeEntity.rotationYawHead * 0.017453292519943295D;
                 dx = -1.0D * Math.sin(rad) * s;
                 dz = Math.cos(rad) * s;
-                var10000 = freeEntity;
-                var10000.posX += dx;
-                var10000 = freeEntity;
-                var10000.posZ += dz;
+                freeEntity.posX += dx;
+                freeEntity.posZ += dz;
             }
 
             if (Keyboard.isKeyDown(mc.gameSettings.keyBindBack.getKeyCode())) {
                 rad = (double) freeEntity.rotationYawHead * 0.017453292519943295D;
                 dx = -1.0D * Math.sin(rad) * s;
                 dz = Math.cos(rad) * s;
-                var10000 = freeEntity;
-                var10000.posX -= dx;
-                var10000 = freeEntity;
-                var10000.posZ -= dz;
+                freeEntity.posX -= dx;
+                freeEntity.posZ -= dz;
             }
 
             if (Keyboard.isKeyDown(mc.gameSettings.keyBindLeft.getKeyCode())) {
                 rad = (double) (freeEntity.rotationYawHead - 90.0F) * 0.017453292519943295D;
                 dx = -1.0D * Math.sin(rad) * s;
                 dz = Math.cos(rad) * s;
-                var10000 = freeEntity;
-                var10000.posX += dx;
-                var10000 = freeEntity;
-                var10000.posZ += dz;
+                freeEntity.posX += dx;
+                freeEntity.posZ += dz;
             }
 
             if (Keyboard.isKeyDown(mc.gameSettings.keyBindRight.getKeyCode())) {
                 rad = (double) (freeEntity.rotationYawHead + 90.0F) * 0.017453292519943295D;
                 dx = -1.0D * Math.sin(rad) * s;
                 dz = Math.cos(rad) * s;
-                var10000 = freeEntity;
-                var10000.posX += dx;
-                var10000 = freeEntity;
-                var10000.posZ += dz;
+                freeEntity.posX += dx;
+                freeEntity.posZ += dz;
             }
 
-            if (Keyboard.isKeyDown(mc.gameSettings.keyBindJump.getKeyCode())) {
-                var10000 = freeEntity;
-                var10000.posY += 0.93D * s;
+            if (Utils.jumpDown()) {
+                freeEntity.posY += 0.93D * s;
             }
 
             if (Keyboard.isKeyDown(mc.gameSettings.keyBindSneak.getKeyCode())) {
-                var10000 = freeEntity;
-                var10000.posY -= 0.93D * s;
+                freeEntity.posY -= 0.93D * s;
             }
 
             mc.thePlayer.setSneaking(false);

@@ -4,17 +4,13 @@ import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.utility.Reflection;
 import keystrokesmod.utility.Utils;
-import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.util.ResourceLocation;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 public class Shaders extends Module {
     private SliderSetting shader;
     private String[] shaderNames;
-    private static ResourceLocation[] shaderLocations;
+    private ResourceLocation[] shaderLocations;
     public Shaders() {
         super("Shaders", category.render);
         try {

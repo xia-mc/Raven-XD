@@ -17,12 +17,12 @@ import java.awt.*;
 import java.util.Iterator;
 
 public class Tracers extends Module {
-    public static ButtonSetting a;
-    public static SliderSetting b;
-    public static SliderSetting c;
-    public static SliderSetting d;
-    public static ButtonSetting e;
-    public static SliderSetting f;
+    public ButtonSetting a;
+    public SliderSetting b;
+    public SliderSetting c;
+    public SliderSetting d;
+    public ButtonSetting e;
+    public SliderSetting f;
     private boolean g;
     private int rgb_c = 0;
 

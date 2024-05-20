@@ -7,27 +7,36 @@ import keystrokesmod.module.impl.combat.KillAura;
 import keystrokesmod.module.setting.Setting;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
-import keystrokesmod.script.classes.Bridge;
-import keystrokesmod.script.classes.Entity;
-import keystrokesmod.script.classes.Vec3;
-import keystrokesmod.script.classes.World;
+import keystrokesmod.script.classes.*;
 import keystrokesmod.script.packets.serverbound.CPacket;
 import keystrokesmod.script.packets.serverbound.PacketHandler;
 import keystrokesmod.utility.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.GuiEnchantment;
+import net.minecraft.client.gui.GuiScreenBook;
 import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.client.gui.inventory.*;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderGlobal;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.inventory.ContainerChest;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.network.Packet;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
+import net.minecraft.util.IChatComponent;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -37,7 +46,6 @@ public class ScriptDefaults {
     private static final World world = new World();
     public final Bridge bridge = new Bridge();
     private static final ScheduledExecutorService executor = Executors.newScheduledThreadPool(2);
-    protected static Entity player;
 
     public static class client {
         public static final String colorSymbol = "§";
@@ -53,7 +61,7 @@ public class ScriptDefaults {
             return mc.thePlayer.inventory.currentItem;
         }
 
-        public static long getFPS() {
+        public static int getFPS() {
             return Minecraft.getDebugFPS();
         }
 
@@ -122,10 +130,10 @@ public class ScriptDefaults {
         }
 
         public static Entity getPlayer() {
-            if (player == null || mc.thePlayer == null) {
-                player = new Entity(mc.thePlayer);
+            if (ScriptManager.localPlayer == null || mc.thePlayer == null || ScriptManager.localPlayer.entity != mc.thePlayer) {
+                ScriptManager.localPlayer = new Entity(mc.thePlayer);
             }
-            return player;
+            return ScriptManager.localPlayer;
         }
 
         public static Vec3 getMotion() {
@@ -189,6 +197,10 @@ public class ScriptDefaults {
             PacketUtils.sendPacketNoEvent(packet1);
         }
 
+        public static void dropItem(boolean dropStack) {
+            mc.thePlayer.dropOneItem(dropStack);
+        }
+
         public static void setMotion(double x, double y, double z) {
             mc.thePlayer.motionX = x;
             mc.thePlayer.motionY = y;
@@ -242,6 +254,127 @@ public class ScriptDefaults {
 
         public static boolean isEnemy(Entity entity) {
             return Utils.isEnemy(entity.getName());
+        }
+
+        public static class inventory {
+            public static void click(int slot, int button, int mode) {
+                mc.playerController.windowClick(mc.thePlayer.inventoryContainer.windowId, slot, button, mode, mc.thePlayer);
+            }
+
+            public static List<String> getBookContents() {
+                if (mc.currentScreen instanceof GuiScreenBook) {
+                    try {
+                        List<String> contents = new ArrayList<>();
+                        int lvt_9_2_ = Math.min(128 / mc.fontRendererObj.FONT_HEIGHT, ((List<IChatComponent>) Reflection.bookContents.get(mc.currentScreen)).size());
+                        for (int lvt_10_2_ = 0; lvt_10_2_ < lvt_9_2_; ++lvt_10_2_) {
+                            IChatComponent lvt_11_2_ = ((List<IChatComponent>) Reflection.bookContents.get(mc.currentScreen)).get(lvt_10_2_);
+                            contents.add(lvt_11_2_.getUnformattedText());
+                            Utils.sendMessage(lvt_11_2_.getUnformattedText());
+                        }
+                        if (!contents.isEmpty()) {
+                            return contents;
+                        }
+                    }
+                    catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+                return null;
+            }
+
+            public static String getChest() {
+                if (mc.thePlayer.openContainer instanceof ContainerChest) {
+                    ContainerChest chest = (ContainerChest) mc.thePlayer.openContainer;
+                    if (chest == null) {
+                        return "";
+                    }
+                    return chest.getLowerChestInventory().getDisplayName().getUnformattedText();
+                }
+                return "";
+            }
+
+            public static String getContainer() {
+                if (mc.currentScreen instanceof GuiContainerCreative) {
+                    CreativeTabs creativetabs = CreativeTabs.creativeTabArray[((GuiContainerCreative) mc.currentScreen).getSelectedTabIndex()];
+                    if (creativetabs != null) {
+                        return I18n.format(creativetabs.getTranslatedTabLabel());
+                    }
+                }
+                else if (mc.currentScreen != null) {
+                    try {
+                        return ((IInventory) Reflection.containerInventoryPlayer.get(mc.currentScreen.getClass()).get(mc.currentScreen)).getDisplayName().getUnformattedText();
+                    } catch (Exception e) {
+                    }
+                }
+                return "";
+            }
+
+            public static int getSize() {
+                return mc.thePlayer.inventory.getSizeInventory();
+            }
+
+            public static int getChestSize() {
+                if (mc.thePlayer.openContainer instanceof ContainerChest) {
+                    ContainerChest chest = (ContainerChest) mc.thePlayer.openContainer;
+                    if (chest == null) {
+                        return -1;
+                    }
+                    return chest.getLowerChestInventory().getSizeInventory();
+                }
+                return -1;
+            }
+
+            public static ItemStack getStackInSlot(int slot) {
+                if (mc.thePlayer.inventory.getStackInSlot(slot) == null) {
+                    return null;
+                }
+                return new ItemStack(mc.thePlayer.inventory.getStackInSlot(slot));
+            }
+
+            public static ItemStack getStackInChestSlot(int slot) {
+                if (mc.thePlayer.openContainer instanceof ContainerChest) {
+                    ContainerChest chest = (ContainerChest) mc.thePlayer.openContainer;
+                    if (chest.getLowerChestInventory().getStackInSlot(slot) == null) {
+                        return null;
+                    }
+                    return new ItemStack(chest.getLowerChestInventory().getStackInSlot(slot));
+                }
+                return null;
+            }
+
+            public static void open() {
+                mc.displayGuiScreen(new GuiInventory(mc.thePlayer));
+            }
+        }
+
+        public static class keybinds {
+            public static boolean isPressed(String key) {
+                for (Map.Entry<KeyBinding, String> map : Reflection.keyBindings.entrySet()) {
+                    if (map.getValue().equals(key)) {
+                        return map.getKey().isKeyDown();
+                    }
+                }
+                return false;
+            }
+
+            public static void setPressed(String key, boolean pressed) {
+                for (Map.Entry<KeyBinding, String> map : Reflection.keyBindings.entrySet()) {
+                    if (map.getValue().equals(key)) {
+                        KeyBinding.setKeyBindState(map.getKey().getKeyCode(), pressed);
+                    }
+                }
+            }
+
+            public static int getKeycode(String key) {
+                return Keyboard.getKeyIndex(key);
+            }
+            public static boolean isMouseDown(int mouseButton) {
+                return Mouse.isButtonDown(mouseButton);
+            }
+
+            public static boolean isKeyDown(int key) {
+                return Keyboard.isKeyDown(key);
+            }
         }
 
         public static class render {
@@ -334,36 +467,6 @@ public class ScriptDefaults {
                 return Utils.randomizeDouble(min, max);
             }
         }
-
-        public static class keybinds {
-            public static boolean isPressed(String key) {
-                for (Map.Entry<KeyBinding, String> map : Reflection.keyBindings.entrySet()) {
-                    if (map.getValue().equals(key)) {
-                        return map.getKey().isKeyDown();
-                    }
-                }
-                return false;
-            }
-
-            public static void setPressed(String key, boolean pressed) {
-                for (Map.Entry<KeyBinding, String> map : Reflection.keyBindings.entrySet()) {
-                    if (map.getValue().equals(key)) {
-                        KeyBinding.setKeyBindState(map.getKey().getKeyCode(), pressed);
-                    }
-                }
-            }
-
-            public static int getKeycode(String key) {
-                return Keyboard.getKeyIndex(key);
-            }
-            public static boolean isMouseDown(int mouseButton) {
-                return Mouse.isButtonDown(mouseButton);
-            }
-
-            public static boolean isKeyDown(int key) {
-                return Keyboard.isKeyDown(key);
-            }
-        }
     }
 
     public static class modules {
@@ -411,23 +514,38 @@ public class ScriptDefaults {
         }
 
         public void enable(String moduleName) {
+            if (getModule(moduleName) == null) {
+                return;
+            }
             getModule(moduleName).enable();
         }
 
         public void disable(String moduleName) {
+            if (getModule(moduleName) == null) {
+                return;
+            }
             getModule(moduleName).disable();
         }
 
         public boolean isEnabled(String moduleName) {
+            if (getModule(moduleName) == null) {
+                return false;
+            }
             return getModule(moduleName).isEnabled();
         }
 
         public Entity getKillAuraTarget() {
+            if (KillAura.target == null) {
+                return null;
+            }
             return new Entity(KillAura.target);
         }
 
         public Vec3 getBedAuraPosition() {
             BlockPos blockPos = ModuleManager.bedAura.currentBlock;
+            if (ModuleManager.bedAura == null || ModuleManager.bedAura.currentBlock == null) {
+                return null;
+            }
             return new Vec3(blockPos.getX(), blockPos.getY(), blockPos.getZ());
         }
 

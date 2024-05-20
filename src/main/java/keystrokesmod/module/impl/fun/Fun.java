@@ -17,12 +17,12 @@ import java.util.Iterator;
 
 public class Fun {
     public static class Spin extends Module {
-        public static SliderSetting a;
-        public static SliderSetting b;
+        public SliderSetting a;
+        public SliderSetting b;
         private float yaw;
 
         public Spin() {
-            super("Spin", Module.category.fun, 0);
+            super("Spin", category.fun, 0);
             this.registerSetting(a = new SliderSetting("Rotation", 360.0D, 30.0D, 360.0D, 1.0D));
             this.registerSetting(b = new SliderSetting("Speed", 25.0D, 1.0D, 60.0D, 1.0D));
         }
@@ -54,12 +54,12 @@ public class Fun {
     }
 
     public static class SlyPort extends Module {
-        public static DescriptionSetting f;
-        public static SliderSetting r;
-        public static ButtonSetting b;
-        public static ButtonSetting d;
-        public static ButtonSetting e;
-        private final boolean s = false;
+        public DescriptionSetting f;
+        public SliderSetting r;
+        public ButtonSetting b;
+        public ButtonSetting playersOnly;
+        public ButtonSetting e;
+        private boolean s = false;
 
         public SlyPort() {
             super("SlyPort", Module.category.fun, 0);
@@ -67,7 +67,7 @@ public class Fun {
             this.registerSetting(r = new SliderSetting("Range", 6.0D, 2.0D, 15.0D, 1.0D));
             this.registerSetting(e = new ButtonSetting("Aim", true));
             this.registerSetting(b = new ButtonSetting("Play sound", true));
-            this.registerSetting(d = new ButtonSetting("Players only", true));
+            this.registerSetting(playersOnly = new ButtonSetting("Players only", true));
         }
 
         public void onEnable() {
@@ -96,7 +96,7 @@ public class Fun {
 
         private Entity ge() {
             Entity en = null;
-            double r = Math.pow(SlyPort.r.getInput(), 2.0D);
+            double r = Math.pow(this.r.getInput(), 2.0D);
             double dist = r + 1.0D;
             Iterator var6 = mc.theWorld.loadedEntityList.iterator();
 
@@ -114,7 +114,7 @@ public class Fun {
                             } while (ent == mc.thePlayer);
                         } while (!(ent instanceof EntityLivingBase));
                     } while (((EntityLivingBase) ent).deathTime != 0);
-                } while (SlyPort.d.isToggled() && !(ent instanceof EntityPlayer));
+                } while (this.playersOnly.isToggled() && !(ent instanceof EntityPlayer));
 
                 if (!AntiBot.isBot(ent)) {
                     double d = mc.thePlayer.getDistanceSqToEntity(ent);
@@ -128,7 +128,7 @@ public class Fun {
     }
 
     public static class FlameTrail extends Module {
-        public static SliderSetting a;
+        public SliderSetting a;
 
         public FlameTrail() {
             super("Flame Trail", Module.category.fun, 0);
@@ -139,17 +139,17 @@ public class Fun {
             double x = mc.thePlayer.posX - vec.xCoord * 2.0D;
             double y = mc.thePlayer.posY + ((double) mc.thePlayer.getEyeHeight() - 0.2D);
             double z = mc.thePlayer.posZ - vec.zCoord * 2.0D;
-            mc.thePlayer.worldObj.spawnParticle(EnumParticleTypes.FLAME, x, y, z, 0.0D, 0.0D, 0.0D, 0);
+            mc.thePlayer.worldObj.spawnParticle(EnumParticleTypes.FLAME, x, y, z, 0.0D, 0.0D, 0.0D, new int[]{0});
         }
     }
 
     public static class ExtraBobbing extends Module {
-        public static SliderSetting a;
+        public SliderSetting level;
         private boolean b;
 
         public ExtraBobbing() {
             super("Extra Bobbing", Module.category.fun, 0);
-            this.registerSetting(a = new SliderSetting("Level", 1.0D, 0.0D, 8.0D, 0.1D));
+            this.registerSetting(level = new SliderSetting("Level", 1.0D, 0.0D, 8.0D, 0.1D));
         }
 
         public void onEnable() {
@@ -171,9 +171,8 @@ public class Fun {
 
             if (mc.thePlayer.movementInput.moveForward != 0.0F || mc.thePlayer.movementInput.moveStrafe != 0.0F) {
                 EntityPlayerSP var10000 = mc.thePlayer;
-                var10000.cameraYaw = (float) ((double) var10000.cameraYaw + a.getInput() / 2.0D);
+                var10000.cameraYaw = (float) ((double) var10000.cameraYaw + level.getInput() / 2.0D);
             }
-
         }
     }
 }

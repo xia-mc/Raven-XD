@@ -20,14 +20,15 @@ import org.lwjgl.input.Mouse;
 import java.util.HashSet;
 
 public class AntiFireball extends Module {
-    private final SliderSetting fov;
-    private final SliderSetting range;
-    private final ButtonSetting disableWhileFlying;
-    private final ButtonSetting blocksRotate;
-    private final ButtonSetting projectileRotate;
+    private SliderSetting fov;
+    private SliderSetting range;
+    private ButtonSetting disableWhileFlying;
+    private ButtonSetting disableWhileScaffold;
+    private ButtonSetting blocksRotate;
+    private ButtonSetting projectileRotate;
     public ButtonSetting silentSwing;
     public EntityFireball fireball;
-    private final HashSet<Entity> fireballs = new HashSet<>();
+    private HashSet<Entity> fireballs = new HashSet<>();
     public boolean attack;
 
     public AntiFireball() {
@@ -35,6 +36,7 @@ public class AntiFireball extends Module {
         this.registerSetting(fov = new SliderSetting("FOV", 360.0, 30.0, 360.0, 4.0));
         this.registerSetting(range = new SliderSetting("Range", 8.0, 3.0, 15.0, 0.5));
         this.registerSetting(disableWhileFlying = new ButtonSetting("Disable while flying", false));
+        this.registerSetting(disableWhileScaffold = new ButtonSetting("Disable while scaffold", false));
         this.registerSetting(blocksRotate = new ButtonSetting("Rotate with blocks", false));
         this.registerSetting(projectileRotate = new ButtonSetting("Rotate with projectiles", false));
         this.registerSetting(silentSwing = new ButtonSetting("Silent swing", false));
@@ -42,10 +44,7 @@ public class AntiFireball extends Module {
 
     @SubscribeEvent(priority = EventPriority.LOW)
     public void onPreMotion(PreMotionEvent e) {
-        if (!condition()) {
-            return;
-        }
-        if (stopAttack()) {
+        if (!condition() || stopAttack()) {
             return;
         }
         if (fireball != null) {
@@ -67,14 +66,11 @@ public class AntiFireball extends Module {
 
     @SubscribeEvent
     public void onPreUpdate(PreUpdateEvent e) {
-        if (!condition()) {
-            return;
-        }
-        if (stopAttack()) {
+        if (!condition() || stopAttack()) {
             return;
         }
         if (fireball != null) {
-            if (ModuleManager.killAura != null && ModuleManager.killAura.isEnabled() && ModuleManager.killAura.block.get() && ModuleManager.killAura.autoBlockMode.getInput() == 3) {
+            if (ModuleManager.killAura != null && ModuleManager.killAura.isEnabled() && ModuleManager.killAura.block.get() && (ModuleManager.killAura.autoBlockMode.getInput() == 3 || ModuleManager.killAura.autoBlockMode.getInput() == 4)) {
                 if (KillAura.target != null) {
                     attack = false;
                     return;
@@ -144,6 +140,12 @@ public class AntiFireball extends Module {
         if (!Utils.nullCheck()) {
             return false;
         }
-        return !mc.thePlayer.capabilities.isFlying || !disableWhileFlying.isToggled();
+        if (mc.thePlayer.capabilities.isFlying && disableWhileFlying.isToggled()) {
+            return false;
+        }
+        if (ModuleManager.scaffold != null && ModuleManager.scaffold.isEnabled() && disableWhileScaffold.isToggled()) {
+            return false;
+        }
+        return true;
     }
 }

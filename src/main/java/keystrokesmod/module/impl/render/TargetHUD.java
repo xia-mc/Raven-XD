@@ -18,13 +18,12 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 import java.awt.*;
 
-import static keystrokesmod.utility.RenderUtils.jelloRender;
-
 public class TargetHUD extends Module {
-    private final DescriptionSetting description;
-    private final SliderSetting theme;
-    private final ButtonSetting renderEsp;
-    private final ButtonSetting showStatus;
+    private DescriptionSetting description;
+    private SliderSetting theme;
+    private ButtonSetting renderEsp;
+    private ButtonSetting showStatus;
+    private ButtonSetting healthColor;
     private Timer fadeTimer;
     private Timer healthBarTimer = null;
     private EntityLivingBase target;
@@ -38,6 +37,7 @@ public class TargetHUD extends Module {
         this.registerSetting(theme = new SliderSetting("Theme", Theme.themes, 0));
         this.registerSetting(renderEsp = new ButtonSetting("Render ESP", true));
         this.registerSetting(showStatus = new ButtonSetting("Show win or loss", true));
+        this.registerSetting(healthColor = new ButtonSetting("Traditional health color", false));
     }
 
     public void onDisable() {
@@ -84,17 +84,13 @@ public class TargetHUD extends Module {
             return;
         }
         if (KillAura.target != null) {
-            EntityLivingBase target = KillAura.target;
-
-            Color color = new Color(255, 255, 255, 128);
-
-            jelloRender(target, target, color);
+            RenderUtils.renderEntity(KillAura.target, 2, 0.0, 0.0, Theme.getGradient((int) theme.getInput(), 0), false);
         }
     }
 
-    private void drawTargetHUD(Timer cd, String string, double n) {
+    private void drawTargetHUD(Timer cd, String string, double health) {
         if (showStatus.isToggled()) {
-            string = string + " " + ((n <= Utils.getCompleteHealth(mc.thePlayer) / mc.thePlayer.getMaxHealth()) ? "§aW" : "§cL");
+            string = string + " " + ((health <= Utils.getCompleteHealth(mc.thePlayer) / mc.thePlayer.getMaxHealth()) ? "§aW" : "§cL");
         }
         final ScaledResolution scaledResolution = new ScaledResolution(mc);
         final int n2 = 8;
@@ -115,23 +111,26 @@ public class TargetHUD extends Module {
             final int n14 = n8 - 6;
             final int n15 = n9;
             RenderUtils.drawRoundedRectangle((float) n13, (float) n15, (float) n14, (float) (n15 + 5), 4.0f, Utils.merge(Color.black.getRGB(), n11)); // background
-            final int k = Utils.merge(array[0], n12);
-            final int n16 = (n > 0.15) ? Utils.merge(array[1], n12) : k;
-            float health = (float) (int) (n14 + (n13 - n14) * (1.0 - ((n < 0.05) ? 0.05 : n)));
-            if (health - n13 < 3) { // if goes below, the rounded health bar glitches out
-                health = n13 + 3;
+            int k = Utils.merge(array[0], n12);
+            int n16 = (health > 0.15) ? Utils.merge(array[1], n12) : k;
+            float healthBar = (float) (int) (n14 + (n13 - n14) * (1.0 - ((health < 0.05) ? 0.05 : health)));
+            if (healthBar - n13 < 3) { // if goes below, the rounded health bar glitches out
+                healthBar = n13 + 3;
             }
-            if (health != lastHealthBar && lastHealthBar - n13 >= 3 && healthBarTimer != null ) {
-                float diff = lastHealthBar - health;
+            if (healthBar != lastHealthBar && lastHealthBar - n13 >= 3 && healthBarTimer != null ) {
+                float diff = lastHealthBar - healthBar;
                 if (diff > 0) {
                     lastHealthBar = lastHealthBar - healthBarTimer.getValueFloat(0, diff, 1);
                 }
                 else {
-                    lastHealthBar = healthBarTimer.getValueFloat(lastHealthBar, health, 1);
+                    lastHealthBar = healthBarTimer.getValueFloat(lastHealthBar, healthBar, 1);
                 }
             }
             else {
-                lastHealthBar = health;
+                lastHealthBar = healthBar;
+            }
+            if (healthColor.isToggled()) {
+                k = n16 = Utils.merge(Utils.getColorForHealth(health), n12);
             }
             RenderUtils.drawRoundedGradientRectangle((float) n13, (float) n15, lastHealthBar, (float) (n15 + 5), 4.0f, k, k, n16, n16); // health bar
             GlStateManager.pushMatrix();

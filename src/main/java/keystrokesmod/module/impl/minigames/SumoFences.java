@@ -20,7 +20,7 @@ import java.util.TimerTask;
 public class SumoFences extends Module {
     private final DescriptionSetting a;
     public static SliderSetting b;
-    public static SliderSetting c;
+    public SliderSetting c;
     private java.util.Timer t;
     private final List<String> m = Arrays.asList("Sumo", "Space Mine", "White Crystal");
     private IBlockState f;
@@ -28,7 +28,7 @@ public class SumoFences extends Module {
     private final String[] mode = new String[]{"Oak fence", "Leaves", "Glass", "Barrier"};
 
     public SumoFences() {
-        super("Sumo Fences", Module.category.minigames, 0);
+        super("Sumo Fences", category.minigames, 0);
         this.f = Blocks.oak_fence.getDefaultState();
         this.registerSetting(a = new DescriptionSetting("Fences for Hypixel sumo."));
         this.registerSetting(b = new SliderSetting("Fence height", 4.0D, 1.0D, 6.0D, 1.0D));
@@ -54,12 +54,11 @@ public class SumoFences extends Module {
                 }
             }
         }
-
     }
 
     @SubscribeEvent
-    public void m(MouseEvent e) {
-        if (e.buttonstate && (e.button == 0 || e.button == 1) && Utils.nullCheck() && this.is()) {
+    public void onMouse(MouseEvent e) {
+        if (e.buttonstate && (e.button == 0 || e.button == 1) && Utils.nullCheck() && this.isSumo()) {
             MovingObjectPosition mop = mc.objectMouseOver;
             if (mop != null && mop.typeOfHit == MovingObjectType.BLOCK) {
                 int x = mop.getBlockPos().getX();
@@ -71,26 +70,23 @@ public class SumoFences extends Module {
                         if (e.button == 0) {
                             Utils.rsa();
                         }
-
                         Mouse.poll();
                         break;
                     }
                 }
             }
         }
-
     }
 
     public TimerTask t() {
         return new TimerTask() {
             public void run() {
-                if (SumoFences.this.is()) {
-
+                if (SumoFences.this.isSumo()) {
                     for (BlockPos p : SumoFences.f_p) {
                         for (int i = 0; (double) i < SumoFences.b.getInput(); ++i) {
                             BlockPos p2 = new BlockPos(p.getX(), p.getY() + i, p.getZ());
-                            if (Module.mc.theWorld.getBlockState(p2).getBlock() == Blocks.air) {
-                                Module.mc.theWorld.setBlockState(p2, SumoFences.this.f);
+                            if (mc.theWorld.getBlockState(p2).getBlock() == Blocks.air) {
+                                mc.theWorld.setBlockState(p2, SumoFences.this.f);
                             }
                         }
                     }
@@ -100,9 +96,8 @@ public class SumoFences extends Module {
         };
     }
 
-    private boolean is() {
+    private boolean isSumo() {
         if (Utils.isHypixel()) {
-
             for (String l : Utils.gsl()) {
                 String s = Utils.stripColor(l);
                 if (s.startsWith("Map:")) {

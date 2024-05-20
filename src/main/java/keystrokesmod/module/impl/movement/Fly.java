@@ -22,7 +22,7 @@ public class Fly extends Module {
 
     public Fly() {
         super("Fly", category.movement);
-        this.registerSetting(mode = new SliderSetting("Mode", modes, 0));
+        this.registerSetting(mode = new SliderSetting("Fly", modes, 0));
         this.registerSetting(horizontalSpeed = new SliderSetting("Horizontal speed", 2.0, 1.0, 9.0, 0.1));
         this.registerSetting(verticalSpeed = new SliderSetting("Vertical speed", 2.0, 1.0, 9.0, 0.1));
         this.registerSetting(showBPS = new ButtonSetting("Show BPS", false));
@@ -43,10 +43,10 @@ public class Fly extends Module {
             case 1:
                 mc.thePlayer.onGround = true;
                 if (mc.currentScreen == null) {
-                    if (Keyboard.isKeyDown(mc.gameSettings.keyBindJump.getKeyCode())) {
+                    if (Utils.jumpDown()) {
                         mc.thePlayer.motionY = 0.3 * verticalSpeed.getInput();
                     }
-                    else if (Keyboard.isKeyDown(mc.gameSettings.keyBindSneak.getKeyCode())) {
+                    else if (Utils.jumpDown()) {
                         mc.thePlayer.motionY = -0.3 * verticalSpeed.getInput();
                     }
                     else {

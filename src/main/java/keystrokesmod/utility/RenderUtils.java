@@ -242,10 +242,10 @@ public class RenderUtils {
                     GL11.glRotated(-mc.getRenderManager().playerViewY, 0.0D, 1.0D, 0.0D);
                     GlStateManager.disableDepth();
                     GL11.glScalef(0.03F + d, 0.03F + d, 0.03F + d);
-                    i = (int) (21.0D + shift * 2.0D);
-                    net.minecraft.client.gui.Gui.drawRect(i, -1, i + 5, 75, Color.black.getRGB());
-                    net.minecraft.client.gui.Gui.drawRect(i + 1, b, i + 4, 74, Color.darkGray.getRGB());
-                    net.minecraft.client.gui.Gui.drawRect(i + 1, 0, i + 4, b, hc);
+                    i = (int) (21 + shift * 2);
+                    net.minecraft.client.gui.Gui.drawRect(i, -1, i + 4, 75, Color.black.getRGB());
+                    net.minecraft.client.gui.Gui.drawRect(i + 1, b, i + 3, 74, Color.darkGray.getRGB());
+                    net.minecraft.client.gui.Gui.drawRect(i + 1, 0, i + 3, b, hc);
                     GlStateManager.enableDepth();
                 } else if (type == 6) {
                     d3p(x, y, z, 0.699999988079071D, 45, 1.5F, color, color == 0);
@@ -577,26 +577,17 @@ public class RenderUtils {
         GL11.glPushMatrix();
         GL11.glEnable(GL11.GL_LINE_SMOOTH);
         GL11.glDisable(GL11.GL_TEXTURE_2D);
-        GL11.glEnable(GL11.GL_BLEND);
         RenderUtils.glColor(color);
         GL11.glLineWidth((float) width);
-
-        // Calculate offset to center the arrow
         float halfWidth = (float) (width / 2.0);
         float xOffset = halfWidth / 2.0f;
         float yOffset = halfWidth / 2.0f;
-
         GL11.glBegin(GL11.GL_LINES);
-        // Left line of the arrow
         GL11.glVertex2d(x - xOffset, y + yOffset);
         GL11.glVertex2d(x + length - xOffset, y - length + yOffset);
-
-        // Right line of the arrow
         GL11.glVertex2d(x + length - xOffset, y - length + yOffset);
         GL11.glVertex2d(x + 2 * length - xOffset, y + yOffset);
         GL11.glEnd();
-
-        GL11.glDisable(GL11.GL_BLEND);
         GL11.glEnable(GL11.GL_TEXTURE_2D);
         GL11.glDisable(GL11.GL_LINE_SMOOTH);
         GL11.glPopMatrix();

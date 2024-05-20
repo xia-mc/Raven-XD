@@ -27,7 +27,7 @@ public class CategoryComponent {
     private int y;
     private int x;
     private int bh;
-    private boolean id;
+    public boolean dragging;
     public int xx;
     public int yy;
     public boolean n4m = false;
@@ -54,7 +54,7 @@ public class CategoryComponent {
         this.smoothTimer = null;
         this.xx = 0;
         this.categoryOpened = false;
-        this.id = false;
+        this.dragging = false;
         int tY = this.bh + 3;
         this.scale = new ScaledResolution(Minecraft.getMinecraft()).getScaleFactor();
 
@@ -108,7 +108,7 @@ public class CategoryComponent {
     }
 
     public void d(boolean d) {
-        this.id = d;
+        this.dragging = d;
     }
 
     public boolean p() {
@@ -194,7 +194,7 @@ public class CategoryComponent {
     }
 
     public void up(int x, int y) {
-        if (this.id) {
+        if (this.dragging) {
             this.x(x - this.xx);
             this.y(y - this.yy);
         }

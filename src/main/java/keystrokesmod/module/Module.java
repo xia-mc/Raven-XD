@@ -23,7 +23,7 @@ public class Module {
     private boolean isToggled = false;
     public boolean canBeEnabled = true;
     public boolean ignoreOnSave = false;
-    public boolean visible = true;
+    public boolean hidden = false;
     public Script script = null;
 
     public Module(String moduleName, Module.category moduleCategory, int keycode) {
@@ -94,12 +94,12 @@ public class Module {
         return this.canBeEnabled;
     }
 
-    public boolean isVisible() {
-        return visible;
+    public boolean isHidden() {
+        return hidden;
     }
 
-    public void setVisibility(boolean visible) {
-        this.visible = visible;
+    public void setHidden(boolean hidden) {
+        this.hidden = hidden;
     }
 
     public void enable() {

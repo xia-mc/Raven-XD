@@ -5,7 +5,6 @@ import keystrokesmod.Raven;
 import keystrokesmod.clickgui.ClickGui;
 import keystrokesmod.clickgui.components.impl.CategoryComponent;
 import keystrokesmod.module.Module;
-import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.render.HUD;
 import keystrokesmod.module.setting.Setting;
 import keystrokesmod.module.setting.impl.ButtonSetting;
@@ -75,8 +74,8 @@ public class ProfileManager {
         moduleInformation.addProperty("name", (module.moduleCategory() == Module.category.scripts && !(module instanceof Manager)) ?  "sc-" + module.getName() :  module.getName());
         if (module.canBeEnabled) {
             moduleInformation.addProperty("enabled", module.isEnabled());
+            moduleInformation.addProperty("hidden", module.isHidden());
             moduleInformation.addProperty("keybind", module.getKeycode());
-            moduleInformation.addProperty("visible", module.isVisible());
         }
         if (module instanceof HUD) {
             moduleInformation.addProperty("posX", HUD.hudX);
@@ -158,13 +157,13 @@ public class ProfileManager {
                                 module.disable();
                             }
                         }
+                        if (moduleInformation.has("hidden")) {
+                            boolean hidden = moduleInformation.get("hidden").getAsBoolean();
+                            module.setHidden(hidden);
+                        }
                         if (moduleInformation.has("keybind")) {
                             int keybind = moduleInformation.get("keybind").getAsInt();
                             module.setBind(keybind);
-                        }
-                        if (moduleInformation.has("visible")) {
-                            boolean visible = moduleInformation.get("visible").getAsBoolean();
-                            module.setVisibility(visible);
                         }
                     }
 

@@ -18,7 +18,7 @@ public class Velocity extends Module {
     private final ButtonSetting disableS;
 
     public Velocity() {
-        super("Velocity", Module.category.combat, 0);
+        super("Velocity", category.combat, 0);
         this.registerSetting(horizontal = new SliderSetting("Horizontal", 90.0D, 0.0D, 100.0D, 1.0D));
         this.registerSetting(vertical = new SliderSetting("Vertical", 100.0D, 0.0D, 100.0D, 1.0D));
         this.registerSetting(chance = new SliderSetting("Chance", 100.0D, 0.0D, 100.0D, 1.0D, "%"));
@@ -53,11 +53,11 @@ public class Velocity extends Module {
                 }
             }
             if (horizontal.getInput() != 100.0D) {
-                mc.thePlayer.motionX *= horizontal.getInput() / 100.0D;
-                mc.thePlayer.motionZ *= horizontal.getInput() / 100.0D;
+                mc.thePlayer.motionX *= horizontal.getInput() / 100;
+                mc.thePlayer.motionZ *= horizontal.getInput() / 100;
             }
             if (vertical.getInput() != 100.0D) {
-                mc.thePlayer.motionY *= vertical.getInput() / 100.0D;
+                mc.thePlayer.motionY *= vertical.getInput() / 100;
             }
         }
     }

@@ -54,6 +54,7 @@ public class Blink extends Module {
     @SubscribeEvent
     public void onSendPacket(SendPacketEvent e) {
         if (!Utils.nullCheck()) {
+            this.disable();
             return;
         }
         Packet packet = e.getPacket();

@@ -115,7 +115,7 @@ public class ScriptEvents {
         }
         if (e.entity == Minecraft.getMinecraft().thePlayer) {
             Raven.scriptManager.invoke("onWorldJoin", module, ScriptDefaults.client.getPlayer());
-            ScriptDefaults.player = new Entity(Minecraft.getMinecraft().thePlayer);
+            ScriptManager.localPlayer = new Entity(Minecraft.getMinecraft().thePlayer);
             return;
         }
         Raven.scriptManager.invoke("onWorldJoin", module, new Entity(e.entity));

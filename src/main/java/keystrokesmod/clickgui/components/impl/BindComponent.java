@@ -11,8 +11,8 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
 public class BindComponent extends Component {
-    private boolean isBinding;
-    private final ModuleComponent moduleComponent;
+    public boolean isBinding;
+    private ModuleComponent moduleComponent;
     private int bind;
     private int x;
     private int y;
@@ -46,7 +46,7 @@ public class BindComponent extends Component {
                 this.isBinding = !this.isBinding;
             }
             else if (b == 1 && this.moduleComponent.mod.moduleCategory() != Module.category.profiles) {
-                this.moduleComponent.mod.setVisibility(!this.moduleComponent.mod.isVisible());
+                this.moduleComponent.mod.setHidden(!this.moduleComponent.mod.isHidden());
                 if (Raven.currentProfile != null) {
                     ((ProfileModule) Raven.currentProfile.getModule()).saved = false;
                 }
@@ -65,7 +65,7 @@ public class BindComponent extends Component {
 
     public void keyTyped(char t, int keybind) {
         if (this.isBinding) {
-            if (keybind == 11) {
+            if (keybind == Keyboard.KEY_0 || keybind == Keyboard.KEY_ESCAPE) {
                 if (this.moduleComponent.mod instanceof Gui) {
                     this.moduleComponent.mod.setBind(54);
                 } else {
@@ -94,7 +94,7 @@ public class BindComponent extends Component {
     }
 
     private void drawString(String s) {
-        Minecraft.getMinecraft().fontRendererObj.drawStringWithShadow(s, (float) ((this.moduleComponent.categoryComponent.getX() + 4) * 2), (float) ((this.moduleComponent.categoryComponent.getY() + this.bind + 3) * 2), this.moduleComponent.mod.visible ? Theme.getGradient(10, 0) : Theme.getGradient(11, 0));
+        Minecraft.getMinecraft().fontRendererObj.drawStringWithShadow(s, (float) ((this.moduleComponent.categoryComponent.getX() + 4) * 2), (float) ((this.moduleComponent.categoryComponent.getY() + this.bind + 3) * 2), !this.moduleComponent.mod.hidden ? Theme.getGradient(10, 0) : Theme.getGradient(11, 0));
     }
 
     public void onGuiClosed() {

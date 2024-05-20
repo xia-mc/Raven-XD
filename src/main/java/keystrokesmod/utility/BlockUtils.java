@@ -1,6 +1,5 @@
 package keystrokesmod.utility;
 
-import keystrokesmod.module.ModuleManager;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -31,15 +30,15 @@ public class BlockUtils {
         return block instanceof BlockFurnace || block instanceof BlockFenceGate || block instanceof BlockChest || block instanceof BlockEnderChest || block instanceof BlockEnchantmentTable || block instanceof BlockBrewingStand || block instanceof BlockBed || block instanceof BlockDropper || block instanceof BlockDispenser || block instanceof BlockHopper || block instanceof BlockAnvil || block == Blocks.crafting_table;
     }
 
-    public static float getBlockHardness(final Block block, final ItemStack itemStack, final boolean b) {
+    public static float getBlockHardness(final Block block, final ItemStack itemStack, boolean ignoreSlow, boolean ignoreGround) {
         final float getBlockHardness = block.getBlockHardness(mc.theWorld, null);
         if (getBlockHardness < 0.0f) {
             return 0.0f;
         }
-        return (block.getMaterial().isToolNotRequired() || (itemStack != null && itemStack.canHarvestBlock(block))) ? (getToolDigEfficiency(itemStack, block, b) / getBlockHardness / 30.0f) : (getToolDigEfficiency(itemStack, block, b) / getBlockHardness / 100.0f);
+        return (block.getMaterial().isToolNotRequired() || (itemStack != null && itemStack.canHarvestBlock(block))) ? (getToolDigEfficiency(itemStack, block, ignoreSlow, ignoreGround) / getBlockHardness / 30.0f) : (getToolDigEfficiency(itemStack, block, ignoreSlow, ignoreGround) / getBlockHardness / 100.0f);
     }
 
-    public static float getToolDigEfficiency(final ItemStack itemStack, final Block block, final boolean b) {
+    public static float getToolDigEfficiency(ItemStack itemStack, Block block, boolean ignoreSlow, boolean ignoreGround) {
         float n = (itemStack == null) ? 1.0f : itemStack.getItem().getStrVsBlock(itemStack, block);
         if (n > 1.0f) {
             final int getEnchantmentLevel = EnchantmentHelper.getEnchantmentLevel(Enchantment.efficiency.effectId, itemStack);
@@ -50,7 +49,7 @@ public class BlockUtils {
         if (mc.thePlayer.isPotionActive(Potion.digSpeed)) {
             n *= 1.0f + (mc.thePlayer.getActivePotionEffect(Potion.digSpeed).getAmplifier() + 1) * 0.2f;
         }
-        if (!b) {
+        if (!ignoreSlow) {
             if (mc.thePlayer.isPotionActive(Potion.digSlowdown)) {
                 float n2;
                 switch (mc.thePlayer.getActivePotionEffect(Potion.digSlowdown).getAmplifier()) {
@@ -76,7 +75,7 @@ public class BlockUtils {
             if (mc.thePlayer.isInsideOfMaterial(Material.water) && !EnchantmentHelper.getAquaAffinityModifier(mc.thePlayer)) {
                 n /= 5.0f;
             }
-            if ((!mc.thePlayer.onGround && (ModuleManager.bedAura == null || !ModuleManager.bedAura.isEnabled() || !ModuleManager.bedAura.groundSpoof.isToggled() || ModuleManager.bedAura.currentBlock == null)) || (ModuleManager.noFall != null && ModuleManager.noFall.isEnabled() && ModuleManager.noFall.mode.getInput() == 3)) {
+            if (!mc.thePlayer.onGround && !ignoreGround) {
                 n /= 5.0f;
             }
         }

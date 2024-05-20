@@ -78,7 +78,7 @@ public class HUD extends Module {
         double n2 = 0.0;
         for (Module module : ModuleManager.organizedModules) {
             if (module.isEnabled() && module != this) {
-                if (!module.isVisible()) {
+                if (module.isHidden()) {
                     continue;
                 }
                 if (module == ModuleManager.commandLine) {
@@ -202,7 +202,7 @@ public class HUD extends Module {
                 double n2 = 0.0;
                 for (Module module : ModuleManager.organizedModules) {
                     if (module.isEnabled() && !module.getName().equals("HUD")) {
-                        if (!module.isVisible()) {
+                        if (module.isHidden()) {
                             continue;
                         }
                         if (module == ModuleManager.commandLine) {
@@ -275,7 +275,7 @@ public class HUD extends Module {
         private boolean empty() {
             for (Module module : ModuleManager.organizedModules) {
                 if (module.isEnabled() && !module.getName().equals("HUD")) {
-                    if (!module.isVisible()) {
+                    if (module.isHidden()) {
                         continue;
                     }
                     if (module == ModuleManager.commandLine) {

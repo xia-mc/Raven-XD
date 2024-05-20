@@ -17,6 +17,7 @@ import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Items;
@@ -192,6 +193,10 @@ public class Utils {
         return ((n < 0.3) ? "§c" : ((n < 0.5) ? "§6" : ((n < 0.7) ? "§e" : "§a"))) + (isWholeNumber(health) ? (int) health + "": health);
     }
 
+    public static int getColorForHealth(double health) {
+        return ((health < 0.3) ? -43691 : ((health < 0.5) ? -22016 : ((health < 0.7) ? -171 : -11141291)));
+    }
+
     public static String formatColor(String txt) {
         return txt.replaceAll("&", "§");
     }
@@ -233,6 +238,33 @@ public class Utils {
 
     public static net.minecraft.util.Timer getTimer() {
         return ObfuscationReflectionHelper.getPrivateValue(Minecraft.class, Minecraft.getMinecraft(), "timer", "field_71428_T");
+    }
+
+    public static String getHitsToKill(final EntityPlayer entityPlayer, final ItemStack itemStack) {
+        final int n = (int)Math.ceil(ap(entityPlayer, itemStack));
+        return "§" + ((n <= 1) ? "c" : ((n <= 3) ? "6" : ((n <= 5) ? "e" : "a"))) + n;
+    }
+
+    public static double ap(final EntityPlayer entityPlayer, final ItemStack itemStack) {
+        double n = 1.0;
+        if (itemStack != null && (itemStack.getItem() instanceof ItemSword || itemStack.getItem() instanceof ItemAxe)) {
+            n += getDamage(itemStack);
+        }
+        double n2 = 0.0;
+        double n3 = 0.0;
+        for (int i = 0; i < 4; ++i) {
+            final ItemStack armorItemInSlot = entityPlayer.inventory.armorItemInSlot(i);
+            if (armorItemInSlot != null) {
+                if (armorItemInSlot.getItem() instanceof ItemArmor) {
+                    n2 += ((ItemArmor)armorItemInSlot.getItem()).damageReduceAmount * 0.04;
+                    final int getEnchantmentLevel = EnchantmentHelper.getEnchantmentLevel(Enchantment.protection.effectId, armorItemInSlot);
+                    if (getEnchantmentLevel != 0) {
+                        n3 += Math.floor(0.75 * (6 + getEnchantmentLevel * getEnchantmentLevel) / 3.0);
+                    }
+                }
+            }
+        }
+        return rnd((double)getCompleteHealth(entityPlayer) / (n * (1.0 - (n2 + 0.04 * Math.min(Math.ceil(Math.min(n3, 25.0) * 0.75), 20.0) * (1.0 - n2)))), 1);
     }
 
     public static float n() {
@@ -442,6 +474,10 @@ public class Utils {
 
     public static boolean keysDown() {
         return Keyboard.isKeyDown(mc.gameSettings.keyBindForward.getKeyCode()) || Keyboard.isKeyDown(mc.gameSettings.keyBindBack.getKeyCode()) || Keyboard.isKeyDown(mc.gameSettings.keyBindLeft.getKeyCode()) || Keyboard.isKeyDown(mc.gameSettings.keyBindRight.getKeyCode());
+    }
+
+    public static boolean jumpDown() {
+        return Keyboard.isKeyDown(mc.gameSettings.keyBindJump.getKeyCode());
     }
 
     public static float gd() {
@@ -687,5 +723,16 @@ public class Utils {
             return false;
         }
         return mc.thePlayer.getHeldItem().getItem() instanceof ItemSword;
+    }
+
+    public static double getDamage(final ItemStack itemStack) {
+        double getAmount = 0;
+        for (final Map.Entry<String, AttributeModifier> entry : itemStack.getAttributeModifiers().entries()) {
+            if (entry.getKey().equals("generic.attackDamage")) {
+                getAmount = entry.getValue().getAmount();
+                break;
+            }
+        }
+        return getAmount + EnchantmentHelper.getEnchantmentLevel(Enchantment.sharpness.effectId, itemStack) * 1.25;
     }
 }

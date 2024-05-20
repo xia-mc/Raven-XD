@@ -22,7 +22,7 @@ public class ItemStack {
         }
         this.itemStack = itemStack;
         this.type = itemStack.getItem().getClass().getSimpleName();
-        this.name = itemStack.getUnlocalizedName();
+        this.name = itemStack.getItem().getRegistryName().substring(10); // substring 10 to remove "minecraft:"
         this.displayName = itemStack.getDisplayName();
         this.stackSize = itemStack.stackSize;
         this.maxStackSize = itemStack.getMaxStackSize();

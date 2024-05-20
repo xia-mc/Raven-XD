@@ -7,19 +7,19 @@ import keystrokesmod.utility.Utils;
 import org.lwjgl.input.Keyboard;
 
 public class BHop extends Module {
-    private final SliderSetting mode;
+    private SliderSetting mode;
     public static SliderSetting speed;
-    private final ButtonSetting waterDisable;
-    private final ButtonSetting sneakDisable;
-    private final ButtonSetting stopMotion;
-    private final String[] modes = new String[]{"Strafe", "Ground"};
+    private ButtonSetting liquidDisable;
+    private ButtonSetting sneakDisable;
+    private ButtonSetting stopMotion;
+    private String[] modes = new String[]{"Strafe", "Ground"};
     public boolean hopping;
 
     public BHop() {
         super("Bhop", Module.category.movement);
         this.registerSetting(mode = new SliderSetting("Mode", modes, 0));
         this.registerSetting(speed = new SliderSetting("Speed", 2.0, 0.5, 8.0, 0.1));
-        this.registerSetting(waterDisable = new ButtonSetting("Disable in water", true));
+        this.registerSetting(liquidDisable = new ButtonSetting("Disable in liquid", true));
         this.registerSetting(sneakDisable = new ButtonSetting("Disable while sneaking", true));
         this.registerSetting(stopMotion = new ButtonSetting("Stop motion", false));
     }
@@ -30,7 +30,7 @@ public class BHop extends Module {
     }
 
     public void onUpdate() {
-        if ((mc.thePlayer.isInWater() && waterDisable.isToggled()) || (mc.thePlayer.isSneaking() && sneakDisable.isToggled())) {
+        if (((mc.thePlayer.isInWater() || mc.thePlayer.isInLava()) && liquidDisable.isToggled()) || (mc.thePlayer.isSneaking() && sneakDisable.isToggled())) {
             return;
         }
         switch ((int) mode.getInput()) {
@@ -46,7 +46,7 @@ public class BHop extends Module {
                 }
                 break;
             case 1:
-                if (!Keyboard.isKeyDown(mc.gameSettings.keyBindJump.getKeyCode()) && Utils.isMoving() && mc.currentScreen == null) {
+                if (!Utils.jumpDown() && Utils.isMoving() && mc.currentScreen == null) {
                     if (!mc.thePlayer.onGround) {
                         break;
                     }

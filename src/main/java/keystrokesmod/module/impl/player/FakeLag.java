@@ -1,15 +1,11 @@
 package keystrokesmod.module.impl.player;
 
-import keystrokesmod.event.ReceivePacketEvent;
+import keystrokesmod.event.SendPacketEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.utility.PacketUtils;
 import keystrokesmod.utility.Utils;
 import net.minecraft.network.Packet;
-import net.minecraft.network.play.server.S02PacketChat;
-import net.minecraft.network.play.server.S04PacketEntityEquipment;
-import net.minecraft.network.play.server.S08PacketPlayerPosLook;
-import net.minecraft.network.play.server.S19PacketEntityStatus;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -36,36 +32,33 @@ public class FakeLag extends Module {
     }
 
     public void onDisable() {
-        receivePacket(true);
+        sendPacket(true);
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onRenderTick(TickEvent.RenderTickEvent ev) {
         if (!Utils.nullCheck()) {
-            receivePacket(false);
+            sendPacket(false);
             return;
         }
-        receivePacket(true);
+        sendPacket(true);
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public void onReceivePacket(ReceivePacketEvent e) {
+    public void onSendPacket(SendPacketEvent e) {
         long receiveTime = System.currentTimeMillis();
         if (!Utils.nullCheck()) {
-            receivePacket(false);
+            sendPacket(false);
             return;
         }
         if (e.isCanceled()) {
-            return;
-        }
-        if (e.getPacket() instanceof S19PacketEntityStatus || e.getPacket() instanceof S02PacketChat || e.getPacket() instanceof S08PacketPlayerPosLook || e.getPacket() instanceof S04PacketEntityEquipment) {
             return;
         }
         delayedPackets.put(e.getPacket(), receiveTime);
         e.setCanceled(true);
     }
 
-    private void receivePacket(boolean delay) {
+    private void sendPacket(boolean delay) {
         try {
             Iterator<Map.Entry<Packet, Long>> packets = delayedPackets.entrySet().iterator();
             while (packets.hasNext()) {
@@ -77,7 +70,7 @@ public class FakeLag extends Module {
                 long receiveTime = entry.getValue();
                 long ms = System.currentTimeMillis();
                 if (Utils.getDifference(ms, receiveTime) > packetDelay.getInput() || !delay) {
-                    PacketUtils.receivePacketNoEvent(packet);
+                    PacketUtils.sendPacketNoEvent(packet);
                     packets.remove();
                 }
             }

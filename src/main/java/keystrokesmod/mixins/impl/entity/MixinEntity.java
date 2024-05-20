@@ -429,29 +429,6 @@ public abstract class MixinEntity {
             p_moveFlying_2_ = prePlayerInput.getForward();
             p_moveFlying_3_ = prePlayerInput.getFriction();
             yaw = prePlayerInput.getYaw();
-            if (Settings.movementFix != null && Settings.movementFix.isToggled() && PreMotionEvent.setRenderYaw()) {
-                if (Minecraft.getMinecraft().thePlayer.movementInput.moveForward == 0.0f && Minecraft.getMinecraft().thePlayer.movementInput.moveStrafe == 0.0f) {
-                    return;
-                }
-                final double wrapAngleTo180_double = MathHelper.wrapAngleTo180_double(Math.toDegrees(Utils.getHorizontalSpeed()));
-                double n = 0.0;
-                double n2 = 0.0;
-                double n3 = -1.0;
-                for (float n4 = -1.0f; n4 <= 1.0f; ++n4) {
-                    for (float n5 = -1.0f; n5 <= 1.0f; ++n5) {
-                        if (n4 != 0.0f || n5 != 0.0f) {
-                            final double abs = Math.abs(wrapAngleTo180_double - MathHelper.wrapAngleTo180_double(Math.toDegrees(Utils.ae(RotationUtils.renderYaw, n4, n5))));
-                            if (n3 == -1.0 || abs < n3) {
-                                n3 = abs;
-                                n = n4;
-                                n2 = n5;
-                            }
-                        }
-                    }
-                }
-                p_moveFlying_2_ = (float)n;
-                p_moveFlying_1_ = (float)n2;
-            }
         }
 
         float f = p_moveFlying_1_ * p_moveFlying_1_ + p_moveFlying_2_ * p_moveFlying_2_;

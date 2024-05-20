@@ -171,7 +171,7 @@ public abstract class MixinEntityPlayer extends EntityLivingBase {
 
     @Overwrite
     public boolean isBlocking() {
-        if (ModuleManager.killAura != null && ModuleManager.killAura.isEnabled() && ModuleManager.killAura.block.get() && ((Object) this) == Minecraft.getMinecraft().thePlayer && ModuleManager.killAura.manualBlock.isToggled()) {
+        if (ModuleManager.killAura != null && ModuleManager.killAura.isEnabled() && ModuleManager.killAura.block.get() && ((Object) this) == Minecraft.getMinecraft().thePlayer && (!ModuleManager.killAura.manualBlock.isToggled() || ModuleManager.killAura.rmbDown)) {
             return true;
         }
         return this.isUsingItem() && this.itemInUse.getItem().getItemUseAction(this.itemInUse) == EnumAction.BLOCK;
