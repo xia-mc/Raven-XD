@@ -256,18 +256,18 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
         float f = 0.8F;
         boolean flag2 = this.movementInput.moveForward >= f;
         this.movementInput.updatePlayerMoveState();
-        boolean usingItemModified = this.isUsingItem() || (ModuleManager.killAura != null && ModuleManager.killAura.isEnabled() && ModuleManager.killAura.block.get() && ((Object) this) == Minecraft.getMinecraft().thePlayer && ModuleManager.killAura.rmbDown && ModuleManager.killAura.manualBlock.isToggled());
+        boolean usingItemModified = this.isUsingItem();
         boolean stopSprint = ModuleManager.noSlow == null || !ModuleManager.noSlow.isEnabled() || NoSlow.slowed.getInput() == 80;
-        if (usingItemModified && !this.isRiding()) {
-            MovementInput var10000 = this.movementInput;
-            float slowed = NoSlow.getSlowed();
-            var10000.moveStrafe *= slowed;
-            var10000 = this.movementInput;
-            var10000.moveForward *= slowed;
+        if (usingItemModified && !this.isRiding()) { // Feather Client "sprint" bug is here
+            float slowdownFactor = NoSlow.getSlowed();
+        //    this.movementInput.moveStrafe *= slowdownFactor;
+        //    this.movementInput.moveForward *= slowdownFactor; //temporary solution Feather Client "sprint" bug
+
             if (stopSprint) {
                 this.sprintToggleTimer = 0;
             }
         }
+
 
         this.pushOutOfBlocks(this.posX - (double) this.width * 0.35, this.getEntityBoundingBox().minY + 0.5, this.posZ + (double) this.width * 0.35);
         this.pushOutOfBlocks(this.posX - (double) this.width * 0.35, this.getEntityBoundingBox().minY + 0.5, this.posZ - (double) this.width * 0.35);

@@ -114,3 +114,4 @@ jar {
 }
 
 setLibsDirName("C:\\Users\\mccm9\\AppData\\Roaming\\.minecraft\\mods")
+setLibsDirName("C:\\Users\\mccm9\\AppData\\Roaming\\.feather\\user-mods\\1.8.9")
