@@ -22,24 +22,7 @@ import java.lang.reflect.Field;
 public class RenderUtils {
     private static final Minecraft mc = Minecraft.getMinecraft();
     public static boolean ring_c = false;
-    private static float renderPartialTicks = 0.0f;
-
-    static {
-        try {
-            Field timerField = Minecraft.class.getDeclaredField("timer");
-            timerField.setAccessible(true);
-            Timer timer = (Timer) timerField.get(Minecraft.getMinecraft());
-            Field renderPartialTicksField = Timer.class.getDeclaredField("renderPartialTicks");
-            renderPartialTicksField.setAccessible(true);
-            renderPartialTicks = renderPartialTicksField.getFloat(timer);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private static float getRenderPartialTicks() {
-        return renderPartialTicks;
-    }
+    private static final float renderPartialTicks = 0.0f;
 
     public static void renderBlock(BlockPos blockPos, int color, boolean outline, boolean shade) {
         renderBox(blockPos.getX(), blockPos.getY(), blockPos.getZ(), color, outline, shade);
@@ -158,10 +141,9 @@ public class RenderUtils {
 
         double radius = target.width;
         double height = target.height + 0.1;
-
-        double x = e.lastTickPosX + (target.posX - target.lastTickPosX) * getRenderPartialTicks() - mc.getRenderManager().viewerPosX;
-        double y = (e.lastTickPosY + (target.posY - target.lastTickPosY) * getRenderPartialTicks() - mc.getRenderManager().viewerPosY) + height * drawPercent;
-        double z = e.lastTickPosZ + (target.posZ - target.lastTickPosZ) * getRenderPartialTicks() - mc.getRenderManager().viewerPosZ;
+        double x = e.lastTickPosX + (e.posX - e.lastTickPosX) * (double) Utils.getTimer().renderPartialTicks - mc.getRenderManager().viewerPosX;
+        double y = e.lastTickPosY + (e.posY - e.lastTickPosY) * (double) Utils.getTimer().renderPartialTicks - mc.getRenderManager().viewerPosY + height * drawPercent;
+        double z = e.lastTickPosZ + (e.posZ - e.lastTickPosZ) * (double) Utils.getTimer().renderPartialTicks - mc.getRenderManager().viewerPosZ;
         double eased = (height / 3) * ((drawPercent > 0.5) ? 1 - drawPercent : drawPercent) * ((drawMode) ? -1 : 1);
 
         for (int segments = 0; segments < 360; segments += 5) {
