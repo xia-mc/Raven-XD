@@ -26,7 +26,7 @@ public class Settings extends Module {
     public static SliderSetting timeMultiplier;
     public static ButtonSetting toggleSound;
     public static ButtonSetting sendMessage;
-    private final String[] capes = new String[]{"None", "Anime", "Die", "Aqua", "Green", "Purple", "Red", "White", "Yellow", "Astolfo", "AstolfoBeta", "AstolfoBeta2", "AstolfoTrap"};
+    private final String[] capes = new String[]{"None", "Anime", "Die", "Aqua", "Green", "Purple", "Red", "White", "Yellow", "Astolfo", "AstolfoBeta", "AstolfoBeta2", "AstolfoTrap", "EDog", "Rose", "Pineapples", "BlurSky", "BlurSky2", "Ejected", "Sunset"};
     public static List<ResourceLocation> loadedCapes = new ArrayList<>();
 
     public Settings() {
