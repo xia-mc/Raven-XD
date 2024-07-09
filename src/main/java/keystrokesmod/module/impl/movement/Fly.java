@@ -3,6 +3,7 @@ package keystrokesmod.module.impl.movement;
 import keystrokesmod.event.BlockAABBEvent;
 import keystrokesmod.event.PrePlayerInputEvent;
 import keystrokesmod.event.ReceivePacketEvent;
+import keystrokesmod.mixins.impl.client.KeyBindingAccessor;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.ModeSetting;
@@ -13,6 +14,7 @@ import keystrokesmod.utility.PacketUtils;
 import keystrokesmod.utility.render.RenderUtils;
 import keystrokesmod.utility.Utils;
 import net.minecraft.block.BlockAir;
+import net.minecraft.entity.item.EntityBoat;
 import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.network.play.server.S08PacketPlayerPosLook;
 import net.minecraft.util.AxisAlignedBB;
@@ -27,6 +29,7 @@ public class Fly extends Module {
     private final SliderSetting verticalSpeed;
     private final SliderSetting maxBalance;
     private final ButtonSetting autoDisable;
+    private final SliderSetting motionMultiplier;
     private final ButtonSetting showBPS;
     private final ButtonSetting stopMotion;
     private boolean d;
@@ -39,16 +42,18 @@ public class Fly extends Module {
     private long startTime = -1;
     private Timer.BalanceState balanceState = Timer.BalanceState.NONE;
     private long lastReport = -1;
+    private boolean lastOnBoat = false;
 
     public Fly() {
         super("Fly", category.movement);
-        this.registerSetting(mode = new ModeSetting("Fly", new String[]{"Vanilla", "Fast", "Fast 2", "AirWalk", "GrimAC", "BlocksMC"}, 0));
-        final ModeOnly canChangeSpeed = new ModeOnly(mode, 0, 1, 2);
+        this.registerSetting(mode = new ModeSetting("Fly", new String[]{"Vanilla", "Fast", "Fast 2", "AirWalk", "GrimAC", "BlocksMC", "GrimACBoat"}, 0));
+        final ModeOnly canChangeSpeed = new ModeOnly(mode, 0, 1, 2, 6);
         final ModeOnly balanceMode = new ModeOnly(mode, 4);
-        this.registerSetting(horizontalSpeed = new SliderSetting("Horizontal speed", 2.0, 1.0, 9.0, 0.1, canChangeSpeed));
-        this.registerSetting(verticalSpeed = new SliderSetting("Vertical speed", 2.0, 1.0, 9.0, 0.1, canChangeSpeed));
+        this.registerSetting(horizontalSpeed = new SliderSetting("Horizontal speed", 2.0, 0.0, 9.0, 0.1, canChangeSpeed));
+        this.registerSetting(verticalSpeed = new SliderSetting("Vertical speed", 2.0, 0.0, 9.0, 0.1, canChangeSpeed));
         this.registerSetting(maxBalance = new SliderSetting("Max balance", 6000, 3000, 30000, 1000, "ms", balanceMode));
         this.registerSetting(autoDisable = new ButtonSetting("Auto disable", true, balanceMode));
+        this.registerSetting(motionMultiplier = new SliderSetting("Motion multiplier", 1.0, 0.8, 1.1, 0.05, new ModeOnly(mode, 6)));
         this.registerSetting(showBPS = new ButtonSetting("Show BPS", false));
         this.registerSetting(stopMotion = new ButtonSetting("Stop motion", false));
     }
@@ -174,6 +179,21 @@ public class Fly extends Module {
                 mc.thePlayer.motionY = 0.0;
                 setSpeed(0.4 * horizontalSpeed.getInput());
                 break;
+            case 6:
+                boolean curOnBoat = mc.thePlayer.isRiding() && mc.thePlayer.ridingEntity instanceof EntityBoat;
+
+                mc.thePlayer.motionX *= motionMultiplier.getInput();
+                mc.thePlayer.motionY *= motionMultiplier.getInput();
+                mc.thePlayer.motionZ *= motionMultiplier.getInput();
+
+                if (lastOnBoat && !curOnBoat) {
+                    mc.thePlayer.setSneaking(false);
+                    ((KeyBindingAccessor) mc.gameSettings.keyBindSneak).setPressed(false);
+                    MoveUtil.strafe(horizontalSpeed.getInput());
+                    mc.thePlayer.motionY = verticalSpeed.getInput();
+                }
+
+                lastOnBoat = curOnBoat;
         }
 
     }
@@ -207,6 +227,7 @@ public class Fly extends Module {
         if ((int) mode.getInput() == 5) {
             MoveUtil.stop();
         }
+        lastOnBoat = false;
     }
 
     private void balance$reset() {

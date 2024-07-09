@@ -23,6 +23,7 @@ import keystrokesmod.module.setting.utils.ModeOnly;
 import keystrokesmod.utility.*;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.play.client.C02PacketUseEntity;
 import net.minecraft.network.play.client.C0APacketAnimation;
@@ -58,8 +59,9 @@ public class Velocity extends Module {
     private final ButtonSetting debug;
 
     private boolean attacked = false;
-    private Entity lastAttack = null;
+    private EntityLivingBase lastAttack = null;
     private long lastVelocityTime = -1;
+    private boolean gotVelocity = false;
 
     public Velocity() {
         super("Velocity", category.combat);
@@ -97,12 +99,11 @@ public class Velocity extends Module {
                     mc.thePlayer.setSprinting(false);
                     if (debug.isToggled()) Utils.sendMessage(String.format("reduced %.2f %.2f", motionX - mc.thePlayer.motionX, motionZ - mc.thePlayer.motionZ));
                 }
+                attacked = false;
             }
         } catch (NullPointerException e) {
             Utils.sendMessage(e.getLocalizedMessage());
         }
-
-        attacked = false;
     }
 
     @SubscribeEvent
@@ -112,8 +113,8 @@ public class Velocity extends Module {
         }
 
         if (mode.getInput() == 3) {
-            if (attacked && lastAttack != null
-                    && RotationUtils.isMouseOver(RotationHandler.getRotationYaw(), RotationHandler.getRotationPitch(), lastAttack, 3)) {
+            if (gotVelocity && attacked && lastAttack != null
+                    && !KillAura.behindBlocks(new float[]{RotationHandler.getRotationYaw(), RotationHandler.getRotationPitch()}, lastAttack)) {
                 final double motionX = mc.thePlayer.motionX;
                 final double motionZ = mc.thePlayer.motionZ;
                 if (((EntityPlayerSPAccessor) mc.thePlayer).isServerSprint() && MoveUtil.isMoving()) {
@@ -125,6 +126,7 @@ public class Velocity extends Module {
                 }
                 if (debug.isToggled()) Utils.sendMessage(String.format("reduced %.2f %.2f", motionX - mc.thePlayer.motionX, motionZ - mc.thePlayer.motionZ));
             }
+            gotVelocity = false;
             attacked = false;
         }
     }
@@ -132,7 +134,7 @@ public class Velocity extends Module {
     private void grimAC$reduce() {
         for (int i = 0; i < 5; i++) {
             PacketUtils.sendPacketNoEvent(new C0APacketAnimation());
-            PacketUtils.sendPacketNoEvent(new C02PacketUseEntity(KillAura.target, C02PacketUseEntity.Action.ATTACK));
+            PacketUtils.sendPacketNoEvent(new C02PacketUseEntity(lastAttack, C02PacketUseEntity.Action.ATTACK));
             mc.thePlayer.motionX *= 0.6;
             mc.thePlayer.motionZ *= 0.6;
         }
@@ -140,8 +142,10 @@ public class Velocity extends Module {
 
     @SubscribeEvent
     public void onAttack(@NotNull AttackEntityEvent event) {
-        attacked = true;
-        lastAttack = event.target;
+        if (event.target instanceof EntityLivingBase) {
+            attacked = true;
+            lastAttack = (EntityLivingBase) event.target;
+        }
     }
 
     private boolean overAir() {
@@ -164,6 +168,7 @@ public class Velocity extends Module {
                     return;
                 }
                 lastVelocityTime = System.currentTimeMillis();
+                gotVelocity = true;
                 if (lobbyCheck.isToggled() && isLobby()) {
                     return;
                 }

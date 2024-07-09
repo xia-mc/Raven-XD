@@ -17,12 +17,13 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.MathHelper;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
+import org.lwjgl.opengl.GL11;
 
 import static net.minecraft.util.MovingObjectPosition.MovingObjectType.BLOCK;
 
 public class Animations extends Module {
-    private final ModeSetting blockAnimation = new ModeSetting("Block animation", new String[]{"None", "1.7", "Smooth", "Exhibition"}, 1);
-    private final ModeSetting swingAnimation = new ModeSetting("Swing animation", new String[]{"None", "1.9+", "Smooth"}, 0);
+    private final ModeSetting blockAnimation = new ModeSetting("Block animation", new String[]{"None", "1.7", "Smooth", "Exhibition", "Stab", "Spin", "Sigma", "Wood", "Swong", "Chill", "Komorebi", "Rhys", "Allah"}, 1);
+    private final ModeSetting swingAnimation = new ModeSetting("Swing animation", new String[]{"None", "1.9+", "Smooth", "Punch", "Shove"}, 0);
     private final ModeSetting otherAnimation = new ModeSetting("Other animation", new String[]{"None", "1.7"}, 1);
     private final ButtonSetting blockAndSwing = new ButtonSetting("Block and swing", false);
     private final SliderSetting x = new SliderSetting("X", 0, -1, 1, 0.05);
@@ -86,14 +87,88 @@ public class Animations extends Module {
                                 GlStateManager.rotate(-y * 20.0F, 1.0F, 0.5F, 1.0F);
                                 break;
 
-                            case 3: {
+                            case 3:
                                 itemRenderer.transformFirstPersonItem(animationProgression / 2.0F, 0.0F);
                                 GlStateManager.translate(0.0F, 0.3F, -0.0F);
                                 GlStateManager.rotate(-convertedProgress * 31.0F, 1.0F, 0.0F, 2.0F);
                                 GlStateManager.rotate(-convertedProgress * 33.0F, 1.5F, (convertedProgress / 1.1F), 0.0F);
                                 itemRenderer.blockTransformation();
                                 break;
-                            }
+
+                            case 4:
+                                final float spin = MathHelper.sin(MathHelper.sqrt_float(swingProgress) * (float) Math.PI);
+
+                                GlStateManager.translate(0.6f, 0.3f, -0.6f + -spin * 0.7);
+                                GlStateManager.rotate(6090, 0.0f, 0.0f, 0.1f);
+                                GlStateManager.rotate(6085, 0.0f, 0.1f, 0.0f);
+                                GlStateManager.rotate(6110, 0.1f, 0.0f, 0.0f);
+                                itemRenderer.transformFirstPersonItem(0.0F, 0.0f);
+                                itemRenderer.blockTransformation();
+                                break;
+
+                            case 5:
+                                itemRenderer.transformFirstPersonItem(animationProgression, 0.0F);
+                                GlStateManager.translate(0, 0.2F, -1);
+                                GlStateManager.rotate(-59, -1, 0, 3);
+                                // Don't cast as float
+                                GlStateManager.rotate(-(System.currentTimeMillis() / 2 % 360), 1, 0, 0.0F);
+                                GlStateManager.rotate(60.0F, 0.0F, 1.0F, 0.0F);
+                                break;
+
+                            case 6:
+                                itemRenderer.transformFirstPersonItem(animationProgression, 0.0F);
+                                GlStateManager.translate(0.0f, 0.1F, 0.0F);
+                                itemRenderer.blockTransformation();
+                                GlStateManager.rotate(convertedProgress * 35.0F / 2.0F, 0.0F, 1.0F, 1.5F);
+                                GlStateManager.rotate(-convertedProgress * 135.0F / 4.0F, 1.0f, 1.0F, 0.0F);
+
+                                break;
+
+                            case 7:
+                                itemRenderer.transformFirstPersonItem(animationProgression / 2.0F, 0.0F);
+                                GlStateManager.translate(0.0F, 0.3F, -0.0F);
+                                GlStateManager.rotate(-convertedProgress * 30.0F, 1.0F, 0.0F, 2.0F);
+                                GlStateManager.rotate(-convertedProgress * 44.0F, 1.5F, (convertedProgress / 1.2F), 0.0F);
+                                itemRenderer.blockTransformation();
+
+                                break;
+
+                            case 8:
+                                itemRenderer.transformFirstPersonItem(animationProgression / 2.0F, swingProgress);
+                                GlStateManager.rotate(convertedProgress * 30.0F / 2.0F, -convertedProgress, -0.0F, 9.0F);
+                                GlStateManager.rotate(convertedProgress * 40.0F, 1.0F, -convertedProgress / 2.0F, -0.0F);
+                                GlStateManager.translate(0.0F, 0.2F, 0.0F);
+                                itemRenderer.blockTransformation();
+
+                                break;
+
+                            case 9:
+                                itemRenderer.transformFirstPersonItem(-0.25F, 1.0F + convertedProgress / 10.0F);
+                                GL11.glRotated(-convertedProgress * 25.0F, 1.0F, 0.0F, 0.0F);
+                                itemRenderer.blockTransformation();
+
+                                break;
+
+                            case 10:
+                                GlStateManager.translate(0.41F, -0.25F, -0.5555557F);
+                                GlStateManager.translate(0.0F, 0, 0.0F);
+                                GlStateManager.rotate(35.0F, 0f, 1.5F, 0.0F);
+
+                                final float racism = MathHelper.sin(swingProgress * swingProgress / 64 * (float) Math.PI);
+
+                                GlStateManager.rotate(racism * -5.0F, 0.0F, 0.0F, 0.0F);
+                                GlStateManager.rotate(convertedProgress * -12.0F, 0.0F, 0.0F, 1.0F);
+                                GlStateManager.rotate(convertedProgress * -65.0F, 1.0F, 0.0F, 0.0F);
+                                itemRenderer.blockTransformation();
+
+                                break;
+
+                            case 11:
+                                itemRenderer.transformFirstPersonItem(animationProgression, swingProgress);
+                                itemRenderer.blockTransformation();
+                                GlStateManager.translate(-0.3F, -0.1F, -0.0F);
+
+                                break;
                         }
                         break;
                     case EAT:
@@ -142,6 +217,16 @@ public class Animations extends Module {
                     case 2:
                         itemRenderer.transformFirstPersonItem(animationProgression, swingProgress);
                         func_178105_d(animationProgression);
+                        break;
+
+                    case 3:
+                        itemRenderer.transformFirstPersonItem(animationProgression, swingProgress);
+                        func_178105_d(swingProgress);
+                        break;
+
+                    case 4:
+                        itemRenderer.transformFirstPersonItem(animationProgression, animationProgression);
+                        func_178105_d(swingProgress);
                         break;
                 }
 

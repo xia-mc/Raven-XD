@@ -7,6 +7,8 @@ import keystrokesmod.module.setting.impl.DescriptionSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.utility.Utils;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
@@ -36,31 +38,37 @@ public class AutoWeapon extends Module {
     }
 
     @SubscribeEvent
-public void onTick(TickEvent.RenderTickEvent e) {
-    if (Utils.nullCheck() || !mc.inGameHasFocus || mc.currentScreen != null) {
-        resetSlot();
-        resetVariables();
-        return;
-    }
-    Entity hoveredEntity = mc.objectMouseOver != null ? mc.objectMouseOver.entityHit : null;
-    if (!(hoveredEntity instanceof Entity)) {
-        resetSlot();
-        resetVariables();
-        return;
-    }
-    ticksHovered = hoveredEntity.equals(currentEntity) ? ticksHovered + 1 : 0;
-    currentEntity = hoveredEntity;
+    public void onTick(TickEvent.RenderTickEvent e) {
+        if (Utils.nullCheck() || !mc.inGameHasFocus || mc.currentScreen != null) {
+            resetSlot();
+            resetVariables();
+            return;
+        }
+        Entity hoveredEntity = mc.objectMouseOver != null ? mc.objectMouseOver.entityHit : null;
+        if (!(hoveredEntity instanceof Entity)) {
+            resetSlot();
+            resetVariables();
+            return;
+        }
+        ticksHovered = hoveredEntity.equals(currentEntity) ? ticksHovered + 1 : 0;
+        if (hoveredEntity instanceof EntityLivingBase
+                && !AntiBot.isBot(hoveredEntity)
+                && (!(hoveredEntity instanceof EntityPlayer) || Utils.isFriended((EntityPlayer) hoveredEntity))
+                && !Utils.isTeamMate(hoveredEntity)
+        ) {
+            currentEntity = hoveredEntity;
+        }
 
-    if (hoverDelay.getInput() == 0 || ticksHovered > hoverDelay.getInput()) {
-        int slot = Utils.getWeapon();
-        if (slot != -1) {
-            if (previousSlot == -1) {
-                previousSlot = SlotHandler.getCurrentSlot();
+        if (hoverDelay.getInput() == 0 || ticksHovered > hoverDelay.getInput()) {
+            int slot = Utils.getWeapon();
+            if (slot != -1) {
+                if (previousSlot == -1) {
+                    previousSlot = SlotHandler.getCurrentSlot();
+                }
+                setSlot(slot);
             }
-            setSlot(slot);
         }
     }
-}
     private void resetVariables() {
         ticksHovered = 0;
         resetSlot();

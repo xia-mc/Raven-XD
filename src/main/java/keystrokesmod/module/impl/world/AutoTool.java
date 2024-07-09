@@ -15,6 +15,7 @@ public class AutoTool extends Module {
     private final ButtonSetting rightDisable;
     private final ButtonSetting requireMouse;
     private final ButtonSetting swap;
+    private final ButtonSetting sneakRequire;
     private int previousSlot = -1;
     private int ticksHovered;
     private BlockPos currentBlock;
@@ -24,6 +25,7 @@ public class AutoTool extends Module {
         this.registerSetting(rightDisable = new ButtonSetting("Disable while right click", true));
         this.registerSetting(requireMouse = new ButtonSetting("Require mouse down", true));
         this.registerSetting(swap = new ButtonSetting("Swap to previous slot", true));
+        this.registerSetting(sneakRequire = new ButtonSetting("Sneak require", false));
     }
 
     public void onDisable() {
@@ -47,7 +49,7 @@ public class AutoTool extends Module {
             return;
         }
         MovingObjectPosition over = mc.objectMouseOver;
-        if (over == null || over.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK) {
+        if (over == null || over.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK || (sneakRequire.isToggled() && !mc.thePlayer.isSneaking())) {
             resetSlot();
             resetVariables();
             return;
