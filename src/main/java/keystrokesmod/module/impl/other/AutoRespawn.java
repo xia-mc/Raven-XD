@@ -19,13 +19,12 @@ public class AutoRespawn extends Module{
     }
    @SubscribeEvent
     public void onReceive(@NotNull ReceivePacketEvent event) {
-        if(Minecraft.getMinecraft().thePlayer.isDead){
+        Minecraft.getMinecraft().addScheduledTask(() -> {
             try {
                 Thread.sleep((long) delay.getInput());
+                PacketUtils.sendPacketNoEvent(new C16PacketClientStatus(C16PacketClientStatus.EnumState.PERFORM_RESPAWN));
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            PacketUtils.sendPacketNoEvent(new C16PacketClientStatus(C16PacketClientStatus.EnumState.PERFORM_RESPAWN));
-        }
-    };
+        });
 }
