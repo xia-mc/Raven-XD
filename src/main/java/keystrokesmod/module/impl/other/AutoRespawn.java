@@ -2,6 +2,7 @@ package keystrokesmod.module.impl.other;
 
 import keystrokesmod.Raven;
 import keystrokesmod.event.ReceivePacketEvent;
+import java.util.concurrent.TimeUnit;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.DescriptionSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
@@ -11,9 +12,6 @@ import net.minecraft.network.play.client.C16PacketClientStatus;
 import org.jetbrains.annotations.NotNull;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-import java.util.concurrent.TimeUnit;
-
-
 public class AutoRespawn extends Module{
     private final SliderSetting delay;
     public AutoRespawn() {
@@ -22,10 +20,12 @@ public class AutoRespawn extends Module{
         this.registerSetting(delay = new SliderSetting("Delay (ms)", 0, 0, 100000, 1000));
     }
    @SubscribeEvent
-  public void onReceive(@NotNull ReceivePacketEvent event) {
-        Raven.getExecutor().schedule(() ->
+    public void onReceive(@NotNull ReceivePacketEvent event) {
+        if(Minecraft.getMinecraft().thePlayer.isDead){
+            Raven.getExecutor().schedule(() ->
                 PacketUtils.sendPacketNoEvent(new C16PacketClientStatus(C16PacketClientStatus.EnumState.PERFORM_RESPAWN)),
                 (long) delay.getInput(),
                 TimeUnit.MILLISECONDS);
-    }
+        }
+    };
 }
