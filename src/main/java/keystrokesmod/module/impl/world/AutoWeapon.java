@@ -1,5 +1,7 @@
 package keystrokesmod.module.impl.world;
 
+import keystrokesmod.event.PreMotionEvent;
+import keystrokesmod.event.PreUpdateEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.other.SlotHandler;
 import keystrokesmod.module.setting.impl.ButtonSetting;
@@ -16,6 +18,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 public class AutoWeapon extends Module {
     private final SliderSetting hoverDelay;
     private final ButtonSetting swap;
+    private final ButtonSetting ignoreTeammates;
     private int previousSlot = -1;
     private int ticksHovered;
     private Entity currentEntity;
@@ -23,8 +26,9 @@ public class AutoWeapon extends Module {
         super("AutoWeapon", category.world);
         this.registerSetting(hoverDelay = new SliderSetting("Hover delay", 0.0, 0.0, 20.0, 1.0));
         this.registerSetting(swap = new ButtonSetting("Swap to previous slot", true));
+        this.registerSetting(ignoreTeammates = new ButtonSetting("Ignore teammates", true));
         this.registerSetting(new DescriptionSetting("Configure your weapons in the Settings tab."));
-        }
+    }
 
     public void onDisable() {
         resetVariables();
@@ -38,26 +42,24 @@ public class AutoWeapon extends Module {
     }
 
     @SubscribeEvent
-    public void onTick(TickEvent.RenderTickEvent e) {
-        if (Utils.nullCheck() || !mc.inGameHasFocus || mc.currentScreen != null) {
+    public void onPreMotion(PreMotionEvent e) {
+        if (!Utils.nullCheck() || !mc.inGameHasFocus || mc.currentScreen != null) {
             resetSlot();
             resetVariables();
             return;
         }
         Entity hoveredEntity = mc.objectMouseOver != null ? mc.objectMouseOver.entityHit : null;
-        if (!(hoveredEntity instanceof Entity)) {
+        if (!(hoveredEntity instanceof EntityLivingBase)
+                || (hoveredEntity instanceof EntityPlayer && AntiBot.isBot(hoveredEntity))
+                || (hoveredEntity instanceof EntityPlayer && Utils.isFriended((EntityPlayer) hoveredEntity))
+                || (ignoreTeammates.isToggled() && Utils.isTeamMate(hoveredEntity))
+        ) {
             resetSlot();
             resetVariables();
             return;
         }
         ticksHovered = hoveredEntity.equals(currentEntity) ? ticksHovered + 1 : 0;
-        if (hoveredEntity instanceof EntityLivingBase
-                && !AntiBot.isBot(hoveredEntity)
-                && (!(hoveredEntity instanceof EntityPlayer) || Utils.isFriended((EntityPlayer) hoveredEntity))
-                && !Utils.isTeamMate(hoveredEntity)
-        ) {
-            currentEntity = hoveredEntity;
-        }
+        currentEntity = hoveredEntity;
 
         if (hoverDelay.getInput() == 0 || ticksHovered > hoverDelay.getInput()) {
             int slot = Utils.getWeapon();

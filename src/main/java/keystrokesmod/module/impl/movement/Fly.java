@@ -53,7 +53,7 @@ public class Fly extends Module {
         this.registerSetting(verticalSpeed = new SliderSetting("Vertical speed", 2.0, 0.0, 9.0, 0.1, canChangeSpeed));
         this.registerSetting(maxBalance = new SliderSetting("Max balance", 6000, 3000, 30000, 1000, "ms", balanceMode));
         this.registerSetting(autoDisable = new ButtonSetting("Auto disable", true, balanceMode));
-        this.registerSetting(motionMultiplier = new SliderSetting("Motion multiplier", 1.0, 0.8, 1.1, 0.05, new ModeOnly(mode, 6)));
+        this.registerSetting(motionMultiplier = new SliderSetting("Motion multiplier", 1.0, 0.8, 1.2, 0.05, new ModeOnly(mode, 6)));
         this.registerSetting(showBPS = new ButtonSetting("Show BPS", false));
         this.registerSetting(stopMotion = new ButtonSetting("Stop motion", false));
     }
