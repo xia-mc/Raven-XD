@@ -27,4 +27,4 @@ public class AutoRespawn extends Module{
                 e.printStackTrace();
             }
         });
-}
+}}
