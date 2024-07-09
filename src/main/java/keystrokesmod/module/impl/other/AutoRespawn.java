@@ -12,7 +12,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 public class AutoRespawn extends Module{
     public AutoRespawn() {
         super("AutoRespawn", category.other);
-        this.registerSetting(new DescriptionSetting("Automatically respawns you after you die."));
+        this.registerSetting(new DescriptionSetting("Automatically respawn."));
     }
    @SubscribeEvent
     public void onReceive(@NotNull ReceivePacketEvent event) {
