@@ -8,7 +8,6 @@ import keystrokesmod.module.impl.client.Settings;
 import keystrokesmod.module.impl.combat.Velocity;
 import keystrokesmod.module.impl.minigames.DuelsStats;
 import keystrokesmod.module.impl.movement.Fly;
-import keystrokesmod.module.impl.movement.Speed;
 import keystrokesmod.module.impl.other.FakeChat;
 import keystrokesmod.module.impl.other.NameHider;
 import keystrokesmod.module.impl.render.HUD;
@@ -16,7 +15,6 @@ import keystrokesmod.utility.font.Font;
 import keystrokesmod.utility.profile.Profile;
 import keystrokesmod.utility.render.RenderUtils;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiChat;
 import net.minecraft.network.play.client.C01PacketChatMessage;
 import org.jetbrains.annotations.NotNull;
@@ -97,7 +95,7 @@ public class Commands {
                     return;
                 }
 
-                NameHider.n = args.get(1);
+                NameHider.n = args.get(1).replace("&", "§");
                 print("&a" + Utils.uf("name") + "Nick has been set to:".substring(4), 1);
                 print("\"" + NameHider.n + "\"", 0);
             } else if (args.get(0).equals(FakeChat.command)) {
