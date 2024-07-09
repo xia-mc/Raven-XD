@@ -8,6 +8,7 @@ import keystrokesmod.module.setting.impl.SliderSetting;
 import org.jetbrains.annotations.NotNull;
 
 public class Settings extends Module {
+    public static ButtonSetting weaponSword;
     public static ButtonSetting weaponAxe;
     public static ButtonSetting weaponRod;
     public static ButtonSetting weaponStick;
@@ -20,6 +21,7 @@ public class Settings extends Module {
     public Settings() {
         super("Settings", category.client, 0);
         this.registerSetting(new DescriptionSetting("General"));
+        this.registerSetting(weaponSword = new ButtonSetting("Set sword as weapon", true));
         this.registerSetting(weaponAxe = new ButtonSetting("Set axe as weapon", false));
         this.registerSetting(weaponRod = new ButtonSetting("Set rod as weapon", false));
         this.registerSetting(weaponStick = new ButtonSetting("Set stick as weapon", false));

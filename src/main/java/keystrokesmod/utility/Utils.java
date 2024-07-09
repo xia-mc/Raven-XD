@@ -221,7 +221,44 @@ public class Utils {
         }
         return n2;
     }
-
+    public static int getWeapon() {
+        int weaponIndex = -1;
+        double highestPriority = 0.0;
+    
+        for (int i = 0; i < InventoryPlayer.getHotbarSize(); ++i) {
+            ItemStack item = mc.thePlayer.inventory.getStackInSlot(i);
+            if (item == null) continue;
+    
+            double priority = 0.0;
+            double typePriority = 0.0;
+    
+            if (Settings.weaponSword.isToggled() && item.getItem() instanceof ItemSword) {
+                priority = getDamage(item);
+                typePriority = 0.4; 
+            } else if (Settings.weaponAxe.isToggled() && item.getItem() instanceof ItemAxe) {
+                priority = getDamage(item);
+                typePriority = 0.3;
+            } else if (Settings.weaponStick.isToggled() && item.getItem() == Items.stick) {
+                priority = getDamage(item);
+                typePriority = 0.2; 
+            } else if (Settings.weaponRod.isToggled() && item.getItem() == Items.fishing_rod) {
+                priority = getDamage(item);
+                typePriority = 0.1;
+            }
+            // The typePriority is added to ensure that if two weapons have the same damage,
+            // the weapon with the higher typePriority (based on the predefined weapon order:
+            // sword > axe > stick > rod) is selected. This helps in making a more informed
+            // choice when weapons have identical damage values.
+            priority += typePriority;
+    
+            if (priority > highestPriority) {
+                highestPriority = priority;
+                weaponIndex = i;
+            }
+        }
+    
+        return weaponIndex;
+    }
     public static float getEfficiency(final ItemStack itemStack, final Block block) {
         float getStrVsBlock = itemStack.getStrVsBlock(block);
         if (getStrVsBlock > 1.0f) {
@@ -801,7 +838,7 @@ public static List<String> getSidebarLines() {
             return false;
         }
         Item getItem = mc.thePlayer.getHeldItem().getItem();
-        return getItem instanceof ItemSword || (Settings.weaponAxe.isToggled() && getItem instanceof ItemAxe) || (Settings.weaponRod.isToggled() && getItem instanceof ItemFishingRod) || (Settings.weaponStick.isToggled() && getItem == Items.stick);
+        return (Settings.weaponSword.isToggled() || getItem instanceof ItemSword) || (Settings.weaponAxe.isToggled() && getItem instanceof ItemAxe) || (Settings.weaponRod.isToggled() && getItem instanceof ItemFishingRod) || (Settings.weaponStick.isToggled() && getItem == Items.stick);
     }
 
     public static boolean holdingSword() {

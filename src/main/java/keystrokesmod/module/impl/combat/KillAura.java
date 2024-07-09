@@ -690,7 +690,7 @@ public class KillAura extends Module {
         blinking = false;
     }
 
-    private boolean behindBlocks(float[] rotations, EntityLivingBase target) {
+    public static boolean behindBlocks(float[] rotations, EntityLivingBase target) {
         try {
             Vec3 eyePos = Utils.getEyePos();
             MovingObjectPosition hitResult = RotationUtils.rayCast(

@@ -211,8 +211,9 @@ public class ModuleManager {
         this.addModule(panic = new Panic());
         this.addModule(slotHandler = new SlotHandler());
         this.addModule(staffDetector = new StaffDetector());
-	this.addModule(new AutoWeapon());
+	      this.addModule(new AutoWeapon());
       	this.addModule(autoRespawn = new AutoRespawn());
+
         antiBot.enable();
         commandChat.enable();
         modSpoofer.enable();

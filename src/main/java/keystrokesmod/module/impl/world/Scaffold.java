@@ -5,6 +5,7 @@ import keystrokesmod.event.JumpEvent;
 import keystrokesmod.event.PreMotionEvent;
 import keystrokesmod.event.PreUpdateEvent;
 import keystrokesmod.event.RotationEvent;
+import keystrokesmod.mixins.impl.client.KeyBindingAccessor;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.other.RotationHandler;
 import keystrokesmod.module.impl.other.SlotHandler;
@@ -629,8 +630,8 @@ public class Scaffold extends Module { // from b4 :)
         if (sneak.isToggled()) {
             if (sneak$bridged >= sneakEveryBlocks.getInput()) {
                 sneak$bridged = 0;
-                mc.thePlayer.setSneaking(true);
-                Raven.getExecutor().schedule(() -> mc.thePlayer.setSneaking(false), (long) sneakTime.getInput(), TimeUnit.MILLISECONDS);
+                ((KeyBindingAccessor) mc.gameSettings.keyBindSneak).setPressed(true);
+                Raven.getExecutor().schedule(() -> ((KeyBindingAccessor) mc.gameSettings.keyBindSneak).setPressed(Keyboard.isKeyDown(mc.gameSettings.keyBindSneak.getKeyCode())), (long) sneakTime.getInput(), TimeUnit.MILLISECONDS);
             }
         }
 
