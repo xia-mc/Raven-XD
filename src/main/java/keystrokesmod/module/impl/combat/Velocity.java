@@ -1,13 +1,7 @@
 package keystrokesmod.module.impl.combat;
 
-import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.type.Type;
 import keystrokesmod.Raven;
-import keystrokesmod.event.PreMotionEvent;
-import keystrokesmod.event.PreUpdateEvent;
-import keystrokesmod.event.ReceivePacketEvent;
-import keystrokesmod.event.RotationEvent;
+import keystrokesmod.event.*;
 import keystrokesmod.mixins.impl.entity.EntityPlayerSPAccessor;
 import keystrokesmod.mixins.impl.network.S12PacketEntityVelocityAccessor;
 import keystrokesmod.mixins.impl.network.S27PacketExplosionAccessor;
@@ -21,10 +15,8 @@ import keystrokesmod.module.setting.impl.ModeSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.utils.ModeOnly;
 import keystrokesmod.utility.*;
-import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.entity.Entity;
+import net.minecraft.block.BlockAir;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.play.client.C02PacketUseEntity;
 import net.minecraft.network.play.client.C0APacketAnimation;
 import net.minecraft.network.play.client.C0BPacketEntityAction;
@@ -34,7 +26,6 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraftforge.event.entity.player.AttackEntityEvent;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
@@ -43,7 +34,7 @@ import java.util.concurrent.TimeUnit;
 import static keystrokesmod.utility.Utils.isLobby;
 
 public class Velocity extends Module {
-    private static final String[] MODES = new String[]{"Normal", "Hypixel", "Intave", "GrimAC"};
+    private static final String[] MODES = new String[]{"Normal", "Hypixel", "Intave", "GrimAC", "Karhu"};
     public static ModeSetting mode;
     public static SliderSetting horizontal;
     public static SliderSetting vertical;
@@ -252,6 +243,19 @@ public class Velocity extends Module {
                     }
                     e.setCanceled(true);
                     break;
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public void onBlockAABBE(BlockAABBEvent event) {
+        if (mode.getInput() != 4) return;
+
+        if (event.getBlock() instanceof BlockAir && mc.thePlayer.hurtTime > 0) {
+            final double x = event.getBlockPos().getX(), y = event.getBlockPos().getY(), z = event.getBlockPos().getZ();
+
+            if (y == Math.floor(mc.thePlayer.posY) + 1) {
+                event.setBoundingBox(AxisAlignedBB.fromBounds(0, 0, 0, 1, 0, 1).offset(x, y, z));
             }
         }
     }
