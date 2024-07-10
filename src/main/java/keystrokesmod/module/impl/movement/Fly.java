@@ -9,11 +9,13 @@ import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.ModeSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.utils.ModeOnly;
+import keystrokesmod.script.classes.Vec3;
 import keystrokesmod.utility.MoveUtil;
 import keystrokesmod.utility.PacketUtils;
 import keystrokesmod.utility.render.RenderUtils;
 import keystrokesmod.utility.Utils;
 import net.minecraft.block.BlockAir;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityBoat;
 import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.network.play.server.S08PacketPlayerPosLook;
@@ -29,7 +31,6 @@ public class Fly extends Module {
     private final SliderSetting verticalSpeed;
     private final SliderSetting maxBalance;
     private final ButtonSetting autoDisable;
-    private final SliderSetting motionMultiplier;
     private final ButtonSetting showBPS;
     private final ButtonSetting stopMotion;
     private boolean d;
@@ -42,7 +43,6 @@ public class Fly extends Module {
     private long startTime = -1;
     private Timer.BalanceState balanceState = Timer.BalanceState.NONE;
     private long lastReport = -1;
-    private boolean lastOnBoat = false;
 
     public Fly() {
         super("Fly", category.movement);
@@ -53,7 +53,6 @@ public class Fly extends Module {
         this.registerSetting(verticalSpeed = new SliderSetting("Vertical speed", 2.0, 0.0, 9.0, 0.1, canChangeSpeed));
         this.registerSetting(maxBalance = new SliderSetting("Max balance", 6000, 3000, 30000, 1000, "ms", balanceMode));
         this.registerSetting(autoDisable = new ButtonSetting("Auto disable", true, balanceMode));
-        this.registerSetting(motionMultiplier = new SliderSetting("Motion multiplier", 1.0, 0.8, 1.2, 0.05, new ModeOnly(mode, 6)));
         this.registerSetting(showBPS = new ButtonSetting("Show BPS", false));
         this.registerSetting(stopMotion = new ButtonSetting("Stop motion", false));
     }
@@ -180,20 +179,31 @@ public class Fly extends Module {
                 setSpeed(0.4 * horizontalSpeed.getInput());
                 break;
             case 6:
-                boolean curOnBoat = mc.thePlayer.isRiding() && mc.thePlayer.ridingEntity instanceof EntityBoat;
-
-                mc.thePlayer.motionX *= motionMultiplier.getInput();
-                mc.thePlayer.motionY *= motionMultiplier.getInput();
-                mc.thePlayer.motionZ *= motionMultiplier.getInput();
-
-                if (lastOnBoat && !curOnBoat) {
-                    mc.thePlayer.setSneaking(false);
-                    ((KeyBindingAccessor) mc.gameSettings.keyBindSneak).setPressed(false);
-                    MoveUtil.strafe(horizontalSpeed.getInput());
-                    mc.thePlayer.motionY = verticalSpeed.getInput();
+                /*
+                 * @see ac.grim.grimac.predictionengine.UncertaintyHandler#hasHardCollision
+                 * SUPER⭐GrimAC⭐TIME
+                 */
+                for (Entity entity : mc.theWorld.loadedEntityList) {
+                    AxisAlignedBB playerBox = mc.thePlayer.getEntityBoundingBox();
+                    AxisAlignedBB grimACBox = playerBox.expand(1, 1, 1);
+                    if (entity instanceof EntityBoat) {
+                        AxisAlignedBB boatBox = entity.getEntityBoundingBox();
+                        if (boatBox.intersectsWith(grimACBox) && !(boatBox.intersectsWith(playerBox))) {
+                            if (Utils.jumpDown()) {
+                                mc.thePlayer.motionY = 0.5 * verticalSpeed.getInput();
+                            } else if (mc.thePlayer.isSneaking()) {
+                                mc.thePlayer.motionY = -0.5 * verticalSpeed.getInput();
+                            } else {
+                                mc.thePlayer.motionY = 0.0;
+                            }
+                            if (MoveUtil.isMoving())
+                                MoveUtil.strafe(horizontalSpeed.getInput());
+                            else
+                                MoveUtil.stop();
+                        }
+                    }
                 }
-
-                lastOnBoat = curOnBoat;
+                break;
         }
 
     }
@@ -227,7 +237,6 @@ public class Fly extends Module {
         if ((int) mode.getInput() == 5) {
             MoveUtil.stop();
         }
-        lastOnBoat = false;
     }
 
     private void balance$reset() {

@@ -1,6 +1,5 @@
 package keystrokesmod.module.impl.render;
 
-import com.mojang.realmsclient.gui.ChatFormatting;
 import keystrokesmod.Raven;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
@@ -35,7 +34,7 @@ import java.util.*;
 import java.util.List;
 
 public class HUD extends Module {
-    public static final String VERSION = "1.12.1";
+    public static final String VERSION = "1.13.0";
     public static final HashMap<String, ResourceLocation> WATERMARK = new HashMap<>();
     public static ModeSetting theme;
 //    public static SliderSetting font;

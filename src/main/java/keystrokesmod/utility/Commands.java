@@ -315,20 +315,11 @@ public class Commands {
 
                 print("&aSet BName to " + HUD.bName, 1);
             } else if (args.get(0).equals("binds")) {
-                StringBuilder result = new StringBuilder(ChatFormatting.BOLD + "Binds:" + ChatFormatting.RESET + '\n');
-
                 for (Module module : Raven.getModuleManager().getModules()) {
                     if (module.getKeycode() != 0) {
-                        if (result.length() > 0)
-                            result.append('\n');
-                        result.append(ChatFormatting.AQUA)
-                                .append(module.getName())
-                                .append(": ")
-                                .append(Keyboard.getKeyName(module.getKeycode()));
+                        print(ChatFormatting.AQUA + module.getName() + ": " + Keyboard.getKeyName(module.getKeycode()), 1);
                     }
                 }
-
-                print(result.toString(), 1);
             } else if (args.get(0).equals("bind")) {
                 if (!hasArgs) {
                     print(invSyn, 1);

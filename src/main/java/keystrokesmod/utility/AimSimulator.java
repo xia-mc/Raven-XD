@@ -74,10 +74,36 @@ public class AimSimulator {
         float fixedCurrent = RotationUtils.normalize(current);
 
         float delta;
-        if (fixedTarget > fixedCurrent)
-            delta = Math.min(fixedTarget - fixedCurrent, diff);
-        else
-            delta = Math.min(fixedCurrent - fixedTarget, diff);
-        return current + delta;
+        if (fixedTarget > fixedCurrent) {
+            float dist1 = fixedTarget - fixedCurrent;
+            float dist2 = fixedCurrent + 360 - fixedTarget;
+            if (dist1 > dist2) {  // 另一边移动更近
+                delta = -fixedCurrent - 360 + fixedTarget;
+            } else {
+                delta = dist1;
+            }
+        } else {
+            float dist1 = fixedCurrent - fixedTarget;
+            float dist2 = fixedTarget + 360 - fixedCurrent;
+            if (dist1 > dist2) {  // 另一边移动更近
+                delta = fixedTarget + 360 + fixedCurrent;
+            } else {
+                delta = -dist1;
+            }
+        }
+
+        if (Math.abs(delta) <= diff) {
+            return current + delta;
+        } else {
+            if (delta < 0) {
+                return current - diff;
+            } else {
+                return current + diff;
+            }
+        }
+    }
+
+    public static boolean yawEquals(float yaw1, float yaw2) {
+        return RotationUtils.normalize(yaw1) == RotationUtils.normalize(yaw2);
     }
 }

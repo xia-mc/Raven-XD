@@ -51,7 +51,7 @@ public abstract class MixinClientSpoofer {
         this.gameController.thePlayer.setReducedDebug(packetIn.isReducedDebugInfo());
         this.gameController.playerController.setGameType(packetIn.getGameType());
         this.gameController.gameSettings.sendSettingsToServer();
-        this.netManager.sendPacket(new C17PacketCustomPayload(ClientSpoofer.getBrandName().channel, (new PacketBuffer(Unpooled.buffer())).writeString(ClientSpoofer.getBrandName().brand)));
+        this.netManager.sendPacket(new C17PacketCustomPayload("MC|BRAND", (new PacketBuffer(Unpooled.buffer())).writeString(ClientSpoofer.getBrandName().brand)));
         callbackInfo.cancel();
     }
 }

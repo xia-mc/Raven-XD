@@ -12,6 +12,9 @@ import keystrokesmod.script.classes.Vec3;
 import keystrokesmod.utility.Utils;
 import net.minecraft.client.network.NetworkPlayerInfo;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.monster.EntityIronGolem;
+import net.minecraft.entity.monster.EntitySilverfish;
+import net.minecraft.entity.passive.EntityChicken;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.play.client.C02PacketUseEntity;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
@@ -31,6 +34,9 @@ public class AntiBot extends Module {
     private static ButtonSetting matrix;
     private static ButtonSetting cancelBotHit;
     private static ButtonSetting debug;
+    private static ButtonSetting whitelistGolem;
+    private static ButtonSetting whitelistSilverfish;
+    private static ButtonSetting whitelistChicken;
 
     public AntiBot() {
         super("AntiBot", Module.category.world, 0);
@@ -41,6 +47,9 @@ public class AntiBot extends Module {
         this.registerSetting(debug = new ButtonSetting("Debug", false, matrix::isToggled));
         this.registerSetting(pitSpawn = new ButtonSetting("Pit spawn", false));
         this.registerSetting(cancelBotHit = new ButtonSetting("Cancel bot hit", false));
+        this.registerSetting(whitelistGolem = new ButtonSetting("Whitelist golems", false));
+        this.registerSetting(whitelistSilverfish = new ButtonSetting("Whitelist silverfishes", false));
+        this.registerSetting(whitelistChicken = new ButtonSetting("Whitelist chickens", false));
     }
 
     @SubscribeEvent
@@ -102,6 +111,15 @@ public class AntiBot extends Module {
         }
         if (Freecam.freeEntity != null && Freecam.freeEntity == entity) {
             return true;
+        }
+        if (whitelistGolem.isToggled() && entity instanceof EntityIronGolem) {
+            return false;
+        }
+        if (whitelistSilverfish.isToggled() && entity instanceof EntitySilverfish) {
+            return false;
+        }
+        if (whitelistChicken.isToggled() && entity instanceof EntityChicken) {
+            return false;
         }
         if (!(entity instanceof EntityPlayer)) {
             return true;
