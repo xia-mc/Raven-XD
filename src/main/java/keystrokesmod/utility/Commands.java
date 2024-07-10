@@ -90,12 +90,13 @@ public class Commands {
                     return;
                 }
 
-                if (args.size() != 2) {
-                    print(invSyn, 1);
-                    return;
+                NameHider.n = args.get(1).replace("&", "§");
+
+                for (int i = 2; i < args.size(); i++) {
+                    NameHider.n += " "+args.get(i).replace("&", "§");
                 }
 
-                NameHider.n = args.get(1).replace("&", "§");
+
                 print("&a" + Utils.uf("name") + "Nick has been set to:".substring(4), 1);
                 print("\"" + NameHider.n + "\"", 0);
             } else if (args.get(0).equals(FakeChat.command)) {
