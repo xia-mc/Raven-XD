@@ -37,7 +37,7 @@ public class TargetStrafe extends Module {
             return;
         }
 
-        float current = RotationUtils.normalize(mc.thePlayer.rotationYaw);
+        float current = mc.thePlayer.rotationYaw;
         float toTarget = RotationUtils.getRotations(KillAura.target)[0];
         float diff = toTarget - current;
 

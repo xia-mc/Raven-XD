@@ -1,14 +1,16 @@
 package keystrokesmod.module.impl.world;
 
-import keystrokesmod.event.PreMotionEvent;
+import keystrokesmod.event.PreUpdateEvent;
 import keystrokesmod.event.RotationEvent;
 import keystrokesmod.module.Module;
+import keystrokesmod.module.impl.other.SlotHandler;
 import keystrokesmod.module.impl.other.anticheats.utils.phys.Vec2;
 import keystrokesmod.module.impl.other.anticheats.utils.world.PlayerRotation;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.DescriptionSetting;
 import keystrokesmod.module.setting.impl.ModeSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
+import keystrokesmod.module.setting.utils.ModeOnly;
 import keystrokesmod.script.classes.Vec3;
 import keystrokesmod.utility.*;
 import net.minecraft.item.ItemBlock;
@@ -41,8 +43,8 @@ public class BlockIn extends Module {
         super("Block-In", category.world);
         this.registerSetting(new DescriptionSetting("make you block in."));
         this.registerSetting(rotationMode = new ModeSetting("Rotation mode", rotationModes, 2));
-        this.registerSetting(aimSpeed = new SliderSetting("Aim speed", 5, 0, 5, 0.05));
-        this.registerSetting(lookView = new ButtonSetting("Look view", false));
+        this.registerSetting(aimSpeed = new SliderSetting("Aim speed", 5, 0, 10, 0.05, new ModeOnly(rotationMode, 1, 2)));
+        this.registerSetting(lookView = new ButtonSetting("Look view", false, new ModeOnly(rotationMode, 1, 2)));
         this.registerSetting(placeDelay = new SliderSetting("Place delay", 50, 0, 500, 1, "ms"));
         this.registerSetting(silentSwing = new ButtonSetting("Silent swing", false));
         this.registerSetting(autoSwitch = new ButtonSetting("Auto switch", true));
@@ -53,7 +55,7 @@ public class BlockIn extends Module {
         currentRot = null;
         lastPlace = 0;
         if (autoSwitch.isToggled() && lastSlot != -1) {
-            mc.thePlayer.inventory.currentItem = lastSlot;
+            SlotHandler.setCurrentSlot(lastSlot);
         }
         lastSlot = -1;
     }
@@ -72,11 +74,11 @@ public class BlockIn extends Module {
     }
 
     @SubscribeEvent
-    public void onRender(TickEvent.RenderTickEvent event) {
+    public void onPreUpdate(PreUpdateEvent event) {
         if (autoSwitch.isToggled() && lastSlot == -1) {
-            int slot = ContainerUtils.getSlot(ItemBlock.class);
-            lastSlot = mc.thePlayer.inventory.currentItem;
-            mc.thePlayer.inventory.currentItem = slot;
+            int slot = Scaffold.getSlot();
+            lastSlot = SlotHandler.getCurrentSlot();
+            SlotHandler.setCurrentSlot(slot);
         }
 
         try {
@@ -102,7 +104,7 @@ public class BlockIn extends Module {
 
             Triple<BlockPos, EnumFacing, Vec3> placeSideBlock;
             try {
-                placeSideBlock = getPlaceSide(blockPos).orElseThrow(NoSuchElementException::new);
+                placeSideBlock = RotationUtils.getPlaceSide(blockPos).orElseThrow(NoSuchElementException::new);
             } catch (NoSuchElementException e) {
                 continue;
             }
@@ -119,7 +121,7 @@ public class BlockIn extends Module {
                 currentRot = new Vec2(mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch);
             }
             if (rotationMode.getInput() != 0 && !currentRot.equals(rotation)) {
-                if (aimSpeed.getInput() == 5) {
+                if (aimSpeed.getInput() == 10) {
                     currentRot = rotation;
                 } else {
                     currentRot = new Vec2(
@@ -137,22 +139,22 @@ public class BlockIn extends Module {
             }
 
             if (rotationMode.getInput() == 0 || currentRot.equals(rotation)) {
-                mc.playerController.onPlayerRightClick(
+                if (mc.playerController.onPlayerRightClick(
                         mc.thePlayer, mc.theWorld,
                         mc.thePlayer.getHeldItem(),
                         placeSideBlock.getLeft(), placeSideBlock.getMiddle(),
                         hitPos.toVec3()
-                );
+                )) {
+                    if (silentSwing.isToggled()) {
+                        mc.thePlayer.sendQueue.addToSendQueue(new C0APacketAnimation());
+                    } else {
+                        mc.thePlayer.swingItem();
+                        mc.getItemRenderer().resetEquippedProgress();
+                    }
 
-                if (silentSwing.isToggled()) {
-                    mc.thePlayer.sendQueue.addToSendQueue(new C0APacketAnimation());
-                } else {
-                    mc.thePlayer.swingItem();
-                    mc.getItemRenderer().resetEquippedProgress();
+                    lastPlace = currentTime;
+                    placed++;
                 }
-
-                lastPlace = currentTime;
-                placed++;
             }
         }
         if (placed == 0) disable();
@@ -162,39 +164,4 @@ public class BlockIn extends Module {
         return BlockUtils.getSurroundBlocks(mc.thePlayer);
     }
 
-    public static @NotNull Optional<Triple<BlockPos, EnumFacing, Vec3>> getPlaceSide(@NotNull BlockPos blockPos) {
-        final List<BlockPos> possible = Arrays.asList(
-                blockPos.down(), blockPos.east(), blockPos.west(),
-                blockPos.north(), blockPos.south(), blockPos.up()
-        );
-
-        for (BlockPos pos : possible) {
-            if (BlockUtils.getBlockState(pos).getBlock().isFullBlock()) {
-                EnumFacing facing;
-                Vec3 hitPos;
-                if (pos.getY() < blockPos.getY()) {
-                    facing = EnumFacing.UP;
-                    hitPos = new Vec3(pos.getX() + 0.5, pos.getY() + 1, pos.getZ() + 0.5);
-                } else if (pos.getX() > blockPos.getX()) {
-                    facing = EnumFacing.WEST;
-                    hitPos = new Vec3(pos.getX(), pos.getY() + 0.5, pos.getZ() + 0.5);
-                } else if (pos.getX() < blockPos.getX()) {
-                    facing = EnumFacing.EAST;
-                    hitPos = new Vec3(pos.getX() + 1, pos.getY() + 0.5, pos.getZ() + 0.5);
-                } else if (pos.getZ() < blockPos.getZ()) {
-                    facing = EnumFacing.SOUTH;
-                    hitPos = new Vec3(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 1);
-                } else if (pos.getZ() > blockPos.getZ()) {
-                    facing = EnumFacing.NORTH;
-                    hitPos = new Vec3(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ());
-                } else {
-                    facing = EnumFacing.DOWN;
-                    hitPos = new Vec3(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
-                }
-
-                return Optional.of(Triple.of(pos, facing, hitPos));
-            }
-        }
-        return Optional.empty();
-    }
 }

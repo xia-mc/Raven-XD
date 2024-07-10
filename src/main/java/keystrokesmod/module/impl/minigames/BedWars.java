@@ -14,6 +14,7 @@ import net.minecraft.block.BlockObsidian;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemEnderPearl;
+import net.minecraft.item.ItemFireball;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
@@ -34,6 +35,7 @@ public class BedWars extends Module {
     public static ButtonSetting whitelistOwnBed;
     private final ButtonSetting diamondArmor;
     private final ButtonSetting enderPearl;
+    private final ButtonSetting fireball;
     private final ButtonSetting obsidian;
     private final ButtonSetting shouldPing;
     private BlockPos spawnPos;
@@ -51,6 +53,7 @@ public class BedWars extends Module {
         this.registerSetting(whitelistOwnBed = new ButtonSetting("Whitelist own bed", true));
         this.registerSetting(diamondArmor = new ButtonSetting("Diamond armor", true));
         this.registerSetting(enderPearl = new ButtonSetting("Ender pearl", true));
+        this.registerSetting(fireball = new ButtonSetting("Fireball", true));
         this.registerSetting(obsidian = new ButtonSetting("Obsidian", true));
         this.registerSetting(shouldPing = new ButtonSetting("Should ping", true));
     }
@@ -190,6 +193,8 @@ public class BedWars extends Module {
             return "&7an §3Ender Pearl";
         } else if (unlocalizedName.contains("tile.obsidian") && obsidian.isToggled()) {
             return "§dObsidian";
+        } else if (item.getItem() instanceof ItemFireball && fireball.isToggled()) {
+            return "&7a §cFireball";
         }
         return null;
     }

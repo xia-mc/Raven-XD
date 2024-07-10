@@ -28,13 +28,7 @@ public class ClientSpoofer extends Module {
     @Override
     public void onUpdate() {
         currentSpoof = SpoofMode.values()[(int) mode.getInput()];
-        if(currentSpoof == SpoofMode.FORGE) {
-            cancelForgePacket.disable();
-        } else {
-            Raven.getModuleManager().getModule("ModSpoofer").enable();
-        }
     }
-
     @SubscribeEvent
     public void onSendPacket(@NotNull SendPacketEvent event) {
         if (event.getPacket() instanceof FMLProxyPacket && cancelForgePacket.isToggled()) {
@@ -42,38 +36,33 @@ public class ClientSpoofer extends Module {
         }
     }
 
-
     public static BrandInfo getBrandName() {
-        return new BrandInfo(currentSpoof.brand, currentSpoof.channel);
+        return new BrandInfo(currentSpoof.brand);
     }
 
 
     public static class BrandInfo {
         public final String brand;
-        public final String channel;
 
-        public BrandInfo(String brand, String channel) {
+        public BrandInfo(String brand) {
             this.brand = brand;
-            this.channel = channel;
         }
     }
 
     enum SpoofMode {
-        FORGE("Forge", "FML,Forge", "MC|Brand"),
-        VANILLA("Vanilla", "vanilla", "MC|Brand"),
-        LUNAR("Lunar", "lunarclient:v2.16.0-2426", "MC|Brand"),
-        CHEATBREAKER("Cheatbreaker", "CB", "MC|Brand"),
-        GEYSER("Geyser", "Geyser", "MC|Brand"),
-        LABYMOD("LabyMod", "LMC", "MC|Brand"),;
+        FORGE("Forge", "FML,Forge"),
+        VANILLA("Vanilla", "vanilla"),
+        LUNAR("Lunar", "lunarclient:v2.16.0-2426"),
+        CHEATBREAKER("Cheatbreaker", "CB"),
+        GEYSER("Geyser", "Geyser"),
+        LABYMOD("LabyMod", "LMC"),;
 
         public final String name;
         public final String brand;
-        public final String channel;
 
-        SpoofMode(String name, String brand, String channel) {
+        SpoofMode(String name, String brand) {
             this.name = name;
             this.brand = brand;
-            this.channel = channel;
         }
 
         public static String @NotNull [] getNames() {

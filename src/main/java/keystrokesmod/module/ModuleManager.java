@@ -91,6 +91,7 @@ public class ModuleManager {
     public static SlotHandler slotHandler;
     public static StaffDetector staffDetector;
     public static AutoRespawn autoRespawn;
+    public static Clutch clutch;
     
     public void register() {
         this.addModule(autoClicker = new AutoClicker());
@@ -212,8 +213,7 @@ public class ModuleManager {
         this.addModule(slotHandler = new SlotHandler());
         this.addModule(staffDetector = new StaffDetector());
         this.addModule(new AutoWeapon());
-      	this.addModule(autoRespawn = new AutoRespawn());
-
+        this.addModule(autoRespawn = new AutoRespawn());
         antiBot.enable();
         commandChat.enable();
         modSpoofer.enable();

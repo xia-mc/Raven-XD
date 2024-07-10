@@ -19,7 +19,7 @@ Raven B4, but for those who can't afford it.
 
 Raven B4, but not only for Hypixel.
 
-![2024-07-05_17 26 21](https://github.com/xia-mc/Raven-bS/assets/108219418/82644c77-0ed1-4f27-babc-d6129f020765)
+![2024-07-10_14 13 51](https://github.com/xia-mc/Raven-XD/assets/108219418/15470b4f-b29d-49a5-8396-1c1d4bd315a1)
 
 ### ***More functionality while staying in sync with upstream branches.***
 
@@ -36,16 +36,26 @@ Raven B4, but not only for Hypixel.
     - NoSlow
     - AntiVoid
     - Tower
- 3. Intave/Polar/GrimAC
+ 3. Intave
+    - KillAura
+    - Scaffold
     - NoSlow
- 4. Undetectable
+ 4. GrimAC
+    - KillAura
+    - Scaffold
+    - NoSlow
+    - Velocity
+    - Fly
+ 5. Polar
+    - NoSlow
+ 6. Undetectable
     - AimAssist
     - AutoClicker
     - HitSelect
     - MoreKB
     - Block-In
     - Legit Scaffold
- 5. Common
+ 7. Common
     - Client-side AntiCheat
     - TimerRange
     - Backtrack
@@ -70,7 +80,7 @@ Raven B4, but not only for Hypixel.
 4. **Clone the Repository**:
    - Run the following commands in the terminal or command prompt:
      ```bash
-     git clone --recursive https://github.com/xia-mc/Raven-bS.git
+     git clone --recursive https://github.com/xia-mc/Raven-XD.git
      cd Raven-bS
      ```
 
