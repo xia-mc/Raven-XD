@@ -43,7 +43,7 @@ public class Commands {
             List<String> args = Arrays.asList(c.split(" "));  // maybe bug
             boolean hasArgs = args.size() > 1;
             String n;
-            String firstArg = args.get(0);
+            String firstArg = args.get(0).toLowerCase();
             
             if (firstArg.equals("setkey")) {
                 if (!hasArgs) {
@@ -303,7 +303,7 @@ public class Commands {
                 }
 
                 PacketUtils.sendPacketNoEvent(new C01PacketChatMessage(c.substring(firstArg.length() + 1)));
-            } else if (firstArg.equals("setBName")) {
+            } else if (firstArg.equals("setbname")) {
                 if (!hasArgs) {
                     print(invSyn, 1);
                     return;
