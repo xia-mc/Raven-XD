@@ -22,7 +22,8 @@ public class RodAimbot extends Module {
     private final ButtonSetting ignoreTeammates;
     public boolean rotate;
     private boolean rightClick;
-    private EntityPlayer entity;
+    private EntityPlayer target;
+    private int lookTicks;
 
     public RodAimbot() {
         super("RodAimbot", Module.category.combat, 0);
@@ -36,7 +37,8 @@ public class RodAimbot extends Module {
     public void onDisable() {
         rotate = false;
         rightClick = false;
-        entity = null;
+        target = null;
+        lookTicks = 0;
     }
 
     @SubscribeEvent
@@ -47,13 +49,14 @@ public class RodAimbot extends Module {
         if (mc.thePlayer.getCurrentEquippedItem() == null || !(mc.thePlayer.getCurrentEquippedItem().getItem() instanceof ItemFishingRod) || mc.thePlayer.fishEntity != null) {
             return;
         }
-        entity = this.getEntity();
-        if (entity == null) {
+        target = getTarget();
+        if (target == null) {
             return;
         }
         mouseEvent.setCanceled(true);
         rightClick = true;
         rotate = true;
+        lookTicks = 1;
     }
 
     @SubscribeEvent
@@ -65,20 +68,26 @@ public class RodAimbot extends Module {
             if (mc.thePlayer.getCurrentEquippedItem() == null || !(mc.thePlayer.getCurrentEquippedItem().getItem() instanceof ItemFishingRod)) {
                 return;
             }
-            float[] rotations = RotationUtils.getRotationsPredicated(entity, (int)predicatedTicks.getInput());
+            float[] rotations = RotationUtils.getRotationsPredicated(target, (int) predicatedTicks.getInput());
             event.setYaw(rotations[0]);
             event.setPitch(rotations[1]);
-            if (!rightClick && rotate) {
-                rotate = false;
-            }
-            if (rightClick) {
-                Reflection.rightClick();
-                rightClick = false;
+            if (lookTicks > 0) {
+                lookTicks--;
+            } else {
+                if (!rightClick && rotate) {
+                    rotate = false;
+                }
+                if (rightClick) {
+                    Reflection.rightClick();
+                    rightClick = false;
+                }
             }
         }
     }
 
-    private @Nullable EntityPlayer getEntity() {
+    private @Nullable EntityPlayer getTarget() {
+        EntityPlayer closestTarget = null;
+        double closestDistance = distance.getInput() * distance.getInput();
         for (final EntityPlayer entityPlayer : mc.theWorld.playerEntities) {
             if (entityPlayer != mc.thePlayer) {
                 if (entityPlayer.deathTime != 0) {
@@ -87,13 +96,14 @@ public class RodAimbot extends Module {
                 if (!aimInvis.isToggled() && entityPlayer.isInvisible()) {
                     continue;
                 }
-                if (mc.thePlayer.getDistanceSqToEntity(entityPlayer) > distance.getInput() * distance.getInput()) {
+                double distanceSq = mc.thePlayer.getDistanceSqToEntity(entityPlayer);
+                if (distanceSq > closestDistance) {
                     continue;
                 }
                 if (Utils.isFriended(entityPlayer)) {
                     continue;
                 }
-                final float n = (float)fov.getInput();
+                float n = (float) fov.getInput();
                 if (n != 360.0f && !Utils.inFov(n, entityPlayer)) {
                     continue;
                 }
@@ -103,9 +113,10 @@ public class RodAimbot extends Module {
                 if (ignoreTeammates.isToggled() && Utils.isTeamMate(entityPlayer)) {
                     continue;
                 }
-                return entityPlayer;
+                closestTarget = entityPlayer;
+                closestDistance = distanceSq;
             }
         }
-        return null;
+        return closestTarget;
     }
 }
