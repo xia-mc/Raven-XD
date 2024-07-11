@@ -43,7 +43,9 @@ public class Commands {
             List<String> args = Arrays.asList(c.split(" "));  // maybe bug
             boolean hasArgs = args.size() > 1;
             String n;
-            if (args.get(0).equals("setkey")) {
+            String firstArg = args.get(0);
+            
+            if (firstArg.equals("setkey")) {
                 if (!hasArgs) {
                     print(invSyn, 1);
                     return;
@@ -65,7 +67,7 @@ public class Commands {
                     }
 
                 });
-            } else if (args.get(0).equals("nick")) {
+            } else if (firstArg.equals("nick")) {
                 if (!hasArgs) {
                     print(invSyn, 1);
                     return;
@@ -84,7 +86,7 @@ public class Commands {
                 DuelsStats.nick = args.get(1);
                 print("&aNick has been set to:", 1);
                 print("\"" + DuelsStats.nick + "\"", 0);
-            } else if (args.get(0).equals("cname")) {
+            } else if (firstArg.equals("cname")) {
                 if (!hasArgs) {
                     print(invSyn, 1);
                     return;
@@ -99,7 +101,7 @@ public class Commands {
 
                 print("&a" + Utils.uf("name") + "Nick has been set to:".substring(4), 1);
                 print("\"" + NameHider.n + "\"", 0);
-            } else if (args.get(0).equals(FakeChat.command)) {
+            } else if (firstArg.equals(FakeChat.command)) {
                 if (!hasArgs) {
                     print(invSyn, 1);
                     return;
@@ -113,7 +115,7 @@ public class Commands {
 
                 FakeChat.msg = n;
                 print("&aMessage set!", 1);
-            } else if (args.get(0).equals("duels")) {
+            } else if (firstArg.equals("duels")) {
                 if (!hasArgs) {
                     print(invSyn, 1);
                     return;
@@ -151,7 +153,7 @@ public class Commands {
                     }
 
                 });
-            } else if (args.get(0).equals("setspeed")) {
+            } else if (firstArg.equals("setspeed")) {
                 if (!hasArgs) {
                     print(invSyn, 1);
                     return;
@@ -184,7 +186,7 @@ public class Commands {
                 }
                 print("&aSet speed to ", 1);
                 print(args.get(2), 0);
-            } else if (args.get(0).equals("setvelocity")) {
+            } else if (firstArg.equals("setvelocity")) {
                 if (!hasArgs) {
                     print(invSyn, 1);
                     return;
@@ -225,11 +227,11 @@ public class Commands {
 
                 print("&aSet " + args.get(1) + " velocity to ", 1);
                 print(args.get(2), 0);
-            } else if (args.get(0).equals("ping")) {
+            } else if (firstArg.equals("ping")) {
                 Ping.checkPing();
-            } else if (args.get(0).equals("clear")) {
+            } else if (firstArg.equals("clear")) {
                 rs.clear();
-            } else if (args.get(0).equals("hide")) {
+            } else if (firstArg.equals("hide")) {
                 if (!hasArgs) {
                     print(invSyn, 1);
                     return;
@@ -247,7 +249,7 @@ public class Commands {
                         print("&a" + module.getName() + " is now hidden in HUD", 1);
                     }
                 }
-            } else if (args.get(0).equals("show")) {
+            } else if (firstArg.equals("show")) {
                 if (!hasArgs) {
                     print(invSyn, 1);
                     return;
@@ -265,7 +267,7 @@ public class Commands {
                         print("&a" + module.getName() + " is now visible in HUD", 1);
                     }
                 }
-            } else if (args.get(0).equals("panic")) {
+            } else if (firstArg.equals("panic")) {
                 List<Module> modulesToDisable = new ArrayList<>();
                 for (Module m : Raven.getModuleManager().getModules()) {
                     if (m.isEnabled()) {
@@ -276,7 +278,7 @@ public class Commands {
                     m.disable();
 
                 }
-            }else if (args.get(0).equals("rename")) {
+            }else if (firstArg.equals("rename")) {
                 if (!hasArgs) {
                     print(invSyn, 1);
                     return;
@@ -294,14 +296,14 @@ public class Commands {
                         print("&a" + module.getName() + " is now called " + module.getRawPrettyName(), 1);
                     }
                 }
-            } else if (args.get(0).equals("say")) {
+            } else if (firstArg.equals("say")) {
                 if (!hasArgs) {
                     print(invSyn, 1);
                     return;
                 }
 
-                PacketUtils.sendPacketNoEvent(new C01PacketChatMessage(c.substring(args.get(0).length() + 1)));
-            } else if (args.get(0).equals("setBName")) {
+                PacketUtils.sendPacketNoEvent(new C01PacketChatMessage(c.substring(firstArg.length() + 1)));
+            } else if (firstArg.equals("setBName")) {
                 if (!hasArgs) {
                     print(invSyn, 1);
                     return;
@@ -315,13 +317,13 @@ public class Commands {
                 HUD.bName = args.get(1);
 
                 print("&aSet BName to " + HUD.bName, 1);
-            } else if (args.get(0).equals("binds")) {
+            } else if (firstArg.equals("binds")) {
                 for (Module module : Raven.getModuleManager().getModules()) {
                     if (module.getKeycode() != 0) {
                         print(ChatFormatting.AQUA + module.getName() + ": " + Keyboard.getKeyName(module.getKeycode()), 1);
                     }
                 }
-            } else if (args.get(0).equals("bind")) {
+            } else if (firstArg.equals("bind")) {
                 if (!hasArgs) {
                     print(invSyn, 1);
                     return;
@@ -352,7 +354,7 @@ public class Commands {
 
                 targetModule.setBind(keyCode);
                 print(ChatFormatting.GREEN + "Bind '" + ChatFormatting.RESET + args.get(2) + ChatFormatting.GREEN + "' to " + targetModule.getPrettyName() + ".", 1);
-            } else if (args.get(0).equals("friend") || args.get(0).equals("f")) {
+            } else if (firstArg.equals("friend") || firstArg.equals("f")) {
                 if (!hasArgs) {
                     print(invSyn, 1);
                     return;
@@ -375,7 +377,7 @@ public class Commands {
                 } else {
                     print("&aRemoved friend: " + args.get(1), 1);
                 }
-            } else if (args.get(0).equals("enemy") || args.get(0).equals("e")) {
+            } else if (firstArg.equals("enemy") || firstArg.equals("e")) {
                 if (!hasArgs) {
                     print(invSyn, 1);
                     return;
@@ -396,10 +398,10 @@ public class Commands {
                 if (!added) {
                     print("&aRemoved enemy: " + args.get(1), 1);
                 }
-            } else if (args.get(0).equals("Debug".toLowerCase())) {
+            } else if (firstArg.equals("Debug".toLowerCase())) {
                 Raven.debugger = !Raven.debugger;
                 print("Debug " + (Raven.debugger ? "enabled" : "disabled") + ".", 1);
-            } else if (args.get(0).equals("profiles") || args.get(0).equals("p")) {
+            } else if (firstArg.equals("profiles") || firstArg.equals("p")) {
                 if (!hasArgs) {
                     print("&aAvailable profiles:", 1);
                     if (Raven.profileManager.profiles.isEmpty()) {
@@ -458,8 +460,8 @@ public class Commands {
                     }
                     print("&cInvalid profile.", 1);
                 }
-            } else if (!args.get(0).equals("help") && !args.get(0).equals("?")) {
-                if (args.get(0).equals("shoutout")) {
+            } else if (!firstArg.equals("help") && !firstArg.equals("?")) {
+                if (firstArg.equals("shoutout")) {
                     print("&eCelebrities:", 1);
                     print("- hevex", 0);
                     print("- jc", 0);
