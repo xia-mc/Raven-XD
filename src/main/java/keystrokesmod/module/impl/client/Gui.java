@@ -6,7 +6,7 @@ import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.utility.Utils;
 
 public class Gui extends Module {
-    public static ButtonSetting removePlayerModel, translucentBackground, removeWatermark, rainBowOutlines;
+    public static ButtonSetting removePlayerModel, resetPosition, translucentBackground, removeWatermark, rainBowOutlines;
 //    public static SliderSetting font;
 
     public Gui() {
@@ -15,6 +15,7 @@ public class Gui extends Module {
         this.registerSetting(removePlayerModel = new ButtonSetting("Remove player model", false));
         this.registerSetting(removeWatermark = new ButtonSetting("Remove watermark", false));
         this.registerSetting(translucentBackground = new ButtonSetting("Translucent background", true));
+        this.registerSetting(resetPosition = new ButtonSetting("Reset position", false));
 //        this.registerSetting(font = new SliderSetting("Font", new String[]{"Minecraft", "Product Sans"}, 0));
     }
 
@@ -23,7 +24,12 @@ public class Gui extends Module {
             mc.displayGuiScreen(Raven.clickGui);
             Raven.clickGui.initMain();
         }
-
         this.disable();
+    }
+    public void guiUpdate() {
+            if (resetPosition.isToggled()) {
+                Raven.clickGui.resetPosition();
+                resetPosition.toggle();
+            }
     }
 }
