@@ -60,6 +60,7 @@ public class KillAura extends Module {
     private final ButtonSetting disableWhileMining;
     private final ButtonSetting fixSlotReset;
     private final ButtonSetting fixNoSlowFlag;
+    private final SliderSetting postDelay;
     private final ButtonSetting hitThroughBlocks;
     private final ButtonSetting ignoreTeammates;
     public ButtonSetting manualBlock;
@@ -97,7 +98,7 @@ public class KillAura extends Module {
     public KillAura() {
         super("KillAura", category.combat);
         this.registerSetting(aps = new SliderSetting("APS", 16.0, 1.0, 20.0, 0.5));
-        String[] autoBlockModes = new String[]{"Manual", "Vanilla", "Post", "Swap", "Interact A", "Interact B", "Fake", "Partial", "Watchdog 1.12.2"};
+        String[] autoBlockModes = new String[]{"Manual", "Vanilla", "Post", "Swap", "Interact A", "Interact B", "Fake", "Partial"};
         this.registerSetting(autoBlockMode = new ModeSetting("Autoblock", autoBlockModes, 0));
         this.registerSetting(fov = new SliderSetting("FOV", 360.0, 30.0, 360.0, 4.0));
         this.registerSetting(attackRange = new SliderSetting("Attack range", 3.2, 3.0, 6.0, 0.1));
@@ -122,6 +123,7 @@ public class KillAura extends Module {
         this.registerSetting(disableWhileMining = new ButtonSetting("Disable while mining", false));
         this.registerSetting(fixSlotReset = new ButtonSetting("Fix slot reset", false));
         this.registerSetting(fixNoSlowFlag = new ButtonSetting("Fix NoSlow flag", true));
+        this.registerSetting(postDelay = new SliderSetting("Post delay", 10, 1, 20, 1, fixNoSlowFlag::isToggled));
         this.registerSetting(hitThroughBlocks = new ButtonSetting("Hit through blocks", true));
         this.registerSetting(ignoreTeammates = new ButtonSetting("Ignore teammates", true));
         this.registerSetting(manualBlock = new ButtonSetting("Manual block", false));
@@ -445,18 +447,6 @@ public class KillAura extends Module {
                 Reflection.setButton(1, down);
                 blocking = down;
                 break;
-            case 8: // watchdog 1.12.2
-                setBlockState(block.get(), true, true);
-                PacketUtils.sendPacketNoEvent(new C0APacketAnimation());
-                /*
-                code from Acrimony 1.0.5.
-                I think it means: "send a swing packet" xd
-                    PacketWrapper useItem = PacketWrapper.create(29, (ByteBuf)null, (UserConnection)Via.getManager().getConnectionManager().getConnections().iterator().next());
-                    useItem.write(Type.VAR_INT, 1);
-                    com.viaversion.viarewind.utils.PacketUtil.sendToServer(useItem, Protocol1_8To1_9.class, true, true);
-                 */
-                blocking = true;
-                break;
         }
         if (block.get()) {
             blockingTime++;
@@ -571,7 +561,7 @@ public class KillAura extends Module {
             return true;
         } else if (isMining() && disableWhileMining.isToggled()) {
             return true;
-        } else if (fixNoSlowFlag.isToggled() && blockingTime > 10) {
+        } else if (fixNoSlowFlag.isToggled() && blockingTime > (int) postDelay.getInput()) {
             unBlock();
             blockingTime = 0;
         } else if (ModuleManager.scaffold.isEnabled()) {

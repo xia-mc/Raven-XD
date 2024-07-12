@@ -3,8 +3,10 @@ package keystrokesmod.module.impl.movement;
 import keystrokesmod.Raven;
 import keystrokesmod.event.PostMotionEvent;
 import keystrokesmod.event.PreMotionEvent;
+import keystrokesmod.event.RotationEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
+import keystrokesmod.module.impl.other.RotationHandler;
 import keystrokesmod.module.impl.other.SlotHandler;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.ModeSetting;
@@ -21,6 +23,7 @@ import net.minecraft.network.play.client.C09PacketHeldItemChange;
 import net.minecraft.network.play.client.C0CPacketInput;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Vec3;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.Nullable;
 
@@ -30,7 +33,6 @@ import java.util.Objects;
 public class NoSlow extends Module {
     public static ModeSetting mode;
     public static SliderSetting slowed;
-    private static SliderSetting slowEveryTick;
     public static ButtonSetting disableBow;
     public static ButtonSetting disableSword;
     public static ButtonSetting disablePotions;
@@ -47,7 +49,6 @@ public class NoSlow extends Module {
         this.registerSetting(mode = new ModeSetting("Mode", modes, 0));
         canChangeSpeed = new ModeOnly(mode, 5, 6, 7).reserve();
         this.registerSetting(slowed = new SliderSetting("Slow %", 5.0D, 0.0D, 80.0D, 1.0D, canChangeSpeed));
-        this.registerSetting(slowEveryTick = new SliderSetting("Slow every tick", 2, 2, 5, 1, new ModeOnly(mode, 10)));
         this.registerSetting(disableSword = new ButtonSetting("Disable sword", false));
         this.registerSetting(disableBow = new ButtonSetting("Disable bow", false, canChangeSpeed));
         this.registerSetting(disablePotions = new ButtonSetting("Disable potions", false));
@@ -81,8 +82,6 @@ public class NoSlow extends Module {
             case 2:
                 postPlace = true;
                 break;
-            case 8:
-                ModuleManager.blink.enable();
             case 3:
                 if (mc.thePlayer.ticksExisted % 3 == 0 && !Raven.badPacketsHandler.C07) {
                     mc.thePlayer.sendQueue.addToSendQueue(new C08PacketPlayerBlockPlacement(new BlockPos(-1, -1, -1), 1, null, 0, 0, 0));
@@ -152,6 +151,17 @@ public class NoSlow extends Module {
                 PacketUtils.sendPacket(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem % 8 + 1));
                 PacketUtils.sendPacket(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem % 7 + 2));
                 PacketUtils.sendPacket(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
+                break;
+            case 8:
+                if (mc.thePlayer.ticksExisted % 3 == 0 && !Raven.badPacketsHandler.C07) {
+                    event.setPitch(90);
+                    RotationHandler.setRotationPitch(90);
+                    BlockPos pos = mc.thePlayer.getPosition().down();
+                    mc.thePlayer.sendQueue.addToSendQueue(new C08PacketPlayerBlockPlacement(
+                            pos, EnumFacing.UP.getIndex(), SlotHandler.getHeldItem(),
+                            pos.getX() + 0.5f, pos.getY(), pos.getZ() + 0.5f
+                    ));
+                }
                 break;
         }
 

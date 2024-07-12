@@ -61,11 +61,12 @@ public class Scaffold extends Module { // from b4 :)
     public final ButtonSetting tower;
     public final ButtonSetting fast;
     public final ButtonSetting sameY;
+    public final ButtonSetting autoJump;
 
     protected MovingObjectPosition placeBlock;
     private int lastSlot;
     private static final String[] rotationModes = new String[]{"None", "Backwards", "Strict", "Precise", "Telly", "Constant", "Snap"};
-    private static final String[] fastScaffoldModes = new String[]{"Disabled", "Sprint", "Edge", "Jump A", "Jump B", "Jump C", "Float", "Side", "Legit", "Auto Jump", "GrimAC", "Sneak"};
+    private static final String[] fastScaffoldModes = new String[]{"Disabled", "Sprint", "Edge", "Jump A", "Jump B", "Jump C", "Float", "Side", "Legit", "GrimAC", "Sneak"};
     private static final String[] precisionModes = new String[]{"Very low", "Low", "Moderate", "High", "Very high"};
     public float placeYaw;
     public float placePitch;
@@ -110,6 +111,7 @@ public class Scaffold extends Module { // from b4 :)
         this.registerSetting(tower = new ButtonSetting("Tower", false));
         this.registerSetting(fast = new ButtonSetting("Fast", false));
         this.registerSetting(sameY = new ButtonSetting("SameY", false));
+        this.registerSetting(autoJump = new ButtonSetting("Auto jump", false, sameY::isToggled));
     }
 
     public void onDisable() {
@@ -219,7 +221,7 @@ public class Scaffold extends Module { // from b4 :)
 
     @SubscribeEvent
     public void onMoveInput(@NotNull MoveInputEvent event) {
-        if (fastScaffold.getInput() == 11) {
+        if (fastScaffold.getInput() == 10) {
             event.setSneak(true);
             event.setSneakSlowDownMultiplier(1);
         }
@@ -232,7 +234,7 @@ public class Scaffold extends Module { // from b4 :)
         } else {
             offGroundTicks++;
         }
-        if ((rotation.getInput() == 4 || fastScaffold.getInput() == 9) && mc.thePlayer.onGround && MoveUtil.isMoving() && !Utils.jumpDown()) {
+        if (rotation.getInput() == 4 && mc.thePlayer.onGround && MoveUtil.isMoving() && !Utils.jumpDown()) {
             mc.thePlayer.jump();
         }
 
@@ -549,8 +551,8 @@ public class Scaffold extends Module { // from b4 :)
             switch ((int) ModuleManager.scaffold.fastScaffold.getInput()) {
                 case 1:
                 case 7:
+                case 9:
                 case 10:
-                case 11:
                     return true;
                 case 2:
                     return Utils.onEdge();
@@ -571,7 +573,7 @@ public class Scaffold extends Module { // from b4 :)
     }
 
     private boolean keepYPosition() {
-        boolean sameYSca = fastScaffold.getInput() == 4 || fastScaffold.getInput() == 3 || fastScaffold.getInput() == 5 || fastScaffold.getInput() == 6 || fastScaffold.getInput() == 9;
+        boolean sameYSca = fastScaffold.getInput() == 4 || fastScaffold.getInput() == 3 || fastScaffold.getInput() == 5 || fastScaffold.getInput() == 6;
         return this.isEnabled() && Utils.keysDown() && (sameYSca || sameY.isToggled()) && (!Utils.jumpDown() || fastScaffold.getInput() == 6) && (!fastOnRMB.isToggled() || Mouse.isButtonDown(1));
     }
 
@@ -745,5 +747,10 @@ public class Scaffold extends Module { // from b4 :)
         Vec3 getOffset() {
             return offset;
         }
+    }
+
+    @Override
+    public String getInfo() {
+        return fastScaffoldModes[(int) fastScaffold.getInput()];
     }
 }

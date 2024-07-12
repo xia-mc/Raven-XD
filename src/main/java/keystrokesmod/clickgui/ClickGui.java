@@ -288,4 +288,20 @@ public class ClickGui extends GuiScreen {
         }
         return false;
     }
+
+    public static void resetPosition() {
+        int xOffSet = 5;
+        int yOffSet = 5;
+        for(CategoryComponent category : categories.values()) {
+            category.fv(false);
+            category.x(xOffSet);
+            category.y(yOffSet);
+            xOffSet = xOffSet + 100;
+            if (xOffSet > 400) {
+                xOffSet = 5;
+                yOffSet += 120;
+            }
+        }
+
+    }
 }

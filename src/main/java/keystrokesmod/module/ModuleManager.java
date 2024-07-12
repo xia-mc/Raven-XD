@@ -92,6 +92,7 @@ public class ModuleManager {
     public static StaffDetector staffDetector;
     public static AutoRespawn autoRespawn;
     public static Clutch clutch;
+    public static Ambience ambience;
     
     public void register() {
         this.addModule(autoClicker = new AutoClicker());
@@ -214,6 +215,7 @@ public class ModuleManager {
         this.addModule(staffDetector = new StaffDetector());
         this.addModule(new AutoWeapon());
         this.addModule(autoRespawn = new AutoRespawn());
+        this.addModule(ambience = new Ambience());
         antiBot.enable();
         commandChat.enable();
         modules.sort(Comparator.comparing(Module::getPrettyName));

@@ -1,22 +1,19 @@
 package keystrokesmod.module.impl.player;
 
 import keystrokesmod.event.PreMotionEvent;
-import keystrokesmod.event.ReceivePacketEvent;
 import keystrokesmod.module.Module;
-import keystrokesmod.module.impl.other.anticheats.utils.world.PlayerMove;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.ModeSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.utility.BlockUtils;
+import keystrokesmod.utility.MoveUtil;
 import keystrokesmod.utility.Reflection;
 import keystrokesmod.utility.Utils;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockAir;
 import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.util.BlockPos;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import org.jetbrains.annotations.NotNull;
 
 import static keystrokesmod.module.ModuleManager.blink;
 import static keystrokesmod.module.ModuleManager.scaffold;
@@ -25,15 +22,12 @@ public class NoFall extends Module {
     public final ModeSetting mode;
     private final SliderSetting minFallDistance;
     private final ButtonSetting ignoreVoid;
-    private final String[] modes = new String[]{"Spoof", "Extra", "NoGround", "Blink", "Alan34"};
+    private final String[] modes = new String[]{"Spoof", "Extra", "NoGround", "Blink", "Matrix"};
 
     // for blink noFall
     private boolean blinked = false;
     private boolean prevOnGround = false;
-    private double fallDistance;
-
-    // for alan34 noFall
-    private int ticksSinceTeleport = 0;
+    private double fallDistance = 0;
 
     public NoFall() {
         super("NoFall", category.player);
@@ -68,17 +62,6 @@ public class NoFall extends Module {
         }
     }
 
-    public void onUpdate() {
-        ticksSinceTeleport++;
-    }
-
-    @SubscribeEvent
-    public void onPacketReceive(@NotNull ReceivePacketEvent event) {
-        if (event.getPacket() instanceof C03PacketPlayer) {
-            ticksSinceTeleport = 0;
-        }
-    }
-
     @SubscribeEvent
     public void onPreMotionEvent(PreMotionEvent event) {
         Utils.resetTimer();
@@ -98,13 +81,13 @@ public class NoFall extends Module {
         }
         switch ((int) mode.getInput()) {
             case 1:
-                float fallDistance = 0;
+                float extra$fallDistance = 0;
                 try {
-                    fallDistance = Reflection.EntityFallDistance.getFloat(mc.thePlayer);
+                    extra$fallDistance = Reflection.EntityFallDistance.getFloat(mc.thePlayer);
                 } catch (Exception exception) {
                     Utils.sendMessage("&cFailed to get fall distance.");
                 }
-                if (fallDistance > minFallDistance.getInput()) {
+                if (extra$fallDistance > minFallDistance.getInput()) {
                     Utils.getTimer().timerSpeed = (float) 0.5;
                     mc.getNetHandler().addToSendQueue(new C03PacketPlayer(true));
                     try {
@@ -138,10 +121,15 @@ public class NoFall extends Module {
                 }
                 break;
             case 4:
-                if (mc.thePlayer.fallDistance > 3.5 && !(blockRelativeToPlayer(PlayerMove.predictedMotion(mc.thePlayer.motionY, 1)) instanceof BlockAir) && ticksSinceTeleport > 50) {
-                    mc.thePlayer.sendQueue.addToSendQueue(new C03PacketPlayer.C04PacketPlayerPosition(mc.thePlayer.posX, mc.thePlayer.posY + 50 - Math.random(), mc.thePlayer.posZ, false));
+                if (BlockUtils.isBlockUnder()) {
+                    if (fallDistance > 2) {
+                        MoveUtil.strafe(0.19);
+                    }
 
-                    mc.thePlayer.fallDistance = 0;
+                    if (fallDistance > 3 && MoveUtil.speed() < 0.2) {
+                        event.setOnGround(true);
+                        fallDistance = 0;
+                    }
                 }
                 break;
         }

@@ -53,7 +53,7 @@ public final class RotationHandler extends Module {
     }
 
     public static void setRotationPitch(float rotationPitch) {
-        RotationHandler.rotationYaw = rotationPitch;
+        RotationHandler.rotationPitch = rotationPitch;
     }
 
     public static float getRotationYaw() {
