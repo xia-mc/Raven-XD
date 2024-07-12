@@ -194,8 +194,8 @@ public class ClickGui extends GuiScreen {
                     category = var4.next();
                     if (category.v(x, y) && !category.i(x, y) && !category.d(x, y) && m == 0) {
                         category.d(true);
-                        category.xx = x - category.getX();
-                        category.yy = y - category.getY();
+                        category.dragStartX = x - category.getX();
+                        category.dragStartY = y - category.getY();
                     }
 
                     if (category.d(x, y) && m == 0) {
