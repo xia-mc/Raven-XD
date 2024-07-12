@@ -1,6 +1,7 @@
 package keystrokesmod.module.impl.movement;
 
 import keystrokesmod.Raven;
+import keystrokesmod.event.JumpEvent;
 import keystrokesmod.event.PostMotionEvent;
 import keystrokesmod.event.PreMotionEvent;
 import keystrokesmod.event.RotationEvent;
@@ -38,7 +39,7 @@ public class NoSlow extends Module {
     public static ButtonSetting disablePotions;
     public static ButtonSetting swordOnly;
     public static ButtonSetting vanillaSword;
-    private final String[] modes = new String[]{"Vanilla", "Pre", "Post", "Alpha", "Old Intave", "Intave", "Polar", "GrimAC", "HypixelTest A"};
+    private final String[] modes = new String[]{"Vanilla", "Pre", "Post", "Alpha", "Old Intave", "Intave", "Polar", "GrimAC", "HypixelTest A", "HypixelTest B", "Blink"};
     private boolean postPlace;
     private static ModeOnly canChangeSpeed;
 
@@ -109,7 +110,7 @@ public class NoSlow extends Module {
     @SubscribeEvent
     public void onPreMotion(PreMotionEvent event) {
         if (!mc.thePlayer.isUsingItem()) {
-            if (lastUsingItem && mode.getInput() == 8)
+            if (lastUsingItem && mode.getInput() == 10)
                 ModuleManager.blink.disable();
 
             lastUsingItem = false;
@@ -159,13 +160,38 @@ public class NoSlow extends Module {
                     BlockPos pos = mc.thePlayer.getPosition().down();
                     mc.thePlayer.sendQueue.addToSendQueue(new C08PacketPlayerBlockPlacement(
                             pos, EnumFacing.UP.getIndex(), SlotHandler.getHeldItem(),
-                            pos.getX() + 0.5f, pos.getY(), pos.getZ() + 0.5f
+                            pos.getX() + 0.5f, pos.getY() + 1, pos.getZ() + 0.5f
                     ));
+                }
+                break;
+            case 9:
+                if (ContainerUtils.isRest(item)) {
+                    if (mc.thePlayer.onGround) {
+                        if (!lastUsingItem) {
+                            mc.thePlayer.motionY = 0.419999986688697104;
+                        } else {
+                            mc.thePlayer.motionY += 0.0000001;
+                        }
+                    }
+                }
+                break;
+            case 10:
+                if (ContainerUtils.isRest(item)) {
+                    if (!lastUsingItem) {
+                        ModuleManager.blink.enable();
+                    }
                 }
                 break;
         }
 
         lastUsingItem = true;
+    }
+
+    @SubscribeEvent
+    public void onJump(JumpEvent event) {
+        if (mode.getInput() == 9 && SlotHandler.getHeldItem() != null && ContainerUtils.isRest(SlotHandler.getHeldItem().getItem())) {
+            event.setMotionY(0.419999986688697104F);
+        }
     }
 
     public static float getSlowed() {

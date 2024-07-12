@@ -106,7 +106,7 @@ public class Velocity extends Module {
         }
 
         if (mode.getInput() == 3) {
-            if (gotVelocity && attacked && lastAttack != null
+            if (gotVelocity && lastAttack != null
                     && !KillAura.behindBlocks(new float[]{RotationHandler.getRotationYaw(), RotationHandler.getRotationPitch()}, lastAttack)) {
                 final double motionX = mc.thePlayer.motionX;
                 final double motionZ = mc.thePlayer.motionZ;
@@ -120,7 +120,6 @@ public class Velocity extends Module {
                 if (debug.isToggled()) Utils.sendMessage(String.format("reduced %.2f %.2f", motionX - mc.thePlayer.motionX, motionZ - mc.thePlayer.motionZ));
             }
             gotVelocity = false;
-            attacked = false;
         }
     }
 
