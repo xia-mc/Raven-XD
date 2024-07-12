@@ -4,6 +4,7 @@
   "refmap": "mixins.raven.refmap.json",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
+    "client.MixinInventoryPlayer",
     "entity.EntityAccessor",
     "entity.MixinEntity",
     "entity.MixinEntityLivingBase",

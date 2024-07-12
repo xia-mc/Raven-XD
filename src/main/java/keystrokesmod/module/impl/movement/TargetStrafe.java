@@ -1,5 +1,7 @@
 package keystrokesmod.module.impl.movement;
 
+import keystrokesmod.event.JumpEvent;
+import keystrokesmod.event.MoveInputEvent;
 import keystrokesmod.event.PrePlayerInputEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.combat.KillAura;
@@ -49,6 +51,12 @@ public class TargetStrafe extends Module {
             input.setYaw(toTarget);
         }
         movementYaw = toTarget;
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    public void onJump(JumpEvent event) {
+        if (movementYaw != null)
+            event.setYaw(movementYaw);
     }
 
     @Override

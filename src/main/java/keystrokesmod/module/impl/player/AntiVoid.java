@@ -52,6 +52,7 @@ public class AntiVoid extends Module {
     public void onDisable() {
         if (mode.getInput() == 0)
             blink.disable();
+        airStuck = false;
     }
 
     @SubscribeEvent

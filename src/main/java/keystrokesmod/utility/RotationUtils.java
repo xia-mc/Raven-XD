@@ -240,10 +240,10 @@ public class RotationUtils {
     }
 
     public static float normalize(float yaw) {
-        while (yaw > 360) {
+        while (yaw > 180) {
             yaw -= 360;
         }
-        while (yaw < 0) {
+        while (yaw < -180) {
             yaw += 360;
         }
         return yaw;

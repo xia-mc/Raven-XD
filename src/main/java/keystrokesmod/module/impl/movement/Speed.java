@@ -12,9 +12,13 @@ import keystrokesmod.utility.*;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockAir;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.play.client.C0BPacketEntityAction;
 import net.minecraft.network.play.server.S08PacketPlayerPosLook;
 import net.minecraft.potion.Potion;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -25,11 +29,13 @@ import static keystrokesmod.module.ModuleManager.scaffold;
 public class Speed extends Module {
     private final ModeSetting mode;
     private final SliderSetting vulcan$lowHop;
+    private final SliderSetting grimAC$boost;
+    private final ButtonSetting autoJump;
     private final ButtonSetting liquidDisable;
     private final ButtonSetting sneakDisable;
     private final ButtonSetting stopMotion;
     private final ButtonSetting stopSprint;
-    private final String[] modes = new String[]{"Ground", "BlocksMC", "Vulcan"};
+    private final String[] modes = new String[]{"Hypixel", "BlocksMC", "Vulcan", "GrimAC"};
     private int offGroundTicks = 0;
     public static int ticksSinceVelocity = Integer.MAX_VALUE;
 
@@ -37,8 +43,6 @@ public class Speed extends Module {
     int cooldownTicks = 0;
 
     double lastAngle = 0;
-
-    float angle = 0;
 
     int groundYPos = -1;
 
@@ -49,6 +53,9 @@ public class Speed extends Module {
         super("Speed", Module.category.movement);
         this.registerSetting(mode = new ModeSetting("Mode", modes, 0));
         this.registerSetting(vulcan$lowHop = new SliderSetting("Low hop", 2, 0, 4, 1, "ticks", new ModeOnly(mode, 2)));
+        ModeOnly grimAC = new ModeOnly(mode, 3);
+        this.registerSetting(grimAC$boost = new SliderSetting("Boost", 4, 0, 10, 1, grimAC));
+        this.registerSetting(autoJump = new ButtonSetting("Auto jump", false, grimAC));
         this.registerSetting(liquidDisable = new ButtonSetting("Disable in liquid", true));
         this.registerSetting(sneakDisable = new ButtonSetting("Disable while sneaking", true));
         this.registerSetting(stopMotion = new ButtonSetting("Stop motion", false));
@@ -122,7 +129,32 @@ public class Speed extends Module {
                     }
                 }
                 break;
+            case 3:
+                if (!Utils.nullCheck() || !MoveUtil.isMoving()) break;
+                if (mc.thePlayer.onGround && autoJump.isToggled()) {
+                    mc.thePlayer.jump();
+                }
+
+                int collisions = 0;
+                AxisAlignedBB grimPlayerBox = mc.thePlayer.getEntityBoundingBox().expand(1.0, 1.0, 1.0);
+                for (Entity entity : mc.theWorld.loadedEntityList) {
+                    if (canCauseSpeed(entity) && (grimPlayerBox.intersectsWith(entity.getEntityBoundingBox()))) {
+                        collisions += 1;
+                    }
+                }
+                double yaw = Math.toRadians(MoveYaw());
+                double boost = grimAC$boost.getInput() / 100 * collisions;
+                mc.thePlayer.addVelocity(-Math.sin(yaw) * boost, 0.0, Math.cos(yaw) * boost);
+                break;
         }
+    }
+
+    public static double MoveYaw(){
+        return  (MoveUtil.direction() * 180f / Math.PI);
+    }
+
+    private boolean canCauseSpeed(Entity entity) {
+        return entity != mc.thePlayer && entity instanceof EntityLivingBase;
     }
 
     private boolean noAction() {

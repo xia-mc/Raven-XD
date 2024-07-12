@@ -66,7 +66,7 @@ public class Clutch extends Module {
         }
 
         final Vec3 eyePos = Utils.getEyePos();
-        final BlockPos position = mc.thePlayer.getPosition();
+        final BlockPos position = new BlockPos(mc.thePlayer.posX, mc.thePlayer.posY, mc.thePlayer.posZ);
         final Vec3 groundPos = new Vec3(position.getX() + 0.5, position.getY() - 1, position.getZ() + 0.5);
         final List<BlockPos> blocks = BlockUtils.getAllInBox(position.add(-5, -5, -5), position.add(5, 0, 5));
 

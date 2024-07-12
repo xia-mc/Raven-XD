@@ -17,11 +17,14 @@ import keystrokesmod.module.setting.utils.ModeOnly;
 import keystrokesmod.utility.*;
 import net.minecraft.block.BlockAir;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.network.Packet;
+import net.minecraft.network.play.INetHandlerPlayClient;
 import net.minecraft.network.play.client.C02PacketUseEntity;
 import net.minecraft.network.play.client.C0APacketAnimation;
 import net.minecraft.network.play.client.C0BPacketEntityAction;
 import net.minecraft.network.play.server.S12PacketEntityVelocity;
 import net.minecraft.network.play.server.S27PacketExplosion;
+import net.minecraft.network.play.server.S32PacketConfirmTransaction;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.MovingObjectPosition;
@@ -29,16 +32,19 @@ import net.minecraftforge.event.entity.player.AttackEntityEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
 
 import static keystrokesmod.utility.Utils.isLobby;
 
 public class Velocity extends Module {
-    private static final String[] MODES = new String[]{"Normal", "Hypixel", "Intave", "GrimAC", "Karhu"};
+    private static final String[] MODES = new String[]{"Normal", "Hypixel", "Old Intave", "GrimAC", "Karhu", "Tick", "7-Zip"};
     public static ModeSetting mode;
     public static SliderSetting horizontal;
     public static SliderSetting vertical;
     private final SliderSetting reduce;
+    private final SliderSetting delay;
     private final ButtonSetting cancelExplosion;
     private final ButtonSetting cancelAir;
     private final ButtonSetting damageBoost;
@@ -54,6 +60,8 @@ public class Velocity extends Module {
     private EntityLivingBase lastAttack = null;
     private long lastVelocityTime = -1;
     private boolean gotVelocity = false;
+    private long startDelayTime = -1;
+    private final Queue<Packet<INetHandlerPlayClient>> delayedPacket = new ConcurrentLinkedQueue<>();
 
     public Velocity() {
         super("Velocity", category.combat);
@@ -63,6 +71,7 @@ public class Velocity extends Module {
         this.registerSetting(horizontal = new SliderSetting("Horizontal", 0.0, -100.0, 100.0, 1.0, canChangeMode));
         this.registerSetting(vertical = new SliderSetting("Vertical", 0.0, 0.0, 100.0, 1.0, canChangeMode));
         this.registerSetting(reduce = new SliderSetting("Reduce", 5, 0, 5, 1, new ModeOnly(mode, 3)));
+        this.registerSetting(delay = new SliderSetting("Delay", 50, 10, 5000, 10, "ms", new ModeOnly(mode, 5, 6)));
         this.registerSetting(cancelExplosion = new ButtonSetting("Cancel explosion packet", true, canChangeMode));
         this.registerSetting(cancelAir = new ButtonSetting("Cancel air", false, canChangeMode));
         this.registerSetting(damageBoost = new ButtonSetting("Damage boost", false));
@@ -72,7 +81,7 @@ public class Velocity extends Module {
         this.registerSetting(lobbyCheck = new ButtonSetting("Lobby check", false));
         this.registerSetting(onlyFirstHit = new ButtonSetting("Only first hit", false));
         this.registerSetting(resetTime = new SliderSetting("Reset time", 5000, 500, 10000, 500, "ms", onlyFirstHit::isToggled));
-        this.registerSetting(debug = new ButtonSetting("Debug", false, new ModeOnly(mode, 2, 3)));
+        this.registerSetting(debug = new ButtonSetting("Debug", false, new ModeOnly(mode, 2, 3, 6)));
     }
 
     @SubscribeEvent
@@ -82,6 +91,10 @@ public class Velocity extends Module {
         }
 
         try {
+            if (!delayedPacket.isEmpty() && System.currentTimeMillis() - startDelayTime > delay.getInput()) {
+                releasePackets();
+            }
+
             if (mode.getInput() == 2) {
                 if (mc.objectMouseOver.typeOfHit.equals(MovingObjectPosition.MovingObjectType.ENTITY) && mc.thePlayer.hurtTime > 0 && !attacked) {
                     final double motionX = mc.thePlayer.motionX;
@@ -154,12 +167,18 @@ public class Velocity extends Module {
         if (!Utils.nullCheck() || LongJump.stopModules || e.isCanceled()) {
             return;
         }
-        if (e.getPacket() instanceof S12PacketEntityVelocity) {
+        final long time = System.currentTimeMillis();
+        if (e.getPacket() instanceof S32PacketConfirmTransaction && mode.getInput() == 6) {
+            if (time - startDelayTime <= delay.getInput()) {
+                e.setCanceled(true);
+                delayedPacket.add((S32PacketConfirmTransaction) e.getPacket());
+            }
+        } else if (e.getPacket() instanceof S12PacketEntityVelocity) {
             if (((S12PacketEntityVelocity) e.getPacket()).getEntityID() == mc.thePlayer.getEntityId()) {
-                if (onlyFirstHit.isToggled() && System.currentTimeMillis() - lastVelocityTime < resetTime.getInput()) {
+                if (onlyFirstHit.isToggled() && time - lastVelocityTime < resetTime.getInput()) {
                     return;
                 }
-                lastVelocityTime = System.currentTimeMillis();
+                lastVelocityTime = time;
                 gotVelocity = true;
                 if (lobbyCheck.isToggled() && isLobby()) {
                     return;
@@ -196,6 +215,25 @@ public class Velocity extends Module {
                         }
                         e.setCanceled(true);
                         break;
+                    case 5:
+                        Raven.getExecutor().schedule(() -> {
+                            if (mc.thePlayer.hurtTime > 0) {
+                                mc.thePlayer.motionX *= horizontal.getInput() / 100;
+                                mc.thePlayer.motionY *= vertical.getInput() / 100;
+                                mc.thePlayer.motionZ *= horizontal.getInput() / 100;
+                            }
+                        }, (long) delay.getInput(), TimeUnit.MILLISECONDS);
+                        break;
+                    case 6:
+                        e.setCanceled(true);
+                        if (startDelayTime == -1) {
+                            startDelayTime = time;
+                        }
+                        if (time - startDelayTime <= delay.getInput()) {
+                            e.setCanceled(true);
+                            delayedPacket.add((S12PacketEntityVelocity) e.getPacket());
+                        }
+                        break;
                 }
                 if (damageBoost.isToggled()) {
                     if (boostDelay.getInput() == 0) {
@@ -205,30 +243,26 @@ public class Velocity extends Module {
                     }
                 }
             }
-        }
-        else if (e.getPacket() instanceof S27PacketExplosion) {
-            if (onlyFirstHit.isToggled() && System.currentTimeMillis() - lastVelocityTime < resetTime.getInput()) {
+        } else if (e.getPacket() instanceof S27PacketExplosion) {
+            if (onlyFirstHit.isToggled() && time - lastVelocityTime < resetTime.getInput()) {
                 return;
             }
-            lastVelocityTime = System.currentTimeMillis();
+            lastVelocityTime = time;
             if (lobbyCheck.isToggled() && isLobby()) {
+                return;
+            }
+            if (cancelExplosion.isToggled() || cancel()) {
+                e.setCanceled(true);
                 return;
             }
             switch ((int) mode.getInput()) {
                 case 0:
-                    if (cancelExplosion.isToggled() || cancel()) {
-                        e.setCanceled(true);
-                        return;
-                    }
                     ((S27PacketExplosionAccessor) e.getPacket()).setMotionX((float) (((S27PacketExplosion) e.getPacket()).func_149149_c() * horizontal.getInput() / 100));
                     ((S27PacketExplosionAccessor) e.getPacket()).setMotionY((float) (((S27PacketExplosion) e.getPacket()).func_149144_d() * vertical.getInput()) / 100);
                     ((S27PacketExplosionAccessor) e.getPacket()).setMotionZ((float) (((S27PacketExplosion) e.getPacket()).func_149147_e() * horizontal.getInput() / 100));
                     break;
                 case 1:
                     e.setCanceled(true);
-                    if (cancelExplosion.isToggled() || cancel()) {
-                        return;
-                    }
                     S27PacketExplosion s27PacketExplosion = (S27PacketExplosion) e.getPacket();
                     if (horizontal.getInput() == 0 && vertical.getInput() > 0) {
                         mc.thePlayer.motionY += s27PacketExplosion.func_149144_d() * vertical.getInput()/100;
@@ -275,5 +309,24 @@ public class Velocity extends Module {
     @Override
     public String getInfo() {
         return MODES[(int) mode.getInput()];
+    }
+
+    @Override
+    public void onDisable() {
+        releasePackets();
+    }
+
+    private void releasePackets() {
+        if (!delayedPacket.isEmpty()) {
+            for (Packet<INetHandlerPlayClient> packet : delayedPacket) {
+                PacketUtils.receivePacketNoEvent(packet);
+            }
+            delayedPacket.clear();
+
+            if (debug.isToggled()) {
+                Utils.sendMessage(String.format("Released. %.2f  %.2f  %.2f", mc.thePlayer.motionX, mc.thePlayer.motionY, mc.thePlayer.motionZ));
+            }
+        }
+        startDelayTime = -1;
     }
 }

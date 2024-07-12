@@ -82,7 +82,7 @@ public class AimSimulator {
             } else {
                 delta = dist1;
             }
-        } else {
+        } else if (fixedTarget < fixedCurrent) {
             float dist1 = fixedCurrent - fixedTarget;
             float dist2 = fixedTarget + 360 - fixedCurrent;
             if (dist1 > dist2) {  // 另一边移动更近
@@ -90,6 +90,8 @@ public class AimSimulator {
             } else {
                 delta = -dist1;
             }
+        } else {
+            return current;
         }
 
         if (Math.abs(delta) <= diff) {
@@ -97,8 +99,10 @@ public class AimSimulator {
         } else {
             if (delta < 0) {
                 return current - diff;
-            } else {
+            } else if (delta > 0) {
                 return current + diff;
+            } else {
+                return current;
             }
         }
     }

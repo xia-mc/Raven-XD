@@ -5,6 +5,7 @@ import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.ModeSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.utils.ModeOnly;
+import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -30,9 +31,10 @@ public final class SlotHandler extends Module {
     }
 
     public static @Nullable ItemStack getHeldItem() {
+        InventoryPlayer inventory = mc.thePlayer.inventory;
         if (currentSlot != null)
-            return currentSlot < 9 && currentSlot >= 0 ? mc.thePlayer.inventory.mainInventory[currentSlot] : null;
-        return mc.thePlayer.getHeldItem();
+            return currentSlot < 9 && currentSlot >= 0 ? inventory.mainInventory[currentSlot] : null;
+        return inventory.currentItem < 9 && inventory.currentItem >= 0 ? inventory.mainInventory[inventory.currentItem] : null;
     }
 
     public static void setCurrentSlot(int slot) {
