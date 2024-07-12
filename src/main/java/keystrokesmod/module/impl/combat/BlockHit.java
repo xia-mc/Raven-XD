@@ -113,7 +113,7 @@ public class BlockHit extends Module {
             }
 
             if (mc.thePlayer.getDistanceToEntity(target) <= range.getInput()) {
-                if ((target.hurtResistantTime >= 10 && MODES[(int) eventType.getInput() - 1] == MODES[1]) || (target.hurtResistantTime <= 10 && MODES[(int) eventType.getInput() - 1] == MODES[0])) {
+                if ((target.hurtResistantTime >= 10 && MODES[(int) eventType.getInput()] == MODES[1]) || (target.hurtResistantTime <= 10 && MODES[(int) eventType.getInput()] == MODES[0])) {
 
                     if (onlyPlayers.isToggled()){
                         if (!(target instanceof EntityPlayer)){
