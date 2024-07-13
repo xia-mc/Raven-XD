@@ -48,6 +48,8 @@ public class ModeComponent extends Component {
     }
 
     public void onClick(int x, int y, int b) {
+        if (this.getSetting() != null && !this.getSetting().isVisible()) return;
+
         if (isHover(x, y) && this.parent.po) {
             changeValue(b, Keyboard.isKeyDown(Raven.mc.gameSettings.keyBindSneak.getKeyCode()));
             parent.categoryComponent.render();

@@ -31,9 +31,14 @@ public final class SlotHandler extends Module {
     }
 
     public static @Nullable ItemStack getHeldItem() {
-        InventoryPlayer inventory = mc.thePlayer.inventory;
+        final InventoryPlayer inventory = mc.thePlayer.inventory;
         if (currentSlot != null)
             return currentSlot < 9 && currentSlot >= 0 ? inventory.mainInventory[currentSlot] : null;
+        return getRenderHeldItem();
+    }
+
+    public static @Nullable ItemStack getRenderHeldItem() {
+        final InventoryPlayer inventory = mc.thePlayer.inventory;
         return inventory.currentItem < 9 && inventory.currentItem >= 0 ? inventory.mainInventory[inventory.currentItem] : null;
     }
 

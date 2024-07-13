@@ -93,6 +93,8 @@ public class ButtonComponent extends Component {
     }
 
     public void onClick(int x, int y, int b) {
+        if (this.getSetting() != null && !this.getSetting().isVisible()) return;
+
         if (this.i(x, y) && b == 0 && this.parent.po) {
             if (this.buttonSetting.isMethodButton) {
                 this.buttonSetting.runMethod();

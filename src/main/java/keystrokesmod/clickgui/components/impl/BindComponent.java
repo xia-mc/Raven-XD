@@ -40,6 +40,8 @@ public class BindComponent extends Component {
     }
 
     public void onClick(int x, int y, int b) {
+        if (this.getSetting() != null && !this.getSetting().isVisible()) return;
+
         if (this.i(x, y) && this.parent.po && this.parent.mod.canBeEnabled()) {
             if (b == 0) {
                 this.isBinding = !this.isBinding;

@@ -39,7 +39,7 @@ public class Clutch extends Module {
     private long lastPlace = -1;
 
     public Clutch() {
-        super("Clutch", category.world);
+        super("Clutch", category.experimental);
         this.registerSetting(mode, aimSpeed, lookView, placeDelay, overVoid, fallDistance, minFallDistance, autoSwitch, silentSwing);
     }
 

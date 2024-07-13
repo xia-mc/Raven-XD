@@ -93,6 +93,7 @@ public class ModuleManager {
     public static AutoRespawn autoRespawn;
     public static Clutch clutch;
     public static Ambience ambience;
+    public static KillAuraV2 killAuraV2;
     
     public void register() {
         this.addModule(autoClicker = new AutoClicker());
@@ -216,6 +217,8 @@ public class ModuleManager {
         this.addModule(new AutoWeapon());
         this.addModule(autoRespawn = new AutoRespawn());
         this.addModule(ambience = new Ambience());
+        this.addModule(clutch = new Clutch());
+        this.addModule(killAuraV2 = new KillAuraV2());
         antiBot.enable();
         commandChat.enable();
         modules.sort(Comparator.comparing(Module::getPrettyName));

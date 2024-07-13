@@ -70,23 +70,20 @@ public class AimSimulator {
     }
 
     public static float rotMoveNoRandom(float target, float current, float diff) {
-        float fixedTarget = RotationUtils.normalize(target);
-        float fixedCurrent = RotationUtils.normalize(current);
-
         float delta;
-        if (fixedTarget > fixedCurrent) {
-            float dist1 = fixedTarget - fixedCurrent;
-            float dist2 = fixedCurrent + 360 - fixedTarget;
+        if (target > current) {
+            float dist1 = target - current;
+            float dist2 = current + 360 - target;
             if (dist1 > dist2) {  // 另一边移动更近
-                delta = -fixedCurrent - 360 + fixedTarget;
+                delta = -current - 360 + target;
             } else {
                 delta = dist1;
             }
-        } else if (fixedTarget < fixedCurrent) {
-            float dist1 = fixedCurrent - fixedTarget;
-            float dist2 = fixedTarget + 360 - fixedCurrent;
+        } else if (target < current) {
+            float dist1 = current - target;
+            float dist2 = target + 360 - current;
             if (dist1 > dist2) {  // 另一边移动更近
-                delta = fixedTarget + 360 + fixedCurrent;
+                delta = target + 360 + current;
             } else {
                 delta = -dist1;
             }

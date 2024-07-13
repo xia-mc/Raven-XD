@@ -2,6 +2,7 @@ package keystrokesmod.mixins.impl.render;
 
 
 import keystrokesmod.event.RenderItemEvent;
+import keystrokesmod.module.impl.other.SlotHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -19,6 +20,9 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(value = ItemRenderer.class, priority = 1983)
 public abstract class MixinItemRenderer {
@@ -35,8 +39,6 @@ public abstract class MixinItemRenderer {
 
     @Shadow protected abstract void func_178110_a(EntityPlayerSP p_178110_1_, float p_178110_2_);
 
-    @Shadow private ItemStack itemToRender;
-
     @Shadow protected abstract void renderItemMap(AbstractClientPlayer p_renderItemMap_1_, float p_renderItemMap_2_, float p_renderItemMap_3_, float p_renderItemMap_4_);
 
     @Shadow protected abstract void transformFirstPersonItem(float p_transformFirstPersonItem_1_, float p_transformFirstPersonItem_2_);
@@ -51,12 +53,20 @@ public abstract class MixinItemRenderer {
 
     @Shadow protected abstract void func_178095_a(AbstractClientPlayer p_178095_1_, float p_178095_2_, float p_178095_3_);
 
+    @Shadow private ItemStack itemToRender;
+
     /**
      * @author xia__mc
      * @reason for Animations module.
      */
-    @Overwrite
-    public void renderItemInFirstPerson(final float partialTicks) {
+    @Inject(method = "renderItemInFirstPerson", at = @At("HEAD"), cancellable = true)
+    public void renderItemInFirstPerson(final float partialTicks, CallbackInfo ci) {
+        if (itemToRender == mc.thePlayer.getHeldItem()) {
+            ci.cancel();
+        } else {
+            return;
+        }
+
         float animationProgression = 1.0F - (this.prevEquippedProgress + (this.equippedProgress - this.prevEquippedProgress) * partialTicks);
         final EntityPlayerSP thePlayer = this.mc.thePlayer;
         float swingProgress = thePlayer.getSwingProgress(partialTicks);
@@ -68,8 +78,9 @@ public abstract class MixinItemRenderer {
         GlStateManager.enableRescaleNormal();
         GlStateManager.pushMatrix();
 
-        if (this.itemToRender != null) {
-            EnumAction enumaction = this.itemToRender.getItemUseAction();
+        ItemStack itemToRender = SlotHandler.getRenderHeldItem();
+        if (itemToRender != null) {
+            EnumAction enumaction = itemToRender.getItemUseAction();
             final int itemInUseCount = thePlayer.getItemInUseCount();
             boolean useItem = itemInUseCount > 0;
 
@@ -80,7 +91,7 @@ public abstract class MixinItemRenderer {
             animationProgression = event.getAnimationProgression();
             swingProgress = event.getSwingProgress();
 
-            if (this.itemToRender.getItem() instanceof ItemMap) {
+            if (itemToRender.getItem() instanceof ItemMap) {
                 this.renderItemMap(thePlayer, f2, animationProgression, swingProgress);
             } else if (useItem) {
                 if (!event.isCanceled()) {
@@ -110,7 +121,7 @@ public abstract class MixinItemRenderer {
                 this.transformFirstPersonItem(animationProgression, swingProgress);
             }
 
-            this.renderItem(thePlayer, this.itemToRender, ItemCameraTransforms.TransformType.FIRST_PERSON);
+            this.renderItem(thePlayer, itemToRender, ItemCameraTransforms.TransformType.FIRST_PERSON);
         } else if (!thePlayer.isInvisible()) {
             this.func_178095_a(thePlayer, animationProgression, swingProgress);
         }

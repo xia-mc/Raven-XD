@@ -108,6 +108,8 @@ public class SliderComponent extends Component {
     }
 
     public void onClick(int x, int y, int b) {
+        if (this.getSetting() != null && !this.getSetting().isVisible()) return;
+
         if (this.u(x, y) && b == 0 && this.parent.po) {
             this.d = true;
         }

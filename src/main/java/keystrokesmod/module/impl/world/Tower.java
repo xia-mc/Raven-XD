@@ -148,7 +148,7 @@ public class Tower extends Module {
             offGroundTicks++;
         }
 
-        if (canTower() && lowHop.isToggled() && Utils.isMoving()) {
+        if (canTower() && mode.getInput() == 1 && lowHop.isToggled() && Utils.isMoving()) {
             switch (offGroundTicks) {
                 case 0:
                     mc.thePlayer.motionY = 0.4196;

@@ -28,8 +28,8 @@ Raven B4, but not only for Hypixel.
 
 ## Additional Modules
  1. Hypixel
-    - Up Sprint Scaffold
-    - Fireball LongJump
+    - Tower (Lowhop)
+    - LongJump (Fireball)
     - NoFall
     - AntiVoid
  2. BlocksMC
@@ -48,6 +48,8 @@ Raven B4, but not only for Hypixel.
     - Fly
  5. Polar
     - NoSlow
+ 6. Minemen
+    - Fly
  6. Undetectable
     - AimAssist
     - AutoClicker
