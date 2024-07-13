@@ -91,7 +91,6 @@ Raven B4, but not only for Hypixel.
      ```bash
      gradlew.bat
      gradle wrapper
-     gradlew setupDecompWorkspace && gradlew idea
      gradlew build
      ```
 
