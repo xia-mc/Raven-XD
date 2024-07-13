@@ -101,8 +101,9 @@ public class KillAura extends Module {
     public KillAura() {
         super("KillAura", category.combat);
         this.registerSetting(clickMode = new ModeSetting("Click mode", new String[]{"CPS", "Record"}, 0));
-        this.registerSetting(minCPS = new SliderSetting("Min CPS", 12.0, 1.0, 20.0, 0.5));
-        this.registerSetting(maxCPS = new SliderSetting("Max CPS", 16.0, 1.0, 20.0, 0.5));
+        ModeOnly cpsMode = new ModeOnly(clickMode, 0);
+        this.registerSetting(minCPS = new SliderSetting("Min CPS", 12.0, 1.0, 20.0, 0.5, cpsMode));
+        this.registerSetting(maxCPS = new SliderSetting("Max CPS", 16.0, 1.0, 20.0, 0.5, cpsMode));
         String[] autoBlockModes = new String[]{"Manual", "Vanilla", "Post", "Swap", "Interact A", "Interact B", "Fake", "Partial"};
         this.registerSetting(autoBlockMode = new ModeSetting("Autoblock", autoBlockModes, 0));
         this.registerSetting(fov = new SliderSetting("FOV", 360.0, 30.0, 360.0, 4.0));
@@ -144,6 +145,7 @@ public class KillAura extends Module {
 
     @Override
     public void guiUpdate() {
+        Utils.correctValue(minCPS, maxCPS);
         Utils.correctValue(attackRange, swingRange);
     }
 
