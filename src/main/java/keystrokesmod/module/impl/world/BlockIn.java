@@ -136,7 +136,6 @@ public class BlockIn extends Module {
                     mc.thePlayer.rotationYaw = currentRot.x;
                     mc.thePlayer.rotationPitch = currentRot.y;
                 }
-                Utils.sendMessage(String.format("Yaw delta: %.2f  Pitch delta: %.2f", rotation.x - currentRot.x, rotation.y - currentRot.y));
                 if (rotating) return;
             }
 

@@ -131,15 +131,11 @@ public class Utils {
     }
 
     public static int randomizeInt(double min, double max) {
-        final int iMin = (int) min;
-        final int iMax = (int) max;
-
-        if (iMin == iMax) return iMin;
-        return rand.nextInt(iMax - iMin + 1) + iMin;
+        return (int) randomizeDouble(min, max);
     }
 
     public static double randomizeDouble(double min, double max) {
-        return org.apache.commons.lang3.RandomUtils.nextDouble(min, max);
+        return Math.random() * (max - min) + min;
     }
 
     public static boolean inFov(float fov, BlockPos blockPos) {

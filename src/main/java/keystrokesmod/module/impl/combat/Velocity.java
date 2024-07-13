@@ -67,7 +67,7 @@ public class Velocity extends Module {
         super("Velocity", category.combat);
         this.registerSetting(new DescriptionSetting("Reduce knock-back."));
         this.registerSetting(mode = new ModeSetting("Mode", MODES, 1));
-        final ModeOnly canChangeMode = new ModeOnly(mode, 0, 1);
+        final ModeOnly canChangeMode = new ModeOnly(mode, 0, 1, 5);
         this.registerSetting(horizontal = new SliderSetting("Horizontal", 0.0, -100.0, 100.0, 1.0, canChangeMode));
         this.registerSetting(vertical = new SliderSetting("Vertical", 0.0, 0.0, 100.0, 1.0, canChangeMode));
         this.registerSetting(reduce = new SliderSetting("Reduce", 5, 0, 5, 1, new ModeOnly(mode, 3)));
