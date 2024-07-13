@@ -324,7 +324,7 @@ public class Commands {
             } else if (firstArg.equals("binds")) {
                 for (Module module : Raven.getModuleManager().getModules()) {
                     if (module.getKeycode() != 0) {
-                        print(ChatFormatting.AQUA + module.getName() + ": " + Keyboard.getKeyName(module.getKeycode()), 1);
+                        print(ChatFormatting.AQUA + module.getName() + ": " + Utils.getKeyName(module.getKeycode()), 1);
                     }
                 }
             } else if (firstArg.equals("bind")) {
@@ -350,7 +350,7 @@ public class Commands {
                     return;
                 }
 
-                int keyCode = Keyboard.getKeyIndex(args.get(2));
+                int keyCode = Utils.getKeyCode(args.get(2));
                 if (keyCode == Keyboard.KEY_NONE) {
                     print(ChatFormatting.RED + "Key '" + ChatFormatting.RESET + args.get(2) + ChatFormatting.RED + "' is invalid.", 1);
                     return;

@@ -187,7 +187,6 @@ public class Utils {
         if (HitSelect.canAttack(e)) mc.playerController.attackEntity(mc.thePlayer, e);
     }
 
-
     public static void sendRawMessage(String txt) {
         if (nullCheck()) {
             mc.thePlayer.addChatMessage(new ChatComponentText(formatColor(txt)));
@@ -923,5 +922,30 @@ public static List<String> getSidebarLines() {
             }
         }
         return false;
+    }
+
+    public static String getKeyName(int keyCode) {
+        if (keyCode >= 1000)
+            return "M" + (keyCode - 1000);
+        try {
+            return Keyboard.getKeyName(keyCode);
+        } catch (Exception e) {
+            return "Unknown";
+        }
+    }
+
+    public static int getKeyCode(@NotNull String keyName) {
+        try {
+//            if (keyName.startsWith("M") && keyName.length() > 1) {
+//                final String number = keyName.substring(1);
+//                if (number.chars().allMatch(Character::isDigit)) {
+//                    return Integer.parseInt(number) + 1000;
+//                }
+//            }
+
+            return Keyboard.getKeyIndex(keyName);
+        } catch (Exception e) {
+            return Keyboard.KEY_NONE;
+        }
     }
 }

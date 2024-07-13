@@ -5,6 +5,7 @@ import keystrokesmod.clickgui.components.Component;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.client.Gui;
 import keystrokesmod.utility.Theme;
+import keystrokesmod.utility.Utils;
 import keystrokesmod.utility.profile.ProfileModule;
 import net.minecraft.client.Minecraft;
 import org.lwjgl.input.Keyboard;
@@ -30,7 +31,7 @@ public class BindComponent extends Component {
     public void render() {
         GL11.glPushMatrix();
         GL11.glScaled(0.5D, 0.5D, 0.5D);
-        this.drawString(!this.parent.mod.canBeEnabled() && this.parent.mod.script == null ? "Module cannot be bound." : this.isBinding ? "Press a key..." : "Current bind: '§e" + (this.parent.mod.getKeycode() >= 1000 ? "M" + (this.parent.mod.getKeycode() - 1000) : Keyboard.getKeyName(this.parent.mod.getKeycode())) + "§r'");
+        this.drawString(!this.parent.mod.canBeEnabled() && this.parent.mod.script == null ? "Module cannot be bound." : this.isBinding ? "Press a key..." : "Current bind: '§e" + Utils.getKeyName(this.parent.mod.getKeycode()) + "§r'");
         GL11.glPopMatrix();
     }
 
