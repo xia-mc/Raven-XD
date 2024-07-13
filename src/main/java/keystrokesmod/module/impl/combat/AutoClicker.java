@@ -204,6 +204,7 @@ public class AutoClicker extends Module {
 
     }
 
+    // TODO we need a cpsCalculator
     public void gd() {
         switch ((int) mode.getInput()) {
             case 0:

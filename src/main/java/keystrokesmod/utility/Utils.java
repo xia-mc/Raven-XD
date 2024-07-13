@@ -172,7 +172,7 @@ public class Utils {
         }
     }
 
-    public static void attackEntity(Entity e, boolean clientSwing, boolean silentSwing) {
+    public static void attackEntity(Entity e, boolean clientSwing) {
         boolean attack = HitSelect.canAttack(e);
         if (clientSwing) {
             if (attack || HitSelect.canSwing()) mc.thePlayer.swingItem();
@@ -182,6 +182,11 @@ public class Utils {
         }
         if (attack) mc.playerController.attackEntity(mc.thePlayer, e);
     }
+
+    public static void attackEntityNoSwing(Entity e) {
+        if (HitSelect.canAttack(e)) mc.playerController.attackEntity(mc.thePlayer, e);
+    }
+
 
     public static void sendRawMessage(String txt) {
         if (nullCheck()) {

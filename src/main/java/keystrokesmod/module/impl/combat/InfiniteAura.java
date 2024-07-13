@@ -134,7 +134,7 @@ public class InfiniteAura extends Module {
                 stopBlink();
             } else {
                 rot = new Vec2(PlayerRotation.getYaw(targetPos), PlayerRotation.getPitch(targetPos));
-                Utils.attackEntity(target, true, false);
+                Utils.attackEntity(target, true);
                 Utils.sendMessage("attack");
                 target = mc.thePlayer;
             }

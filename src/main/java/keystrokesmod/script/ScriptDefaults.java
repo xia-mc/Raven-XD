@@ -95,7 +95,7 @@ public class ScriptDefaults {
         }
 
         public static void attack(Entity entity) {
-            Utils.attackEntity(entity.entity, true, true);
+            Utils.attackEntity(entity.entity, true);
         }
 
         public static boolean isSinglePlayer() {

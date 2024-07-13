@@ -104,7 +104,7 @@ public class KillAuraV2 extends Module {
     }
 
     private void attackEntity(final Entity target) {
-        Utils.attackEntity(target, true, true);
+        Utils.attackEntity(target, true);
         this.attackTimer.reset();
     }
 

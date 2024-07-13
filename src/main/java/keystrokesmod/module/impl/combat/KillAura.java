@@ -5,6 +5,7 @@ import keystrokesmod.Raven;
 import keystrokesmod.event.*;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
+import keystrokesmod.module.impl.other.RecordClick;
 import keystrokesmod.module.impl.other.RotationHandler;
 import keystrokesmod.module.impl.other.SlotHandler;
 import keystrokesmod.module.impl.world.AntiBot;
@@ -39,7 +40,9 @@ import static net.minecraft.util.EnumFacing.DOWN;
 
 public class KillAura extends Module {
     public static EntityLivingBase target;
-    private final SliderSetting aps;
+    private final ModeSetting clickMode;
+    private final SliderSetting minCPS;
+    private final SliderSetting maxCPS;
     public ModeSetting autoBlockMode;
     private final SliderSetting fov;
     private final SliderSetting attackRange;
@@ -75,8 +78,8 @@ public class KillAura extends Module {
     private byte entityIndex;
     public boolean swing;
     // autoclicker vars
-    private long i;
-    private long j;
+    private long nextReleaseClickTime;
+    private long nextClickTime;
     private long k;
     private long l;
     private double m;
@@ -97,7 +100,9 @@ public class KillAura extends Module {
 
     public KillAura() {
         super("KillAura", category.combat);
-        this.registerSetting(aps = new SliderSetting("APS", 16.0, 1.0, 20.0, 0.5));
+        this.registerSetting(clickMode = new ModeSetting("Click mode", new String[]{"CPS", "Record"}, 0));
+        this.registerSetting(minCPS = new SliderSetting("Min CPS", 12.0, 1.0, 20.0, 0.5));
+        this.registerSetting(maxCPS = new SliderSetting("Max CPS", 16.0, 1.0, 20.0, 0.5));
         String[] autoBlockModes = new String[]{"Manual", "Vanilla", "Post", "Swap", "Interact A", "Interact B", "Fake", "Partial"};
         this.registerSetting(autoBlockMode = new ModeSetting("Autoblock", autoBlockModes, 0));
         this.registerSetting(fov = new SliderSetting("FOV", 360.0, 30.0, 360.0, 4.0));
@@ -221,9 +226,10 @@ public class KillAura extends Module {
         if (swing && attack && HitSelect.canSwing()) {
             if (swingWhileBlocking) {
                 mc.thePlayer.swingItem();
-            }
-            else {
+                RecordClick.click();
+            } else {
                 mc.thePlayer.sendQueue.addToSendQueue(new C0APacketAnimation());
+                RecordClick.click();
             }
         }
         int input = (int) autoBlockMode.getInput();
@@ -251,7 +257,7 @@ public class KillAura extends Module {
                             mc.thePlayer.sendQueue.addToSendQueue(new C09PacketHeldItemChange(Raven.badPacketsHandler.playerSlot = mc.thePlayer.inventory.currentItem));
                             swapped = false;
                         }
-                        attackAndInteract(target, swingWhileBlocking, false);
+                        attackAndInteract(target);
                         sendBlock();
                         releasePackets();
                         lag = true;
@@ -265,7 +271,7 @@ public class KillAura extends Module {
                         lag = false;
                     }
                     else {
-                        attackAndInteract(target, swingWhileBlocking, false); // attack while blinked
+                        attackAndInteract(target); // attack while blinked
                         releasePackets(); // release
                         sendBlock(); // block after releasing unblock
                         lag = true;
@@ -279,7 +285,7 @@ public class KillAura extends Module {
                         if (blocking) {
                             unBlock();
                         } else {
-                            attackAndInteract(target, swingWhileBlocking, false);// attack while blinked
+                            attackAndInteract(target);// attack while blinked
                             sendBlock();
                             lag = true;
                         }
@@ -301,7 +307,7 @@ public class KillAura extends Module {
                 return;
             }
             switchTargets = true;
-            Utils.attackEntity(target, swingWhileBlocking, !swingWhileBlocking);
+            Utils.attackEntity(target, swingWhileBlocking);
         }
     }
 
@@ -405,8 +411,8 @@ public class KillAura extends Module {
         swing = false;
         rmbDown = false;
         attack = false;
-        this.i = 0L;
-        this.j = 0L;
+        this.nextReleaseClickTime = 0L;
+        this.nextClickTime = 0L;
         block();
         resetBlinkState(true);
         swapped = false;
@@ -570,21 +576,18 @@ public class KillAura extends Module {
         return mc.currentScreen != null && disableInInventory.isToggled();
     }
 
-    private void attackAndInteract(EntityLivingBase target, boolean swingWhileBlocking, boolean predict) {
+    private void attackAndInteract(EntityLivingBase target) {
         if (target != null && attack) {
             attack = false;
             if (noAimToEntity()) {
                 return;
             }
-            if (predict && target.hurtResistantTime > 16) {
-                return;
-            }
             switchTargets = true;
-            Utils.attackEntity(target, !swing && swingWhileBlocking, !swingWhileBlocking);
+            // TODO double swing?
+            Utils.attackEntityNoSwing(target);
             mc.thePlayer.sendQueue.addToSendQueue(new C02PacketUseEntity(target, C02PacketUseEntity.Action.INTERACT));
-        }
-        else if (ModuleManager.antiFireball != null && ModuleManager.antiFireball.isEnabled() && ModuleManager.antiFireball.fireball != null && ModuleManager.antiFireball.attack) {
-            Utils.attackEntity(ModuleManager.antiFireball.fireball, !ModuleManager.antiFireball.silentSwing.isToggled(), ModuleManager.antiFireball.silentSwing.isToggled());
+        } else if (ModuleManager.antiFireball != null && ModuleManager.antiFireball.isEnabled() && ModuleManager.antiFireball.fireball != null && ModuleManager.antiFireball.attack) {
+            Utils.attackEntityNoSwing(ModuleManager.antiFireball.fireball);
             mc.thePlayer.sendQueue.addToSendQueue(new C02PacketUseEntity(ModuleManager.antiFireball.fireball, C02PacketUseEntity.Action.INTERACT));
         }
     }
@@ -598,11 +601,11 @@ public class KillAura extends Module {
     }
 
     private boolean canAttack() {
-        if (this.j > 0L && this.i > 0L) {
-            if (System.currentTimeMillis() > this.j) {
+        if (this.nextClickTime > 0L && this.nextReleaseClickTime > 0L) {
+            if (System.currentTimeMillis() > this.nextClickTime) {
                 this.gd();
                 return true;
-            } else if (System.currentTimeMillis() > this.i) {
+            } else if (System.currentTimeMillis() > this.nextReleaseClickTime) {
                 return false;
             }
         } else {
@@ -612,33 +615,41 @@ public class KillAura extends Module {
     }
 
     public void gd() {
-        double c = aps.getInput() + 0.4D * this.rand.nextDouble();
-        long d = (int) Math.round(1000.0D / c);
-        if (System.currentTimeMillis() > this.k) {
-            if (!this.n && this.rand.nextInt(100) >= 85) {
-                this.n = true;
-                this.m = 1.1D + this.rand.nextDouble() * 0.15D;
-            } else {
-                this.n = false;
-            }
+        switch ((int) clickMode.getInput()) {
+            case 0:
+                double c = Utils.getRandomValue(minCPS, maxCPS, this.rand) + 0.4D * this.rand.nextDouble();
+                long d = (int) Math.round(1000.0D / c);
+                if (System.currentTimeMillis() > this.k) {
+                    if (!this.n && this.rand.nextInt(100) >= 85) {
+                        this.n = true;
+                        this.m = 1.1D + this.rand.nextDouble() * 0.15D;
+                    } else {
+                        this.n = false;
+                    }
 
-            this.k = System.currentTimeMillis() + 500L + (long) this.rand.nextInt(1500);
+                    this.k = System.currentTimeMillis() + 500L + (long) this.rand.nextInt(1500);
+                }
+
+                if (this.n) {
+                    d = (long) ((double) d * this.m);
+                }
+
+                if (System.currentTimeMillis() > this.l) {
+                    if (this.rand.nextInt(100) >= 80) {
+                        d += 50L + (long) this.rand.nextInt(100);
+                    }
+
+                    this.l = System.currentTimeMillis() + 500L + (long) this.rand.nextInt(1500);
+                }
+
+                this.nextClickTime = System.currentTimeMillis() + d;
+                this.nextReleaseClickTime = System.currentTimeMillis() + d / 2L - (long) this.rand.nextInt(10);
+                break;
+            case 1:
+                this.nextClickTime = RecordClick.getNextClickTime();
+                this.nextReleaseClickTime = this.nextClickTime + 1;
+                break;
         }
-
-        if (this.n) {
-            d = (long) ((double) d * this.m);
-        }
-
-        if (System.currentTimeMillis() > this.l) {
-            if (this.rand.nextInt(100) >= 80) {
-                d += 50L + (long) this.rand.nextInt(100);
-            }
-
-            this.l = System.currentTimeMillis() + 500L + (long) this.rand.nextInt(1500);
-        }
-
-        this.j = System.currentTimeMillis() + d;
-        this.i = System.currentTimeMillis() + d / 2L - (long) this.rand.nextInt(10);
     }
 
     private void unBlock() {

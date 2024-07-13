@@ -77,7 +77,7 @@ public class AntiFireball extends Module {
                 }
                 attack = true;
             } else {
-                Utils.attackEntity(fireball, !silentSwing.isToggled(), silentSwing.isToggled());
+                Utils.attackEntity(fireball, !silentSwing.isToggled());
             }
         }
     }
