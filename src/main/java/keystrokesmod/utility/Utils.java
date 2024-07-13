@@ -936,12 +936,12 @@ public static List<String> getSidebarLines() {
 
     public static int getKeyCode(@NotNull String keyName) {
         try {
-//            if (keyName.startsWith("M") && keyName.length() > 1) {
-//                final String number = keyName.substring(1);
-//                if (number.chars().allMatch(Character::isDigit)) {
-//                    return Integer.parseInt(number) + 1000;
-//                }
-//            }
+            if (keyName.startsWith("M") && keyName.length() > 1) {
+                final String number = keyName.substring(1);
+                if (number.chars().allMatch(Character::isDigit)) {
+                    return Integer.parseInt(number) + 1000;
+                }
+            }
 
             return Keyboard.getKeyIndex(keyName);
         } catch (Exception e) {
