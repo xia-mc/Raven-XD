@@ -5,6 +5,7 @@ import keystrokesmod.event.ReceivePacketEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.ModeSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
+import keystrokesmod.utility.Utils;
 import net.minecraft.network.play.server.S03PacketTimeUpdate;
 import net.minecraft.network.play.server.S2BPacketChangeGameState;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -27,6 +28,11 @@ public class Ambience extends Module {
 
     @Override
     public void onDisable() {
+        if (!Utils.nullCheck()) return;
+        reset();
+    }
+
+    private void reset() {
         mc.theWorld.setRainStrength(0);
         mc.theWorld.getWorldInfo().setCleanWeatherTime(Integer.MAX_VALUE);
         mc.theWorld.getWorldInfo().setRainTime(0);
@@ -37,21 +43,18 @@ public class Ambience extends Module {
 
     @SubscribeEvent
     public void onRenderTick(TickEvent.RenderTickEvent event) {
+        if (!Utils.nullCheck()) return;
         mc.theWorld.setWorldTime((long) (time.getInput() + (System.currentTimeMillis() * speed.getInput())));
     }
 
     @SubscribeEvent
     public void onPreMotion(PreMotionEvent event) {
+        if (!Utils.nullCheck()) return;
         if (mc.thePlayer.ticksExisted % 20 == 0) {
 
             switch ((int) this.weather.getInput()) {
                 case 1: {
-                    mc.theWorld.setRainStrength(0);
-                    mc.theWorld.getWorldInfo().setCleanWeatherTime(Integer.MAX_VALUE);
-                    mc.theWorld.getWorldInfo().setRainTime(0);
-                    mc.theWorld.getWorldInfo().setThunderTime(0);
-                    mc.theWorld.getWorldInfo().setRaining(false);
-                    mc.theWorld.getWorldInfo().setThundering(false);
+                    reset();
                     break;
                 }
                 case 2:

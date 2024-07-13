@@ -2,6 +2,7 @@ package keystrokesmod.mixins.impl.render;
 
 
 import keystrokesmod.event.RenderItemEvent;
+import keystrokesmod.module.impl.other.SlotHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -35,8 +36,6 @@ public abstract class MixinItemRenderer {
 
     @Shadow protected abstract void func_178110_a(EntityPlayerSP p_178110_1_, float p_178110_2_);
 
-    @Shadow private ItemStack itemToRender;
-
     @Shadow protected abstract void renderItemMap(AbstractClientPlayer p_renderItemMap_1_, float p_renderItemMap_2_, float p_renderItemMap_3_, float p_renderItemMap_4_);
 
     @Shadow protected abstract void transformFirstPersonItem(float p_transformFirstPersonItem_1_, float p_transformFirstPersonItem_2_);
@@ -68,8 +67,9 @@ public abstract class MixinItemRenderer {
         GlStateManager.enableRescaleNormal();
         GlStateManager.pushMatrix();
 
-        if (this.itemToRender != null) {
-            EnumAction enumaction = this.itemToRender.getItemUseAction();
+        ItemStack itemToRender = SlotHandler.getRenderHeldItem();
+        if (itemToRender != null) {
+            EnumAction enumaction = itemToRender.getItemUseAction();
             final int itemInUseCount = thePlayer.getItemInUseCount();
             boolean useItem = itemInUseCount > 0;
 
@@ -80,7 +80,7 @@ public abstract class MixinItemRenderer {
             animationProgression = event.getAnimationProgression();
             swingProgress = event.getSwingProgress();
 
-            if (this.itemToRender.getItem() instanceof ItemMap) {
+            if (itemToRender.getItem() instanceof ItemMap) {
                 this.renderItemMap(thePlayer, f2, animationProgression, swingProgress);
             } else if (useItem) {
                 if (!event.isCanceled()) {
@@ -110,7 +110,7 @@ public abstract class MixinItemRenderer {
                 this.transformFirstPersonItem(animationProgression, swingProgress);
             }
 
-            this.renderItem(thePlayer, this.itemToRender, ItemCameraTransforms.TransformType.FIRST_PERSON);
+            this.renderItem(thePlayer, itemToRender, ItemCameraTransforms.TransformType.FIRST_PERSON);
         } else if (!thePlayer.isInvisible()) {
             this.func_178095_a(thePlayer, animationProgression, swingProgress);
         }

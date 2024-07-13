@@ -834,10 +834,11 @@ public static List<String> getSidebarLines() {
     }
 
     public static boolean holdingWeapon() {
-        if (mc.thePlayer.getHeldItem() == null) {
+        ItemStack item = SlotHandler.getHeldItem();
+        if (item == null) {
             return false;
         }
-        Item getItem = mc.thePlayer.getHeldItem().getItem();
+        Item getItem = item.getItem();
         return (Settings.weaponSword.isToggled() || getItem instanceof ItemSword) || (Settings.weaponAxe.isToggled() && getItem instanceof ItemAxe) || (Settings.weaponRod.isToggled() && getItem instanceof ItemFishingRod) || (Settings.weaponStick.isToggled() && getItem == Items.stick);
     }
 
