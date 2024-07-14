@@ -2,8 +2,10 @@ package keystrokesmod.module.impl.movement;
 
 import keystrokesmod.event.*;
 import keystrokesmod.mixins.impl.client.KeyBindingAccessor;
+import keystrokesmod.mixins.impl.entity.EntityPlayerSPAccessor;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
+import keystrokesmod.module.impl.other.RotationHandler;
 import keystrokesmod.module.impl.other.SlotHandler;
 import keystrokesmod.module.impl.world.Scaffold;
 import keystrokesmod.module.setting.impl.ButtonSetting;
@@ -15,8 +17,11 @@ import keystrokesmod.utility.render.RenderUtils;
 import net.minecraft.block.BlockAir;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityBoat;
+import net.minecraft.item.ItemBow;
+import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.network.play.server.S08PacketPlayerPosLook;
+import net.minecraft.network.play.server.S12PacketEntityVelocity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
@@ -31,6 +36,7 @@ public class Fly extends Module {
     public static SliderSetting horizontalSpeed;
     private final SliderSetting verticalSpeed;
     private final SliderSetting maxBalance;
+    private final SliderSetting velocityReleaseTime;
     private final ButtonSetting autoDisable;
     private final ButtonSetting showBPS;
     private final ButtonSetting stopMotion;
@@ -39,20 +45,25 @@ public class Fly extends Module {
     private int offGroundTicks = 0;
     private boolean started, notUnder, clipped, teleport;
 
-
     private long balance = 0;
     private long startTime = -1;
     private Timer.BalanceState balanceState = Timer.BalanceState.NONE;
     private long lastReport = -1;
 
+    private boolean airStuck = false;
+    private double airStuck$posX, airStuck$posY, airStuck$posZ;
+    private float airStuck$yaw;
+    private int disableTicks = 0;
+
     public Fly() {
         super("Fly", category.movement);
-        this.registerSetting(mode = new ModeSetting("Fly", new String[]{"Vanilla", "Fast", "Fast 2", "AirWalk", "Old GrimAC", "BlocksMC", "GrimACBoat", "AirPlace"}, 0));
+        this.registerSetting(mode = new ModeSetting("Mode", new String[]{"Vanilla", "Fast", "Fast 2", "AirWalk", "Old GrimAC", "BlocksMC", "GrimACBoat", "MMC", "Matrix"}, 0));
         final ModeOnly canChangeSpeed = new ModeOnly(mode, 0, 1, 2, 6);
         final ModeOnly balanceMode = new ModeOnly(mode, 4);
         this.registerSetting(horizontalSpeed = new SliderSetting("Horizontal speed", 2.0, 0.0, 9.0, 0.1, canChangeSpeed));
         this.registerSetting(verticalSpeed = new SliderSetting("Vertical speed", 2.0, 0.0, 9.0, 0.1, canChangeSpeed));
         this.registerSetting(maxBalance = new SliderSetting("Max balance", 6000, 3000, 30000, 1000, "ms", balanceMode));
+        this.registerSetting(velocityReleaseTime = new SliderSetting("Velocity release time", 8, 20, 5, 1, "tick", new ModeOnly(mode, 8)));
         this.registerSetting(autoDisable = new ButtonSetting("Auto disable", true, balanceMode));
         this.registerSetting(showBPS = new ButtonSetting("Show BPS", false));
         this.registerSetting(stopMotion = new ButtonSetting("Stop motion", false));
@@ -84,6 +95,9 @@ public class Fly extends Module {
                 teleport = false;
                 Utils.sendMessage("Teleported!");
             }
+        } else if (event.getPacket() instanceof S12PacketEntityVelocity) {
+            if (((S12PacketEntityVelocity) event.getPacket()).getEntityID() == mc.thePlayer.getEntityId())
+                disableTicks = (int) velocityReleaseTime.getInput();
         }
     }
 
@@ -234,7 +248,45 @@ public class Fly extends Module {
                     }
                 }
                 break;
+            case 8:
+                if (disableTicks <= 0) {
+                    if (!airStuck) {
+                        airStuck$posX = mc.thePlayer.posX;
+                        airStuck$posY = mc.thePlayer.posY;
+                        airStuck$posZ = mc.thePlayer.posZ;
+                        airStuck$yaw = RotationHandler.getRotationYaw();
+                    }
+                    airStuck = true;
+                } else {
+                    airStuck = false;
+                    disableTicks--;
+                }
+                break;
         }
+    }
+
+    @SubscribeEvent
+    public void onPreMotion(PreMotionEvent event) {
+        if (mode.getInput() == 8) {
+            if (airStuck) {
+                mc.thePlayer.posX = airStuck$posX;
+                mc.thePlayer.posY = airStuck$posY;
+                mc.thePlayer.posZ = airStuck$posZ;
+                mc.thePlayer.motionX = mc.thePlayer.motionY = mc.thePlayer.motionZ = 0;
+                event.setYaw(airStuck$yaw);
+            }
+            event.setPitch(-88);
+            SlotHandler.setCurrentSlot(ContainerUtils.getSlot(ItemBow.class));
+        }
+    }
+
+    @SubscribeEvent
+    public void onSendPacket(@NotNull SendPacketEvent event) {
+//        if (event.getPacket() instanceof C03PacketPlayer
+//                && !(event.getPacket() instanceof C03PacketPlayer.C05PacketPlayerLook)
+//                && mode.getInput() == 8 && airStuck) {
+//            event.setCanceled(true);
+//        }
     }
 
     public void onDisable() {
@@ -266,6 +318,7 @@ public class Fly extends Module {
         if ((int) mode.getInput() == 5) {
             MoveUtil.stop();
         }
+        airStuck = false;
     }
 
     private void balance$reset() {

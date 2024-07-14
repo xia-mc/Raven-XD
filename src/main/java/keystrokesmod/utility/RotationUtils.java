@@ -240,18 +240,22 @@ public class RotationUtils {
     }
 
     public static float normalize(float yaw) {
-        while (yaw > 180f) {
-            yaw -= 360f;
+        if (yaw > 180f) {
+            while (yaw > 180f) {
+                yaw -= 360f;
+            }
+        } else if (yaw <= -180f) {
+            while (yaw <= -180f) {
+                yaw += 360f;
+            }
         }
-        while (yaw <= -180f) {
-            yaw += 360f;
-        }
+
         return yaw;
     }
 
     public static boolean isMouseOver(final float yaw, final float pitch, final Entity target, final float range) {
         final float partialTicks = Utils.getTimer().renderPartialTicks;
-        final Entity entity = mc.getRenderViewEntity();
+        final Entity entity = mc.thePlayer;
         MovingObjectPosition objectMouseOver;
         Entity mcPointedEntity = null;
 

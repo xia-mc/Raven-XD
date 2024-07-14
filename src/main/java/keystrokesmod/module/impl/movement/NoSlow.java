@@ -157,21 +157,18 @@ public class NoSlow extends Module {
                 if (mc.thePlayer.ticksExisted % 3 == 0 && !Raven.badPacketsHandler.C07) {
                     event.setPitch(90);
                     RotationHandler.setRotationPitch(90);
-                    BlockPos pos = mc.thePlayer.getPosition().down();
-                    mc.thePlayer.sendQueue.addToSendQueue(new C08PacketPlayerBlockPlacement(
-                            pos, EnumFacing.UP.getIndex(), SlotHandler.getHeldItem(),
-                            pos.getX() + 0.5f, pos.getY() + 1, pos.getZ() + 0.5f
-                    ));
                 }
                 break;
             case 9:
                 if (ContainerUtils.isRest(item)) {
                     if (mc.thePlayer.onGround) {
                         if (!lastUsingItem) {
-                            mc.thePlayer.motionY = 0.419999986688697104;
+                            mc.thePlayer.jump();
                         } else {
                             mc.thePlayer.motionY += 0.0000001;
                         }
+                    } else {
+                        mc.thePlayer.motionY -= 0.0000001;
                     }
                 }
                 break;
@@ -185,13 +182,6 @@ public class NoSlow extends Module {
         }
 
         lastUsingItem = true;
-    }
-
-    @SubscribeEvent
-    public void onJump(JumpEvent event) {
-        if (mode.getInput() == 9 && SlotHandler.getHeldItem() != null && ContainerUtils.isRest(SlotHandler.getHeldItem().getItem())) {
-            event.setMotionY(0.419999986688697104F);
-        }
     }
 
     public static float getSlowed() {
