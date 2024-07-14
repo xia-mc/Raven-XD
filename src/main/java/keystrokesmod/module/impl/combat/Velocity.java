@@ -44,7 +44,8 @@ public class Velocity extends Module {
     public static SliderSetting horizontal;
     public static SliderSetting vertical;
     private final SliderSetting reduce;
-    private final SliderSetting delay;
+    private final SliderSetting tickDelay;
+    private final SliderSetting zipDelay;
     private final ButtonSetting cancelExplosion;
     private final ButtonSetting cancelAir;
     private final ButtonSetting damageBoost;
@@ -71,7 +72,8 @@ public class Velocity extends Module {
         this.registerSetting(horizontal = new SliderSetting("Horizontal", 0.0, -100.0, 100.0, 1.0, canChangeMode));
         this.registerSetting(vertical = new SliderSetting("Vertical", 0.0, 0.0, 100.0, 1.0, canChangeMode));
         this.registerSetting(reduce = new SliderSetting("Reduce", 5, 0, 5, 1, new ModeOnly(mode, 3)));
-        this.registerSetting(delay = new SliderSetting("Delay", 50, 10, 5000, 10, "ms", new ModeOnly(mode, 5, 6)));
+        this.registerSetting(tickDelay = new SliderSetting("Delay", 50, 10, 400, 10, "ms", new ModeOnly(mode, 5)));
+        this.registerSetting(zipDelay = new SliderSetting("Delay", 1000, 500, 10000, 250, "ms", new ModeOnly(mode, 6)));
         this.registerSetting(cancelExplosion = new ButtonSetting("Cancel explosion packet", true, canChangeMode));
         this.registerSetting(cancelAir = new ButtonSetting("Cancel air", false, canChangeMode));
         this.registerSetting(damageBoost = new ButtonSetting("Damage boost", false));
@@ -91,7 +93,7 @@ public class Velocity extends Module {
         }
 
         try {
-            if (!delayedPacket.isEmpty() && System.currentTimeMillis() - startDelayTime > delay.getInput()) {
+            if (!delayedPacket.isEmpty() && System.currentTimeMillis() - startDelayTime > zipDelay.getInput()) {
                 releasePackets();
             }
 
@@ -169,7 +171,7 @@ public class Velocity extends Module {
         }
         final long time = System.currentTimeMillis();
         if (e.getPacket() instanceof S32PacketConfirmTransaction && mode.getInput() == 6) {
-            if (time - startDelayTime <= delay.getInput()) {
+            if (time - startDelayTime <= zipDelay.getInput()) {
                 e.setCanceled(true);
                 delayedPacket.add((S32PacketConfirmTransaction) e.getPacket());
             }
@@ -222,14 +224,14 @@ public class Velocity extends Module {
                                 mc.thePlayer.motionY *= vertical.getInput() / 100;
                                 mc.thePlayer.motionZ *= horizontal.getInput() / 100;
                             }
-                        }, (long) delay.getInput(), TimeUnit.MILLISECONDS);
+                        }, (long) tickDelay.getInput(), TimeUnit.MILLISECONDS);
                         break;
                     case 6:
                         e.setCanceled(true);
                         if (startDelayTime == -1) {
                             startDelayTime = time;
                         }
-                        if (time - startDelayTime <= delay.getInput()) {
+                        if (time - startDelayTime <= zipDelay.getInput()) {
                             e.setCanceled(true);
                             delayedPacket.add((S12PacketEntityVelocity) e.getPacket());
                         }

@@ -94,6 +94,7 @@ public class ModuleManager {
     public static Clutch clutch;
     public static Ambience ambience;
     public static KillAuraV2 killAuraV2;
+    public static DynamicManager dynamicManager;
     
     public void register() {
         this.addModule(autoClicker = new AutoClicker());
@@ -219,6 +220,7 @@ public class ModuleManager {
         this.addModule(ambience = new Ambience());
         this.addModule(clutch = new Clutch());
         this.addModule(killAuraV2 = new KillAuraV2());
+        this.addModule(dynamicManager = new DynamicManager());
         antiBot.enable();
         commandChat.enable();
         modules.sort(Comparator.comparing(Module::getPrettyName));

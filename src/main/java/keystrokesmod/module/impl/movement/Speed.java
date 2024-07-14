@@ -2,6 +2,7 @@ package keystrokesmod.module.impl.movement;
 
 import keystrokesmod.event.PreMotionEvent;
 import keystrokesmod.event.PrePlayerInputEvent;
+import keystrokesmod.event.PreUpdateEvent;
 import keystrokesmod.event.ReceivePacketEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.ButtonSetting;
@@ -14,7 +15,6 @@ import net.minecraft.block.BlockAir;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.play.client.C0BPacketEntityAction;
 import net.minecraft.network.play.server.S08PacketPlayerPosLook;
 import net.minecraft.potion.Potion;
@@ -35,7 +35,7 @@ public class Speed extends Module {
     private final ButtonSetting sneakDisable;
     private final ButtonSetting stopMotion;
     private final ButtonSetting stopSprint;
-    private final String[] modes = new String[]{"Hypixel", "BlocksMC", "Vulcan", "GrimAC"};
+    private final String[] modes = new String[]{"Hypixel A", "BlocksMC", "Vulcan", "GrimAC", "Hypixel B"};
     private int offGroundTicks = 0;
     public static int ticksSinceVelocity = Integer.MAX_VALUE;
 
@@ -87,6 +87,36 @@ public class Speed extends Module {
     @Override
     public void onEnable() {
         ticksSinceVelocity = Integer.MAX_VALUE;
+    }
+
+    @SubscribeEvent
+    public void onPreUpdate(PreUpdateEvent event) {
+        if (mode.getInput() == 4) {
+            if (mc.thePlayer.hurtTime > 0 || !MoveUtil.isMoving() || Utils.jumpDown()) {
+                Utils.resetTimer();
+                return;
+            }
+
+            switch (offGroundTicks) {
+                case 0:
+                    mc.thePlayer.motionY = 0.42;
+                    MoveUtil.strafe(0.45);
+                    Utils.getTimer().timerSpeed = 1.0f;
+                    break;
+                case 10:
+                    mc.thePlayer.motionY = -0.28;
+                    MoveUtil.strafe(0.315);
+                    Utils.getTimer().timerSpeed = 1.8f;
+                    break;
+                case 11:
+                    MoveUtil.strafe();
+                    Utils.getTimer().timerSpeed = 1.0f;
+                    break;
+                case 12:
+                    MoveUtil.stop();
+                    break;
+            }
+        }
     }
 
     public void onUpdate() {

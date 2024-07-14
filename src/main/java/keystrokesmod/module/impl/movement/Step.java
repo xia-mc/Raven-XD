@@ -10,9 +10,8 @@ import keystrokesmod.utility.Utils;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class Step extends Module {
-    private final ModeSetting mode = new ModeSetting("Mode", new String[]{"HypixelTest"}, 0);
+    private final ModeSetting mode = new ModeSetting("Mode", new String[]{"Hypixel 1.5"}, 0);
     private final SliderSetting delay = new SliderSetting("Delay", 1000, 0, 5000, 250, "ms");
-    private final SliderSetting timer = new SliderSetting("Timer", 1, 0.1, 2, 0.1, "x");
 
     private int offGroundTicks = -1;
     private boolean stepping = false;
@@ -47,22 +46,39 @@ public class Step extends Module {
         }
 
         if (stepping) {
-            if (timer.getInput() != 1) {
-                Utils.getTimer().timerSpeed = (float) timer.getInput();
+            if (!MoveUtil.isMoving() || Utils.jumpDown() || !mc.thePlayer.isCollidedHorizontally) {
+                stepping = false;
+                return;
             }
+
             switch (offGroundTicks) {
                 case 0:
-                    mc.thePlayer.motionY = 0.4196;
+                    MoveUtil.stop();
+                    MoveUtil.strafe();
+                    mc.thePlayer.jump();
                     break;
+                case 1:
+                case 2:
                 case 3:
                 case 4:
-                    mc.thePlayer.motionY = 0;
-                    break;
                 case 5:
+                case 6:
+                case 7:
+                case 8:
+                case 9:
+                    MoveUtil.stop();
+                    break;
+                case 10:
+                case 11:
+                case 13:
+                case 14:
+                case 15:
+                    mc.thePlayer.motionY = 0;
+                    MoveUtil.stop();
+                    break;
+                case 16:
+                    mc.thePlayer.jump();
                     stepping = false;
-                    if (timer.getInput() != 1) {
-                        Utils.resetTimer();
-                    }
                     break;
             }
         }

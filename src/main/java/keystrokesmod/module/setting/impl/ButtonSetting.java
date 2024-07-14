@@ -4,7 +4,10 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import keystrokesmod.module.setting.Setting;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.concurrent.Callable;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class ButtonSetting extends Setting {
@@ -12,16 +15,26 @@ public class ButtonSetting extends Setting {
     private boolean isEnabled;
     public boolean isMethodButton;
     private Runnable method;
+    private Consumer<ButtonSetting> onToggle;
 
     public ButtonSetting(String name, boolean isEnabled) {
         this(name, isEnabled, () -> true);
     }
 
+    public ButtonSetting(String name, boolean isEnabled, @NotNull Consumer<ButtonSetting> onToggle) {
+        this(name, isEnabled, () -> true, onToggle);
+    }
+
     public ButtonSetting(String name, boolean isEnabled, @NotNull Supplier<Boolean> visibleCheck) {
+        this(name, isEnabled, visibleCheck, setting -> {});
+    }
+
+    public ButtonSetting(String name, boolean isEnabled, @NotNull Supplier<Boolean> visibleCheck, @NotNull Consumer<ButtonSetting> onToggle) {
         super(name, visibleCheck);
         this.name = name;
         this.isEnabled = isEnabled;
         this.isMethodButton = false;
+        this.onToggle = onToggle;
     }
 
     public ButtonSetting(String name, Runnable method) {
@@ -52,6 +65,7 @@ public class ButtonSetting extends Setting {
 
     public void toggle() {
         this.isEnabled = !this.isEnabled;
+        onToggle.accept(this);
     }
 
     public void enable() {

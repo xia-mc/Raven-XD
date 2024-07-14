@@ -36,7 +36,6 @@ public class Fly extends Module {
     public static SliderSetting horizontalSpeed;
     private final SliderSetting verticalSpeed;
     private final SliderSetting maxBalance;
-    private final SliderSetting velocityReleaseTime;
     private final ButtonSetting autoDisable;
     private final ButtonSetting showBPS;
     private final ButtonSetting stopMotion;
@@ -53,7 +52,7 @@ public class Fly extends Module {
     private boolean airStuck = false;
     private double airStuck$posX, airStuck$posY, airStuck$posZ;
     private float airStuck$yaw;
-    private int disableTicks = 0;
+    private int usingTicks = 0;
 
     public Fly() {
         super("Fly", category.movement);
@@ -63,7 +62,6 @@ public class Fly extends Module {
         this.registerSetting(horizontalSpeed = new SliderSetting("Horizontal speed", 2.0, 0.0, 9.0, 0.1, canChangeSpeed));
         this.registerSetting(verticalSpeed = new SliderSetting("Vertical speed", 2.0, 0.0, 9.0, 0.1, canChangeSpeed));
         this.registerSetting(maxBalance = new SliderSetting("Max balance", 6000, 3000, 30000, 1000, "ms", balanceMode));
-        this.registerSetting(velocityReleaseTime = new SliderSetting("Velocity release time", 8, 20, 5, 1, "tick", new ModeOnly(mode, 8)));
         this.registerSetting(autoDisable = new ButtonSetting("Auto disable", true, balanceMode));
         this.registerSetting(showBPS = new ButtonSetting("Show BPS", false));
         this.registerSetting(stopMotion = new ButtonSetting("Stop motion", false));
@@ -97,7 +95,7 @@ public class Fly extends Module {
             }
         } else if (event.getPacket() instanceof S12PacketEntityVelocity) {
             if (((S12PacketEntityVelocity) event.getPacket()).getEntityID() == mc.thePlayer.getEntityId())
-                disableTicks = (int) velocityReleaseTime.getInput();
+                airStuck = false;
         }
     }
 
@@ -249,17 +247,17 @@ public class Fly extends Module {
                 }
                 break;
             case 8:
-                if (disableTicks <= 0) {
+                if (mc.thePlayer.motionY <= 0 && mc.thePlayer.hurtTime == 0) {
                     if (!airStuck) {
                         airStuck$posX = mc.thePlayer.posX;
                         airStuck$posY = mc.thePlayer.posY;
                         airStuck$posZ = mc.thePlayer.posZ;
                         airStuck$yaw = RotationHandler.getRotationYaw();
+                        usingTicks = 0;
                     }
                     airStuck = true;
                 } else {
                     airStuck = false;
-                    disableTicks--;
                 }
                 break;
         }
@@ -268,15 +266,29 @@ public class Fly extends Module {
     @SubscribeEvent
     public void onPreMotion(PreMotionEvent event) {
         if (mode.getInput() == 8) {
+            event.setPitch(-88);
+            SlotHandler.setCurrentSlot(ContainerUtils.getSlot(ItemBow.class));
             if (airStuck) {
                 mc.thePlayer.posX = airStuck$posX;
                 mc.thePlayer.posY = airStuck$posY;
                 mc.thePlayer.posZ = airStuck$posZ;
                 mc.thePlayer.motionX = mc.thePlayer.motionY = mc.thePlayer.motionZ = 0;
                 event.setYaw(airStuck$yaw);
+
+                final ItemStack item = SlotHandler.getHeldItem();
+
+                if (item != null && item.getItem() instanceof ItemBow) {
+                    if (usingTicks == 6 && mc.thePlayer.isUsingItem()) {
+                        mc.playerController.onStoppedUsingItem(mc.thePlayer);
+                    } else {
+                        mc.playerController.sendUseItem(mc.thePlayer, mc.theWorld, item);
+                        mc.thePlayer.setItemInUse(item, usingTicks);
+                        usingTicks++;
+                    }
+                }
+            } else {
+                usingTicks = 0;
             }
-            event.setPitch(-88);
-            SlotHandler.setCurrentSlot(ContainerUtils.getSlot(ItemBow.class));
         }
     }
 
@@ -319,6 +331,7 @@ public class Fly extends Module {
             MoveUtil.stop();
         }
         airStuck = false;
+        usingTicks = 0;
     }
 
     private void balance$reset() {

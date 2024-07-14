@@ -165,7 +165,7 @@ public class NoSlow extends Module {
                         if (!lastUsingItem) {
                             mc.thePlayer.jump();
                         } else {
-                            mc.thePlayer.motionY += 0.0000001;
+                            mc.thePlayer.motionY += 1E-14;
                         }
                     } else {
                         mc.thePlayer.motionY -= 0.0000001;

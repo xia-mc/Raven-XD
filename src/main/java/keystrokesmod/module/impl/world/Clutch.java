@@ -150,6 +150,7 @@ public class Clutch extends Module {
     }
 
     private boolean shouldClutch() {
+        if (mc.thePlayer.onGround) return false;
         if (overVoid.isToggled() && Utils.overVoid()) return true;
         return fallDistance.isToggled() && mc.thePlayer.fallDistance >= minFallDistance.getInput();
     }

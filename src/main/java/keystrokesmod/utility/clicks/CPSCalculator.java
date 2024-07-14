@@ -9,19 +9,20 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraftforge.client.event.MouseEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class CPSCalculator {
-    private static Minecraft mc = Minecraft.getMinecraft();
-    private static List<Long> a = new ArrayList();
-    private static List<Long> b = new ArrayList();
+    private static final Minecraft mc = Minecraft.getMinecraft();
+    private static final List<Long> a = new ArrayList<>();
+    private static final List<Long> b = new ArrayList<>();
     public static long LL = 0L;
     public static long LR = 0L;
 
     @SubscribeEvent
-    public void onMouseUpdate(MouseEvent d) {
+    public void onMouseUpdate(@NotNull MouseEvent d) {
         if (d.buttonstate) {
             if (d.button == 0) {
                 aL();
@@ -43,7 +44,7 @@ public class CPSCalculator {
             }
             else if (d.button == 2 && Settings.middleClickFriends.isToggled()) {
                 EntityLivingBase g = Utils.raytrace(30);
-                if (!AntiBot.isBot(g) && !Utils.addFriend(g.getName())) {
+                if (g != null && !AntiBot.isBot(g) && !Utils.addFriend(g.getName())) {
                     Utils.removeFriend(g.getName());
                 }
             }

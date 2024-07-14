@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class ScriptDefaults {
@@ -605,6 +606,14 @@ public class ScriptDefaults {
 
         public void registerButton(String name, boolean defaultValue, Supplier<Boolean> visibleCheck) {
             getScript(this.superName).registerSetting(new ButtonSetting(name, defaultValue, visibleCheck));
+        }
+
+        public void registerButton(String name, boolean defaultValue, Consumer<ButtonSetting> onToggle) {
+            getScript(this.superName).registerSetting(new ButtonSetting(name, defaultValue, onToggle));
+        }
+
+        public void registerButton(String name, boolean defaultValue, Supplier<Boolean> visibleCheck, Consumer<ButtonSetting> onToggle) {
+            getScript(this.superName).registerSetting(new ButtonSetting(name, defaultValue, visibleCheck, onToggle));
         }
 
         public void registerSlider(String name, double defaultValue, double minimum, double maximum, double interval) {

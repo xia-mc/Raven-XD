@@ -2,7 +2,9 @@ package keystrokesmod.mixins.impl.render;
 
 
 import keystrokesmod.event.RenderItemEvent;
+import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.other.SlotHandler;
+import keystrokesmod.utility.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -62,70 +64,76 @@ public abstract class MixinItemRenderer {
      */
     @Inject(method = "renderItemInFirstPerson", at = @At("HEAD"), cancellable = true)
     public void renderItemInFirstPerson(final float partialTicks, @NotNull CallbackInfo ci) {
-        ci.cancel();
-
-        float animationProgression = 1.0F - (this.prevEquippedProgress + (this.equippedProgress - this.prevEquippedProgress) * partialTicks);
-        final EntityPlayerSP thePlayer = this.mc.thePlayer;
-        float swingProgress = thePlayer.getSwingProgress(partialTicks);
-        final float f2 = thePlayer.prevRotationPitch + (thePlayer.rotationPitch - thePlayer.prevRotationPitch) * partialTicks;
-        final float f3 = thePlayer.prevRotationYaw + (thePlayer.rotationYaw - thePlayer.prevRotationYaw) * partialTicks;
-        this.func_178101_a(f2, f3);
-        this.func_178109_a(thePlayer);
-        this.func_178110_a(thePlayer, partialTicks);
-        GlStateManager.enableRescaleNormal();
-        GlStateManager.pushMatrix();
-
-        ItemStack itemToRender = SlotHandler.getRenderHeldItem();
-        if (itemToRender != null) {
-            EnumAction enumaction = itemToRender.getItemUseAction();
-            final int itemInUseCount = thePlayer.getItemInUseCount();
-            boolean useItem = itemInUseCount > 0;
-
-            final RenderItemEvent event = new RenderItemEvent(enumaction, useItem, animationProgression, partialTicks, swingProgress, itemToRender);
-            MinecraftForge.EVENT_BUS.post(event);
-            enumaction = event.getEnumAction();
-            useItem = event.isUseItem();
-            animationProgression = event.getAnimationProgression();
-            swingProgress = event.getSwingProgress();
-
-            if (itemToRender.getItem() instanceof ItemMap) {
-                this.renderItemMap(thePlayer, f2, animationProgression, swingProgress);
-            } else if (useItem) {
-                if (!event.isCanceled()) {
-                    switch (enumaction) {
-                        case NONE:
-                            this.transformFirstPersonItem(animationProgression, 0.0F);
-                            break;
-
-                        case EAT:
-                        case DRINK:
-                            this.func_178104_a(thePlayer, partialTicks);
-                            this.transformFirstPersonItem(animationProgression, 0.0F);
-                            break;
-
-                        case BLOCK:
-                            this.transformFirstPersonItem(animationProgression, 0.0F);
-                            this.func_178103_d();
-                            break;
-
-                        case BOW:
-                            this.transformFirstPersonItem(animationProgression, 0.0F);
-                            this.func_178098_a(partialTicks, thePlayer);
-                    }
-                }
-            } else if (!event.isCanceled()) {
-                this.func_178105_d(swingProgress);
-                this.transformFirstPersonItem(animationProgression, swingProgress);
-            }
-
-            this.renderItem(thePlayer, itemToRender, ItemCameraTransforms.TransformType.FIRST_PERSON);
-        } else if (!thePlayer.isInvisible()) {
-            this.func_178095_a(thePlayer, animationProgression, swingProgress);
+        if (!Utils.nullCheck() || !ModuleManager.animations.isEnabled()) {
+            return;
         }
 
-        GlStateManager.popMatrix();
-        GlStateManager.disableRescaleNormal();
-        RenderHelper.disableStandardItemLighting();
+        try {
+            float animationProgression = 1.0F - (this.prevEquippedProgress + (this.equippedProgress - this.prevEquippedProgress) * partialTicks);
+            final EntityPlayerSP thePlayer = this.mc.thePlayer;
+            float swingProgress = thePlayer.getSwingProgress(partialTicks);
+            final float f2 = thePlayer.prevRotationPitch + (thePlayer.rotationPitch - thePlayer.prevRotationPitch) * partialTicks;
+            final float f3 = thePlayer.prevRotationYaw + (thePlayer.rotationYaw - thePlayer.prevRotationYaw) * partialTicks;
+            this.func_178101_a(f2, f3);
+            this.func_178109_a(thePlayer);
+            this.func_178110_a(thePlayer, partialTicks);
+            GlStateManager.enableRescaleNormal();
+            GlStateManager.pushMatrix();
+
+            ItemStack itemToRender = SlotHandler.getRenderHeldItem();
+            if (itemToRender != null) {
+                EnumAction enumaction = itemToRender.getItemUseAction();
+                final int itemInUseCount = thePlayer.getItemInUseCount();
+                boolean useItem = itemInUseCount > 0;
+
+                final RenderItemEvent event = new RenderItemEvent(enumaction, useItem, animationProgression, partialTicks, swingProgress, itemToRender);
+                MinecraftForge.EVENT_BUS.post(event);
+                enumaction = event.getEnumAction();
+                useItem = event.isUseItem();
+                animationProgression = event.getAnimationProgression();
+                swingProgress = event.getSwingProgress();
+
+                ci.cancel();
+                if (itemToRender.getItem() instanceof ItemMap) {
+                    this.renderItemMap(thePlayer, f2, animationProgression, swingProgress);
+                } else if (useItem) {
+                    if (!event.isCanceled()) {
+                        switch (enumaction) {
+                            case NONE:
+                                this.transformFirstPersonItem(animationProgression, 0.0F);
+                                break;
+
+                            case EAT:
+                            case DRINK:
+                                this.func_178104_a(thePlayer, partialTicks);
+                                this.transformFirstPersonItem(animationProgression, 0.0F);
+                                break;
+
+                            case BLOCK:
+                                this.transformFirstPersonItem(animationProgression, 0.0F);
+                                this.func_178103_d();
+                                break;
+
+                            case BOW:
+                                this.transformFirstPersonItem(animationProgression, 0.0F);
+                                this.func_178098_a(partialTicks, thePlayer);
+                        }
+                    }
+                } else if (!event.isCanceled()) {
+                    this.func_178105_d(swingProgress);
+                    this.transformFirstPersonItem(animationProgression, swingProgress);
+                }
+
+                this.renderItem(thePlayer, itemToRender, ItemCameraTransforms.TransformType.FIRST_PERSON);
+            } else if (!thePlayer.isInvisible()) {
+                this.func_178095_a(thePlayer, animationProgression, swingProgress);
+            }
+
+            GlStateManager.popMatrix();
+            GlStateManager.disableRescaleNormal();
+            RenderHelper.disableStandardItemLighting();
+        } catch (Exception ignored) {
+        }
     }
 
     /**

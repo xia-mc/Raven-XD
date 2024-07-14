@@ -2,6 +2,7 @@ package keystrokesmod.module.impl.other;
 
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.ButtonSetting;
+import keystrokesmod.module.setting.impl.DescriptionSetting;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ModContainer;
 
@@ -15,7 +16,7 @@ public class ModSpoofer extends Module {
 
     public ModSpoofer() {
         super("ModSpoofer", category.other);
-        this.registerSetting(cancel);
+        this.registerSetting(cancel, new DescriptionSetting("Active mods:", () -> !cancel.isToggled()));
         for (ModContainer modContainer : Loader.instance().getActiveModList()) {
             ButtonSetting setting = new ButtonSetting(modContainer.getModId(), true, () -> !cancel.isToggled());
             this.registerSetting(setting);
