@@ -76,6 +76,7 @@ public class ModuleManager {
     public static ClickRecorder clickRecorder;
     public static InfiniteAura infiniteAura;
     public static LegitScaffold legitScaffold;
+    public static FreeLook freeLook;
     public static Step step;
     public static Animations animations;
     public static ChestStealer chestStealer;
@@ -200,6 +201,7 @@ public class ModuleManager {
         this.addModule(clickRecorder = new ClickRecorder());
         this.addModule(infiniteAura = new InfiniteAura());
         this.addModule(legitScaffold = new LegitScaffold());
+        this.addModule(freeLook = new FreeLook());
         this.addModule(step = new Step());
         this.addModule(animations = new Animations());
         this.addModule(chestStealer = new ChestStealer());
