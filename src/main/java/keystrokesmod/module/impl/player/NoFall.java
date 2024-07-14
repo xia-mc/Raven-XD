@@ -1,19 +1,20 @@
 package keystrokesmod.module.impl.player;
 
 import keystrokesmod.event.PreMotionEvent;
+import keystrokesmod.event.SendPacketEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.ModeSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
-import keystrokesmod.utility.BlockUtils;
-import keystrokesmod.utility.MoveUtil;
-import keystrokesmod.utility.Reflection;
-import keystrokesmod.utility.Utils;
-import net.minecraft.block.Block;
+import keystrokesmod.utility.*;
 import net.minecraft.network.play.client.C03PacketPlayer;
-import net.minecraft.util.BlockPos;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static keystrokesmod.module.ModuleManager.blink;
 import static keystrokesmod.module.ModuleManager.scaffold;
@@ -22,12 +23,17 @@ public class NoFall extends Module {
     public final ModeSetting mode;
     private final SliderSetting minFallDistance;
     private final ButtonSetting ignoreVoid;
-    private final String[] modes = new String[]{"Spoof", "Extra", "NoGround", "Blink", "Matrix"};
+    private final String[] modes = new String[]{"Spoof", "Extra", "NoGround", "Blink", "Matrix", "Vulcan"};
 
     // for blink noFall
     private boolean blinked = false;
     private boolean prevOnGround = false;
     private double fallDistance = 0;
+
+    // for vulcan noFall
+    public static final List<Integer> maxModCount = new ArrayList<>(Arrays.asList(3, 2, 2));
+    private int currentModCount = 0;
+    private int hasModCount = 0;
 
     public NoFall() {
         super("NoFall", category.player);
@@ -49,6 +55,34 @@ public class NoFall extends Module {
         }
         Utils.resetTimer();
     }
+
+    public void onUpdate() {
+        if (mode.getInput() == 5 && mc.thePlayer.onGround && currentModCount > 0) {
+            hasModCount++;
+            currentModCount = 0;
+        }
+    }
+
+    @SubscribeEvent
+    public void onPacketSend(@NotNull SendPacketEvent event) {
+        if (mode.getInput() == 5) {
+            if (event.getPacket() instanceof C03PacketPlayer && mc.thePlayer.fallDistance > minFallDistance.getInput()) {
+                Utils.sendMessage(String.format("currentMod: %s  hasMod: %s", currentModCount, hasModCount));
+                if (currentModCount > maxModCount.get(hasModCount % maxModCount.size())) {
+                    return;
+                }
+
+                try {
+                    Reflection.C03PacketPlayerOnGround.set(event.getPacket(), true);
+                    mc.thePlayer.fallDistance = 0;
+                    mc.thePlayer.setVelocity(0, 0, 0);
+                    currentModCount++;
+                } catch (IllegalAccessException ignored) {
+                }
+            }
+        }
+    }
+
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onPreMotion(PreMotionEvent e) {
@@ -133,10 +167,6 @@ public class NoFall extends Module {
                 }
                 break;
         }
-    }
-
-    public static Block blockRelativeToPlayer(final double offsetY) {
-        return mc.theWorld.getBlockState(new BlockPos(mc.thePlayer).add(0, offsetY, 0)).getBlock();
     }
 
     @Override

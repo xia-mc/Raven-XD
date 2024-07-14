@@ -53,23 +53,24 @@ public class KillAuraV2 extends Module {
     private final ButtonSetting targetInvisible = new ButtonSetting("Invisible", false);
 
     private final ModeSetting mode = new ModeSetting("Mode", new String[]{"Single", "Switch"}, 0);
-    public final SliderSetting switchDelay = new SliderSetting("SwitchDelay",200,0,1000,50, new ModeOnly(mode, 1));
+    public final SliderSetting switchDelay = new SliderSetting("Switch delay",200,0,1000,50, new ModeOnly(mode, 1));
 
     private final SliderSetting rotationSpeed = new SliderSetting("Rotation speed", 20, 2, 20, 0.1);
-    private final ModeSetting rotationMode = new ModeSetting("Rotation Mode", new String[]{"Instant", "Nearest"}, 0);
+    private final ModeSetting rotationMode = new ModeSetting("Rotation mode", new String[]{"Instant", "Nearest"}, 0);
+    private final ModeSetting moveFixMode = new ModeSetting("MoveFix mode", RotationHandler.MoveFix.MODES, 2);
 
     private final ButtonSetting autoBlock = new ButtonSetting("AutoBlock", false);
-    private final ModeSetting autoBlockMode = new ModeSetting("AutoBlock Mode", new String[]{"Fake", "Watchdog", "GrimAC 1.8", "GrimAC 1.12"}, 0, autoBlock::isToggled);
+    private final ModeSetting autoBlockMode = new ModeSetting("AutoBlock mode", new String[]{"Fake", "Watchdog", "GrimAC 1.8", "GrimAC 1.12"}, 0, autoBlock::isToggled);
     private final ButtonSetting fixNoSlowFlag = new ButtonSetting("Fix NoSlow flag", false, () -> autoBlock.isToggled() && autoBlockMode.getInput() == 1);
     private final ModeSetting sortMode = new ModeSetting("Sort Mode", new String[]{"Distance", "Hurt Time", "Health", "Armor"}, 0, autoBlock::isToggled);
 
     private final SliderSetting minCPS = new SliderSetting("Min CPS", 10, 1, 20, 1);
     private final SliderSetting maxCPS = new SliderSetting("Max CPS", 20, 1, 20, 1);
-    private final SliderSetting preAimRange = new SliderSetting("PreAim Range", 3.5, 3, 10, 0.1);
-    public static final SliderSetting attackRange = new SliderSetting("Attack Range", 3, 3, 6, 0.1);
+    private final SliderSetting preAimRange = new SliderSetting("PreAim range", 3.5, 3, 10, 0.1);
+    public static final SliderSetting attackRange = new SliderSetting("Attack range", 3, 3, 6, 0.1);
 
-    private static final ButtonSetting ThroughWalls = new ButtonSetting("Through Walls", false);
-    private final ButtonSetting RayCast = new ButtonSetting("Ray Cast", true);
+    private static final ButtonSetting ThroughWalls = new ButtonSetting("Through walls", false);
+    private final ButtonSetting RayCast = new ButtonSetting("Ray cast", true);
 
     private int autoBlock$watchdog$blockingTime = 0;
 
@@ -191,6 +192,7 @@ public class KillAuraV2 extends Module {
             }
             event.setYaw(lastYaw = AimSimulator.rotMove(yaw, lastYaw, rotationSpeed));
             event.setPitch(lastPitch = AimSimulator.rotMove(pitch, lastPitch, rotationSpeed));
+            event.setMoveFix(RotationHandler.MoveFix.values()[(int) moveFixMode.getInput()]);
 
             if (RayCast.isToggled() && !RotationUtils.isMouseOver(lastYaw, lastPitch, target, (float) attackRange.getInput()))
                 return;

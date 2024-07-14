@@ -19,6 +19,8 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
+
 public final class RotationHandler extends Module {
     private static @Nullable Float movementYaw = null;
     private static @Nullable Float rotationYaw = null;
@@ -26,8 +28,9 @@ public final class RotationHandler extends Module {
     private static @Nullable Float lastRotationYaw = null;
     private static @Nullable Float lastRotationPitch = null;
     private boolean isSet = false;
+    private static MoveFix moveFix = MoveFix.NONE;
 
-    private final ModeSetting moveFix = new ModeSetting("Move fix", new String[]{"None", "Default", "Advanced"}, 0);
+    private final ModeSetting defaultMoveFix = new ModeSetting("Default MoveFix", new String[]{"None", "Silent", "Strict"}, 0);
     private final ModeSetting smoothBack = new ModeSetting("Smooth back", new String[]{"None", "Default"}, 0);
     private final SliderSetting aimSpeed = new SliderSetting("Aim speed", 5, 1, 15, 0.1, new ModeOnly(smoothBack, 1));
     public static final ButtonSetting rotateBody = new ButtonSetting("Rotate body", true);
@@ -36,7 +39,7 @@ public final class RotationHandler extends Module {
 
     public RotationHandler() {
         super("RotationHandler", category.other);
-        this.registerSetting(moveFix, smoothBack, aimSpeed);
+        this.registerSetting(defaultMoveFix, smoothBack, aimSpeed);
         this.registerSetting(new DescriptionSetting("Classic"));
         this.registerSetting(rotateBody, fullBody, randomYawFactor);
         this.canBeEnabled = false;
@@ -54,6 +57,10 @@ public final class RotationHandler extends Module {
 
     public static void setRotationPitch(float rotationPitch) {
         RotationHandler.rotationPitch = rotationPitch;
+    }
+
+    public static void setMoveFix(MoveFix moveFix) {
+        RotationHandler.moveFix = moveFix;
     }
 
     public static float getRotationYaw() {
@@ -104,19 +111,20 @@ public final class RotationHandler extends Module {
         if (AimSimulator.yawEquals(getRotationYaw(), mc.thePlayer.rotationYaw)) rotationYaw = null;
         if (getRotationPitch() == mc.thePlayer.rotationPitch) rotationPitch = null;
 
-        RotationEvent rotationEvent = new RotationEvent(getRotationYaw(), getRotationPitch());
+        RotationEvent rotationEvent = new RotationEvent(getRotationYaw(), getRotationPitch(), MoveFix.values()[(int) defaultMoveFix.getInput()]);
         MinecraftForge.EVENT_BUS.post(rotationEvent);
         isSet = rotationEvent.isSet() || rotationYaw != null || rotationPitch != null;
         if (isSet) {
             rotationYaw = RotationUtils.normalize(rotationEvent.getYaw());
             rotationPitch = rotationEvent.getPitch();
+            moveFix = rotationEvent.getMoveFix();
         }
 
-        switch ((int) moveFix.getInput()) {
-            case 0:
+        switch (moveFix) {
+            case NONE:
                 movementYaw = null;
                 break;
-            case 1:
+            case SILENT:
                 movementYaw = getRotationYaw();
 
                 final float forward = event.getForward();
@@ -148,9 +156,17 @@ public final class RotationHandler extends Module {
                 event.setForward(closestForward);
                 event.setStrafe(closestStrafe);
                 break;
-            case 2:
+            case STRICT:
                 movementYaw = getRotationYaw();
                 break;
         }
+    }
+
+    public enum MoveFix {
+        NONE,
+        SILENT,
+        STRICT;
+
+        public static final String[] MODES = Arrays.stream(values()).map(Enum::name).toArray(String[]::new);
     }
 }

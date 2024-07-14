@@ -40,6 +40,7 @@ public class Scaffold extends Module { // from b4 :)
     private final SliderSetting aimSpeed;
     private final SliderSetting motion;
     private final ModeSetting rotation;
+    private final ButtonSetting moveFix;
     private final SliderSetting tellyStartTick;
     private final SliderSetting tellyStopTick;
     private final SliderSetting strafe;
@@ -90,6 +91,7 @@ public class Scaffold extends Module { // from b4 :)
         this.registerSetting(aimSpeed = new SliderSetting("Aim speed", 20, 5, 20, 0.1));
         this.registerSetting(motion = new SliderSetting("Motion", 1.0, 0.5, 1.2, 0.01));
         this.registerSetting(rotation = new ModeSetting("Rotation", rotationModes, 1));
+        this.registerSetting(moveFix = new ButtonSetting("MoveFix", false));
         this.registerSetting(tellyStartTick = new SliderSetting("Telly start", 3, 0, 11, 1, "tick", new ModeOnly(rotation, 4)));
         this.registerSetting(tellyStopTick = new SliderSetting("Telly stop", 8, 0, 11, 1, "tick", new ModeOnly(rotation, 4)));
         this.registerSetting(strafe = new SliderSetting("Strafe", 0, -45, 45, 5));
@@ -195,6 +197,7 @@ public class Scaffold extends Module { // from b4 :)
         boolean instant = aimSpeed.getInput() == aimSpeed.getMax();
         event.setYaw(instant ? yaw : AimSimulator.rotMove(yaw, RotationHandler.getLastRotationYaw(), (float) aimSpeed.getInput()));
         event.setPitch(instant ? pitch : AimSimulator.rotMove(pitch, RotationHandler.getLastRotationPitch(), (float) aimSpeed.getInput()));
+        event.setMoveFix(moveFix.isToggled() ? RotationHandler.MoveFix.SILENT : RotationHandler.MoveFix.NONE);
 
         place = true;
     }

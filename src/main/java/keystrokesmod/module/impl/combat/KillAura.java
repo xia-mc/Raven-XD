@@ -49,6 +49,7 @@ public class KillAura extends Module {
     private final SliderSetting swingRange;
     private final SliderSetting blockRange;
     private final ModeSetting rotationMode;
+    private final ModeSetting moveFixMode;
     private final ModeSetting rotationTarget;
     private final ModeSetting rotationSimulator;
     private final SliderSetting rotationSpeed;
@@ -112,6 +113,7 @@ public class KillAura extends Module {
         this.registerSetting(blockRange = new SliderSetting("Block range", 6.0, 3.0, 12.0, 0.1));
         this.registerSetting(rotationMode = new ModeSetting("Rotation mode", rotationModes, 0));
         final ModeOnly doRotation = new ModeOnly(rotationMode, 1, 2);
+        this.registerSetting(moveFixMode = new ModeSetting("MoveFix mode", RotationHandler.MoveFix.MODES, 0, new ModeOnly(rotationMode, 1)));
         String[] rotationTargets = new String[]{"Head", "Nearest", "Constant"};
         this.registerSetting(rotationTarget = new ModeSetting("Rotation target", rotationTargets, 0, doRotation));
         String[] rotationSimulators = new String[]{"None", "Lazy", "Noise"};
@@ -322,6 +324,7 @@ public class KillAura extends Module {
         if (target != null && rotationMode.getInput() == 1) {
             e.setYaw(rotations[0]);
             e.setPitch(rotations[1]);
+            e.setMoveFix(RotationHandler.MoveFix.values()[(int) moveFixMode.getInput()]);
         } else {
             this.rotations = new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch};
         }

@@ -16,6 +16,7 @@ import net.minecraft.item.ItemMap;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.MathHelper;
 import net.minecraftforge.common.MinecraftForge;
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
@@ -60,12 +61,8 @@ public abstract class MixinItemRenderer {
      * @reason for Animations module.
      */
     @Inject(method = "renderItemInFirstPerson", at = @At("HEAD"), cancellable = true)
-    public void renderItemInFirstPerson(final float partialTicks, CallbackInfo ci) {
-        if (itemToRender == mc.thePlayer.getHeldItem()) {
-            ci.cancel();
-        } else {
-            return;
-        }
+    public void renderItemInFirstPerson(final float partialTicks, @NotNull CallbackInfo ci) {
+        ci.cancel();
 
         float animationProgression = 1.0F - (this.prevEquippedProgress + (this.equippedProgress - this.prevEquippedProgress) * partialTicks);
         final EntityPlayerSP thePlayer = this.mc.thePlayer;
