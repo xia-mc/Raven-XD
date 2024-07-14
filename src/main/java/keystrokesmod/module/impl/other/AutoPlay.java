@@ -21,12 +21,13 @@ public class AutoPlay extends Module {
     private static final String SkywarsLoseMessage = "You died! Want to play again? Click here!";
     private static final String BedwarsWinMessage = "This game has been recorded. Click here to watch the Replay!";
     private static final String BedwarsLoseMessage = "You have been eliminated!";
+    private static final String DuelWinMessage = "YOU WON! Want to play again? CLICK HERE!";
 
     public AutoPlay() {
         super("AutoPlay", category.other);
         this.registerSetting(new DescriptionSetting("Auto takes you to the next game."));
         this.registerSetting(mode = new ModeSetting("Mode", new String[]{"Skywars Solo Normal", "Skywars Solo Insane", "Skywars Teams Normal", "Skywars Teams Insane", "Bedwars Solo", "Bedwars Doubles", "Bedwars 3v3v3v3", "Bedwars 4v4v4v4", "Bedwars 4v4"}, 0));
-        this.registerSetting(delay = new SliderSetting("Delay", 1500, 0, 4000, 50, "ms"));
+        this.registerSetting(delay = new SliderSetting("Delay", 1.5, 0.5, 5, 0.5, "s"));
     }
 
     @SubscribeEvent
@@ -47,7 +48,7 @@ public class AutoPlay extends Module {
                     switch ((int) this.mode.getInput()) { // list of commands comes from https://hypixel.net/threads/guide-play-commands-useful-tools-mods-more-new-pixel-party-play-command.1025608/
 						case 0:
                             command = "/play solo_normal";
-                            break; 
+                            break;
                         case 1:
                             command = "/play solo_insane";
                             break;
@@ -77,7 +78,7 @@ public class AutoPlay extends Module {
 							break;
                     }
                     mc.thePlayer.sendChatMessage(command);
-                }, (long) delay.getInput(), TimeUnit.MILLISECONDS);
+                }, (long) (delay.getInput() * 1000), TimeUnit.MILLISECONDS);
             }
         }
 
