@@ -3,6 +3,7 @@ package keystrokesmod.mixins.impl.client;
 import keystrokesmod.event.PreTickEvent;
 import keystrokesmod.module.impl.combat.HitBox;
 import keystrokesmod.module.impl.combat.Reach;
+import keystrokesmod.module.impl.render.FreeLook;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.common.MinecraftForge;
 import org.spongepowered.asm.mixin.Mixin;
@@ -24,6 +25,7 @@ public class MixinMinecraft {
      */
     @Inject(method = "clickMouse", at = @At("HEAD"))
     private void clickMouse(CallbackInfo ci) {
+        FreeLook.call();
         Reach.call();
         HitBox.call();
     }

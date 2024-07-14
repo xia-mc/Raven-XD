@@ -2,6 +2,7 @@ package keystrokesmod.module.impl.render;
 
 import keystrokesmod.event.*;
 import keystrokesmod.module.Module;
+import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.utility.RotationUtils;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
@@ -31,6 +32,16 @@ public class FreeLook extends Module {
         viewData = null;
     }
 
+    public static void call() {
+        if (ModuleManager.freeLook.isEnabled() && ModuleManager.freeLook.viewData != null) {
+            mc.objectMouseOver = RotationUtils.rayCast(
+                    mc.playerController.getBlockReachDistance(),
+                    ModuleManager.freeLook.viewData.rotationYaw,
+                    ModuleManager.freeLook.viewData.rotationPitch
+            );
+        }
+    }
+
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onPreMotion(RotationEvent event) {
         if (onlyIfPressed.isToggled() && !Keyboard.isKeyDown(this.getKeycode())) {
@@ -39,7 +50,7 @@ public class FreeLook extends Module {
         }
 
         if (viewData != null){
-            mc.objectMouseOver = RotationUtils.rayCast(mc.playerController.getBlockReachDistance(), viewData.rotationYaw, viewData.rotationPitch);
+            call();
             if (!event.isSet()) {
                 event.setYaw(viewData.rotationYaw);
                 event.setPitch(viewData.rotationPitch);
