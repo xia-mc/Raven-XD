@@ -61,6 +61,14 @@ public final class DynamicManager extends Module {
         if (!directory.exists() || !directory.isDirectory())
             return;
 
+        try {
+            for (File file : Objects.requireNonNull(cacheDirectory.listFiles())) {
+                file.delete();
+            }
+        } catch (NullPointerException ignored) {
+        }
+
+
         File[] files = directory.listFiles();
         if (files == null) return;
 
@@ -75,13 +83,6 @@ public final class DynamicManager extends Module {
             } else {
                 System.out.println(ChatFormatting.RED + "Compilation failed." + ChatFormatting.RESET + "(" + file.getName() + ")");
             }
-        }
-
-        try {
-            for (File file : Objects.requireNonNull(cacheDirectory.listFiles())) {
-                file.delete();
-            }
-        } catch (NullPointerException ignored) {
         }
 
         List<File> classFiles = findClassFiles(cacheDirectory.getPath());

@@ -24,9 +24,18 @@ public class MixinMinecraft {
      * @reason to fix reach and hitBox won't work with autoClicker
      */
     @Inject(method = "clickMouse", at = @At("HEAD"))
-    private void clickMouse(CallbackInfo ci) {
+    private void onLeftClickMouse(CallbackInfo ci) {
         FreeLook.call();
         Reach.call();
         HitBox.call();
+    }
+
+    /**
+     * @author xia__mc
+     * @reason to fix freelook do impossible action
+     */
+    @Inject(method = "rightClickMouse", at = @At("HEAD"))
+    private void onRightClickMouse(CallbackInfo ci) {
+        FreeLook.call();
     }
 }

@@ -38,7 +38,7 @@ public class LegitScaffold extends Module {
 
     @SubscribeEvent
     public void onRender(TickEvent.RenderTickEvent event) {
-        if (!Utils.nullCheck()) return;
+        if (!Utils.nullCheck() || mc.currentScreen != null) return;
 
         if ((onlySPressed.isToggled() && !mc.gameSettings.keyBindBack.isKeyDown())
                 || (pitchCheck.isToggled() && mc.thePlayer.rotationPitch < pitch.getInput())
@@ -49,7 +49,7 @@ public class LegitScaffold extends Module {
         }
 
         final long currentTime = System.currentTimeMillis();
-        if (Utils.overAir()) {
+        if (Utils.overAir() || Utils.onEdge()) {
             setSneak(true);
             lastSneakTime = currentTime;
         } else if (lastSneakTime != -1
