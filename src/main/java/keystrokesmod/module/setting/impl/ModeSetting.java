@@ -53,6 +53,11 @@ public class ModeSetting extends Setting implements InputSetting {
         return this.max;
     }
 
+    @Override
+    public void setValue(double n) {
+        setValue((int) n);
+    }
+
     public void setValue(int n) {
         n = (int) correctValue(n, 0, this.max);
         this.value = n;

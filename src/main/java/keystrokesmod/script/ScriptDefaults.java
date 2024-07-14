@@ -8,6 +8,7 @@ import keystrokesmod.module.setting.Setting;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.ModeSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
+import keystrokesmod.module.setting.interfaces.InputSetting;
 import keystrokesmod.script.classes.*;
 import keystrokesmod.script.packets.serverbound.CPacket;
 import keystrokesmod.script.packets.serverbound.PacketHandler;
@@ -508,15 +509,24 @@ public class ScriptDefaults {
         public modules(String superName) {
             this.superName = superName;
         }
-        private Module getModule(String moduleName) {
+
+        public ModuleManager getModuleManager() {
+            return Raven.getModuleManager();
+        }
+
+        public ScriptManager getScriptManager() {
+            return Raven.scriptManager;
+        }
+
+        public Module getModule(String moduleName) {
             boolean found = false;
-            for (Module module : Raven.getModuleManager().getModules()) {
+            for (Module module : getModuleManager().getModules()) {
                 if (module.getName().equals(moduleName)) {
                     return module;
                 }
             }
             if (!found) {
-                for (Module module : Raven.scriptManager.scripts.values()) {
+                for (Module module : getScriptManager().scripts.values()) {
                     if (module.getName().equals(moduleName)) {
                         return module;
                     }
@@ -525,8 +535,8 @@ public class ScriptDefaults {
             return null;
         }
 
-        private Module getScript(String name) {
-            for (Module module : Raven.scriptManager.scripts.values()) {
+        public Module getScript(String name) {
+            for (Module module : getScriptManager().scripts.values()) {
                 if (module.getName().equals(name)) {
                     return module;
                 }
@@ -534,7 +544,7 @@ public class ScriptDefaults {
             return null;
         }
 
-        private Setting getSetting(Module module, String settingName) {
+        public Setting getSetting(Module module, String settingName) {
             if (module == null) {
                 return null;
             }
@@ -628,17 +638,19 @@ public class ScriptDefaults {
             if (setting == null) {
                 return false;
             }
-            boolean buttonState = setting.isToggled();
-            return buttonState;
+            return setting.isToggled();
         }
 
         public double getSlider(String moduleName, String name) {
-            SliderSetting setting = ((SliderSetting) getSetting(getModule(moduleName), name));
+            InputSetting setting = (InputSetting) getSetting(getModule(moduleName), name);
             if (setting == null) {
                 return 0;
             }
-            double sliderValue = setting.getInput();
-            return sliderValue;
+            return setting.getInput();
+        }
+
+        public double getMode(String moduleName, String name) {
+            return getSlider(moduleName, name);
         }
 
         public void setButton(String moduleName, String name, boolean value) {
@@ -650,11 +662,15 @@ public class ScriptDefaults {
         }
 
         public void setSlider(String moduleName, String name, double value) {
-            SliderSetting setting = ((SliderSetting) getSetting(getModule(moduleName), name));
+            InputSetting setting = ((InputSetting) getSetting(getModule(moduleName), name));
             if (setting == null) {
                 return;
             }
             setting.setValue(value);
+        }
+
+        public void setMode(String moduleName, String name, double value) {
+            setSlider(moduleName, name, value);
         }
     }
 }

@@ -93,6 +93,7 @@ public class SliderSetting extends Setting implements InputSetting {
         return this.max;
     }
 
+    @Override
     public void setValue(double n) {
         n = correctValue(n, this.min, this.max);
         n = (double) Math.round(n * (1.0D / this.intervals)) / (1.0D / this.intervals);
