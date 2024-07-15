@@ -245,7 +245,7 @@ public class Scaffold extends Module { // from b4 :)
         } else {
             offGroundTicks++;
         }
-        if (rotation.getInput() == 4 && mc.thePlayer.onGround && MoveUtil.isMoving() && !Utils.jumpDown()) {
+        if ((rotation.getInput() == 4 || autoJump.isToggled()) && mc.thePlayer.onGround && MoveUtil.isMoving() && !Utils.jumpDown()) {
             mc.thePlayer.jump();
         }
 
