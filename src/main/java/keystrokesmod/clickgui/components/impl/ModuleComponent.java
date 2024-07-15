@@ -35,8 +35,13 @@ public class ModuleComponent implements IComponent {
         this.o = o;
         this.settings = new ArrayList<>();
         this.po = false;
+        updateSetting();
+    }
+
+    public void updateSetting() {
         int y = o + 12;
         if (mod != null && !mod.getSettings().isEmpty()) {
+            this.settings.clear();
             for (Setting v : mod.getSettings()) {
                 this.settings.add(Component.fromSetting(v, this, y));
                 y += 12;

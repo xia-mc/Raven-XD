@@ -2,15 +2,20 @@ package keystrokesmod.module.impl.client;
 
 import com.mojang.realmsclient.gui.ChatFormatting;
 import keystrokesmod.Raven;
+import keystrokesmod.clickgui.ClickGui;
+import keystrokesmod.clickgui.components.impl.ModuleComponent;
 import keystrokesmod.dynamic.Dynamic;
+import keystrokesmod.event.PreUpdateEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.Setting;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.DescriptionSetting;
 import keystrokesmod.utility.Utils;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
 import javax.tools.*;
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -20,6 +25,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -29,10 +35,20 @@ public final class DynamicManager extends Module {
     public static final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 
     private static final Set<Dynamic> activeDynamics = new HashSet<>();
+    private boolean needToLoad = false;
 
     public DynamicManager() {
         super("DynamicManager", category.client);
-        this.registerSetting(new ButtonSetting("Load dynamics", this::loadDynamics));
+        this.registerSetting(new ButtonSetting("Load dynamics", () -> needToLoad = true));
+        this.registerSetting(new ButtonSetting("Open folder", () -> {
+            try {
+                Desktop.getDesktop().open(directory);
+            }
+            catch (IOException ex) {
+                Raven.profileManager.directory.mkdirs();
+                Utils.sendMessage("&cError locating folder, recreated.");
+            }
+        }));
         this.registerSetting(new DescriptionSetting("Dynamics:", () -> !activeDynamics.isEmpty()));
         this.canBeEnabled = false;
 
@@ -54,6 +70,14 @@ public final class DynamicManager extends Module {
         }
 
         loadDynamics();
+    }
+
+    @SubscribeEvent
+    public void onPreUpdate(PreUpdateEvent event) {
+        if (needToLoad) {
+            needToLoad = false;
+            loadDynamics();
+        }
     }
 
     public void loadDynamics() {
@@ -164,6 +188,16 @@ public final class DynamicManager extends Module {
                 else
                     dynamic.exit();
             }));
+        }
+
+        try {
+            for (ModuleComponent module : ClickGui.categories.get(this.moduleCategory()).getModules()) {
+                if (module.mod == this) {
+                    module.updateSetting();
+                    break;
+                }
+            }
+        } catch (NullPointerException ignored) {
         }
     }
 

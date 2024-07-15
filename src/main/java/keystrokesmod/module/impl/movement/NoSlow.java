@@ -209,15 +209,17 @@ public class NoSlow extends Module {
 
     @SubscribeEvent
     public void onPacketSent(@NotNull SendPacketEvent event) {
-        if (event.getPacket() instanceof C08PacketPlayerBlockPlacement && !mc.thePlayer.isUsingItem()) {
-            C08PacketPlayerBlockPlacement blockPlacement = (C08PacketPlayerBlockPlacement) event.getPacket();
-            if (SlotHandler.getHeldItem() != null && blockPlacement.getPlacedBlockDirection() == 255
-                    && ContainerUtils.isRest(SlotHandler.getHeldItem().getItem()) && offGroundTicks < 2) {
-                if (mc.thePlayer.onGround) {
-                    mc.thePlayer.setJumping(false);
-                    mc.thePlayer.jump();
+        if (mode.getInput() == 11) {
+            if (event.getPacket() instanceof C08PacketPlayerBlockPlacement && !mc.thePlayer.isUsingItem()) {
+                C08PacketPlayerBlockPlacement blockPlacement = (C08PacketPlayerBlockPlacement) event.getPacket();
+                if (SlotHandler.getHeldItem() != null && blockPlacement.getPlacedBlockDirection() == 255
+                        && ContainerUtils.isRest(SlotHandler.getHeldItem().getItem()) && offGroundTicks < 2) {
+                    if (mc.thePlayer.onGround) {
+                        mc.thePlayer.setJumping(false);
+                        mc.thePlayer.jump();
+                    }
+                    send = true;
                 }
-                send = true;
             }
         }
     }

@@ -92,7 +92,7 @@ public class Speed extends Module {
     @SubscribeEvent
     public void onPreUpdate(PreUpdateEvent event) {
         if (mode.getInput() == 4) {
-            if (mc.thePlayer.hurtTime > 0 || !MoveUtil.isMoving() || Utils.jumpDown()) {
+            if ((mc.thePlayer.hurtTime > 0 && offGroundTicks != 0) || !MoveUtil.isMoving() || Utils.jumpDown()) {
                 Utils.resetTimer();
                 return;
             }
