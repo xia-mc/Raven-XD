@@ -39,11 +39,14 @@ public class NoSlow extends Module {
     public static ButtonSetting disablePotions;
     public static ButtonSetting swordOnly;
     public static ButtonSetting vanillaSword;
-    private final String[] modes = new String[]{"Vanilla", "Pre", "Post", "Alpha", "Old Intave", "Intave", "Polar", "GrimAC", "HypixelTest A", "HypixelTest B", "Blink"};
+    private final String[] modes = new String[]{"Vanilla", "Pre", "Post", "Alpha", "Beta", "Old Intave", "Intave", "Polar", "GrimAC", "HypixelTest A", "HypixelTest B", "Blink"};
     private boolean postPlace;
     private static ModeOnly canChangeSpeed;
 
     private boolean lastUsingItem = false;
+
+    private int offGroundTicks;
+    private boolean send;
 
     public NoSlow() {
         super("NoSlow", Module.category.movement, 0);
@@ -104,7 +107,6 @@ public class NoSlow extends Module {
                 }
                 break;
         }
-
     }
 
     @SubscribeEvent
@@ -179,31 +181,45 @@ public class NoSlow extends Module {
                     }
                 }
                 break;
+            case 4: // Beta mode
+                if (mc.thePlayer.onGround) {
+                    offGroundTicks = 0;
+                } else {
+                    offGroundTicks++;
+                }
+
+                if (offGroundTicks == 2 && send) {
+                    send = false;
+                    mc.getNetHandler().addToSendQueue(new C08PacketPlayerBlockPlacement(player.getHeldItem(), new Vec3(-1, -1, -1), 255, new Vec3(0, 0, 0)));
+
+                } else if (mc.thePlayer.isUsingItem() && isConsumable(mc.thePlayer.getHeldItem().getItem().getUnlocalizedName())) {
+                    event.setPitch(event.getPitch() - 1E-14f);
+                }
+                break;
         }
 
         lastUsingItem = true;
     }
 
-    public static float getSlowed() {
-        if (!mc.thePlayer.isUsingItem()) return (100.0F - 0.0F) / 100.0F;
-        if (SlotHandler.getHeldItem() == null || ModuleManager.noSlow == null || !ModuleManager.noSlow.isEnabled()) {
-            return 0.2f;
+    @SubscribeEvent
+    public boolean onPacketSent(Packet packet) {
+        if (super.onPacketSent(packet)) {
+            EntityPlayerSP player = mc.thePlayer;
+
+            if (packet instanceof C08PacketPlayerBlockPlacement && !player.isUsingItem()) {
+                C08PacketPlayerBlockPlacement blockPlacement = (C08PacketPlayerBlockPlacement) packet;
+                if (blockPlacement.func_149576_c() == 255 && isConsumable(player.getHeldItem().getItem().getUnlocalizedName()) && offGroundTicks < 2) {
+                    if (player.onGround) {
+                        player.setJumping(false);
+                        player.jump();
+                    }
+                    send = true;
+                    return false;
+                }
+            }
         }
-        if (swordOnly.isToggled() && !(SlotHandler.getHeldItem().getItem() instanceof ItemSword)) {
-            return 0.2f;
-        }
-        if (SlotHandler.getHeldItem().getItem() instanceof ItemSword && disableSword.isToggled()) {
-            return 0.2f;
-        } if (SlotHandler.getHeldItem().getItem() instanceof ItemBow && (disableBow.isToggled() || Arrays.asList(5, 6).contains((int) mode.getInput()))) {
-            return 0.2f;
-        } else if (SlotHandler.getHeldItem().getItem() instanceof ItemPotion && !ItemPotion.isSplash(SlotHandler.getHeldItem().getItemDamage()) && disablePotions.isToggled()) {
-            return 0.2f;
-        }
-        return !canChangeSpeed.get() ? 1.0f : (100.0F - (float) slowed.getInput()) / 100.0F;
+        return true;
     }
 
-    @Override
-    public String getInfo() {
-        return modes[(int) mode.getInput()];
-    }
-}
+    private boolean isConsumable(String itemStack) {
+        return (itemStack.contains("item") || itemStack.contains("food") || itemStack.contains("bow") || itemStack
