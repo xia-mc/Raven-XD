@@ -94,12 +94,14 @@ public class ModuleManager {
     public static Clutch clutch;
     public static Ambience ambience;
     public static KillAuraV2 killAuraV2;
+    public static DynamicManager dynamicManager;
 
     public void register() {
 
         // client
         this.addModule(commandChat = new CommandChat());
         this.addModule(commandLine = new CommandLine());
+        this.addModule(dynamicManager = new DynamicManager());
         this.addModule(new Gui());
         // this.addModule(new NyaProxy());
         this.addModule(new Settings());

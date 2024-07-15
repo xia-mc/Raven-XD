@@ -10,6 +10,7 @@ import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.utility.Utils;
 import keystrokesmod.utility.render.RenderUtils;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -28,7 +29,7 @@ public class LegitScaffold extends Module {
 
     public LegitScaffold() {
         super("Legit scaffold", category.world);
-        this.registerSetting(minDelay, maxDelay, pitchCheck, pitch, onlySPressed, onlySneak);
+        this.registerSetting(minDelay, maxDelay, pitchCheck, pitch, onlySPressed, onlySneak, showBlockCount);
     }
 
     @Override
@@ -46,6 +47,15 @@ public class LegitScaffold extends Module {
     public void onRender(TickEvent.RenderTickEvent event) {
         if (!Utils.nullCheck() || mc.currentScreen != null) return;
 
+        ItemStack item = SlotHandler.getHeldItem();
+        if (showBlockCount.isToggled()) {
+            if (item != null && item.getItem() instanceof ItemBlock) {
+                RenderUtils.drawText(String.valueOf(item.stackSize));
+            } else {
+                RenderUtils.drawText("0");
+            }
+        }
+
         if ((onlySPressed.isToggled() && !mc.gameSettings.keyBindBack.isKeyDown())
                 || (pitchCheck.isToggled() && (FreeLook.viewData != null ? FreeLook.viewData.rotationPitch : mc.thePlayer.rotationPitch) < pitch.getInput())
                 || (onlySneak.isToggled() && !Keyboard.isKeyDown(mc.gameSettings.keyBindSneak.getKeyCode()))
@@ -62,11 +72,6 @@ public class LegitScaffold extends Module {
                 && currentTime - lastSneakTime > Math.random() * (maxDelay.getInput() - minDelay.getInput()) + minDelay.getInput()) {
             setSneak(false);
             lastSneakTime = -1;
-        }
-
-        ItemStack item = SlotHandler.getHeldItem();
-        if (showBlockCount.isToggled() && mc.currentScreen == null && item != null) {
-            RenderUtils.drawText(String.valueOf(item.stackSize));
         }
     }
 

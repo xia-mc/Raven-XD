@@ -41,6 +41,7 @@ import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Range;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
@@ -147,16 +148,15 @@ public class Utils {
     }
 
     public static boolean inFov(float fov, final double n2, final double n3) {
-        fov *= 0.5;
-        final double wrapAngleTo180_double = MathHelper.wrapAngleTo180_double((mc.thePlayer.rotationYaw - RotationUtils.angle(n2, n3)) % 360.0f);
-        if (wrapAngleTo180_double > 0.0) {
-            if (wrapAngleTo180_double < fov) {
-                return true;
-            }
-        } else if (wrapAngleTo180_double > -fov) {
-            return true;
-        }
-        return false;
+        fov *= 0.5F;
+        final double fovToPoint = getFov(n2, n3);
+        if (fovToPoint > 0.0) {
+            return fovToPoint < fov;
+        } else return fovToPoint > -fov;
+    }
+
+    public static @Range(from = -180, to = 180) double getFov(final double posX, final double posZ)  {
+        return MathHelper.wrapAngleTo180_double((mc.thePlayer.rotationYaw - RotationUtils.angle(posX, posZ)) % 360.0f);
     }
 
     public static void sendMessage(String txt) {
