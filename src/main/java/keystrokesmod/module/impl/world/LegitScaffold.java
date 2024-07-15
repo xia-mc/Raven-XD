@@ -2,10 +2,13 @@ package keystrokesmod.module.impl.world;
 
 import keystrokesmod.mixins.impl.client.KeyBindingAccessor;
 import keystrokesmod.module.Module;
+import keystrokesmod.module.impl.other.SlotHandler;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.utility.Utils;
+import keystrokesmod.utility.render.RenderUtils;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.lwjgl.input.Keyboard;
@@ -17,6 +20,7 @@ public class LegitScaffold extends Module {
     private final SliderSetting pitch = new SliderSetting("Pitch", 45, 0, 90, 5, pitchCheck::isToggled);
     private final ButtonSetting onlySPressed = new ButtonSetting("Only S pressed", false);
     private final ButtonSetting onlySneak = new ButtonSetting("Only sneak", false);
+    private final ButtonSetting showBlockCount = new ButtonSetting("Show block count", false);
 
     private long lastSneakTime = -1;
 
@@ -56,6 +60,11 @@ public class LegitScaffold extends Module {
                 && currentTime - lastSneakTime > Math.random() * (maxDelay.getInput() - minDelay.getInput()) + minDelay.getInput()) {
             setSneak(false);
             lastSneakTime = -1;
+        }
+
+        ItemStack item = SlotHandler.getHeldItem();
+        if (showBlockCount.isToggled() && mc.currentScreen == null && item != null) {
+            RenderUtils.drawText(String.valueOf(item.stackSize));
         }
     }
 
