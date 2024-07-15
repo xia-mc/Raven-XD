@@ -2,7 +2,9 @@ package keystrokesmod.module.impl.world;
 
 import keystrokesmod.mixins.impl.client.KeyBindingAccessor;
 import keystrokesmod.module.Module;
+import keystrokesmod.module.impl.other.RotationHandler;
 import keystrokesmod.module.impl.other.SlotHandler;
+import keystrokesmod.module.impl.render.FreeLook;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.utility.Utils;
@@ -45,7 +47,7 @@ public class LegitScaffold extends Module {
         if (!Utils.nullCheck() || mc.currentScreen != null) return;
 
         if ((onlySPressed.isToggled() && !mc.gameSettings.keyBindBack.isKeyDown())
-                || (pitchCheck.isToggled() && mc.thePlayer.rotationPitch < pitch.getInput())
+                || (pitchCheck.isToggled() && (FreeLook.viewData != null ? FreeLook.viewData.rotationPitch : mc.thePlayer.rotationPitch) < pitch.getInput())
                 || (onlySneak.isToggled() && !Keyboard.isKeyDown(mc.gameSettings.keyBindSneak.getKeyCode()))
         ) {
             setSneak(Keyboard.isKeyDown(mc.gameSettings.keyBindSneak.getKeyCode()));
