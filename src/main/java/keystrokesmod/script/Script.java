@@ -77,10 +77,10 @@ public class Script {
                 try {
                     s = URLDecoder.decode(s, "UTF-8");
                 }
-                catch (UnsupportedOperationException ex2) {}
+                catch (UnsupportedOperationException ignored) {}
                 list.add(s);
             }
-            boolean success = Raven.scriptManager.compiler.getTask(null, standardFileManager, bp, list, null, Arrays.asList(new ClassObject(this.scriptName, this.codeStr, this.extraLines))).call();
+            boolean success = Raven.scriptManager.compiler.getTask(null, standardFileManager, bp, list, null, Collections.singletonList(new ClassObject(this.scriptName, this.codeStr, this.extraLines))).call();
             if (!success) {
                 this.error = true;
                 return false;

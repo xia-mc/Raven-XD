@@ -48,6 +48,7 @@ public class KillAura extends Module {
     private final SliderSetting attackRange;
     private final SliderSetting swingRange;
     private final SliderSetting blockRange;
+    private final SliderSetting preAimRange;
     private final ModeSetting rotationMode;
     private final ModeSetting moveFixMode;
     private final ModeSetting rotationTarget;
@@ -111,6 +112,7 @@ public class KillAura extends Module {
         this.registerSetting(attackRange = new SliderSetting("Attack range", 3.2, 3.0, 6.0, 0.1));
         this.registerSetting(swingRange = new SliderSetting("Swing range", 3.2, 3.0, 8.0, 0.1));
         this.registerSetting(blockRange = new SliderSetting("Block range", 6.0, 3.0, 12.0, 0.1));
+        this.registerSetting(preAimRange = new SliderSetting("PreAim range", 6.0, 3.0, 12.0, 0.1));
         this.registerSetting(rotationMode = new ModeSetting("Rotation mode", rotationModes, 0));
         final ModeOnly doRotation = new ModeOnly(rotationMode, 1, 2);
         this.registerSetting(moveFixMode = new ModeSetting("MoveFix mode", RotationHandler.MoveFix.MODES, 0, new ModeOnly(rotationMode, 1)));
@@ -149,6 +151,7 @@ public class KillAura extends Module {
     public void guiUpdate() {
         Utils.correctValue(minCPS, maxCPS);
         Utils.correctValue(attackRange, swingRange);
+        Utils.correctValue(swingRange, preAimRange);
     }
 
     public void onDisable() {
@@ -514,7 +517,7 @@ public class KillAura extends Module {
                     if (pair.second() <= swingRange.getInput()) {
                         swing = true;
                     }
-                    if (pair.second() <= attackRange.getInput() || pair.second() <= swingRange.getInput()) {
+                    if (pair.second() <= preAimRange.getInput()) {
                         availableTargets.add(pair.first());
                     }
                 });

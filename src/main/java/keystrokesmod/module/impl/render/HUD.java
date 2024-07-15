@@ -34,7 +34,7 @@ import java.util.*;
 import java.util.List;
 
 public class HUD extends Module {
-    public static final String VERSION = "1.15.0";
+    public static final String VERSION = "1.15.1";
     public static final HashMap<String, ResourceLocation> WATERMARK = new HashMap<>();
     public static ModeSetting theme;
 //    public static SliderSetting font;

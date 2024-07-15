@@ -25,8 +25,6 @@ public final class RotationHandler extends Module {
     private static @Nullable Float movementYaw = null;
     private static @Nullable Float rotationYaw = null;
     private static @Nullable Float rotationPitch = null;
-    private static @Nullable Float lastRotationYaw = null;
-    private static @Nullable Float lastRotationPitch = null;
     private boolean isSet = false;
     private static MoveFix moveFix = MoveFix.NONE;
 
@@ -52,7 +50,7 @@ public final class RotationHandler extends Module {
     }
 
     public static void setRotationYaw(float rotationYaw) {
-        RotationHandler.rotationYaw = RotationUtils.normalize(rotationYaw);
+        RotationHandler.rotationYaw = rotationYaw;
     }
 
     public static void setRotationPitch(float rotationPitch) {
@@ -75,18 +73,6 @@ public final class RotationHandler extends Module {
         return mc.thePlayer.rotationPitch;
     }
 
-    public static float getLastRotationYaw() {
-        if (lastRotationYaw != null)
-            return RotationUtils.normalize(lastRotationYaw);
-        return getRotationYaw();
-    }
-
-    public static float getLastRotationPitch() {
-        if (lastRotationPitch != null)
-            return lastRotationPitch;
-        return getRotationPitch();
-    }
-
     /**
      * Fix movement
      * @param event before update living entity (move)
@@ -94,16 +80,16 @@ public final class RotationHandler extends Module {
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onPreMotion(MoveInputEvent event) {
         if (isSet) {
-            lastRotationYaw = rotationYaw;
-            lastRotationPitch = rotationPitch;
+            float viewYaw = RotationUtils.normalize(mc.thePlayer.rotationYaw);
+            float viewPitch = RotationUtils.normalize(mc.thePlayer.rotationPitch);
             switch ((int) smoothBack.getInput()) {
                 case 0:
-                    rotationYaw = mc.thePlayer.rotationYaw;
-                    rotationPitch = mc.thePlayer.rotationPitch;
+                    setRotationYaw(viewYaw);
+                    setRotationPitch(viewPitch);
                     break;
                 case 1:
-                    rotationYaw = AimSimulator.rotMove(mc.thePlayer.rotationYaw, getRotationYaw(), (float) aimSpeed.getInput());
-                    rotationPitch = AimSimulator.rotMove(mc.thePlayer.rotationPitch, getRotationPitch(), (float) aimSpeed.getInput());
+                    setRotationYaw(AimSimulator.rotMove(viewYaw, getRotationYaw(), (float) aimSpeed.getInput()));
+                    setRotationPitch(AimSimulator.rotMove(viewPitch, getRotationPitch(), (float) aimSpeed.getInput()));
                     break;
             }
         }
@@ -115,7 +101,7 @@ public final class RotationHandler extends Module {
         MinecraftForge.EVENT_BUS.post(rotationEvent);
         isSet = rotationEvent.isSet() || rotationYaw != null || rotationPitch != null;
         if (isSet) {
-            rotationYaw = RotationUtils.normalize(rotationEvent.getYaw());
+            rotationYaw = rotationEvent.getYaw();
             rotationPitch = rotationEvent.getPitch();
             moveFix = rotationEvent.getMoveFix();
         }

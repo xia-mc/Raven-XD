@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 public class Module {
-    protected ArrayList<Setting> settings;
+    protected final ArrayList<Setting> settings;
     private final String moduleName;
     private String prettyName;
     private final Module.category moduleCategory;

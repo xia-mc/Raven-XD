@@ -86,6 +86,7 @@ public class Scaffold extends Module { // from b4 :)
     private boolean placedUp;
     private int offGroundTicks = 0;
     private boolean telly$noBlockPlace = false;
+    private Float lastYaw = null, lastPitch = null;
     public Scaffold() {
         super("Scaffold", category.world);
         this.registerSetting(aimSpeed = new SliderSetting("Aim speed", 20, 5, 20, 0.1));
@@ -134,6 +135,7 @@ public class Scaffold extends Module { // from b4 :)
         sameY$bridged = 1;
         offGroundTicks = 0;
         telly$noBlockPlace = false;
+        lastYaw = lastPitch = null;
     }
 
     public void onEnable() {
@@ -195,8 +197,14 @@ public class Scaffold extends Module { // from b4 :)
                 break;
         }
         boolean instant = aimSpeed.getInput() == aimSpeed.getMax();
-        event.setYaw(instant ? yaw : AimSimulator.rotMove(yaw, RotationHandler.getLastRotationYaw(), (float) aimSpeed.getInput()));
-        event.setPitch(instant ? pitch : AimSimulator.rotMove(pitch, RotationHandler.getLastRotationPitch(), (float) aimSpeed.getInput()));
+
+        if (lastYaw == null || lastPitch == null) {
+            lastYaw = event.getYaw();
+            lastPitch = event.getPitch();
+        }
+
+        event.setYaw(lastYaw = instant ? yaw : AimSimulator.rotMove(yaw, lastYaw, (float) aimSpeed.getInput()));
+        event.setPitch(lastPitch = instant ? pitch : AimSimulator.rotMove(pitch, lastPitch, (float) aimSpeed.getInput()));
         event.setMoveFix(moveFix.isToggled() ? RotationHandler.MoveFix.SILENT : RotationHandler.MoveFix.NONE);
 
         place = true;
@@ -685,7 +693,7 @@ public class Scaffold extends Module { // from b4 :)
         }
 
         if (rayCast.isToggled()) {
-            MovingObjectPosition hitResult = RotationUtils.rayCast(4.5, placeYaw, placePitch);
+            MovingObjectPosition hitResult = RotationUtils.rayCast(4.5, lastYaw, lastPitch);
             if (hitResult != null && hitResult.getBlockPos().equals(block.getBlockPos())) {
                 block.hitVec = hitResult.hitVec;
             } else {

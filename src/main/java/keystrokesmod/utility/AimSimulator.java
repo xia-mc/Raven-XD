@@ -83,7 +83,7 @@ public class AimSimulator {
             float dist1 = current - target;
             float dist2 = target + 360 - current;
             if (dist1 > dist2) {  // 另一边移动更近
-                delta = target + 360 + current;
+                delta = current + 360 + target;
             } else {
                 delta = -dist1;
             }
@@ -91,9 +91,9 @@ public class AimSimulator {
             return current;
         }
 
-        delta = RotationUtils.normalize(delta);
-
-        if (Math.abs(delta) <= diff) {
+        if (Math.abs(delta) < 0.1 * Math.random() + 0.1) {
+            return current;
+        } else if (Math.abs(delta) <= diff) {
             return current + delta;
         } else {
             if (delta < 0) {
