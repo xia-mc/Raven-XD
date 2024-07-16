@@ -19,8 +19,6 @@ public abstract class MixinInventoryPlayer {
 
     @Shadow public EntityPlayer player;
 
-    @Shadow public EntityPlayer player;
-
     @Inject(method = "getCurrentItem", at = @At("HEAD"), cancellable = true)
     public void getCurrentItem(@NotNull CallbackInfoReturnable<ItemStack> cir) {
         if (Utils.nullCheck() && this.player == Raven.mc.thePlayer) {
