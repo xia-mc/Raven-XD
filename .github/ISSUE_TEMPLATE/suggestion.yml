@@ -1,5 +1,5 @@
-name: Suggestion
-description: "Suggest a change to improve the Raven XD"
+name: Suggestion / 建议
+description: "Suggest a change to improve the Raven XD / 建议一个改动以改善Raven XD"
 labels: ["type:enhancement", "status:unconfirmed"]
 body:
 - type: markdown

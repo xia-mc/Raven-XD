@@ -1,5 +1,5 @@
-name: Bug Report
-description: Report a bug
+name: Bug Report / 问题报告
+description: Report a bug / 报告一个问题
 labels: ["type:bug", "status:unconfirmed"]
 body:
 - type: markdown

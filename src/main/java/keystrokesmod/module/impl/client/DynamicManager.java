@@ -51,7 +51,7 @@ public final class DynamicManager extends Module {
         }));
         this.registerSetting(new DescriptionSetting("Dynamics:", () -> !activeDynamics.isEmpty()));
         this.canBeEnabled = false;
-
+      
         directory = new File(Raven.mc.mcDataDir + File.separator + "keystrokes", "dynamics");
         if (!directory.exists()) {
             boolean success = directory.mkdirs();
@@ -175,7 +175,6 @@ public final class DynamicManager extends Module {
         } catch (IOException | ClassNotFoundException | InstantiationException | IllegalAccessException e) {
             Utils.sendMessage("Exception: " + e.getMessage());
         }
-
 
         Utils.sendMessage(ChatFormatting.GREEN + "Loaded " + activeDynamics.size() + " dynamics.");
 
