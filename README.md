@@ -44,7 +44,8 @@ Raven B4, but not only for Hypixel.
     - KillAura
     - Scaffold
     - NoSlow
-    - Velocity
+    - Velocity (1.9+)
+    - Speed (1.9+)
     - Fly
  5. Polar
     - NoSlow

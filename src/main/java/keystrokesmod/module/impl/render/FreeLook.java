@@ -15,7 +15,7 @@ import javax.annotation.Nullable;
 public class FreeLook extends Module {
     private final ButtonSetting onlyIfPressed = new ButtonSetting("Only if pressed", true);
 
-    private @Nullable ViewData viewData = null;
+    public static @Nullable ViewData viewData = null;
 
     public FreeLook() {
         super("FreeLook", category.render);
@@ -33,11 +33,11 @@ public class FreeLook extends Module {
     }
 
     public static void call() {
-        if (ModuleManager.freeLook.isEnabled() && ModuleManager.freeLook.viewData != null) {
+        if (ModuleManager.freeLook.isEnabled() && FreeLook.viewData != null) {
             mc.objectMouseOver = RotationUtils.rayCast(
                     mc.playerController.getBlockReachDistance(),
-                    ModuleManager.freeLook.viewData.rotationYaw,
-                    ModuleManager.freeLook.viewData.rotationPitch
+                    FreeLook.viewData.rotationYaw,
+                    FreeLook.viewData.rotationPitch
             );
         }
     }
@@ -79,10 +79,10 @@ public class FreeLook extends Module {
         }
     }
 
-    private static class ViewData {
-        private final int thirdPersonView;
-        private final float rotationYaw;
-        private final float rotationPitch;
+    public static class ViewData {
+        public final int thirdPersonView;
+        public final float rotationYaw;
+        public final float rotationPitch;
 
         public ViewData(int thirdPersonView, float rotationYaw, float rotationPitch) {
             this.thirdPersonView = thirdPersonView;

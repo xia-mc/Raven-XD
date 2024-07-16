@@ -114,7 +114,7 @@ public class Scaffold extends Module { // from b4 :)
         this.registerSetting(tower = new ButtonSetting("Tower", false));
         this.registerSetting(fast = new ButtonSetting("Fast", false));
         this.registerSetting(sameY = new ButtonSetting("SameY", false));
-        this.registerSetting(autoJump = new ButtonSetting("Auto jump", false, sameY::isToggled));
+        this.registerSetting(autoJump = new ButtonSetting("Auto jump", false));
     }
 
     public void onDisable() {
@@ -245,7 +245,7 @@ public class Scaffold extends Module { // from b4 :)
         } else {
             offGroundTicks++;
         }
-        if (rotation.getInput() == 4 && mc.thePlayer.onGround && MoveUtil.isMoving() && !Utils.jumpDown()) {
+        if ((rotation.getInput() == 4 || autoJump.isToggled()) && mc.thePlayer.onGround && MoveUtil.isMoving() && !Utils.jumpDown()) {
             mc.thePlayer.jump();
         }
 
@@ -585,7 +585,7 @@ public class Scaffold extends Module { // from b4 :)
 
     private boolean keepYPosition() {
         boolean sameYSca = fastScaffold.getInput() == 4 || fastScaffold.getInput() == 3 || fastScaffold.getInput() == 5 || fastScaffold.getInput() == 6;
-        return this.isEnabled() && Utils.keysDown() && (sameYSca || sameY.isToggled()) && (!Utils.jumpDown() || fastScaffold.getInput() == 6) && (!fastOnRMB.isToggled() || Mouse.isButtonDown(1));
+        return this.isEnabled() && Utils.keysDown() && (sameYSca || (sameY.isToggled() && !Utils.jumpDown())) && (!Utils.jumpDown() || fastScaffold.getInput() == 6) && (!fastOnRMB.isToggled() || Mouse.isButtonDown(1));
     }
 
     public boolean safewalk() {

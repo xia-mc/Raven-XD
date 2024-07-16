@@ -16,8 +16,8 @@ import java.util.*;
 
 public final class RecordClick extends Module {
     private static File directory;
-    private static List<Pattern> LOADED_PATTERNS = new ArrayList<>(Collections.singletonList(Pattern.DEFAULT));
-    public static String[] LOADED_PATTERNS_NAMES = new String[]{Pattern.DEFAULT.getName()};
+    private static List<Pattern> LOADED_PATTERNS = new ArrayList<>(Arrays.asList(Pattern.DEFAULT, Pattern.VAPE));
+    public static String[] LOADED_PATTERNS_NAMES = new String[]{Pattern.DEFAULT.getName(), Pattern.VAPE.getName()};
 
     private static ModeSetting currentPattern;
     private int lastPattern = 0;
@@ -98,9 +98,10 @@ public final class RecordClick extends Module {
     public static void loadPatterns() {
         File[] requireNonNull = Objects.requireNonNull(directory.listFiles());
 
-        LOADED_PATTERNS = new ArrayList<>(Collections.singletonList(Pattern.DEFAULT));
-        LOADED_PATTERNS_NAMES = new String[requireNonNull.length + 1];
+        LOADED_PATTERNS = new ArrayList<>(Arrays.asList(Pattern.DEFAULT, Pattern.VAPE));
+        LOADED_PATTERNS_NAMES = new String[requireNonNull.length + 2];
         LOADED_PATTERNS_NAMES[0] = Pattern.DEFAULT.getName();
+        LOADED_PATTERNS_NAMES[1] = Pattern.VAPE.getName();
 
         for (int i = 0, requireNonNullLength = requireNonNull.length; i < requireNonNullLength; i++) {
             File file = requireNonNull[i];

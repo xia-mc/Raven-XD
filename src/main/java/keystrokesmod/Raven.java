@@ -75,6 +75,7 @@ public class Raven {
         FMLCommonHandler.instance().bus().register(ModuleManager.tower);
         FMLCommonHandler.instance().bus().register(ModuleManager.rotationHandler);
         FMLCommonHandler.instance().bus().register(ModuleManager.slotHandler);
+        FMLCommonHandler.instance().bus().register(ModuleManager.dynamicManager);
 
         try {
             ViaMCP.create();

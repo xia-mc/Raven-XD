@@ -172,7 +172,9 @@ public class Module {
     }
 
     public void registerSetting(Setting setting) {
-        this.settings.add(setting);
+        synchronized (settings) {
+            this.settings.add(setting);
+        }
     }
 
     public void registerSetting(Setting @NotNull ... setting) {
@@ -182,7 +184,9 @@ public class Module {
     }
 
     public void unregisterSetting(Setting setting) {
-        this.settings.remove(setting);
+        synchronized (settings) {
+            this.settings.remove(setting);
+        }
     }
 
     public Module.category moduleCategory() {

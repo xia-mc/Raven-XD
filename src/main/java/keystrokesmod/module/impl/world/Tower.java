@@ -1,12 +1,10 @@
 package keystrokesmod.module.impl.world;
 
-import keystrokesmod.Raven;
 import keystrokesmod.event.PreMotionEvent;
 import keystrokesmod.event.PreUpdateEvent;
 import keystrokesmod.event.SendPacketEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
-import keystrokesmod.module.impl.other.anticheats.utils.world.BlockUtils;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.DescriptionSetting;
 import keystrokesmod.module.setting.impl.ModeSetting;
@@ -14,18 +12,10 @@ import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.utils.ModeOnly;
 import keystrokesmod.utility.Reflection;
 import keystrokesmod.utility.Utils;
-import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
 import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.Vec3;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import org.apache.commons.lang3.tuple.Triple;
 import org.lwjgl.input.Keyboard;
-
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 import static keystrokesmod.module.ModuleManager.scaffold;
 
@@ -40,11 +30,13 @@ public class Tower extends Module {
     private final ButtonSetting sprintJumpForward;
     private final ButtonSetting hypixelNoStrafe;
     private final SliderSetting hypixelOffGroundSpeed;
-    private final ButtonSetting lowHop;
+    private final ModeSetting lowHop;
     private int slowTicks;
     private boolean wasTowering;
     private int offGroundTicks = 0;
-    private BlockPos toweredBlock = null;
+    private int onGroundTicks = 0;
+    private boolean lowHopTest1$watchdog = false;
+
     public Tower() {
         super("Tower", category.world);
         this.registerSetting(new DescriptionSetting("Works with SafeWalk & Scaffold"));
@@ -58,7 +50,7 @@ public class Tower extends Module {
         this.registerSetting(slowedTicks = new SliderSetting("Slowed ticks", 1, 0, 20, 1, mode0));
         this.registerSetting(hypixelOffGroundSpeed = new SliderSetting("Hypixel off ground speed", 0.5, 0.0, 1.0, 0.01, mode1));
         this.registerSetting(hypixelNoStrafe = new ButtonSetting("Hypixel no strafe", false, mode1));
-        this.registerSetting(lowHop = new ButtonSetting("Low hop", false, mode1));
+        this.registerSetting(lowHop = new ModeSetting("Low hop", new String[]{"None", "Default", "Test1", "Test2"}, 0));
         this.registerSetting(disableWhileCollided = new ButtonSetting("Disable while collided", false));
         this.registerSetting(disableWhileHurt = new ButtonSetting("Disable while hurt", false));
         this.registerSetting(sprintJumpForward = new ButtonSetting("Sprint jump forward", true));
@@ -69,7 +61,8 @@ public class Tower extends Module {
     public void onDisable() {
         wasTowering = false;
         offGroundTicks = 0;
-        toweredBlock = null;
+        onGroundTicks = 0;
+        lowHopTest1$watchdog = false;
     }
 
     @SubscribeEvent
@@ -86,7 +79,6 @@ public class Tower extends Module {
                     Reflection.jumpTicks.set(mc.thePlayer, 0);
                     e.setSprinting(false);
 
-                    toweredBlock = null;
                     double moveSpeed = e.isOnGround() ? speed.getInput() : hypixelOffGroundSpeed.getInput();
                     if (hypixelNoStrafe.isToggled()) {
                         if (Math.abs(mc.thePlayer.motionX) >= Math.abs(mc.thePlayer.motionZ)) {
@@ -100,6 +92,23 @@ public class Tower extends Module {
                         mc.thePlayer.motionX *= moveSpeed;
                         mc.thePlayer.motionZ *= moveSpeed;
                     }
+
+                    if (lowHop.getInput() == 2) {
+                        onGroundTicks = mc.thePlayer.onGround ? onGroundTicks + 1 : 0;
+                        lowHopTest1$watchdog = (lowHopTest1$watchdog || onGroundTicks == 1) && onGroundTicks < 2;
+                        if (onGroundTicks > 0)
+                            e.setPosY(e.getPosY() + 1E-14);
+
+                        if (lowHopTest1$watchdog) {
+                            if (mc.thePlayer.motionY == 0.16477328182606651) mc.thePlayer.motionY = 0.14961479459521598;
+                            if (mc.thePlayer.motionY == 0.0682225000311085) mc.thePlayer.motionY = 0.0532225003663811;
+                            if (mc.thePlayer.motionY == -0.0262419501516868) mc.thePlayer.motionY = -0.027141950136226;
+                            if (mc.thePlayer.motionY == -0.104999113177072) mc.thePlayer.motionY = -0.31999911675335113;
+                            if (mc.thePlayer.motionY == -0.3919991420476618) mc.thePlayer.motionY = -0.3968991421057737;
+                        }
+                    }
+
+                    break;   // WTF?? why it works?? without this break???
                 case 2:
                     if (mc.thePlayer.onGround)
                         mc.thePlayer.motionY = 0.42F;
@@ -148,23 +157,49 @@ public class Tower extends Module {
             offGroundTicks++;
         }
 
-        if (canTower() && mode.getInput() == 1 && lowHop.isToggled() && Utils.isMoving()) {
-            switch (offGroundTicks) {
+        if (canTower() && mode.getInput() == 1 && Utils.isMoving()) {
+            switch ((int) lowHop.getInput()) {
+                default:
                 case 0:
-                    mc.thePlayer.motionY = 0.4196;
+                    break;
+                case 1:
+                    switch (offGroundTicks) {
+                        case 0:
+                            mc.thePlayer.motionY = 0.4196;
+                            break;
+                        case 3:
+                        case 4:
+                            mc.thePlayer.motionY = 0;
+                            break;
+                        case 5:
+                            mc.thePlayer.motionY = 0.4191;
+                            break;
+                        case 6:
+                            mc.thePlayer.motionY = 0.3275;
+                            break;
+                        case 11:
+                            mc.thePlayer.motionY = -0.5;
+                            break;
+                    }
                     break;
                 case 3:
-                case 4:
-                    mc.thePlayer.motionY = 0;
-                    break;
-                case 5:
-                    mc.thePlayer.motionY = 0.4191;
-                    break;
-                case 6:
-                    mc.thePlayer.motionY = 0.3275;
-                    break;
-                case 11:
-                    mc.thePlayer.motionY = -0.5;
+                    switch (offGroundTicks) {
+                        case 0:
+                            mc.thePlayer.motionY = 0.4191;
+                            break;
+                        case 1:
+                            mc.thePlayer.motionY = 0.327318;
+                            break;
+                        case 4:
+                            mc.thePlayer.motionY = 0.065;
+                            break;
+                        case 5:
+                            mc.thePlayer.motionY = -0.005;
+                            break;
+                        case 6:
+                            mc.thePlayer.motionY = -1.0;
+                            break;
+                    }
                     break;
             }
         }

@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 
 public class InvManager extends Module {
     private final ModeSetting mode = new ModeSetting("Mode", new String[]{"Basic", "OpenInv"}, 1);
-    private final ButtonSetting notWhileMoving = new ButtonSetting("Not while moving", false, new ModeOnly(mode, 1));
+    private final ButtonSetting notWhileMoving = new ButtonSetting("Not while moving", false, new ModeOnly(mode, 0));
     private final SliderSetting minStartDelay = new SliderSetting("Min start delay", 100, 0, 500, 10, "ms");
     private final SliderSetting maxStartDelay = new SliderSetting("Max start delay", 200, 0, 500, 10, "ms");
     private final ButtonSetting armor = new ButtonSetting("Armor", false);

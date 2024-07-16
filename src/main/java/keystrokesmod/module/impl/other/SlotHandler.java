@@ -1,6 +1,7 @@
 package keystrokesmod.module.impl.other;
 
 import keystrokesmod.event.PreUpdateEvent;
+import keystrokesmod.mixins.impl.client.PlayerControllerMPAccessor;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.ModeSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
@@ -57,7 +58,9 @@ public final class SlotHandler extends Module {
                 currentSlot = null;
                 break;
             case 1:
-                if (currentSlot != null && System.currentTimeMillis() - lastSetCurrentSlotTime > switchBackDelay.getInput())
+                if (currentSlot != null
+                        && !((PlayerControllerMPAccessor) mc.playerController).isHittingBlock()
+                        && System.currentTimeMillis() - lastSetCurrentSlotTime > switchBackDelay.getInput())
                     currentSlot = null;
                 break;
         }
