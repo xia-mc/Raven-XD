@@ -11,6 +11,7 @@ import keystrokesmod.module.setting.Setting;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.DescriptionSetting;
 import keystrokesmod.utility.Utils;
+import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
@@ -110,13 +111,7 @@ public final class DynamicManager extends Module {
         if (files == null) return;
 
         try (StandardJavaFileManager fileManager = compiler.getStandardFileManager(null, null, null)) {
-            Set<File> classPath = new HashSet<>();
-
-            for (File file : Objects.requireNonNull(new File(mc.mcDataDir, "mods").listFiles())) {
-                if (file.exists() && file.isFile() && file.getName().endsWith(".jar"))
-                    classPath.add(file);
-            }
-            classPath.add(new File(DynamicManager.class.getProtectionDomain().getCodeSource().getLocation().getFile()));
+            Set<File> classPath = getClassPath();
 
             fileManager.setLocation(StandardLocation.CLASS_PATH, classPath);
             fileManager.setLocation(StandardLocation.CLASS_OUTPUT, Collections.singletonList(cacheDirectory));
@@ -198,6 +193,18 @@ public final class DynamicManager extends Module {
             }
         } catch (NullPointerException ignored) {
         }
+    }
+
+    private static @NotNull Set<File> getClassPath() {
+        Set<File> classPath = new HashSet<>();
+
+        for (File file : Objects.requireNonNull(new File(mc.mcDataDir, "mods").listFiles())) {
+            if (file.exists() && file.isFile() && file.getName().endsWith(".jar"))
+                classPath.add(file);
+        }
+        classPath.add(new File(Raven.class.getProtectionDomain().getCodeSource().getLocation().getFile()));
+        classPath.add(new File(Minecraft.class.getProtectionDomain().getCodeSource().getLocation().getFile()));
+        return classPath;
     }
 
     private static List<File> findClassFiles(String dir) {

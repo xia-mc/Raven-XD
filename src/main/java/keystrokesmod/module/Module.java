@@ -243,6 +243,7 @@ public class Module {
         client,
         profiles,
         scripts,
+        exploit,
         experimental
     }
 }
