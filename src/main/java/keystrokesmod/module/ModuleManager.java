@@ -105,6 +105,7 @@ public class ModuleManager {
         this.addModule(new Gui());
         // this.addModule(new NyaProxy());
         this.addModule(new Settings());
+        this.addModule(new MiddleClick());
 
         // combat
         this.addModule(new AimAssist());
