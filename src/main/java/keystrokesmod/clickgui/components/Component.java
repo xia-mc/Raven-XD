@@ -2,10 +2,7 @@ package keystrokesmod.clickgui.components;
 
 import keystrokesmod.clickgui.components.impl.*;
 import keystrokesmod.module.setting.Setting;
-import keystrokesmod.module.setting.impl.ButtonSetting;
-import keystrokesmod.module.setting.impl.DescriptionSetting;
-import keystrokesmod.module.setting.impl.ModeSetting;
-import keystrokesmod.module.setting.impl.SliderSetting;
+import keystrokesmod.module.setting.impl.*;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -58,6 +55,9 @@ public abstract class Component implements IComponent {
         }
         if (setting instanceof ModeSetting) {
             return new ModeComponent((ModeSetting) setting, component, y);
+        }
+        if (setting instanceof ModeValue) {
+            return new ModeValueComponent((ModeValue) setting, component, y);
         }
         throw new NoSuchElementException("no match component for setting '%s', this shouldn't be happen. please content author.");
     }
