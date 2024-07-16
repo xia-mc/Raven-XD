@@ -12,7 +12,6 @@ public class Settings extends Module {
     public static ButtonSetting weaponAxe;
     public static ButtonSetting weaponRod;
     public static ButtonSetting weaponStick;
-    public static ButtonSetting middleClickFriends;
     public static SliderSetting offset;
     public static SliderSetting timeMultiplier;
     public static ModeSetting toggleSound;
