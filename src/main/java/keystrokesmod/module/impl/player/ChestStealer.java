@@ -82,6 +82,7 @@ public class ChestStealer extends Module {
 
     @SubscribeEvent
     public void onPreMotion(PreMotionEvent event) {
+        // Stop player movement on X and Z axes if `notMoving` is toggled and a chest is targeted
         if (notMoving.isToggled() && ContainerUtils.isChest(customChest.isToggled())) {
             mc.thePlayer.motionX = 0;
             mc.thePlayer.motionZ = 0;
