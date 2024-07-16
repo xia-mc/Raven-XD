@@ -1,6 +1,5 @@
 package keystrokesmod.module.impl.other;
 
-import com.mojang.realmsclient.gui.ChatFormatting;
 import keystrokesmod.Raven;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.ButtonSetting;
@@ -14,7 +13,7 @@ import java.io.*;
 import java.util.*;
 
 public class StaffDetector extends Module {
-    public static final String[] STAFFLISTS = new String[]{"HypixelDefault", "BlocksMCDefault", "GamsterDefault", "GommeHDDefault", "PikaDefault"};
+    public static final String[] STAFFLISTS = new String[]{"HypixelDefault", "BlocksMCDefault", "GamsterDefault", "GommeHDDefault", "PikaDefault", "SyuuDefault"};
     public static final List<Set<String>> STAFFS = new ArrayList<>();
     public static final Set<String> hasFlagged = new HashSet<>();
 

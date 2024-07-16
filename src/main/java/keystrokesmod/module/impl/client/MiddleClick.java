@@ -1,6 +1,7 @@
 package keystrokesmod.module.impl.client;
 
 import keystrokesmod.module.Module;
+import keystrokesmod.module.impl.other.SlotHandler;
 import keystrokesmod.module.impl.world.AntiBot;
 import keystrokesmod.module.setting.impl.ModeSetting;
 import keystrokesmod.utility.Utils;
@@ -33,7 +34,7 @@ public class MiddleClick extends Module {
             return;
         if (pearlEvent < 4) {
             if (pearlEvent == 3) {
-                mc.thePlayer.inventory.currentItem = prevSlot;
+                SlotHandler.setCurrentSlot(prevSlot);
             }
             pearlEvent++;
         }
@@ -50,8 +51,8 @@ public class MiddleClick extends Module {
                     for (int slot = 0; slot <= 8; slot++) {
                         ItemStack itemInSlot = mc.thePlayer.inventory.getStackInSlot(slot);
                         if (itemInSlot != null && itemInSlot.getItem() instanceof ItemEnderPearl) {
-                            prevSlot = mc.thePlayer.inventory.currentItem;
-                            mc.thePlayer.inventory.currentItem = slot;
+                            prevSlot = SlotHandler.getCurrentSlot();
+                            SlotHandler.setCurrentSlot(slot);
                             mc.playerController.sendUseItem(mc.thePlayer, mc.theWorld, itemInSlot);
                             pearlEvent = 0;
                         }
