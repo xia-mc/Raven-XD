@@ -114,7 +114,7 @@ public class Scaffold extends Module { // from b4 :)
         this.registerSetting(tower = new ButtonSetting("Tower", false));
         this.registerSetting(fast = new ButtonSetting("Fast", false));
         this.registerSetting(sameY = new ButtonSetting("SameY", false));
-        this.registerSetting(autoJump = new ButtonSetting("Auto jump", false, sameY::isToggled));
+        this.registerSetting(autoJump = new ButtonSetting("Auto jump", false));
     }
 
     public void onDisable() {
