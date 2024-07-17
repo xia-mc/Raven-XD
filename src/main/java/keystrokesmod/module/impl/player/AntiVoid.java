@@ -156,9 +156,7 @@ public class AntiVoid extends Module {
     @SubscribeEvent
     public void onPreMotion(PreMotionEvent event) {
         if ((mode.getInput() == 1 || mode.getInput() == 2) && airStuck) {
-            mc.thePlayer.posX = airStuck$posX;
-            mc.thePlayer.posY = airStuck$posY;
-            mc.thePlayer.posZ = airStuck$posZ;
+            mc.thePlayer.setPosition(airStuck$posX, airStuck$posY, airStuck$posZ);
             mc.thePlayer.motionX = mc.thePlayer.motionY = mc.thePlayer.motionZ = 0;
             event.setYaw(airStuck$yaw);
             event.setPitch(airStuck$pitch);

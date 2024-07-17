@@ -27,7 +27,7 @@ public class ModeValueComponent extends Component {
         GL11.glPushMatrix();
         GL11.glScaled(0.5D, 0.5D, 0.5D);
 
-        String value = this.ModeValue.getSubModeValues().get((int) this.ModeValue.getInput()).getName();
+        String value = this.ModeValue.getSubModeValues().get((int) this.ModeValue.getInput()).getRawPrettyName();
         Raven.mc.fontRendererObj.drawString(
                 this.ModeValue.getName() + ": " + value,
                 (float) ((int) ((float) (this.parent.categoryComponent.getX() + 4) * 2.0F)),

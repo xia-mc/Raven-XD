@@ -64,8 +64,6 @@ public class AimSimulator {
     }
 
     public static float rotMove(float target, float current, float diff) {
-        diff *= (float) Math.min(Math.random() * diff + diff * 0.2, diff);
-
         return rotMoveNoRandom(target, current, diff);
     }
 
@@ -93,9 +91,7 @@ public class AimSimulator {
 
         delta = RotationUtils.normalize(delta);
 
-        if (Math.abs(delta) < 0.1 * Math.random() + 0.1) {
-            return current;
-        } else if (Math.abs(delta) <= diff) {
+        if (Math.abs(delta) <= diff) {
             return current + delta;
         } else {
             if (delta < 0) {

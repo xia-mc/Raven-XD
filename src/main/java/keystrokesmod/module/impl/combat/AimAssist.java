@@ -16,6 +16,7 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -143,27 +144,40 @@ public class AimAssist extends Module {
     }
 
     private @NotNull Pair<Pair<Float, Float>, Pair<Float, Float>> getRotation(@NotNull AxisAlignedBB boundingBox) {
-        float minYaw = Float.MAX_VALUE;
-        float maxYaw = Float.MIN_VALUE;
+        AxisAlignedBB box = boundingBox.expand(-0.05, -0.9, -0.1).offset(0, 0.48, 0);
 
-        for (Double x : Arrays.asList(boundingBox.minX, boundingBox.maxX)) {
-            for (Double z : Arrays.asList(boundingBox.minZ, boundingBox.maxZ)) {
-                float yaw = PlayerRotation.getYaw(new Vec3(x, 0, z));
+        float yaw1 = PlayerRotation.getYaw(new Vec3(box.minX, 0, box.minZ));
+        float yaw2 = PlayerRotation.getYaw(new Vec3(box.maxX, 0, box.maxZ));
 
-                if (yaw < minYaw)
-                    minYaw = yaw;
-                if (yaw > maxYaw)
-                    maxYaw = yaw;
-            }
-        }
-
-        float pitch1 = PlayerRotation.getPitch(new Vec3(0, boundingBox.minY + 1.12, 0));
-        float pitch2 = PlayerRotation.getPitch(new Vec3(0, boundingBox.maxY + 0.12, 0));
+        float pitch1 = PlayerRotation.getPitch(new Vec3(0, box.minY, 0));
+        float pitch2 = PlayerRotation.getPitch(new Vec3(0, box.maxY, 0));
 
         return new Pair<>(
-                new Pair<>(minYaw, maxYaw),
+                sortYaw(yaw1, yaw2),
                 new Pair<>(Math.min(pitch1, pitch2), Math.max(pitch1, pitch2))
         );
+    }
+
+    @Contract("_, _ -> new")
+    private static @NotNull Pair<Float, Float> sortYaw(final float yaw1, final float yaw2) {
+        final float fixedYaw1 = fixYaw(yaw1);
+        final float fixedYaw2 = fixYaw(yaw2);
+
+        if (fixedYaw1 < fixedYaw2) {
+            return new Pair<>(yaw1, yaw2);
+        } else {
+            return new Pair<>(yaw2, yaw1);
+        }
+    }
+
+    private static float fixYaw(float yaw) {
+        while (yaw < 0) {
+            yaw += 360;
+        }
+        while (yaw > 360) {
+            yaw -= 360;
+        }
+        return yaw;
     }
 
     private boolean noAction() {
