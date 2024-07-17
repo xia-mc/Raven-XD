@@ -18,11 +18,6 @@ public abstract class SubMode<T extends Module> extends Module {
     }
 
     @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
     public void registerSetting(Setting setting) {
         super.registerSetting(setting);
     }
