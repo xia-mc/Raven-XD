@@ -31,6 +31,7 @@ public class ChestStealer extends Module {
     private static final ButtonSetting customChest = new ButtonSetting("Custom chest", false);
     private final ButtonSetting ignoreTrash = new ButtonSetting("Ignore trash", false);
     private static final ButtonSetting silent = new ButtonSetting("Silent", false);
+    private static final ButtonSetting notMoving = new ButtonSetting("Not Moving", false);
 
     private static State state = State.NONE;
     private long nextStealTime;
@@ -46,7 +47,7 @@ public class ChestStealer extends Module {
         super("ChestStealer", category.player);
         this.registerSetting(minStartDelay, maxStartDelay, minStealDelay, maxStealDelay, shuffle,
                 autoClose, autoCloseIfInvFull, minCloseDelay, maxCloseDelay,
-                customChest, ignoreTrash, silent);
+                customChest, ignoreTrash, silent, notMoving);
     }
 
     @Override
@@ -81,6 +82,12 @@ public class ChestStealer extends Module {
 
     @SubscribeEvent
     public void onPreMotion(PreMotionEvent event) {
+        // Stop player movement on X and Z axes if `notMoving` is toggled and a chest is targeted
+        if (notMoving.isToggled() && ContainerUtils.isChest(customChest.isToggled())) {
+            mc.thePlayer.motionX = 0;
+            mc.thePlayer.motionZ = 0;
+        }
+
         switch (state) {
             case STEAL:
                 while (nextStealTime <= System.currentTimeMillis()) {
