@@ -8,12 +8,15 @@ import keystrokesmod.module.setting.interfaces.InputSetting;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Supplier;
 
 public class ModeValue extends Setting implements InputSetting {
-    private String settingName;
+    private final String settingName;
     private final Module parent;
-    private ArrayList<SubModeValue> subModeValues = new ArrayList<>();
-    private String defaultValue;
+    private final List<SubMode<?>> subModes = new ArrayList<>();
     private int selected;
     public ModeValue(String settingName, Module parent) {
         super(settingName, () -> true);
@@ -21,17 +24,26 @@ public class ModeValue extends Setting implements InputSetting {
         this.parent = parent;
 
     }
-    public ModeValue add(final SubModeValue subModeValue) {
-        if(subModeValue == null)
+    public ModeValue add(final SubMode<?> subMode) {
+        if (subMode == null)
             return this;
-        subModeValues.add(subModeValue);
+        subModes.add(subMode);
+        // register settings from SubModes
+        for (Setting setting : subMode.getSettings()) {
+            final Supplier<Boolean> fromVisibleCheck = setting.visibleCheck;
+            setting.visibleCheck = () -> subModes.get((int) this.getInput()) == subMode && fromVisibleCheck.get();
+            parent.registerSetting(setting);
+        }
         return this;
     }
-    public ArrayList<SubModeValue> getSubModeValues() {
-        return subModeValues;
+    public List<SubMode<?>> getSubModeValues() {
+        return subModes;
     }
     public ModeValue setDefaultValue(String name) {
-        this.defaultValue = name;
+        Optional<SubMode<?>> subMode = subModes.stream().filter(mode -> Objects.equals(mode.getName(), name)).findFirst();
+        if (!subMode.isPresent()) return this;
+
+        setValue(subModes.indexOf(subMode.get()));
         return this;
     }
     @Override
@@ -61,24 +73,24 @@ public class ModeValue extends Setting implements InputSetting {
     @Override
     public void setValue(double value) {
         this.selected = (int) value;
-        if(this.parent.isEnabled()) {
-            this.subModeValues.get(selected).enable();
+        if (this.parent.isEnabled()) {
+            this.subModes.get(selected).enable();
         }
     }
     public void setValueRaw(int n) {
-        this.subModeValues.get(selected).disable();
+        disable();
         this.selected = n;
         this.setValue(n);
     }
-    public int getMax() {
-        return subModeValues.size() - 1;
+    public double getMax() {
+        return subModes.size() - 1;
     }
-    public int getMin() {
+    public double getMin() {
         return 0;
     }
     public void nextValue() {
         if (getInput() >= getMax()) {
-            setValueRaw(getMin());
+            setValueRaw((int) getMin());
         } else {
             setValueRaw((int) (getInput() + 1));
         }
@@ -87,16 +99,18 @@ public class ModeValue extends Setting implements InputSetting {
 
     public void prevValue() {
         if (getInput() <= getMin()) {
-            setValueRaw(getMax());
+            setValueRaw((int) getMax());
         } else {
             setValueRaw((int) (getInput() - 1));
 
         }
     }
 
-    public void enable(SubModeValue subModeValue) {
-        subModeValues.get(this.selected).disable();
-        subModeValue.enable();
-        this.selected = subModeValues.indexOf(subModeValue);
+    public void enable(@NotNull SubMode<?> subMode) {
+        setValueRaw(subModes.indexOf(subMode));
+    }
+
+    public void disable() {
+        this.subModes.get(selected).disable();
     }
 }

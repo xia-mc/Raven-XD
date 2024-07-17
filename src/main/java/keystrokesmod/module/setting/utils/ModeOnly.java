@@ -1,7 +1,6 @@
 package keystrokesmod.module.setting.utils;
 
-import keystrokesmod.module.setting.impl.ModeSetting;
-import keystrokesmod.module.setting.impl.ModeValue;
+import keystrokesmod.module.setting.interfaces.InputSetting;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -11,46 +10,31 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 public class ModeOnly implements Supplier<Boolean> {
-    private final Object mode;
-    private final Set<Integer> activeMode;
+    private final InputSetting mode;
+    private final Set<Double> activeMode;
 
-    public ModeOnly(@NotNull Object mode, int @NotNull ... activeMode) {
-        if (!(mode instanceof ModeSetting || mode instanceof ModeValue)) {
-            throw new IllegalArgumentException("Mode must be an instance of ModeSetting or ModeValue");
-        }
+    public ModeOnly(@NotNull InputSetting mode, double @NotNull ... activeMode) {
         this.mode = mode;
         this.activeMode = new HashSet<>();
-        for (int i : activeMode) {
+        for (double i : activeMode) {
             this.activeMode.add(i);
         }
     }
-    public ModeOnly(@NotNull Object mode, @NotNull List<Integer> activeMode) {
-        if (!(mode instanceof ModeSetting || mode instanceof ModeValue)) {
-            throw new IllegalArgumentException("Mode must be an instance of ModeSetting or ModeValue");
-        }
+    public ModeOnly(@NotNull InputSetting mode, @NotNull List<Double> activeMode) {
         this.mode = mode;
         this.activeMode = new HashSet<>(activeMode);
     }
 
     @Override
     public Boolean get() {
-        if (mode instanceof ModeSetting) {
-            return activeMode.contains((int) ((ModeSetting) mode).getInput());
-        } else if (mode instanceof ModeValue) {
-            return activeMode.contains((int) ((ModeValue) mode).getInput());
-        }
-        return false;
+        return activeMode.contains(mode.getInput());
     }
 
     public ModeOnly reserve() {
-        int max = 0;
-        if (mode instanceof ModeSetting) {
-            max = ((ModeSetting) mode).getMax();
-        } else if (mode instanceof ModeValue) {
-            max = ((ModeValue) mode).getMax();
-        }
-        List<Integer> options = new ArrayList<>(max + 1 - activeMode.size());
-        for (int i = 0; i <= max; i++) {
+        double max = mode.getMax();
+
+        List<Double> options = new ArrayList<>((int) (max + 1 - activeMode.size()));
+        for (double i = 0; i <= max; i++) {
             if (!activeMode.contains(i)) {
                 options.add(i);
             }
