@@ -223,6 +223,7 @@ public class ModuleManager {
         this.addModule(new Tracers());
         this.addModule(new Trajectories());
         this.addModule(new Xray());
+        this.addModule(new BedPlates());
 
         // world
         this.addModule(antiBot = new AntiBot());
