@@ -17,7 +17,7 @@ public class ModeValue extends Setting implements InputSetting {
     private final String settingName;
     private final Module parent;
     private final List<SubMode<?>> subModes = new ArrayList<>();
-    private int selected;
+    private int selected = 0;
     public ModeValue(String settingName, Module parent) {
         super(settingName, () -> true);
         this.settingName = settingName;
@@ -73,7 +73,7 @@ public class ModeValue extends Setting implements InputSetting {
     @Override
     public void setValue(double value) {
         this.selected = (int) value;
-        if (this.parent.isEnabled()) {
+        if (this.parent.isEnabled() || !parent.canBeEnabled) {
             this.subModes.get(selected).enable();
         }
     }
@@ -106,8 +106,8 @@ public class ModeValue extends Setting implements InputSetting {
         }
     }
 
-    public void enable(@NotNull SubMode<?> subMode) {
-        setValueRaw(subModes.indexOf(subMode));
+    public void enable() {
+        setValueRaw((int) getInput());
     }
 
     public void disable() {

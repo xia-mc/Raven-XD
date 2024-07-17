@@ -12,6 +12,7 @@ import keystrokesmod.module.setting.utils.ModeOnly;
 import keystrokesmod.utility.AimSimulator;
 import keystrokesmod.utility.MoveUtil;
 import keystrokesmod.utility.RotationUtils;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.MathHelper;
 import net.minecraftforge.common.MinecraftForge;
@@ -28,7 +29,7 @@ public final class RotationHandler extends Module {
     private boolean isSet = false;
     private static MoveFix moveFix = MoveFix.NONE;
 
-    private final ModeSetting defaultMoveFix = new ModeSetting("Default MoveFix", new String[]{"None", "Silent", "Strict"}, 0);
+    private static final ModeSetting defaultMoveFix = new ModeSetting("Default MoveFix", new String[]{"None", "Silent", "Strict"}, 0);
     private final ModeSetting smoothBack = new ModeSetting("Smooth back", new String[]{"None", "Default"}, 0);
     private final SliderSetting aimSpeed = new SliderSetting("Aim speed", 5, 1, 15, 0.1, new ModeOnly(smoothBack, 1));
     public static final ButtonSetting rotateBody = new ButtonSetting("Rotate body", true);
@@ -44,9 +45,13 @@ public final class RotationHandler extends Module {
     }
 
     public static float getMovementYaw(Entity entity) {
-        if (movementYaw != null)
+        if (entity instanceof EntityPlayerSP && movementYaw != null)
             return movementYaw;
         return entity.rotationYaw;
+    }
+
+    public static void setMovementYaw(float movementYaw) {
+        RotationHandler.movementYaw = movementYaw;
     }
 
     public static void setRotationYaw(float rotationYaw) {
@@ -59,6 +64,12 @@ public final class RotationHandler extends Module {
 
     public static void setMoveFix(MoveFix moveFix) {
         RotationHandler.moveFix = moveFix;
+    }
+
+    public static MoveFix getMoveFix() {
+        if (moveFix != null)
+            return moveFix;
+        return MoveFix.values()[(int) defaultMoveFix.getInput()];
     }
 
     public static float getRotationYaw() {
@@ -97,54 +108,54 @@ public final class RotationHandler extends Module {
         if (AimSimulator.yawEquals(getRotationYaw(), mc.thePlayer.rotationYaw)) rotationYaw = null;
         if (getRotationPitch() == mc.thePlayer.rotationPitch) rotationPitch = null;
 
-        RotationEvent rotationEvent = new RotationEvent(getRotationYaw(), getRotationPitch(), MoveFix.values()[(int) defaultMoveFix.getInput()]);
+        RotationEvent rotationEvent = new RotationEvent(getRotationYaw(), getRotationPitch(), getMoveFix());
         MinecraftForge.EVENT_BUS.post(rotationEvent);
         isSet = rotationEvent.isSet() || rotationYaw != null || rotationPitch != null;
         if (isSet) {
             rotationYaw = rotationEvent.getYaw();
             rotationPitch = rotationEvent.getPitch();
             moveFix = rotationEvent.getMoveFix();
-        }
 
-        switch (moveFix) {
-            case NONE:
-                movementYaw = null;
-                break;
-            case SILENT:
-                movementYaw = getRotationYaw();
+            switch (moveFix) {
+                case NONE:
+                    movementYaw = null;
+                    break;
+                case SILENT:
+                    movementYaw = getRotationYaw();
 
-                final float forward = event.getForward();
-                final float strafe = event.getStrafe();
+                    final float forward = event.getForward();
+                    final float strafe = event.getStrafe();
 
-                final double angle = MathHelper.wrapAngleTo180_double(Math.toDegrees(MoveUtil.direction(mc.thePlayer.rotationYaw, forward, strafe)));
+                    final double angle = MathHelper.wrapAngleTo180_double(Math.toDegrees(MoveUtil.direction(mc.thePlayer.rotationYaw, forward, strafe)));
 
-                if (forward == 0 && strafe == 0) {
-                    return;
-                }
+                    if (forward == 0 && strafe == 0) {
+                        return;
+                    }
 
-                float closestForward = 0, closestStrafe = 0, closestDifference = Float.MAX_VALUE;
+                    float closestForward = 0, closestStrafe = 0, closestDifference = Float.MAX_VALUE;
 
-                for (float predictedForward = -1F; predictedForward <= 1F; predictedForward += 1F) {
-                    for (float predictedStrafe = -1F; predictedStrafe <= 1F; predictedStrafe += 1F) {
-                        if (predictedStrafe == 0 && predictedForward == 0) continue;
+                    for (float predictedForward = -1F; predictedForward <= 1F; predictedForward += 1F) {
+                        for (float predictedStrafe = -1F; predictedStrafe <= 1F; predictedStrafe += 1F) {
+                            if (predictedStrafe == 0 && predictedForward == 0) continue;
 
-                        final double predictedAngle = MathHelper.wrapAngleTo180_double(Math.toDegrees(MoveUtil.direction(movementYaw, predictedForward, predictedStrafe)));
-                        final double difference = Math.abs(angle - predictedAngle);
+                            final double predictedAngle = MathHelper.wrapAngleTo180_double(Math.toDegrees(MoveUtil.direction(movementYaw, predictedForward, predictedStrafe)));
+                            final double difference = Math.abs(angle - predictedAngle);
 
-                        if (difference < closestDifference) {
-                            closestDifference = (float) difference;
-                            closestForward = predictedForward;
-                            closestStrafe = predictedStrafe;
+                            if (difference < closestDifference) {
+                                closestDifference = (float) difference;
+                                closestForward = predictedForward;
+                                closestStrafe = predictedStrafe;
+                            }
                         }
                     }
-                }
 
-                event.setForward(closestForward);
-                event.setStrafe(closestStrafe);
-                break;
-            case STRICT:
-                movementYaw = getRotationYaw();
-                break;
+                    event.setForward(closestForward);
+                    event.setStrafe(closestStrafe);
+                    break;
+                case STRICT:
+                    movementYaw = getRotationYaw();
+                    break;
+                    }
         }
     }
 

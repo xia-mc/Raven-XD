@@ -11,6 +11,7 @@ import keystrokesmod.module.impl.other.*;
 import keystrokesmod.module.impl.player.*;
 import keystrokesmod.module.impl.render.*;
 import keystrokesmod.module.impl.world.*;
+import keystrokesmod.module.impl.world.tower.HypixelBTower;
 import keystrokesmod.utility.Utils;
 
 import java.util.ArrayList;

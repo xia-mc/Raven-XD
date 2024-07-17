@@ -21,7 +21,7 @@ public class FakeLag extends Module {
     }
 
     public void onEnable() {
-        mode.enable(mode.getSubModeValues().get((int) mode.getInput()));
+        mode.enable();
     }
 
     public void onDisable() {
