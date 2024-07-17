@@ -62,7 +62,11 @@ public class PlayerMove {
      * Used to get the players speed
      */
     public static double speed(@NotNull EntityPlayer player) {
-        return Math.hypot(player.motionX, player.motionZ);
+        return speed(player.motionX, player.motionZ);
+    }
+
+    public static double speed(final double motionX, final double motionZ) {
+        return Math.hypot(motionX, motionZ);
     }
 
     @Contract("_, _, _ -> new")

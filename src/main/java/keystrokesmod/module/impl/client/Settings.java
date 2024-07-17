@@ -12,7 +12,6 @@ public class Settings extends Module {
     public static ButtonSetting weaponAxe;
     public static ButtonSetting weaponRod;
     public static ButtonSetting weaponStick;
-    public static ButtonSetting middleClickFriends;
     public static SliderSetting offset;
     public static SliderSetting timeMultiplier;
     public static ModeSetting toggleSound;
@@ -25,7 +24,6 @@ public class Settings extends Module {
         this.registerSetting(weaponAxe = new ButtonSetting("Set axe as weapon", false));
         this.registerSetting(weaponRod = new ButtonSetting("Set rod as weapon", false));
         this.registerSetting(weaponStick = new ButtonSetting("Set stick as weapon", false));
-        this.registerSetting(middleClickFriends = new ButtonSetting("Middle click friends", false));
         this.registerSetting(new DescriptionSetting("Profiles"));
         this.registerSetting(sendMessage = new ButtonSetting("Send message on enable", true));
         this.registerSetting(new DescriptionSetting("Theme colors"));

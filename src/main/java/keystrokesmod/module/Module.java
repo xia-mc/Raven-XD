@@ -4,6 +4,7 @@ import keystrokesmod.Raven;
 import keystrokesmod.module.impl.client.Settings;
 import keystrokesmod.module.setting.Setting;
 import keystrokesmod.module.setting.impl.ButtonSetting;
+import keystrokesmod.module.setting.impl.ModeValue;
 import keystrokesmod.script.Script;
 import keystrokesmod.utility.Utils;
 import net.minecraft.client.Minecraft;
@@ -173,7 +174,11 @@ public class Module {
 
     public void registerSetting(Setting setting) {
         synchronized (settings) {
-            this.settings.add(setting);
+            if (setting instanceof ModeValue) {
+                this.settings.add(0, setting);
+            } else {
+                this.settings.add(setting);
+            }
         }
     }
 
@@ -231,6 +236,7 @@ public class Module {
         this.keycode = keybind;
     }
 
+
     public enum category {
         combat,
         movement,
@@ -243,6 +249,7 @@ public class Module {
         client,
         profiles,
         scripts,
+        exploit,
         experimental
     }
 }

@@ -45,11 +45,11 @@ public class ModeSetting extends Setting implements InputSetting {
         return value;
     }
 
-    public int getMin() {
+    public double getMin() {
         return 0;
     }
 
-    public int getMax() {
+    public double getMax() {
         return this.max;
     }
 
@@ -65,7 +65,7 @@ public class ModeSetting extends Setting implements InputSetting {
 
     public void nextValue() {
         if (getInput() >= getMax()) {
-            setValueRaw(getMin());
+            setValueRaw((int) getMin());
         } else {
             setValueRaw((int) (getInput() + 1));
         }
@@ -73,7 +73,7 @@ public class ModeSetting extends Setting implements InputSetting {
 
     public void prevValue() {
         if (getInput() <= getMin()) {
-            setValueRaw(getMax());
+            setValueRaw((int) getMax());
         } else {
             setValueRaw((int) (getInput() - 1));
         }

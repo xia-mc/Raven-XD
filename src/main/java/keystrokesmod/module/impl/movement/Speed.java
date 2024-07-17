@@ -20,7 +20,6 @@ import net.minecraft.network.play.server.S08PacketPlayerPosLook;
 import net.minecraft.potion.Potion;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
-import net.minecraft.util.MovingObjectPosition;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
@@ -35,7 +34,7 @@ public class Speed extends Module {
     private final ButtonSetting sneakDisable;
     private final ButtonSetting stopMotion;
     private final ButtonSetting stopSprint;
-    private final String[] modes = new String[]{"Hypixel A", "BlocksMC", "Vulcan", "GrimAC", "Hypixel B"};
+    private final String[] modes = new String[]{"Hypixel A", "BlocksMC", "Vulcan", "GrimAC", "Hypixel B", "Hypixel C"};
     private int offGroundTicks = 0;
     public static int ticksSinceVelocity = Integer.MAX_VALUE;
 
@@ -43,8 +42,6 @@ public class Speed extends Module {
     int cooldownTicks = 0;
 
     double lastAngle = 0;
-
-    int groundYPos = -1;
 
     private boolean reset;
     private double speed;
@@ -91,31 +88,59 @@ public class Speed extends Module {
 
     @SubscribeEvent
     public void onPreUpdate(PreUpdateEvent event) {
-        if (mode.getInput() == 4) {
-            if ((mc.thePlayer.hurtTime > 0 && offGroundTicks != 0) || !MoveUtil.isMoving() || Utils.jumpDown()) {
-                Utils.resetTimer();
-                return;
-            }
+        switch ((int) mode.getInput()) {
+            case 4:
+                if ((mc.thePlayer.hurtTime > 0 && offGroundTicks != 0) || !MoveUtil.isMoving() || Utils.jumpDown()) {
+                    Utils.resetTimer();
+                    return;
+                }
 
-            switch (offGroundTicks) {
-                case 0:
-                    mc.thePlayer.motionY = 0.42;
-                    MoveUtil.strafe(0.45);
-                    Utils.getTimer().timerSpeed = 1.0f;
-                    break;
-                case 10:
-                    mc.thePlayer.motionY = -0.28;
-                    MoveUtil.strafe(0.315);
-                    Utils.getTimer().timerSpeed = 1.8f;
-                    break;
-                case 11:
-                    MoveUtil.strafe();
-                    Utils.getTimer().timerSpeed = 1.0f;
-                    break;
-                case 12:
-                    MoveUtil.stop();
-                    break;
-            }
+                switch (offGroundTicks) {
+                    case 0:
+                        mc.thePlayer.motionY = 0.42;
+                        MoveUtil.strafe(mc.thePlayer.hurtTime > 0 ? 0.415 : 0.45);
+                        Utils.getTimer().timerSpeed = 1.0f;
+                        break;
+                    case 10:
+                        mc.thePlayer.motionY = -0.28;
+                        MoveUtil.strafe(0.315);
+                        Utils.getTimer().timerSpeed = 1.8f;
+                        break;
+                    case 11:
+                        MoveUtil.strafe();
+                        Utils.getTimer().timerSpeed = 1.0f;
+                        break;
+                    case 12:
+                        MoveUtil.stop();
+                        break;
+                }
+                break;
+            case 5:
+                if ((mc.thePlayer.hurtTime > 0 && offGroundTicks != 0) || !MoveUtil.isMoving() || Utils.jumpDown()) {
+                    Utils.resetTimer();
+                    return;
+                }
+
+                switch (offGroundTicks) {
+                    case 0:
+                        mc.thePlayer.motionY = 0.42;
+                        MoveUtil.strafe(0.415);
+                    case 1:
+                        Utils.getTimer().timerSpeed = 1.0f;
+                        break;
+                    case 10:
+                        mc.thePlayer.motionY = -0.3;
+                        Utils.getTimer().timerSpeed = 1.6f;
+                        break;
+                    case 11:
+                        MoveUtil.strafe();
+                        Utils.getTimer().timerSpeed = 1.0f;
+                        break;
+                    case 12:
+                        Utils.getTimer().timerSpeed = 1.0f;
+                        break;
+                }
+                break;
         }
     }
 
@@ -277,11 +302,6 @@ public class Speed extends Module {
 
     public Block blockRelativeToPlayer(final double offsetX, final double offsetY, final double offsetZ) {
         return mc.theWorld.getBlockState(new BlockPos(mc.thePlayer).add(offsetX, offsetY, offsetZ)).getBlock();
-    }
-
-    private boolean isYAxisChange() {
-        MovingObjectPosition hitResult = RotationUtils.rayCast(3, 0, 90);
-        return hitResult == null || hitResult.getBlockPos().getY() != groundYPos;
     }
 
     public void onDisable() {

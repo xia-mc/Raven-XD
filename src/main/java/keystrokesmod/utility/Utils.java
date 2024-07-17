@@ -948,4 +948,8 @@ public static List<String> getSidebarLines() {
             return Keyboard.KEY_NONE;
         }
     }
+
+    public static boolean isInRange(double value, double target, double range) {
+        return value - range <= target && value + range >= target;
+    }
 }

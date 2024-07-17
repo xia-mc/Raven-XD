@@ -3,6 +3,7 @@ package keystrokesmod.module;
 import keystrokesmod.module.impl.client.CommandLine;
 import keystrokesmod.module.impl.client.*;
 import keystrokesmod.module.impl.combat.*;
+import keystrokesmod.module.impl.exploit.*;
 import keystrokesmod.module.impl.fun.*;
 import keystrokesmod.module.impl.minigames.*;
 import keystrokesmod.module.impl.movement.*;
@@ -10,6 +11,7 @@ import keystrokesmod.module.impl.other.*;
 import keystrokesmod.module.impl.player.*;
 import keystrokesmod.module.impl.render.*;
 import keystrokesmod.module.impl.world.*;
+import keystrokesmod.module.impl.world.tower.HypixelBTower;
 import keystrokesmod.utility.Utils;
 
 import java.util.ArrayList;
@@ -95,6 +97,8 @@ public class ModuleManager {
     public static Ambience ambience;
     public static KillAuraV2 killAuraV2;
     public static DynamicManager dynamicManager;
+    public static Disabler disabler;
+    public static BridgeAssist bridgeAssist;
 
     public void register() {
 
@@ -105,6 +109,7 @@ public class ModuleManager {
         this.addModule(new Gui());
         // this.addModule(new NyaProxy());
         this.addModule(new Settings());
+        this.addModule(new MiddleClick());
 
         // combat
         this.addModule(new AimAssist());
@@ -115,7 +120,6 @@ public class ModuleManager {
         this.addModule(criticals = new Criticals());
         this.addModule(hitBox = new HitBox());
         this.addModule(hitSelect = new HitSelect());
-        this.addModule(infiniteAura = new InfiniteAura());
         this.addModule(new JumpReset());
         this.addModule(killAura = new KillAura());
         this.addModule(killAuraV2 = new KillAuraV2());
@@ -161,14 +165,11 @@ public class ModuleManager {
         this.addModule(autoPlay = new AutoPlay());
         this.addModule(autoRespawn = new AutoRespawn());
         this.addModule(clickRecorder = new ClickRecorder());
-        this.addModule(clientSpoofer = new ClientSpoofer());
         this.addModule(new FakeChat());
         this.addModule(new LatencyAlerts());
-        this.addModule(modSpoofer = new ModSpoofer());
         this.addModule(motionSkidder = new MotionSkidder());
         this.addModule(nameHider = new NameHider());
         this.addModule(panic = new Panic());
-        this.addModule(pingSpoof = new PingSpoof());
         this.addModule(recordClick = new RecordClick());
         this.addModule(rotationHandler = new RotationHandler());
         this.addModule(new ScreenshotHelper());
@@ -230,6 +231,7 @@ public class ModuleManager {
         this.addModule(new AutoWeapon());
         this.addModule(bedAura = new BedAura());
         this.addModule(blockIn = new BlockIn());
+        this.addModule(bridgeAssist = new BridgeAssist());
         this.addModule(clutch = new Clutch());
         this.addModule(fastMine = new FastMine());
         this.addModule(fastPlace = new FastPlace());
@@ -238,6 +240,13 @@ public class ModuleManager {
         this.addModule(scaffold = new Scaffold());
         this.addModule(tower = new Tower());
         this.addModule(new WaterBucket());
+
+        // exploit
+        this.addModule(clientSpoofer = new ClientSpoofer());
+        this.addModule(disabler = new Disabler());
+        this.addModule(infiniteAura = new InfiniteAura());
+        this.addModule(modSpoofer = new ModSpoofer());
+        this.addModule(pingSpoof = new PingSpoof());
 
         // enable
         antiBot.enable();

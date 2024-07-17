@@ -23,6 +23,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.jetbrains.annotations.NotNull;
 
+import static keystrokesmod.Raven.mc;
+
 public class LongJump extends Module {
     public static final String[] MODES = {"Fireball", "Fireball Auto", "Self Damage"};
     private final ModeSetting mode;
@@ -32,6 +34,7 @@ public class LongJump extends Module {
     private final ButtonSetting reverseYaw;
     private final SliderSetting pitch;
     private final SliderSetting aimTicks;
+    private final ButtonSetting stopAtFirst;
     private final ButtonSetting jumpAtEnd;
     private final ButtonSetting showBPS;
     private final ButtonSetting stopOnTeleport;
@@ -48,6 +51,7 @@ public class LongJump extends Module {
         this.registerSetting(horizonBoost = new SliderSetting("Horizon boost", 1.0, 1.0, 1.5, 0.01));
         this.registerSetting(horizonMotionMultiplier = new SliderSetting("Horizon motion multiplier", 1.0, 0.9, 1.1, 0.005));
         this.registerSetting(verticalMotion = new SliderSetting("Vertical motion", 0.01, 0.01, 0.6, 0.01));
+        this.registerSetting(stopAtFirst = new ButtonSetting("Stop at first", false));
         ModeOnly mode1 = new ModeOnly(mode, 1);
         this.registerSetting(reverseYaw = new ButtonSetting("Reverse yaw", false, mode1));
         this.registerSetting(pitch = new SliderSetting("Pitch", 90, 80, 90, 0.5, mode1));
@@ -80,12 +84,16 @@ public class LongJump extends Module {
                 if (ticks < 33) {
                     event.setOnGround(false);
                     mc.thePlayer.motionX = mc.thePlayer.motionZ = 0;
-                    mc.thePlayer.posX = mc.thePlayer.lastTickPosX;
-                    mc.thePlayer.posZ = mc.thePlayer.lastTickPosZ;
                 } else if (ticks == 50) {
                     event.setOnGround(true);
                 }
                 break;
+        }
+
+        if (((!start && !done) || ticks <= 0) && stopAtFirst.isToggled()) {
+            mc.thePlayer.posX = mc.thePlayer.lastTickPosX;
+            mc.thePlayer.posZ = mc.thePlayer.lastTickPosZ;
+            mc.thePlayer.motionX = mc.thePlayer.motionZ = 0;
         }
     }
 

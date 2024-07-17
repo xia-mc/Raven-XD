@@ -1,12 +1,10 @@
 package keystrokesmod.module.impl.movement;
 
 import keystrokesmod.event.*;
-import keystrokesmod.mixins.impl.client.KeyBindingAccessor;
-import keystrokesmod.mixins.impl.entity.EntityPlayerSPAccessor;
 import keystrokesmod.module.Module;
-import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.other.RotationHandler;
 import keystrokesmod.module.impl.other.SlotHandler;
+import keystrokesmod.module.impl.other.anticheats.utils.world.PlayerMove;
 import keystrokesmod.module.impl.world.Scaffold;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.ModeSetting;
@@ -18,7 +16,6 @@ import net.minecraft.block.BlockAir;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityBoat;
 import net.minecraft.item.ItemBow;
-import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.network.play.server.S08PacketPlayerPosLook;
 import net.minecraft.network.play.server.S12PacketEntityVelocity;
@@ -52,7 +49,6 @@ public class Fly extends Module {
     private boolean airStuck = false;
     private double airStuck$posX, airStuck$posY, airStuck$posZ;
     private float airStuck$yaw;
-    private int usingTicks = 0;
 
     public Fly() {
         super("Fly", category.movement);
@@ -79,7 +75,6 @@ public class Fly extends Module {
         started = false;
         clipped = false;
         teleport = false;
-
         if ((int) mode.getInput() == 5) {
             Utils.sendMessage("Start the fly under the block and walk forward.");
         }
@@ -87,15 +82,26 @@ public class Fly extends Module {
 
     @SubscribeEvent
     public void onReceivePacket(@NotNull ReceivePacketEvent event) {
-        if (event.getPacket() instanceof S08PacketPlayerPosLook) {
+        if (mode.getInput() == 5 && event.getPacket() instanceof S08PacketPlayerPosLook) {
             if (teleport) {
                 event.setCanceled(true);
                 teleport = false;
                 Utils.sendMessage("Teleported!");
             }
-        } else if (event.getPacket() instanceof S12PacketEntityVelocity) {
-            if (((S12PacketEntityVelocity) event.getPacket()).getEntityID() == mc.thePlayer.getEntityId())
+        } else if (mode.getInput() == 8 && event.getPacket() instanceof S12PacketEntityVelocity) {
+            S12PacketEntityVelocity packet = (S12PacketEntityVelocity) event.getPacket();
+            if (packet.getEntityID() == mc.thePlayer.getEntityId()) {
+                event.setCanceled(true);
                 airStuck = false;
+                mc.thePlayer.fallDistance = 0;
+
+                keystrokesmod.script.classes.Vec3 addMotion = PlayerMove.getStrafeMotion(
+                        PlayerMove.speed(packet.getMotionX() / 8000.0, packet.getMotionZ() / 8000.0),
+                        RotationHandler.getRotationYaw(),
+                        packet.getMotionY() / 8000.0
+                );
+                mc.thePlayer.setVelocity(addMotion.x, addMotion.y, addMotion.z);
+            }
         }
     }
 
@@ -247,13 +253,15 @@ public class Fly extends Module {
                 }
                 break;
             case 8:
-                if (mc.thePlayer.motionY <= 0 && mc.thePlayer.hurtTime == 0) {
+                if (mc.thePlayer.motionY <= 0) {
                     if (!airStuck) {
                         airStuck$posX = mc.thePlayer.posX;
                         airStuck$posY = mc.thePlayer.posY;
                         airStuck$posZ = mc.thePlayer.posZ;
                         airStuck$yaw = RotationHandler.getRotationYaw();
-                        usingTicks = 0;
+                    } else {
+                        mc.thePlayer.setPosition(airStuck$posX, airStuck$posY, airStuck$posZ);
+
                     }
                     airStuck = true;
                 } else {
@@ -266,39 +274,21 @@ public class Fly extends Module {
     @SubscribeEvent
     public void onPreMotion(PreMotionEvent event) {
         if (mode.getInput() == 8) {
-            event.setPitch(-88);
+            event.setSprinting(false);
+            event.setPitch(-89);
             SlotHandler.setCurrentSlot(ContainerUtils.getSlot(ItemBow.class));
+
             if (airStuck) {
-                mc.thePlayer.posX = airStuck$posX;
-                mc.thePlayer.posY = airStuck$posY;
-                mc.thePlayer.posZ = airStuck$posZ;
-                mc.thePlayer.motionX = mc.thePlayer.motionY = mc.thePlayer.motionZ = 0;
+                mc.thePlayer.setPosition(airStuck$posX, airStuck$posY, airStuck$posZ);
                 event.setYaw(airStuck$yaw);
-
-                final ItemStack item = SlotHandler.getHeldItem();
-
-                if (item != null && item.getItem() instanceof ItemBow) {
-                    if (usingTicks == 6 && mc.thePlayer.isUsingItem()) {
-                        mc.playerController.onStoppedUsingItem(mc.thePlayer);
-                    } else {
-                        mc.playerController.sendUseItem(mc.thePlayer, mc.theWorld, item);
-                        mc.thePlayer.setItemInUse(item, usingTicks);
-                        usingTicks++;
-                    }
-                }
-            } else {
-                usingTicks = 0;
             }
         }
     }
 
     @SubscribeEvent
     public void onSendPacket(@NotNull SendPacketEvent event) {
-//        if (event.getPacket() instanceof C03PacketPlayer
-//                && !(event.getPacket() instanceof C03PacketPlayer.C05PacketPlayerLook)
-//                && mode.getInput() == 8 && airStuck) {
-//            event.setCanceled(true);
-//        }
+        if (mode.getInput() == 8 && airStuck && event.getPacket() instanceof C03PacketPlayer)
+            event.setCanceled(true);
     }
 
     public void onDisable() {
@@ -331,7 +321,6 @@ public class Fly extends Module {
             MoveUtil.stop();
         }
         airStuck = false;
-        usingTicks = 0;
     }
 
     private void balance$reset() {

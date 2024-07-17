@@ -4,6 +4,7 @@ import keystrokesmod.Raven;
 import keystrokesmod.clickgui.components.IComponent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.client.Gui;
+import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.Timer;
 import keystrokesmod.utility.font.Font;
 import keystrokesmod.utility.render.RenderUtils;
@@ -63,10 +64,14 @@ public class CategoryComponent {
         this.scale = new ScaledResolution(Minecraft.getMinecraft()).getScaleFactor();
         this.openCloseAnimation = new Animation(Easing.EASE_OUT_QUART, 600); // EASE_OUT_QUART
 
-        for (Iterator<Module> var3 = Raven.getModuleManager().inCategory(this.categoryName).iterator(); var3.hasNext(); tY += 16) {
-            Module mod = var3.next();
+        for (Module mod : Raven.getModuleManager().inCategory(this.categoryName)) {
+            if (mod instanceof SubMode) {
+                continue;
+            }
+
             ModuleComponent b = new ModuleComponent(mod, this, tY);
             this.modules.add(b);
+            tY += 16;
         }
     }
 
@@ -97,6 +102,9 @@ public class CategoryComponent {
             }
             else {
                 for (Module module : Raven.scriptManager.scripts.values()) {
+                    if (module instanceof SubMode)
+                        continue;
+
                     tY += 16;
                     ModuleComponent b = new ModuleComponent(module, this, tY);
                     this.modules.add(b);

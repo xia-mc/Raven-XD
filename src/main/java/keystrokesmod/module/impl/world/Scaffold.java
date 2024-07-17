@@ -25,6 +25,7 @@ import net.minecraft.network.play.client.C0APacketAnimation;
 import net.minecraft.util.*;
 import net.minecraftforge.client.event.MouseEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.apache.commons.lang3.tuple.Triple;
@@ -64,7 +65,7 @@ public class Scaffold extends Module { // from b4 :)
     public final ButtonSetting sameY;
     public final ButtonSetting autoJump;
 
-    protected MovingObjectPosition placeBlock;
+    public MovingObjectPosition placeBlock;
     private int lastSlot;
     private static final String[] rotationModes = new String[]{"None", "Backwards", "Strict", "Precise", "Telly", "Constant", "Snap"};
     private static final String[] fastScaffoldModes = new String[]{"Disabled", "Sprint", "Edge", "Jump A", "Jump B", "Jump C", "Float", "Side", "Legit", "GrimAC", "Sneak"};
@@ -86,6 +87,7 @@ public class Scaffold extends Module { // from b4 :)
     private boolean placedUp;
     private int offGroundTicks = 0;
     private boolean telly$noBlockPlace = false;
+    public boolean tower$noBlockPlace = false;
     private Float lastYaw = null, lastPitch = null;
     public Scaffold() {
         super("Scaffold", category.world);
@@ -135,6 +137,7 @@ public class Scaffold extends Module { // from b4 :)
         sameY$bridged = 1;
         offGroundTicks = 0;
         telly$noBlockPlace = false;
+        tower$noBlockPlace = false;
         lastYaw = lastPitch = null;
     }
 
@@ -238,7 +241,7 @@ public class Scaffold extends Module { // from b4 :)
         }
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGH)
     public void onPreUpdate(PreUpdateEvent e) { // place here
         if (mc.thePlayer.onGround) {
             offGroundTicks = 0;
@@ -676,8 +679,12 @@ public class Scaffold extends Module { // from b4 :)
         return null;
     }
 
-    protected void place(MovingObjectPosition block, boolean extra) {
+    public void place(MovingObjectPosition block, boolean extra) {
         if (rotation.getInput() == 4 && telly$noBlockPlace) return;
+        if (tower$noBlockPlace) {
+            tower$noBlockPlace = false;
+            return;
+        }
 
         if (sneak.isToggled()) {
             if (sneak$bridged >= sneakEveryBlocks.getInput()) {

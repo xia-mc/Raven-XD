@@ -7,6 +7,7 @@ import keystrokesmod.module.impl.player.ChestStealer;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.DescriptionSetting;
 import keystrokesmod.module.setting.impl.ModeSetting;
+import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.font.Font;
 import keystrokesmod.utility.font.FontManager;
 import keystrokesmod.utility.render.RenderUtils;
@@ -34,7 +35,7 @@ import java.util.*;
 import java.util.List;
 
 public class HUD extends Module {
-    public static final String VERSION = "1.16.0";
+    public static final String VERSION = "1.16.1-Dev";
     public static final HashMap<String, ResourceLocation> WATERMARK = new HashMap<>();
     public static ModeSetting theme;
 //    public static SliderSetting font;
@@ -177,7 +178,10 @@ public class HUD extends Module {
         }
 
         for (Module module : modules) {
-            if (!module.isEnabled() || module == this) continue;
+            if (!module.isEnabled() || module == this)
+                continue;
+            if (module instanceof SubMode)
+                continue;
             if (module.isHidden()) continue;
             if (module == ModuleManager.commandLine) continue;
 
@@ -304,34 +308,36 @@ public class HUD extends Module {
                 int n = this.miY;
                 double n2 = 0.0;
                 for (Module module : ModuleManager.organizedModules) {
-                    if (module.isEnabled() && !module.getName().equals("HUD")) {
-                        if (module.isHidden()) {
-                            continue;
-                        }
-                        if (module == ModuleManager.commandLine) {
-                            continue;
-                        }
-                        String moduleName = module.getPrettyName();
-                        if (showInfo.isToggled() && !module.getInfo().isEmpty()) {
-                            moduleName += " §7" + module.getInfo();
-                        }
-                        if (lowercase.isToggled()) {
-                            moduleName = moduleName.toLowerCase();
-                        }
-                        int e = Theme.getGradient((int) theme.getInput(), n2);
-                        if (theme.getInput() == 0) {
-                            n2 -= 120;
-                        }
-                        else {
-                            n2 -= 12;
-                        }
-                        int n3 = this.miX;
-                        if (alignRight.isToggled()) {
-                            n3 -= getFontRenderer().getStringWidth(moduleName);
-                        }
-                        getFontRenderer().drawString(moduleName, n3, (float) n, e, dropShadow.isToggled());
-                        n += Math.round(getFontRenderer().height() + 2);
+                    if (!module.isEnabled() || module.getName().equals("HUD"))
+                        continue;
+                    if (module instanceof SubMode)
+                        continue;
+                    if (module.isHidden()) {
+                        continue;
                     }
+                    if (module == ModuleManager.commandLine) {
+                        continue;
+                    }
+                    String moduleName = module.getPrettyName();
+                    if (showInfo.isToggled() && !module.getInfo().isEmpty()) {
+                        moduleName += " §7" + module.getInfo();
+                    }
+                    if (lowercase.isToggled()) {
+                        moduleName = moduleName.toLowerCase();
+                    }
+                    int e = Theme.getGradient((int) theme.getInput(), n2);
+                    if (theme.getInput() == 0) {
+                        n2 -= 120;
+                    }
+                    else {
+                        n2 -= 12;
+                    }
+                    int n3 = this.miX;
+                    if (alignRight.isToggled()) {
+                        n3 -= getFontRenderer().getStringWidth(moduleName);
+                    }
+                    getFontRenderer().drawString(moduleName, n3, (float) n, e, dropShadow.isToggled());
+                    n += Math.round(getFontRenderer().height() + 2);
                 }
                 return new int[]{this.miX + longestModule, n, this.miX - longestModule};
             }

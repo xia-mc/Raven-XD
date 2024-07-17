@@ -198,24 +198,26 @@ public class NoSlow extends Module {
 
     @SubscribeEvent
     public void onPreMotion$Beta(PreMotionEvent event) {
-        if (mc.thePlayer.onGround) {
-            offGroundTicks = 0;
-        } else {
-            offGroundTicks++;
-        }
+        if (mode.getInput() == 11) {
+            if (mc.thePlayer.onGround) {
+                offGroundTicks = 0;
+            } else {
+                offGroundTicks++;
+            }
 
-        final @Nullable ItemStack item = SlotHandler.getHeldItem();
-        if (offGroundTicks == 2 && send) {
-            send = false;
-            PacketUtils.sendPacketNoEvent(new C08PacketPlayerBlockPlacement(
-                    new BlockPos(-1, -1, -1),
-                    255, item,
-                    0, 0, 0
-            ));
+            final @Nullable ItemStack item = SlotHandler.getHeldItem();
+            if (offGroundTicks == 2 && send) {
+                send = false;
+                PacketUtils.sendPacketNoEvent(new C08PacketPlayerBlockPlacement(
+                        new BlockPos(-1, -1, -1),
+                        255, item,
+                        0, 0, 0
+                ));
 
-        } else if (item != null && mc.thePlayer.isUsingItem()
-                && (ContainerUtils.isRest(item.getItem()) || item.getItem() instanceof ItemBow)) {
-            event.setPosY(event.getPosY() + 1E-14);
+            } else if (item != null && mc.thePlayer.isUsingItem()
+                    && (ContainerUtils.isRest(item.getItem()) || item.getItem() instanceof ItemBow)) {
+                event.setPosY(event.getPosY() + 1E-14);
+            }
         }
     }
 
