@@ -95,7 +95,6 @@ public class ModuleManager {
     public static Ambience ambience;
     public static KillAuraV2 killAuraV2;
     public static DynamicManager dynamicManager;
-    public static BridgeAssist bridgeAssist;
 
     public void register() {
 
@@ -231,7 +230,6 @@ public class ModuleManager {
         this.addModule(new AutoWeapon());
         this.addModule(bedAura = new BedAura());
         this.addModule(blockIn = new BlockIn());
-        this.addModule(bridgeAssist = new BridgeAssist());
         this.addModule(clutch = new Clutch());
         this.addModule(fastMine = new FastMine());
         this.addModule(fastPlace = new FastPlace());
