@@ -11,17 +11,19 @@ public class ColorUtils {
     private static final Pattern COLOR_PATTERN = Pattern.compile("(?i)§[0-9A-FK-OR]");
 
     public static Color getBackgroundColor(int id) {
-        Color color = new Color(255, 0, 255);
-        if (id == 1) {
-            color = new Color(16, 15, 69);
-        } else if (id == 2) {
-            color = new Color(19, 19, 128);
-        } else if (id == 3) {
-            color = new Color(255, 255, 255);
-        } else if (id == 4) {
-            color = new Color(0, 0, 0);
+        switch (id) {
+            case 1:
+                return new Color(16, 15, 69);
+            case 2:
+                return new Color(19, 19, 128);
+            case 3:
+                return new Color(255, 255, 255);
+            case 4:
+                return new Color(0, 0, 0);
+            default:
+                return new Color(255, 0, 255);
         }
-        return color;
+    }
     }
 
     public static Color getFontColor(int id, int alpha) {
