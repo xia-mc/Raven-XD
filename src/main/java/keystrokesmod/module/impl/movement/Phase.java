@@ -11,6 +11,7 @@ import keystrokesmod.module.setting.impl.ModeSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import net.minecraft.network.play.server.S02PacketChat;
 import net.minecraft.network.play.server.S08PacketPlayerPosLook;
+import net.minecraft.util.BlockPos;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
@@ -23,6 +24,7 @@ public class Phase extends Module {
     private final ButtonSetting cancelS08;
     private final ButtonSetting waitingBreakBlock;
     private final SliderSetting autoDisable;
+    private final ButtonSetting exceptGround;
 
     private int phaseTime;
 
@@ -40,6 +42,7 @@ public class Phase extends Module {
         this.registerSetting(cancelS08 = new ButtonSetting("Cancel S06", false));
         this.registerSetting(waitingBreakBlock = new ButtonSetting("waiting break block", false));
         this.registerSetting(autoDisable = new SliderSetting("Auto disable", 6, 1, 20, 1, "ticks"));
+        this.registerSetting(exceptGround = new ButtonSetting("Except ground", false));
     }
 
     @Override
@@ -94,8 +97,11 @@ public class Phase extends Module {
 
     @SubscribeEvent
     public void onBlockAABB(BlockAABBEvent event) {
-        if (this.phase)
+        if (this.phase) {
+            if (exceptGround.isToggled() && event.getBlockPos().equals(new BlockPos(mc.thePlayer).down()))
+                return;
             event.setBoundingBox(null);
+        }
     }
 
     @SubscribeEvent
