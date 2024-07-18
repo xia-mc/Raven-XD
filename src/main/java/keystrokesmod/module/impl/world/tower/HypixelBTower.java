@@ -51,7 +51,7 @@ public class HypixelBTower extends SubMode<Tower> {
         else
             offGroundTicks++;
 
-        if (blockPlaceRequest) {
+        if (blockPlaceRequest && !Utils.isMoving()) {
             MovingObjectPosition lastScaffoldPlace = ModuleManager.scaffold.placeBlock;
             if (lastScaffoldPlace == null)
                 return;
