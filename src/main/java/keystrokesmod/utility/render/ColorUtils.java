@@ -57,15 +57,14 @@ public class ColorUtils {
     }
 
     private static Color getRawFontColor(int id) {
-        Color color = new Color(255, 0, 0);
-
-        if (id == 1) {
-            color = new Color(255, 255, 255);
-        } else if (id == 2) {
-            color = new Color(173, 173, 173);
+        switch (id) {
+            case 1:
+                return new Color(255, 255, 255);
+            case 2:
+                return new Color(173, 173, 173);
+            default:
+                return new Color(255, 0, 0);
         }
-
-        return color;
     }
 
     public static Color getFontColor(int id) {
