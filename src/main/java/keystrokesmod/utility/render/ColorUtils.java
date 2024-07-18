@@ -6,14 +6,7 @@ import java.awt.*;
 import java.util.regex.Pattern;
 
 public class ColorUtils {
-    public static final AnimationUtils[] animation = {
-            new AnimationUtils(0.0F), new AnimationUtils(0.0F), new AnimationUtils(0.0F),
-            new AnimationUtils(0.0F), new AnimationUtils(0.0F), new AnimationUtils(0.0F),
-            new AnimationUtils(0.0F), new AnimationUtils(0.0F), new AnimationUtils(0.0F),
-            new AnimationUtils(0.0F), new AnimationUtils(0.0F), new AnimationUtils(0.0F),
-            new AnimationUtils(0.0F), new AnimationUtils(0.0F), new AnimationUtils(0.0F),
-            new AnimationUtils(0.0F), new AnimationUtils(0.0F), new AnimationUtils(0.0F)
-    };
+    public static final List<AnimationUtils> animation = new ArrayList<>(Collections.nCopies(18, new AnimationUtils(0.0F)));
     // fixing this never >:(
     private static final Pattern COLOR_PATTERN = Pattern.compile("(?i)§[0-9A-FK-OR]");
 
