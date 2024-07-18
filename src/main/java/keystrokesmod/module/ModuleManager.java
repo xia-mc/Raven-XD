@@ -110,6 +110,7 @@ public class ModuleManager {
         // this.addModule(new NyaProxy());
         this.addModule(new Settings());
         this.addModule(new MiddleClick());
+        this.addModule(new Notifications());
 
         // combat
         this.addModule(new AimAssist());
