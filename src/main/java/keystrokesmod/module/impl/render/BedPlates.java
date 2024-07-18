@@ -12,11 +12,9 @@ import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
 import net.minecraft.block.Block;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.event.RenderHandEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
@@ -30,7 +28,6 @@ public class BedPlates extends Module {
     public static final ShaderUtils roundedShader = new ShaderUtils("keystrokesmod:shaders/rrect.frag");
 
     public static SliderSetting updateRate, yShift, layers;
-   // public static ButtonSetting bedwarsOnly;
     private final CoolDown updateCooldown = new CoolDown(0);
     private final List<BlockPos> beds = new ArrayList<>();
     private final List<List<Block>> bedBlocks = new ArrayList<>();
@@ -40,7 +37,6 @@ public class BedPlates extends Module {
         this.registerSetting(yShift = new SliderSetting("Y-shift", 2, -5, 10, 1));
         this.registerSetting(updateRate = new SliderSetting("Update rate (ms)", 1000, 250, 5000, 250));
         this.registerSetting(layers = new SliderSetting("Layers", 3, 3, 10, 1));
-        //this.registerSetting(bedwarsOnly = new ButtonSetting("Bedwars only", true));
     }
 
     public void onEnable() {

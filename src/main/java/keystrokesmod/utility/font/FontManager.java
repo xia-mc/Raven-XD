@@ -1,9 +1,9 @@
 package keystrokesmod.utility.font;
 
+import keystrokesmod.utility.Utils;
 import keystrokesmod.utility.font.impl.FontRenderer;
 import keystrokesmod.utility.font.impl.FontUtil;
 import keystrokesmod.utility.font.impl.MinecraftFontRenderer;
-import net.minecraft.client.Minecraft;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -15,7 +15,7 @@ public class FontManager {
     private static final HashMap<Integer, FontRenderer> INTERNATIONAL = new HashMap<>();
     private static final HashMap<Integer, FontRenderer> MONTSERRAT_MAP = new HashMap<>();
     private static final HashMap<Integer, FontRenderer> ROBOTO_MAP = new HashMap<>();
-
+    private static final HashMap<Integer, FontRenderer> Regular = new HashMap<>();
     private static final HashMap<Integer, FontRenderer> LIGHT_MAP = new HashMap<>();
 
     private static final HashMap<Integer, FontRenderer> NUNITO = new HashMap<>();
@@ -36,7 +36,7 @@ public class FontManager {
     private static final HashMap<Integer, FontRenderer> TAHOMA_BOLD = new HashMap<>();
     private static final HashMap<Integer, FontRenderer> TAHOMA = new HashMap<>();
 
-    private static final HashMap<Integer, FontRenderer> ICONS_1 = new HashMap<>();
+    private static final HashMap<Integer, FontRenderer> ICONS = new HashMap<>();
     private static final HashMap<Integer, FontRenderer> ICONS_2 = new HashMap<>();
     private static final HashMap<Integer, FontRenderer> ICONS_3 = new HashMap<>();
 
@@ -62,7 +62,9 @@ public class FontManager {
     public static Font getMontserratMedium(final int size) {
         return get(MONTSERRAT_MAP, size, "Montserrat-Medium", true, true);
     }
-
+    public static Font getRegular(final int size) {
+        return get(Regular, size, "regular", true, true);
+    }
     public static Font getMontserratHairline(final int size) {
         return get(MONTSERRAT_HAIRLINE, size, "Montserrat-Hairline", true, true);
     }
@@ -147,8 +149,8 @@ public class FontManager {
         return get(DREAMSCAPE_NO_AA, size, "Dreamscape", true, false);
     }
 
-    public static Font getIconsOne(final int size) {
-        return get(ICONS_1, size, "Icon-1", true, true);
+    public static Font getIcons(final int size) {
+        return get(ICONS, size, "icon", true, true);
     }
 
     public static Font getIconsThree(final int size) {
@@ -197,6 +199,8 @@ public class FontManager {
 
             if (font != null) {
                 map.put(size, new FontRenderer(font, fractionalMetrics, AA, international));
+            } else {
+                Utils.sendMessage("Failed to load font: " + name);
             }
         }
 

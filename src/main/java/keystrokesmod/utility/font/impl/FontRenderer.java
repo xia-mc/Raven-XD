@@ -1,6 +1,7 @@
 package keystrokesmod.utility.font.impl;
 
 import keystrokesmod.utility.font.FontManager;
+import keystrokesmod.utility.render.ColorUtils;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.MathHelper;
 import org.lwjgl.BufferUtils;
@@ -12,6 +13,8 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Patrick, Hazsi
@@ -176,6 +179,33 @@ public class FontRenderer implements keystrokesmod.utility.font.Font {
         return drawString(text, x - (width(text)), y, color, false);
     }
 
+    @Override
+    public void wrapText(String text, double x, double y, MinecraftFontRenderer.CenterMode centerMode, boolean shadow, int color, double width) {
+        List<String> lines = new ArrayList<>();
+        String[] words = text.trim().split(" ");
+        StringBuilder line = new StringBuilder();
+
+        for (String word : words) {
+            double totalWidth = getStringWidth(line + " " + word);
+
+            if (x + totalWidth >= x + width) {
+                lines.add(line.toString());
+                line = new StringBuilder(word).append(" ");
+                continue;
+            }
+
+            line.append(word).append(" ");
+        }
+        lines.add(line.toString());
+
+        double newY = y - (centerMode == MinecraftFontRenderer.CenterMode.XY || centerMode == MinecraftFontRenderer.CenterMode.Y ? ((lines.size() - 1) * (height() + 5)) / 2 : 0);
+        for (String s : lines) {
+            ColorUtils.resetColor();
+            drawString(s, x, newY, centerMode, shadow, color);
+            newY += height() + 5;
+        }
+    }
+
     public int drawStringWithShadow(final String text, final double x, final double y, final int color) {
         drawString(text, x + 0.25, y + 0.25, color, true);
         return drawString(text, x, y, color, false);
@@ -242,6 +272,34 @@ public class FontRenderer implements keystrokesmod.utility.font.Font {
         return (int) (x - givenX);
     }
 
+    @Override
+    public void drawString(String text, double x, double y, MinecraftFontRenderer.CenterMode centerMode, boolean shadow, int color) {
+        switch (centerMode) {
+            case X:
+                if (shadow) {
+                    this.drawString(text, x - (double) this.getStringWidth(text) / 2 + 0.5, y + 0.5, color, true);
+                }
+                this.drawString(text, x - (double) this.getStringWidth(text) / 2, y, color, false);
+                return;
+            case Y:
+                if (shadow) {
+                    this.drawString(text, x + 0.5, y - this.height() / 2 + 0.5, color, true);
+                }
+                this.drawString(text, x, y - this.height() / 2, color, false);
+                return;
+            case XY:
+                if (shadow) {
+                    this.drawString(text, x - (double) this.getStringWidth(text) / 2 + 0.5, y - this.height() / 2 + 0.5, color, true);
+                }
+                this.drawString(text, x - (double) this.getStringWidth(text) / 2, y - this.height() / 2, color, false);
+                return;
+            case NONE:
+                if (shadow) {
+                    this.drawString(text, x + 0.5, y + 0.5, color, true);
+                }
+                this.drawString(text, x, y, color, false);
+        }
+    }
     public int width(String text) {
         if (!this.international && this.requiresInternationalFont(text)) {
             return FontManager.getInternational(this.font.getSize()).width(text);
