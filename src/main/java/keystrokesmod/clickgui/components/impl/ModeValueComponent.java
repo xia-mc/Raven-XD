@@ -8,11 +8,12 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
 public class ModeValueComponent extends Component {
-    private final ModeValue ModeValue;
+    public static final double SCALE_FACTOR = 0.5D;
+    private final ModeValue modeValue;
 
     public ModeValueComponent(ModeValue modeValue, ModuleComponent moduleComponent, int o) {
         super(moduleComponent);
-        this.ModeValue = modeValue;
+        this.modeValue = modeValue;
         this.x = moduleComponent.categoryComponent.getX() + moduleComponent.categoryComponent.gw();
         this.y = moduleComponent.categoryComponent.getY() + moduleComponent.o;
         this.o = o;
@@ -20,16 +21,16 @@ public class ModeValueComponent extends Component {
 
     @Override
     public Setting getSetting() {
-        return ModeValue;
+        return modeValue;
     }
 
     public void render() {
         GL11.glPushMatrix();
-        GL11.glScaled(0.5D, 0.5D, 0.5D);
+        GL11.glScaled(SCALE_FACTOR, SCALE_FACTOR, SCALE_FACTOR);
 
-        String value = this.ModeValue.getSubModeValues().get((int) this.ModeValue.getInput()).getRawPrettyName();
+        String value = this.modeValue.getSubModeValues().get((int) this.modeValue.getInput()).getRawPrettyName();
         Raven.mc.fontRendererObj.drawString(
-                this.ModeValue.getName() + ": " + value,
+                this.modeValue.getName() + ": " + value,
                 (float) ((int) ((float) (this.parent.categoryComponent.getX() + 4) * 2.0F)),
                 (float) ((int) ((float) (this.parent.categoryComponent.getY() + this.o + 3) * 2.0F)),
                 color, true
@@ -73,9 +74,9 @@ public class ModeValueComponent extends Component {
             next = !next;
 
         if (next) {
-            this.ModeValue.nextValue();
+            this.modeValue.nextValue();
         } else {
-            this.ModeValue.prevValue();
+            this.modeValue.prevValue();
         }
     }
 }

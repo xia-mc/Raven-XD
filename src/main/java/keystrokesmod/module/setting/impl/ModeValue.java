@@ -28,6 +28,7 @@ public class ModeValue extends Setting implements InputSetting {
         if (subMode == null)
             return this;
         subModes.add(subMode);
+        subMode.register();
         // register settings from SubModes
         for (Setting setting : subMode.getSettings()) {
             final Supplier<Boolean> fromVisibleCheck = setting.visibleCheck;
