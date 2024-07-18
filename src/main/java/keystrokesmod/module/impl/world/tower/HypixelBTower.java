@@ -1,9 +1,11 @@
 package keystrokesmod.module.impl.world.tower;
 
+import keystrokesmod.Raven;
 import keystrokesmod.event.PreMotionEvent;
 import keystrokesmod.event.PreUpdateEvent;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.world.Tower;
+import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.script.classes.Vec3;
 import keystrokesmod.utility.MoveUtil;
@@ -18,6 +20,7 @@ import org.apache.commons.lang3.tuple.Triple;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 import static keystrokesmod.module.ModuleManager.tower;
 
@@ -40,8 +43,11 @@ public class HypixelBTower extends SubMode<Tower> {
     private int offGroundTicks = 0;
     private BlockPos deltaPlace = BlockPos.ORIGIN;
 
+    private final ButtonSetting onlyWhileMoving;
+
     public HypixelBTower(String name, @NotNull Tower parent) {
         super(name, parent);
+        this.registerSetting(onlyWhileMoving = new ButtonSetting("Only while moving", true));
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)
@@ -51,7 +57,7 @@ public class HypixelBTower extends SubMode<Tower> {
         else
             offGroundTicks++;
 
-        if (blockPlaceRequest) {
+        if (blockPlaceRequest && !Utils.isMoving()) {
             MovingObjectPosition lastScaffoldPlace = ModuleManager.scaffold.placeBlock;
             if (lastScaffoldPlace == null)
                 return;
@@ -62,10 +68,10 @@ public class HypixelBTower extends SubMode<Tower> {
             Triple<BlockPos, EnumFacing, Vec3> placeSide = optionalPlaceSide.get();
 
 
-            ModuleManager.scaffold.place(
+            Raven.getExecutor().schedule(() -> ModuleManager.scaffold.place(
                     new MovingObjectPosition(placeSide.getRight().toVec3(), placeSide.getMiddle(), placeSide.getLeft()),
                     false
-            );
+            ), 50, TimeUnit.MILLISECONDS);
 //            ModuleManager.scaffold.tower$noBlockPlace = true;
             blockPlaceRequest = false;
         }
@@ -73,9 +79,9 @@ public class HypixelBTower extends SubMode<Tower> {
 
     @SubscribeEvent
     public void onPreMotion(PreMotionEvent event) {
-        if (!tower.canTower()) return;
+        if (onlyWhileMoving.isToggled() && !MoveUtil.isMoving()) return;
 
-        if (!Utils.jumpDown()) {
+        if (!tower.canTower()) {
             this.Io = mc.thePlayer.rotationYaw;
             this.er = 100;
         } else {
@@ -171,6 +177,6 @@ public class HypixelBTower extends SubMode<Tower> {
 
     public void et() {
         this.Iq = (int)Math.floor(mc.thePlayer.posY);
-        deltaPlace = new BlockPos(0, 0, 1);
+        deltaPlace = new BlockPos(0, 1, 1);
     }
 }

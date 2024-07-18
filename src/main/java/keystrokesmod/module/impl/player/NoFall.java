@@ -67,7 +67,6 @@ public class NoFall extends Module {
     public void onPacketSend(@NotNull SendPacketEvent event) {
         if (mode.getInput() == 5) {
             if (event.getPacket() instanceof C03PacketPlayer && mc.thePlayer.fallDistance > minFallDistance.getInput()) {
-                Utils.sendMessage(String.format("currentMod: %s  hasMod: %s", currentModCount, hasModCount));
                 if (currentModCount > maxModCount.get(hasModCount % maxModCount.size())) {
                     return;
                 }
@@ -121,7 +120,7 @@ public class NoFall extends Module {
                 } catch (Exception exception) {
                     Utils.sendMessage("&cFailed to get fall distance.");
                 }
-                if (extra$fallDistance > minFallDistance.getInput()) {
+                if (extra$fallDistance - mc.thePlayer.motionY > minFallDistance.getInput()) {
                     Utils.getTimer().timerSpeed = (float) 0.5;
                     mc.getNetHandler().addToSendQueue(new C03PacketPlayer(true));
                     try {

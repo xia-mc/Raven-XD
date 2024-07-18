@@ -17,6 +17,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.network.play.client.C0BPacketEntityAction;
 import net.minecraft.network.play.server.S08PacketPlayerPosLook;
+import net.minecraft.network.play.server.S12PacketEntityVelocity;
 import net.minecraft.potion.Potion;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
@@ -34,7 +35,7 @@ public class Speed extends Module {
     private final ButtonSetting sneakDisable;
     private final ButtonSetting stopMotion;
     private final ButtonSetting stopSprint;
-    private final String[] modes = new String[]{"Hypixel A", "BlocksMC", "Vulcan", "GrimAC", "Hypixel B", "Hypixel C"};
+    private final String[] modes = new String[]{"Hypixel A", "BlocksMC", "Vulcan", "GrimAC", "Hypixel B", "Hypixel C", "Polar"};
     private int offGroundTicks = 0;
     public static int ticksSinceVelocity = Integer.MAX_VALUE;
 
@@ -46,13 +47,17 @@ public class Speed extends Module {
     private boolean reset;
     private double speed;
 
+    public TimerUtil timeUtil = new TimerUtil();
+    public int ticks = 0;
+    private boolean start = false;
+
     public Speed() {
         super("Speed", Module.category.movement);
         this.registerSetting(mode = new ModeSetting("Mode", modes, 0));
         this.registerSetting(vulcan$lowHop = new SliderSetting("Low hop", 2, 0, 4, 1, "ticks", new ModeOnly(mode, 2)));
         ModeOnly grimAC = new ModeOnly(mode, 3);
         this.registerSetting(grimAC$boost = new SliderSetting("Boost", 4, 0, 10, 1, grimAC));
-        this.registerSetting(autoJump = new ButtonSetting("Auto jump", false, grimAC));
+        this.registerSetting(autoJump = new ButtonSetting("Auto jump", false, new ModeOnly(mode, 3, 6)));
         this.registerSetting(liquidDisable = new ButtonSetting("Disable in liquid", true));
         this.registerSetting(sneakDisable = new ButtonSetting("Disable while sneaking", true));
         this.registerSetting(stopMotion = new ButtonSetting("Stop motion", false));
@@ -84,6 +89,8 @@ public class Speed extends Module {
     @Override
     public void onEnable() {
         ticksSinceVelocity = Integer.MAX_VALUE;
+        ticks = 0;
+        start = false;
     }
 
     @SubscribeEvent
@@ -201,6 +208,30 @@ public class Speed extends Module {
                 double boost = grimAC$boost.getInput() / 100 * collisions;
                 mc.thePlayer.addVelocity(-Math.sin(yaw) * boost, 0.0, Math.cos(yaw) * boost);
                 break;
+            case 6:
+                if (mc.thePlayer.onGround && autoJump.isToggled() && MoveUtil.isMoving()) {
+                    mc.thePlayer.jump();
+                }
+
+                if (start) {
+
+                    if (this.timeUtil.hasTimeElapsed(20)) {
+                        start = false;
+                    }
+
+                    if (mc.thePlayer.motionY <= -0.10) {
+                        ticks++;
+                        if (ticks % 2 == 0) {
+                            mc.thePlayer.motionY = -0.1;
+                        } else {
+                            mc.thePlayer.motionY = -0.16;
+                        }
+                        mc.thePlayer.jumpMovementFactor = 0.0265f;
+                    } else {
+                        ticks = 0;
+                    }
+                }
+                break;
         }
     }
 
@@ -295,8 +326,25 @@ public class Speed extends Module {
 
     @SubscribeEvent
     public void onReceivePacket(@NotNull ReceivePacketEvent event) {
-        if (event.getPacket() instanceof S08PacketPlayerPosLook) {
-            speed = 0;
+        if (noAction()) return;
+
+        switch ((int) mode.getInput()) {
+            case 1:
+                if (event.getPacket() instanceof S08PacketPlayerPosLook) {
+                    speed = 0;
+                }
+                break;
+            case 6:
+                if (event.getPacket() instanceof S12PacketEntityVelocity) {
+
+                    S12PacketEntityVelocity s = (S12PacketEntityVelocity) event.getPacket();
+
+                    if (s.getEntityID() == mc.thePlayer.getEntityId()) {
+                        start = true;
+                        timeUtil.reset();
+                    }
+
+                }
         }
     }
 

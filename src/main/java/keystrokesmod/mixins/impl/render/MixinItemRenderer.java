@@ -83,6 +83,9 @@ public abstract class MixinItemRenderer {
 
             ItemStack itemToRender = SlotHandler.getRenderHeldItem();
             if (itemToRender != null) {
+                if (itemToRender != SlotHandler.getHeldItem())
+                    animationProgression = 0.0F;
+
                 EnumAction enumaction = itemToRender.getItemUseAction();
                 final int itemInUseCount = thePlayer.getItemInUseCount();
                 boolean useItem = itemInUseCount > 0;
