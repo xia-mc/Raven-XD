@@ -592,10 +592,10 @@ public class KillAura extends Module {
             }
             switchTargets = true;
             // TODO double swing?
-            Utils.attackEntityNoSwing(target);
+            Utils.attackEntity(target, !swing);
             mc.thePlayer.sendQueue.addToSendQueue(new C02PacketUseEntity(target, C02PacketUseEntity.Action.INTERACT));
         } else if (ModuleManager.antiFireball != null && ModuleManager.antiFireball.isEnabled() && ModuleManager.antiFireball.fireball != null && ModuleManager.antiFireball.attack) {
-            Utils.attackEntityNoSwing(ModuleManager.antiFireball.fireball);
+            Utils.attackEntity(ModuleManager.antiFireball.fireball, !ModuleManager.antiFireball.silentSwing.isToggled());
             mc.thePlayer.sendQueue.addToSendQueue(new C02PacketUseEntity(ModuleManager.antiFireball.fireball, C02PacketUseEntity.Action.INTERACT));
         }
     }
