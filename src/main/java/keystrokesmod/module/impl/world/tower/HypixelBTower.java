@@ -29,6 +29,7 @@ import static keystrokesmod.module.ModuleManager.tower;
  * <p>
  * Counter-confused by xia__mc
  * @see hackclient.rise.rh (rise 6.1.30)
+ * @author Alan34
  */
 public class HypixelBTower extends SubMode<Tower> {
     private int vr;
