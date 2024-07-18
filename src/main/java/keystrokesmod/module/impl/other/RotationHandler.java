@@ -55,10 +55,18 @@ public final class RotationHandler extends Module {
     }
 
     public static void setRotationYaw(float rotationYaw) {
+        if (AimSimulator.yawEquals(rotationYaw, mc.thePlayer.rotationYaw)) {
+            RotationHandler.rotationYaw = null;
+            return;
+        }
         RotationHandler.rotationYaw = rotationYaw;
     }
 
     public static void setRotationPitch(float rotationPitch) {
+        if (rotationPitch == mc.thePlayer.rotationPitch) {
+            RotationHandler.rotationPitch = null;
+            return;
+        }
         RotationHandler.rotationPitch = rotationPitch;
     }
 
@@ -95,8 +103,8 @@ public final class RotationHandler extends Module {
             float viewPitch = RotationUtils.normalize(mc.thePlayer.rotationPitch);
             switch ((int) smoothBack.getInput()) {
                 case 0:
-                    setRotationYaw(viewYaw);
-                    setRotationPitch(viewPitch);
+                    rotationYaw = null;
+                    rotationPitch = null;
                     break;
                 case 1:
                     setRotationYaw(AimSimulator.rotMove(viewYaw, getRotationYaw(), (float) aimSpeed.getInput()));
@@ -108,7 +116,7 @@ public final class RotationHandler extends Module {
         if (AimSimulator.yawEquals(getRotationYaw(), mc.thePlayer.rotationYaw)) rotationYaw = null;
         if (getRotationPitch() == mc.thePlayer.rotationPitch) rotationPitch = null;
 
-        RotationEvent rotationEvent = new RotationEvent(getRotationYaw(), getRotationPitch(), getMoveFix());
+        RotationEvent rotationEvent = new RotationEvent(getRotationYaw(), getRotationPitch(), MoveFix.values()[(int) defaultMoveFix.getInput()]);
         MinecraftForge.EVENT_BUS.post(rotationEvent);
         isSet = rotationEvent.isSet() || rotationYaw != null || rotationPitch != null;
         if (isSet) {
@@ -155,7 +163,10 @@ public final class RotationHandler extends Module {
                 case STRICT:
                     movementYaw = getRotationYaw();
                     break;
-                    }
+            }
+        } else {
+            movementYaw = null;
+            moveFix = null;
         }
     }
 
