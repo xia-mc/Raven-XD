@@ -21,6 +21,7 @@ import static keystrokesmod.module.ModuleManager.*;
 public class InvMove extends Module {
     public static final String[] MODES = {"Normal", "Blink", "LegitInv"};
     private final ModeSetting mode;
+    private final ButtonSetting noOpenPacket;
     private final ButtonSetting allowSprint;
     private final ButtonSetting allowSneak;
     private final ButtonSetting chestNameCheck;
@@ -34,6 +35,7 @@ public class InvMove extends Module {
         super("InvMove", category.movement);
         this.registerSetting(new DescriptionSetting("Allow you move in inventory."));
         this.registerSetting(mode = new ModeSetting("Mode", MODES, 0));
+        this.registerSetting(noOpenPacket = new ButtonSetting("No open packet", false));
         this.registerSetting(allowSprint = new ButtonSetting("Allow sprint", false));
         this.registerSetting(allowSneak = new ButtonSetting("Allow sneak", false));
         this.registerSetting(chestNameCheck = new ButtonSetting("Chest name check", true));
@@ -79,6 +81,12 @@ public class InvMove extends Module {
 
     @SubscribeEvent
     public void onSendPacket(SendPacketEvent event) {
+        if (noOpenPacket.isToggled() && event.getPacket() instanceof C0BPacketEntityAction) {
+            if (((C0BPacketEntityAction) event.getPacket()).getAction() == C0BPacketEntityAction.Action.OPEN_INVENTORY) {
+                event.setCanceled(true);
+            }
+        }
+
         if ((int) mode.getInput() != 2) return;
 
         if (event.getPacket() instanceof C0BPacketEntityAction) {
@@ -89,7 +97,7 @@ public class InvMove extends Module {
                 event.setCanceled(true);
             }
         } else if (event.getPacket() instanceof C0EPacketClickWindow) {
-            if (!clicked) {
+            if (!clicked && !noOpenPacket.isToggled()) {
                 PacketUtils.sendPacketNoEvent(new C0BPacketEntityAction(mc.thePlayer, C0BPacketEntityAction.Action.OPEN_INVENTORY));
             }
             clicked = true;

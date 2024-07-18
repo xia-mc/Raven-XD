@@ -17,6 +17,11 @@ public abstract class SubMode<T extends Module> extends Module {
     }
 
     @Override
+    public String getInfo() {
+        return getPrettyName();
+    }
+
+    @Override
     public String getPrettyName() {
         return getRawPrettyName();
     }

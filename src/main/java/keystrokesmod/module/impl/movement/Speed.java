@@ -5,9 +5,8 @@ import keystrokesmod.event.PrePlayerInputEvent;
 import keystrokesmod.event.PreUpdateEvent;
 import keystrokesmod.event.ReceivePacketEvent;
 import keystrokesmod.module.Module;
-import keystrokesmod.module.setting.impl.ButtonSetting;
-import keystrokesmod.module.setting.impl.ModeSetting;
-import keystrokesmod.module.setting.impl.SliderSetting;
+import keystrokesmod.module.impl.movement.speed.HypixelDSpeed;
+import keystrokesmod.module.setting.impl.*;
 import keystrokesmod.module.setting.utils.ModeOnly;
 import keystrokesmod.utility.*;
 import net.minecraft.block.Block;
@@ -27,7 +26,7 @@ import org.jetbrains.annotations.NotNull;
 import static keystrokesmod.module.ModuleManager.scaffold;
 
 public class Speed extends Module {
-    private final ModeSetting mode;
+    private final ModeValue mode;
     private final SliderSetting vulcan$lowHop;
     private final SliderSetting grimAC$boost;
     private final ButtonSetting autoJump;
@@ -35,7 +34,6 @@ public class Speed extends Module {
     private final ButtonSetting sneakDisable;
     private final ButtonSetting stopMotion;
     private final ButtonSetting stopSprint;
-    private final String[] modes = new String[]{"Hypixel A", "BlocksMC", "Vulcan", "GrimAC", "Hypixel B", "Hypixel C", "Polar"};
     private int offGroundTicks = 0;
     public static int ticksSinceVelocity = Integer.MAX_VALUE;
 
@@ -53,7 +51,16 @@ public class Speed extends Module {
 
     public Speed() {
         super("Speed", Module.category.movement);
-        this.registerSetting(mode = new ModeSetting("Mode", modes, 0));
+        this.registerSetting(mode = new ModeValue("Mode", this)
+                .add(new LiteralSubMode("Hypixel A", this))
+                .add(new LiteralSubMode("BlocksMC", this))
+                .add(new LiteralSubMode("Vulcan", this))
+                .add(new LiteralSubMode("GrimAC", this))
+                .add(new LiteralSubMode("Hypixel B", this))
+                .add(new LiteralSubMode("Hypixel C", this))
+                .add(new LiteralSubMode("Polar", this))
+                .add(new HypixelDSpeed("Hypixel D", this))
+        );
         this.registerSetting(vulcan$lowHop = new SliderSetting("Low hop", 2, 0, 4, 1, "ticks", new ModeOnly(mode, 2)));
         ModeOnly grimAC = new ModeOnly(mode, 3);
         this.registerSetting(grimAC$boost = new SliderSetting("Boost", 4, 0, 10, 1, grimAC));
@@ -66,7 +73,7 @@ public class Speed extends Module {
 
     @Override
     public String getInfo() {
-        return modes[(int) mode.getInput()];
+        return mode.getSubModeValues().get((int) mode.getInput()).getInfo();
     }
 
     @SubscribeEvent
@@ -88,6 +95,8 @@ public class Speed extends Module {
 
     @Override
     public void onEnable() {
+        mode.enable();
+
         ticksSinceVelocity = Integer.MAX_VALUE;
         ticks = 0;
         start = false;
@@ -352,7 +361,10 @@ public class Speed extends Module {
         return mc.theWorld.getBlockState(new BlockPos(mc.thePlayer).add(offsetX, offsetY, offsetZ)).getBlock();
     }
 
+    @Override
     public void onDisable() {
+        mode.disable();
+
         if (stopMotion.isToggled()) {
             MoveUtil.stop();
         }

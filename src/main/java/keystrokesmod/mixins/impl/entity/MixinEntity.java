@@ -3,6 +3,7 @@ package keystrokesmod.mixins.impl.entity;
 import keystrokesmod.event.PrePlayerInputEvent;
 import keystrokesmod.event.StepEvent;
 import keystrokesmod.module.ModuleManager;
+import keystrokesmod.utility.rise.RiseSecret;
 import keystrokesmod.module.impl.other.RotationHandler;
 import keystrokesmod.module.impl.world.SafeWalk;
 import net.minecraft.block.Block;
@@ -235,6 +236,7 @@ public abstract class MixinEntity {
             this.setEntityBoundingBox(this.getEntityBoundingBox().offset(0.0D, 0.0D, z));
 
             if ((Entity)(Object) this instanceof EntityPlayerSP) {
+                RiseSecret.entityPlayerSP$bIm = 0;
                 StepEvent event = new StepEvent(this.getEntityBoundingBox().minY - this.posY);
                 MinecraftForge.EVENT_BUS.post(event);
             }
@@ -321,6 +323,8 @@ public abstract class MixinEntity {
                 }
             }
 
+            if ((Object) this instanceof EntityPlayerSP)
+                ++RiseSecret.entityPlayerSP$bIm;
             this.worldObj.theProfiler.endSection();
             this.worldObj.theProfiler.startSection("rest");
             this.resetPositionToBB();
