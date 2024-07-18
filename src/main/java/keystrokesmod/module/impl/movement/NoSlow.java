@@ -4,7 +4,6 @@ import keystrokesmod.Raven;
 import keystrokesmod.event.*;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
-import keystrokesmod.module.impl.other.RotationHandler;
 import keystrokesmod.module.impl.other.SlotHandler;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.ModeSetting;
@@ -37,7 +36,7 @@ public class NoSlow extends Module {
     public static ButtonSetting disablePotions;
     public static ButtonSetting swordOnly;
     public static ButtonSetting vanillaSword;
-    private final String[] modes = new String[]{"Vanilla", "Pre", "Post", "Alpha", "Old Intave", "Intave", "Polar", "GrimAC", "HypixelTest A", "HypixelTest B", "Blink", "Beta", "Sneak"};
+    private final String[] modes = new String[]{"Vanilla", "Pre", "Post", "Alpha", "Old Intave", "Intave", "Polar", "GrimAC", "Blink", "Beta", "Sneak"};
     private boolean postPlace;
     private static ModeOnly canChangeSpeed;
 
@@ -68,7 +67,7 @@ public class NoSlow extends Module {
 
     @SubscribeEvent
     public void onMoveInput(@NotNull MoveInputEvent event) {
-        if (mc.thePlayer.isUsingItem() && mode.getInput() == 12) {
+        if (mc.thePlayer.isUsingItem() && mode.getInput() == 10) {
             event.setSneak(true);
             event.setSneakSlowDownMultiplier(1 - sneakSlowed.getInput() / 100);
         }
@@ -105,16 +104,13 @@ public class NoSlow extends Module {
 
     @SubscribeEvent
     public void onPostMotion(PostMotionEvent e) {
-        switch ((int) mode.getInput()) {
-            case 8:
-            case 3:
-                if (postPlace) {
-                    if (mc.thePlayer.ticksExisted % 3 == 0 && !Raven.badPacketsHandler.C07) {
-                        mc.thePlayer.sendQueue.addToSendQueue(new C08PacketPlayerBlockPlacement(SlotHandler.getHeldItem()));
-                    }
-                    postPlace = false;
+        if ((int) mode.getInput() == 3) {
+            if (postPlace) {
+                if (mc.thePlayer.ticksExisted % 3 == 0 && !Raven.badPacketsHandler.C07) {
+                    mc.thePlayer.sendQueue.addToSendQueue(new C08PacketPlayerBlockPlacement(SlotHandler.getHeldItem()));
                 }
-                break;
+                postPlace = false;
+            }
         }
 
     }
@@ -122,7 +118,7 @@ public class NoSlow extends Module {
     @SubscribeEvent
     public void onPreMotion(PreMotionEvent event) {
         if (!mc.thePlayer.isUsingItem()) {
-            if (lastUsingItem && mode.getInput() == 10)
+            if (lastUsingItem && mode.getInput() == 8)
                 ModuleManager.blink.disable();
 
             lastUsingItem = false;
@@ -166,25 +162,6 @@ public class NoSlow extends Module {
                 PacketUtils.sendPacket(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
                 break;
             case 8:
-                if (mc.thePlayer.ticksExisted % 3 == 0 && !Raven.badPacketsHandler.C07) {
-                    event.setPitch(90);
-                    RotationHandler.setRotationPitch(90);
-                }
-                break;
-            case 9:
-                if (ContainerUtils.isRest(item)) {
-                    if (mc.thePlayer.onGround) {
-                        if (!lastUsingItem) {
-                            mc.thePlayer.jump();
-                        } else {
-                            mc.thePlayer.motionY += 1E-14;
-                        }
-                    } else {
-                        mc.thePlayer.motionY -= 0.0000001;
-                    }
-                }
-                break;
-            case 10:
                 if (ContainerUtils.isRest(item)) {
                     if (!lastUsingItem) {
                         ModuleManager.blink.enable();
@@ -198,7 +175,7 @@ public class NoSlow extends Module {
 
     @SubscribeEvent
     public void onPreMotion$Beta(PreMotionEvent event) {
-        if (mode.getInput() == 11) {
+        if (mode.getInput() == 9) {
             if (mc.thePlayer.onGround) {
                 offGroundTicks = 0;
             } else {
@@ -223,7 +200,7 @@ public class NoSlow extends Module {
 
     @SubscribeEvent
     public void onPacketSent(@NotNull SendPacketEvent event) {
-        if (mode.getInput() == 11) {
+        if (mode.getInput() == 9) {
             if (event.getPacket() instanceof C08PacketPlayerBlockPlacement && !mc.thePlayer.isUsingItem()) {
                 C08PacketPlayerBlockPlacement blockPlacement = (C08PacketPlayerBlockPlacement) event.getPacket();
                 if (SlotHandler.getHeldItem() != null && blockPlacement.getPlacedBlockDirection() == 255

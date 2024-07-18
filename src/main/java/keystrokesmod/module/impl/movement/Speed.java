@@ -83,7 +83,7 @@ public class Speed extends Module {
         }
 
         if (noAction()) return;
-        if ((int) mode.getInput() == 6) {
+        if ((int) mode.getInput() == 1) {
             if (!MoveUtil.isMoving()) {
                 event.setPosX(event.getPosX() + (Math.random() - 0.5) / 100);
                 event.setPosZ(event.getPosZ() + (Math.random() - 0.5) / 100);
