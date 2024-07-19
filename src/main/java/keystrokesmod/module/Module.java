@@ -1,6 +1,7 @@
 package keystrokesmod.module;
 
 import keystrokesmod.Raven;
+import keystrokesmod.module.impl.client.Notifications;
 import keystrokesmod.module.impl.client.Settings;
 import keystrokesmod.module.setting.Setting;
 import keystrokesmod.module.setting.impl.ButtonSetting;
@@ -212,9 +213,13 @@ public class Module {
         if (this.isEnabled()) {
             this.disable();
             if (Settings.toggleSound.getInput() != 0) mc.thePlayer.playSound(Settings.getToggleSound(false), 1, 1);
+            if (Notifications.moduleToggled.isToggled())
+                Notifications.sendNotification(Notifications.NotificationTypes.INFO, "Disabled " + this.getPrettyName());
         } else {
             this.enable();
             if (Settings.toggleSound.getInput() != 0) mc.thePlayer.playSound(Settings.getToggleSound(true), 1, 1);
+            if (Notifications.moduleToggled.isToggled())
+                Notifications.sendNotification(Notifications.NotificationTypes.INFO, "Enabled " + this.getPrettyName());
         }
 
     }
