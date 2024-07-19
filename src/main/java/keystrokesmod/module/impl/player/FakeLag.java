@@ -1,8 +1,7 @@
 package keystrokesmod.module.impl.player;
 
 import keystrokesmod.module.Module;
-import keystrokesmod.module.impl.player.fakelag.DynamicFakeLag;
-import keystrokesmod.module.impl.player.fakelag.LatencyFakeLag;
+import keystrokesmod.module.impl.player.fakelag.*;
 import keystrokesmod.module.setting.impl.ModeValue;
 
 public class FakeLag extends Module {

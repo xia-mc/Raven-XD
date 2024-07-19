@@ -526,7 +526,7 @@ public class Utils {
      */
     public static void aim(Entity en, float ps, boolean pc) {
         if (en != null) {
-            float[] t = gr(en);
+            float[] t = getRotation(en);
             if (t != null) {
                 float y = t[0];
                 float p = t[1] + 4.0F + ps;
@@ -541,7 +541,7 @@ public class Utils {
         }
     }
 
-    public static float[] gr(Entity q) {
+    public static float[] getRotation(Entity q) {
         if (q == null) {
             return null;
         } else {
@@ -658,7 +658,7 @@ public class Utils {
         return str.replace("§k", "").replace("§l", "").replace("§m", "").replace("§n", "").replace("§o", "").replace("§r", "");
     }
 
-    public static boolean ilc() {
+    public static boolean isLeftClicking() {
         if (ModuleManager.autoClicker.isEnabled()) {
             return AutoClicker.leftClick.isToggled() && Mouse.isButtonDown(0);
         } else return CPSCalculator.f() > 1 && System.currentTimeMillis() - CPSCalculator.LL < 300L;
@@ -754,7 +754,29 @@ public class Utils {
             return (double) Math.round(n * p) / p;
         }
     }
+    public static double PitchFromEntity(Entity en, float f) {
+        return (double) (mc.thePlayer.rotationPitch - pitchToEntity(en, f));
+    }
+    public static double fovFromEntity(Entity en) {
+        return ((((double) (mc.thePlayer.rotationYaw - fovToEntity(en)) % 360.0D) + 540.0D) % 360.0D) - 180.0D;
+    }
 
+    public static float fovFromEntityf(Entity en) {
+        return (float) (((((float) (mc.thePlayer.rotationYaw - fovToEntity(en)) % 360.0D) + 540.0D) % 360.0D) - 180.0D);
+    }
+
+    public static float fovToEntity(Entity ent) {
+        double x = ent.posX - mc.thePlayer.posX;
+        double z = ent.posZ - mc.thePlayer.posZ;
+        double yaw = Math.atan2(x, z) * 57.2957795D;
+        return (float) (yaw * -1.0D);
+    }
+    public static float pitchToEntity(Entity ent, float f) {
+        double x = mc.thePlayer.getDistanceToEntity(ent);
+        double y = mc.thePlayer.posY - (ent.posY + f);
+        double pitch = (((Math.atan2(x, y) * 180.0D) / 3.141592653589793D));
+        return (float) (90 - pitch);
+    }
     public static String stripColor(final String s) {
         if (s.isEmpty()) {
             return s;
