@@ -41,7 +41,7 @@ public abstract class MixinMinecraft {
         if (ModuleManager.animations != null && ModuleManager.animations.isEnabled() && Animations.swingWhileDigging.isToggled()
                 && this.gameSettings.keyBindAttack.isKeyDown()) {
             if (this.objectMouseOver != null && this.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
-                clickMouse();
+                this.thePlayer.swingItem();
             }
         }
     }

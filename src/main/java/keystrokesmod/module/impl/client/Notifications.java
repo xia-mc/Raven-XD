@@ -33,6 +33,10 @@ public class Notifications extends Module {
         this.registerSetting(chatNoti = new ButtonSetting("Show in chat", false));
     }
 
+    public static void sendNotification(NotificationTypes notificationType, String message) {
+        sendNotification(notificationType, message, 2000);
+    }
+
     public static void sendNotification(NotificationTypes notificationType, String message, long duration) {
         if (!chatNoti.isToggled()) {
             ScaledResolution sr = new ScaledResolution(mc);
