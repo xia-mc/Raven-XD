@@ -5,10 +5,9 @@ import keystrokesmod.event.PreMotionEvent;
 import keystrokesmod.event.ReceivePacketEvent;
 import keystrokesmod.mixins.impl.client.PlayerControllerMPAccessor;
 import keystrokesmod.module.Module;
-import keystrokesmod.module.setting.impl.ButtonSetting;
-import keystrokesmod.module.setting.impl.DescriptionSetting;
-import keystrokesmod.module.setting.impl.ModeSetting;
-import keystrokesmod.module.setting.impl.SliderSetting;
+import keystrokesmod.module.impl.movement.phase.VulcanPhase;
+import keystrokesmod.module.setting.impl.*;
+import keystrokesmod.module.setting.utils.ModeOnly;
 import net.minecraft.network.play.server.S02PacketChat;
 import net.minecraft.network.play.server.S08PacketPlayerPosLook;
 import net.minecraft.util.BlockPos;
@@ -19,7 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import static keystrokesmod.module.ModuleManager.blink;
 
 public class Phase extends Module {
-    private final ModeSetting mode;
+    private final ModeValue mode;
     private final ButtonSetting autoBlink;
     private final ButtonSetting cancelS08;
     private final ButtonSetting waitingBreakBlock;
@@ -37,16 +36,23 @@ public class Phase extends Module {
     public Phase() {
         super("Phase", category.movement);
         this.registerSetting(new DescriptionSetting("Lets you go through solid blocks."));
-        this.registerSetting(mode = new ModeSetting("Mode", new String[]{"Normal", "Watchdog Auto Phase"}, 0));
-        this.registerSetting(autoBlink = new ButtonSetting("Blink", true));
-        this.registerSetting(cancelS08 = new ButtonSetting("Cancel S06", false));
-        this.registerSetting(waitingBreakBlock = new ButtonSetting("waiting break block", false));
-        this.registerSetting(autoDisable = new SliderSetting("Auto disable", 6, 1, 20, 1, "ticks"));
-        this.registerSetting(exceptGround = new ButtonSetting("Except ground", false));
+        this.registerSetting(mode = new ModeValue("Mode", this)
+                .add(new LiteralSubMode("Normal", this))
+                .add(new LiteralSubMode("Watchdog Auto Phase", this))
+                .add(new VulcanPhase("Vulcan", this))
+        );
+        ModeOnly normalMode = new ModeOnly(mode, 2).reserve();
+        this.registerSetting(autoBlink = new ButtonSetting("Blink", true, normalMode));
+        this.registerSetting(cancelS08 = new ButtonSetting("Cancel S08", false, normalMode));
+        this.registerSetting(waitingBreakBlock = new ButtonSetting("waiting break block", false, normalMode));
+        this.registerSetting(autoDisable = new SliderSetting("Auto disable", 6, 1, 20, 1, "ticks", normalMode));
+        this.registerSetting(exceptGround = new ButtonSetting("Except ground", false, normalMode));
     }
 
     @Override
     public void onEnable() {
+        mode.enable();
+
         phaseTime = 0;
         phase = false;
         currentHittingBlock = lastHittingBlock = false;
@@ -54,6 +60,8 @@ public class Phase extends Module {
 
     @Override
     public void onDisable() {
+        mode.disable();
+
         if (autoBlink.isToggled())
             blink.disable();
 

@@ -1,5 +1,6 @@
 package keystrokesmod.module.impl.player;
 
+import keystrokesmod.event.BlockAABBEvent;
 import keystrokesmod.event.PreMotionEvent;
 import keystrokesmod.event.PreUpdateEvent;
 import keystrokesmod.event.SendPacketEvent;
@@ -9,9 +10,11 @@ import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.DescriptionSetting;
 import keystrokesmod.module.setting.impl.ModeSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
+import keystrokesmod.utility.BlockUtils;
 import keystrokesmod.utility.ContainerUtils;
 import keystrokesmod.utility.PacketUtils;
 import keystrokesmod.utility.Utils;
+import net.minecraft.block.BlockAir;
 import net.minecraft.item.ItemSword;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.client.C03PacketPlayer;
@@ -23,7 +26,7 @@ import org.jetbrains.annotations.NotNull;
 import static keystrokesmod.module.ModuleManager.*;
 
 public class AntiVoid extends Module {
-    private static final String[] MODES = new String[]{"Hypixel", "AirStuck", "Remiaft"};
+    private static final String[] MODES = new String[]{"Hypixel", "AirStuck", "Remiaft", "Vulcan"};
     private final ModeSetting mode;
     private final SliderSetting distance;
     private final ButtonSetting toggleScaffold;
@@ -40,6 +43,8 @@ public class AntiVoid extends Module {
     private int lastSlot = -1;
     private int delayed = -1;
 
+    private boolean fallDistanced = false;
+
     public AntiVoid() {
         super("AntiVoid", category.player);
         this.registerSetting(new DescriptionSetting("Prevent you from falling into the void."));
@@ -53,6 +58,22 @@ public class AntiVoid extends Module {
         if (mode.getInput() == 0)
             blink.disable();
         airStuck = false;
+    }
+
+    @SubscribeEvent
+    public void onAABB(BlockAABBEvent event) {
+        if (mc.thePlayer.fallDistance > distance.getInput())
+            fallDistanced = true;
+        if (mode.getInput() == 3) {
+            if (fallDistanced && event.getBlockPos().getY() < mc.thePlayer.posY) {
+                if (BlockUtils.getBlock(event.getBlockPos()) instanceof BlockAir) {
+                    final double x = event.getBlockPos().getX(), y = event.getBlockPos().getY(), z = event.getBlockPos().getZ();
+                    event.setBoundingBox(AxisAlignedBB.fromBounds(-15, -1, -15, 15, 1, 15).offset(x, y, z));
+                } else {
+                    fallDistanced = false;
+                }
+            }
+        }
     }
 
     @SubscribeEvent

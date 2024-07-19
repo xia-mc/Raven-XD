@@ -27,10 +27,10 @@ import org.jetbrains.annotations.NotNull;
 
 
 /**
- * Skidded from Rise
+ * Skidded from Rise (com.alan.clients.module.impl.movement.speed.WatchdogSpeed)
  * <p>
  * Counter-confused by xia__mc
- * @see hackclient.rise.nb (rise 6.1.30)
+ * @see hackclient.rise.nb
  * @author Alan34
  */
 public class HypixelDSpeed extends SubMode<Speed> {
@@ -88,6 +88,10 @@ public class HypixelDSpeed extends SubMode<Speed> {
     public void onStrafe(PrePlayerInputEvent event) {
         switch (mode.getOptions()[(int) mode.getInput()]) {
             case "Ground Strafe":
+                if (!MoveUtil.isMoving()) {
+                    Sprint.omni = false;
+                    break;
+                }
                 Sprint.omni = true;
                 if (mc.thePlayer.onGround) {
                     MoveUtil.strafe(MoveUtil.getAllowedHorizontalDistance() - 0.01);

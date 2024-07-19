@@ -144,7 +144,7 @@ public class AimAssist extends Module {
     }
 
     private @NotNull Pair<Pair<Float, Float>, Pair<Float, Float>> getRotation(@NotNull AxisAlignedBB boundingBox) {
-        AxisAlignedBB box = boundingBox.expand(-0.05, -0.9, -0.1).offset(0, 0.48, 0);
+        AxisAlignedBB box = boundingBox.expand(-0.05, -0.9, -0.1).offset(0, 0.405, 0);
 
         float yaw1 = PlayerRotation.getYaw(new Vec3(box.minX, 0, box.minZ));
         float yaw2 = PlayerRotation.getYaw(new Vec3(box.maxX, 0, box.maxZ));

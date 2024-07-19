@@ -25,10 +25,10 @@ import java.util.concurrent.TimeUnit;
 import static keystrokesmod.module.ModuleManager.tower;
 
 /**
- * Skidded from Rise
+ * Skidded from Rise (com.alan.clients.module.impl.player.scaffold.tower.WatchdogTower)
  * <p>
  * Counter-confused by xia__mc
- * @see hackclient.rise.rh (rise 6.1.30)
+ * @see hackclient.rise.rh
  * @author Alan34
  */
 public class HypixelBTower extends SubMode<Tower> {
@@ -70,7 +70,7 @@ public class HypixelBTower extends SubMode<Tower> {
 
 
             Raven.getExecutor().schedule(() -> ModuleManager.scaffold.place(
-                    new MovingObjectPosition(placeSide.getRight().toVec3(), placeSide.getMiddle(), placeSide.getLeft()),
+                    new MovingObjectPosition(placeSide.getRight().toVec3(), EnumFacing.NORTH, placeSide.getLeft()),
                     false
             ), 50, TimeUnit.MILLISECONDS);
 //            ModuleManager.scaffold.tower$noBlockPlace = true;
