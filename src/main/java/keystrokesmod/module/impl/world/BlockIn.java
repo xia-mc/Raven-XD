@@ -35,8 +35,6 @@ public class BlockIn extends Module {
     private final ButtonSetting autoSwitch;
 
     private Vec2 currentRot = null;
-    private Vec2 targetRot = null;
-    private boolean rotating = false;
     private long lastPlace = 0;
 
     private int lastSlot = -1;
@@ -45,7 +43,7 @@ public class BlockIn extends Module {
         super("Block-In", category.world);
         this.registerSetting(new DescriptionSetting("make you block in."));
         this.registerSetting(rotationMode = new ModeSetting("Rotation mode", rotationModes, 2));
-        this.registerSetting(aimSpeed = new SliderSetting("Aim speed", 10, 0, 20, 0.05, new ModeOnly(rotationMode, 1, 2)));
+        this.registerSetting(aimSpeed = new SliderSetting("Aim speed", 5, 0, 10, 0.05, new ModeOnly(rotationMode, 1, 2)));
         this.registerSetting(lookView = new ButtonSetting("Look view", false, new ModeOnly(rotationMode, 1, 2)));
         this.registerSetting(placeDelay = new SliderSetting("Place delay", 50, 0, 500, 1, "ms"));
         this.registerSetting(silentSwing = new ButtonSetting("Silent swing", false));
@@ -69,27 +67,6 @@ public class BlockIn extends Module {
             currentRot = null;
             return;
         }
-
-        if (currentRot == null) {
-            currentRot = new Vec2(RotationHandler.getRotationYaw(), RotationHandler.getRotationPitch());
-        }
-        if (rotationMode.getInput() != 0 && !currentRot.equals(targetRot)) {
-            if (aimSpeed.getInput() == 20) {
-                currentRot = targetRot;
-            } else {
-                currentRot = new Vec2(
-                        AimSimulator.rotMove(targetRot.x, currentRot.x, (float) aimSpeed.getInput()),
-                        AimSimulator.rotMove(targetRot.y, currentRot.y, (float) aimSpeed.getInput())
-                );
-                rotating = true;
-            }
-
-            if (lookView.isToggled()) {
-                mc.thePlayer.rotationYaw = currentRot.x;
-                mc.thePlayer.rotationPitch = currentRot.y;
-            }
-        }
-
         if (!lookView.isToggled()) {
             event.setYaw(currentRot.x);
             event.setPitch(currentRot.y);
@@ -98,9 +75,9 @@ public class BlockIn extends Module {
 
     @SubscribeEvent
     public void onPreUpdate(PreUpdateEvent event) {
-        if (autoSwitch.isToggled()) {
+        if (autoSwitch.isToggled() && lastSlot == -1) {
             int slot = Scaffold.getSlot();
-            if (lastSlot != -1) lastSlot = SlotHandler.getCurrentSlot();
+            lastSlot = SlotHandler.getCurrentSlot();
             SlotHandler.setCurrentSlot(slot);
         }
 
@@ -139,9 +116,23 @@ public class BlockIn extends Module {
                 if (hitResult != null && hitPos.distanceTo(hitResult.hitVec) > 0.05) continue;
             }
 
-            targetRot = rotation;
+            if (currentRot == null) {
+                currentRot = new Vec2(RotationHandler.getRotationYaw(), RotationHandler.getRotationPitch());
+            }
+            if (rotationMode.getInput() != 0 && !AimSimulator.equals(currentRot, rotation)) {
+                currentRot = new Vec2(
+                        AimSimulator.rotMove(rotation.x, currentRot.x, (float) aimSpeed.getInput() * 5),
+                        AimSimulator.rotMove(rotation.y, currentRot.y, (float) aimSpeed.getInput() * 5)
+                );
 
-            if (rotationMode.getInput() == 0 || currentRot.equals(rotation)) {
+                if (lookView.isToggled()) {
+                    mc.thePlayer.rotationYaw = currentRot.x;
+                    mc.thePlayer.rotationPitch = currentRot.y;
+                }
+                return;
+            }
+
+            if (rotationMode.getInput() == 0 || AimSimulator.equals(currentRot, rotation)) {
                 if (mc.playerController.onPlayerRightClick(
                         mc.thePlayer, mc.theWorld,
                         SlotHandler.getHeldItem(),
