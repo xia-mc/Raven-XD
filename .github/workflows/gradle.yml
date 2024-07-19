@@ -52,18 +52,18 @@ jobs:
 
     - name: Execute Gradle build
       run: ./gradlew build --stacktrace
-
+      
     - name: Send JAR to Discord Webhook
       env:
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
       run: |
-          JAR_PATH=$(find build/libs -name "*.jar" | head -n 1)
-          if [ -z "$JAR_PATH" ]; then
-            echo "No JAR file found"
-            exit 1
-          fi
-          FILENAME=$(basename $JAR_PATH)
-          curl -X POST -H "Content-Type: multipart/form-data" \
-            -F "file=@$JAR_PATH" \
-            -F "payload_json={\"content\":\"New build available: $FILENAME\ (These builds are just for testing please don't use them for playing)"}" \
-            $DISCORD_WEBHOOK_URL
+        JAR_PATH=$(find build/libs -name "*.jar" | head -n 1)
+        if [ -z "$JAR_PATH" ]; then
+          echo "No JAR file found"
+          exit 1
+        fi
+        FILENAME=$(basename $JAR_PATH)
+        curl -X POST -H "Content-Type: multipart/form-data" \
+          -F "file=@$JAR_PATH" \
+          -F "payload_json={\"content\":\"New build available: $FILENAME (These builds are just for testing please don't use them for playing)\"}" \
+          $DISCORD_WEBHOOK_URL
