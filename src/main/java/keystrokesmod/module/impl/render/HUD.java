@@ -35,7 +35,7 @@ import java.util.*;
 import java.util.List;
 
 public class HUD extends Module {
-    public static final String VERSION = "1.17.1";
+    public static final String VERSION = "1.17.2";
     public static final HashMap<String, ResourceLocation> WATERMARK = new HashMap<>();
     public static ModeSetting theme;
 //    public static SliderSetting font;
@@ -286,7 +286,7 @@ public class HUD extends Module {
 
         @SubscribeEvent
         public void onRenderTick(RenderTickEvent event) {
-            TargetHUD.drawTargetHUD(null, mc.thePlayer.getName(), mc.thePlayer.getHealth());
+            TargetHUD.drawTargetHUD(null, mc.thePlayer.getName(), 1);
         }
 
         private int @Nullable [] d(Font fr, String t) {
