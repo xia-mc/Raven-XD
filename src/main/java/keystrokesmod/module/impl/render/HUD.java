@@ -40,10 +40,23 @@ public class HUD extends Module {
 //    public static SliderSetting fontSize;
     public static ButtonSetting dropShadow;
     private final ButtonSetting background;
+    private final ButtonSetting sidebar;
     public static ButtonSetting alphabeticalSort;
     private static ButtonSetting alignRight;
     private static ButtonSetting lowercase;
     public static ButtonSetting showInfo;
+    private static final ButtonSetting combat = new ButtonSetting("Combat", true);
+    private static final ButtonSetting movement = new ButtonSetting("Movement", true);
+    private static final ButtonSetting player = new ButtonSetting("Player", true);
+    private static final ButtonSetting world = new ButtonSetting("World", true);
+    private static final ButtonSetting render = new ButtonSetting("Render", true);
+    private static final ButtonSetting minigames = new ButtonSetting("Minigames", true);
+    private static final ButtonSetting fun = new ButtonSetting("Fun", true);
+    private static final ButtonSetting other = new ButtonSetting("Other", true);
+    private static final ButtonSetting client = new ButtonSetting("Client", true);
+    private static final ButtonSetting scripts = new ButtonSetting("Scripts", true);
+    private static final ButtonSetting exploit = new ButtonSetting("Exploit", true);
+    private static final ButtonSetting experimental = new ButtonSetting("Experimental", true);
     public static int hudX = 5;
     public static int hudY = 70;
     private boolean isAlphabeticalSort;
@@ -64,8 +77,12 @@ public class HUD extends Module {
         this.registerSetting(alphabeticalSort = new ButtonSetting("Alphabetical sort", false));
         this.registerSetting(dropShadow = new ButtonSetting("Drop shadow", true));
         this.registerSetting(background = new ButtonSetting("Background", false));
+        this.registerSetting(sidebar = new ButtonSetting("Sidebar", false));
         this.registerSetting(lowercase = new ButtonSetting("Lowercase", false));
         this.registerSetting(showInfo = new ButtonSetting("Show module info", true));
+
+        this.registerSetting(new DescriptionSetting("Categories"));
+        this.registerSetting(combat, movement, player, world, render, minigames, fun, other, client, scripts, exploit, experimental);
     }
 
     public void onEnable() {
@@ -114,6 +131,9 @@ public class HUD extends Module {
                 if (background.isToggled()) {
                     RenderUtils.drawRect(n3 - 1, n - 1, n3 + width, n + Math.round(getFontRenderer().height() + 1), new Color(0, 0, 0, 100).getRGB());
                 }
+                if (sidebar.isToggled()) {
+                    RenderUtils.drawRect(alignRight.isToggled() ? n3 + width : n3 - 1, n - 1, alignRight.isToggled() ? n3 + width + 1 : n3, n + Math.round(getFontRenderer().height() + 1), new Color(255, 255, 255, 200).getRGB());
+                }
                 getFontRenderer().drawString(text, n3, n, e, dropShadow.isToggled());
                 n += Math.round(getFontRenderer().height() + 2);
             }
@@ -131,12 +151,7 @@ public class HUD extends Module {
         List<String> texts = new ArrayList<>(modules.size());
 
         for (Module module : modules) {
-            if (!module.isEnabled() || module == this)
-                continue;
-            if (module instanceof SubMode)
-                continue;
-            if (module.isHidden()) continue;
-            if (module == ModuleManager.commandLine) continue;
+            if (isIgnored(module)) continue;
 
             String text = module.getPrettyName();
             if (showInfo.isToggled() && !module.getInfo().isEmpty()) {
@@ -259,16 +274,8 @@ public class HUD extends Module {
                 int n = this.miY;
                 double n2 = 0.0;
                 for (Module module : ModuleManager.organizedModules) {
-                    if (!module.isEnabled() || module.getName().equals("HUD"))
-                        continue;
-                    if (module instanceof SubMode)
-                        continue;
-                    if (module.isHidden()) {
-                        continue;
-                    }
-                    if (module == ModuleManager.commandLine) {
-                        continue;
-                    }
+                    if (isIgnored(module)) continue;
+
                     String moduleName = module.getPrettyName();
                     if (showInfo.isToggled() && !module.getInfo().isEmpty()) {
                         moduleName += " §7" + module.getInfo();
@@ -370,6 +377,31 @@ public class HUD extends Module {
             }
             return true;
         }
+    }
+
+    private static boolean isIgnored(@NotNull Module module) {
+        if (!module.isEnabled() || module.getName().equals("HUD"))
+            return true;
+        if (module instanceof SubMode)
+            return true;
+
+        if (module.moduleCategory() == category.combat && !combat.isToggled()) return true;
+        if (module.moduleCategory() == category.movement && !movement.isToggled()) return true;
+        if (module.moduleCategory() == category.player && !player.isToggled()) return true;
+        if (module.moduleCategory() == category.world && !world.isToggled()) return true;
+        if (module.moduleCategory() == category.render && !render.isToggled()) return true;
+        if (module.moduleCategory() == category.minigames && !minigames.isToggled()) return true;
+        if (module.moduleCategory() == category.fun && !fun.isToggled()) return true;
+        if (module.moduleCategory() == category.other && !other.isToggled()) return true;
+        if (module.moduleCategory() == category.client && !client.isToggled()) return true;
+        if (module.moduleCategory() == category.scripts && !scripts.isToggled()) return true;
+        if (module.moduleCategory() == category.exploit && !exploit.isToggled()) return true;
+        if (module.moduleCategory() == category.experimental && !experimental.isToggled()) return true;
+
+        if (module.isHidden()) {
+            return true;
+        }
+        return module == ModuleManager.commandLine;
     }
 
     private static Font getFontRenderer() {

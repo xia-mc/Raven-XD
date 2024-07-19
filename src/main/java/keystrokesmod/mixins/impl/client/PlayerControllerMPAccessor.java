@@ -9,4 +9,7 @@ public interface PlayerControllerMPAccessor {
 
     @Accessor("isHittingBlock")
     boolean isHittingBlock();
+
+    @Accessor("curBlockDamageMP")
+    void setCurBlockDamageMP(float curBlockDamageMP);
 }

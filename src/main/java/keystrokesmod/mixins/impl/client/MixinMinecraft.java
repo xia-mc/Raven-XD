@@ -1,6 +1,8 @@
 package keystrokesmod.mixins.impl.client;
 
+import keystrokesmod.event.ClickEvent;
 import keystrokesmod.event.PreTickEvent;
+import keystrokesmod.event.RightClickEvent;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.combat.HitBox;
 import keystrokesmod.module.impl.combat.Reach;
@@ -57,12 +59,25 @@ public abstract class MixinMinecraft {
         HitBox.call();
     }
 
+    @Inject(method = "clickMouse", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/entity/EntityPlayerSP;swingItem()V"), cancellable = true)
+    private void beforeSwingByClick(CallbackInfo ci) {
+        ClickEvent event = new ClickEvent();
+        MinecraftForge.EVENT_BUS.post(event);
+        if (event.isCanceled())
+            ci.cancel();
+    }
+
     /**
      * @author xia__mc
      * @reason to fix freelook do impossible action
      */
-    @Inject(method = "rightClickMouse", at = @At("HEAD"))
+    @Inject(method = "rightClickMouse", at = @At("HEAD"), cancellable = true)
     private void onRightClickMouse(CallbackInfo ci) {
         FreeLook.call();
+
+        RightClickEvent event = new RightClickEvent();
+        MinecraftForge.EVENT_BUS.post(event);
+        if (event.isCanceled())
+            ci.cancel();
     }
 }

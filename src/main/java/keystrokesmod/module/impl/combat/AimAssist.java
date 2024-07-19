@@ -10,6 +10,7 @@ import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.script.classes.Vec3;
 import keystrokesmod.utility.AimSimulator;
+import keystrokesmod.utility.RotationUtils;
 import keystrokesmod.utility.Utils;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.AxisAlignedBB;
@@ -35,6 +36,7 @@ public class AimAssist extends Module {
     private final SliderSetting distance;
     private final ButtonSetting weaponOnly;
     private final ButtonSetting ignoreTeammates;
+    private final ButtonSetting throughBlock;
 
     private Double yawNoise = null;
     private Double pitchNoise = null;
@@ -53,6 +55,7 @@ public class AimAssist extends Module {
         this.registerSetting(distance = new SliderSetting("Distance", 5, 1, 8, 0.1));
         this.registerSetting(weaponOnly = new ButtonSetting("Weapon only", false));
         this.registerSetting(ignoreTeammates = new ButtonSetting("Ignore teammates", false));
+        this.registerSetting(throughBlock = new ButtonSetting("Through block", true));
     }
 
     @Override
@@ -217,9 +220,12 @@ public class AimAssist extends Module {
                     continue;
                 if (ignoreTeammates.isToggled() && Utils.isTeamMate(entityPlayer))
                     continue;
-                if (playerPos.distanceTo(entityPlayer) > distance.getInput())
+                double dist = playerPos.distanceTo(entityPlayer);
+                if (dist > distance.getInput())
                     continue;
                 if (fov != 360 && !Utils.inFov(fov, entityPlayer))
+                    continue;
+                if (!throughBlock.isToggled() && RotationUtils.rayCast(dist, mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch) != null)
                     continue;
 
                 double curFov = Math.abs(Utils.getFov(entityPlayer.posX, entityPlayer.posZ));
