@@ -952,4 +952,23 @@ public static List<String> getSidebarLines() {
     public static boolean isInRange(double value, double target, double range) {
         return value - range <= target && value + range >= target;
     }
+    public static boolean isPlayerInGame() {
+        return mc.thePlayer != null && mc.theWorld != null;
+    }
+
+    public static class Player {
+        public static void hotkeyToSlot(int slot) {
+            if (!isPlayerInGame()) {
+                return;
+            }
+        }
+
+        public static boolean playerOverAir() {
+            double x = mc.thePlayer.posX;
+            double y = mc.thePlayer.posY - 1.0D;
+            double z = mc.thePlayer.posZ;
+            BlockPos p = new BlockPos(MathHelper.floor_double(x), MathHelper.floor_double(y), MathHelper.floor_double(z));
+            return mc.theWorld.isAirBlock(p);
+        }
+    }
 }
