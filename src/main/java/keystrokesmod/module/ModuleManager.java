@@ -97,6 +97,7 @@ public class ModuleManager {
     public static DynamicManager dynamicManager;
     public static Disabler disabler;
     public static BridgeAssist bridgeAssist;
+    public static Watermark watermark;
 
     public void register() {
 
@@ -223,6 +224,7 @@ public class ModuleManager {
         this.addModule(new Trajectories());
         this.addModule(new Xray());
         this.addModule(new BedPlates());
+        this.addModule(watermark = new Watermark());
 
         // world
         this.addModule(antiBot = new AntiBot());
