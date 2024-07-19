@@ -52,18 +52,27 @@ jobs:
 
     - name: Execute Gradle build
       run: ./gradlew build --stacktrace
-
+      
     - name: Send JAR to Discord Webhook
       env:
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        GITHUB_SHA: ${{ github.sha }}
+        GITHUB_REF: ${{ github.ref }}
+        GITHUB_REPOSITORY: ${{ github.repository }}
+        GIT_COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+        GIT_COMMIT_AUTHOR: ${{ github.event.head_commit.author.name }}
+        GIT_COMMIT_URL: ${{ github.event.head_commit.url }}
+        GIT_COMMIT_TIMESTAMP: ${{ github.event.head_commit.timestamp }}
+        GIT_COMMIT_ID: ${{ github.event.head_commit.id }}
+        GIT_COMMIT_COMMENT_COUNT: ${{ github.event.head_commit.comment_count }}
       run: |
-          JAR_PATH=$(find build/libs -name "*.jar" | head -n 1)
-          if [ -z "$JAR_PATH" ]; then
-            echo "No JAR file found"
-            exit 1
-          fi
-          FILENAME=$(basename $JAR_PATH)
-          curl -X POST -H "Content-Type: multipart/form-data" \
-            -F "file=@$JAR_PATH" \
-            -F "payload_json={\"content\":\"New build available: $FILENAME\ (These builds are just for testing please don't use them for playing)"}" \
-            $DISCORD_WEBHOOK_URL
+        JAR_PATH=$(find build/libs -name "*.jar" | head -n 1)
+        if [ -z "$JAR_PATH" ]; then
+          echo "No JAR file found"
+          exit 1
+        fi
+        FILENAME=$(basename $JAR_PATH)
+        curl -X POST -H "Content-Type: multipart/form-data" \
+          -F "file=@$JAR_PATH" \
+          -F "payload_json={\"content\":\"$GIT_COMMIT_AUTHOR pushed $GIT_COMMIT_COMMENT_COUNT changes to the repository $GITHUB_REPOSITORY on branch $GITHUB_REF. Commit message: '$GIT_COMMIT_MESSAGE'. Commit URL: $GIT_COMMIT_URL\"}" \
+          $DISCORD_WEBHOOK_URL

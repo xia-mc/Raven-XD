@@ -13,7 +13,6 @@ import org.lwjgl.input.Keyboard;
 import static keystrokesmod.module.ModuleManager.scaffold;
 
 public class Tower extends Module {
-    private final ModeValue mode;
     private final ButtonSetting disableWhileCollided;
     private final ButtonSetting disableWhileHurt;
     private final ButtonSetting sprintJumpForward;
@@ -21,6 +20,7 @@ public class Tower extends Module {
     public Tower() {
         super("Tower", category.world);
         this.registerSetting(new DescriptionSetting("Works with SafeWalk & Scaffold"));
+        final ModeValue mode;
         this.registerSetting(mode = new ModeValue("Mode", this)
                 .add(new VanillaTower("Vanilla", this))
                 .add(new HypixelATower("Hypixel A", this))

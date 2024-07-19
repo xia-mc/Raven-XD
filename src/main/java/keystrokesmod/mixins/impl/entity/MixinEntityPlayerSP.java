@@ -1,15 +1,11 @@
 package keystrokesmod.mixins.impl.entity;
 
 import com.mojang.authlib.GameProfile;
-import keystrokesmod.event.PostMotionEvent;
-import keystrokesmod.event.PostUpdateEvent;
-import keystrokesmod.event.PreMotionEvent;
-import keystrokesmod.event.PreUpdateEvent;
+import keystrokesmod.event.*;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.movement.NoSlow;
 import keystrokesmod.module.impl.movement.Sprint;
 import keystrokesmod.module.impl.other.RotationHandler;
-import keystrokesmod.module.impl.world.Scaffold;
 import keystrokesmod.utility.RotationUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
@@ -24,10 +20,8 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.MovementInput;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
-import org.spongepowered.asm.mixin.Shadow;
+import net.minecraftforge.common.MinecraftForge;
+import org.spongepowered.asm.mixin.*;
 
 @Mixin(value = EntityPlayerSP.class, priority = 999)
 public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
@@ -95,6 +89,19 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
     private float lastReportedPitch;
     @Shadow
     private int positionUpdateTicks;
+
+    @Unique
+    private boolean raven_bS$isHeadspaceFree(BlockPos p_isHeadspaceFree_1_, int p_isHeadspaceFree_2_) {
+        for(int y = 0; y < p_isHeadspaceFree_2_; ++y) {
+            if (!this.isOpenBlockSpace(p_isHeadspaceFree_1_.add(0, y, 0))) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    @Shadow protected abstract boolean isOpenBlockSpace(BlockPos p_isOpenBlockSpace_1_);
 
     /**
      * @author strangerrrs
@@ -362,5 +369,65 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
             this.sendPlayerAbilities();
         }
 
+    }
+
+    /**
+     * @author xia__mc
+     * @reason for vulcan phase
+     */
+    @Overwrite
+    protected boolean pushOutOfBlocks(double p_pushOutOfBlocks_1_, double p_pushOutOfBlocks_3_, double p_pushOutOfBlocks_5_) {
+        if (!this.noClip) {
+            BlockPos blockpos = new BlockPos(p_pushOutOfBlocks_1_, p_pushOutOfBlocks_3_, p_pushOutOfBlocks_5_);
+            double d0 = p_pushOutOfBlocks_1_ - (double) blockpos.getX();
+            double d1 = p_pushOutOfBlocks_5_ - (double) blockpos.getZ();
+            int entHeight = Math.max((int) Math.ceil(this.height), 1);
+            if (!this.raven_bS$isHeadspaceFree(blockpos, entHeight)) {
+                PushOutOfBlockEvent event = new PushOutOfBlockEvent();
+                MinecraftForge.EVENT_BUS.post(event);
+                if (event.isCanceled())
+                    return false;
+
+                int i = -1;
+                double d2 = 9999.0;
+                if (this.raven_bS$isHeadspaceFree(blockpos.west(), entHeight) && d0 < d2) {
+                    d2 = d0;
+                    i = 0;
+                }
+
+                if (this.raven_bS$isHeadspaceFree(blockpos.east(), entHeight) && 1.0 - d0 < d2) {
+                    d2 = 1.0 - d0;
+                    i = 1;
+                }
+
+                if (this.raven_bS$isHeadspaceFree(blockpos.north(), entHeight) && d1 < d2) {
+                    d2 = d1;
+                    i = 4;
+                }
+
+                if (this.raven_bS$isHeadspaceFree(blockpos.south(), entHeight) && 1.0 - d1 < d2) {
+                    i = 5;
+                }
+
+                float f = 0.1F;
+                if (i == 0) {
+                    this.motionX = -f;
+                }
+
+                if (i == 1) {
+                    this.motionX = f;
+                }
+
+                if (i == 4) {
+                    this.motionZ = -f;
+                }
+
+                if (i == 5) {
+                    this.motionZ = f;
+                }
+            }
+
+        }
+        return false;
     }
 }

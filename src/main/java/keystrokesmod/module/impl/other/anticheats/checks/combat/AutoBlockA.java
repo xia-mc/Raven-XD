@@ -13,7 +13,7 @@ public class AutoBlockA extends Check {
 
     @Override
     public void _onTick() {
-        if ((player.fabricPlayer.isUsingItem() || player.fabricPlayer.isBlocking()) && !player.lastSwing && player.currentSwing) {
+        if (player.fabricPlayer.isBlocking() && !player.lastSwing && player.currentSwing) {
             flag("impossible hit.");
         }
     }

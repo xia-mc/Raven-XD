@@ -8,6 +8,7 @@ import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.client.Gui;
 import keystrokesmod.module.impl.render.HUD;
 import keystrokesmod.module.impl.render.TargetHUD;
+import keystrokesmod.module.impl.render.Watermark;
 import keystrokesmod.module.setting.Setting;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.ModeValue;
@@ -48,7 +49,7 @@ public class ProfileManager {
 
     public void saveProfile(Profile profile) {
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("bName", HUD.bName);
+        jsonObject.addProperty("clientName", Watermark.customName);
         jsonObject.addProperty("keybind", profile.getModule().getKeycode());
         JsonArray jsonArray = new JsonArray();
         for (Module module : Raven.moduleManager.getModules()) {
@@ -169,8 +170,8 @@ public class ProfileManager {
                     failedMessage("load", name);
                     return;
                 }
-                if (profileJson.has("bName")) {
-                    HUD.bName = profileJson.get("bName").getAsString();
+                if (profileJson.has("clientName")) {
+                    Watermark.customName = profileJson.get("clientName").getAsString();
                 }
 
                 for (JsonElement moduleJson : modules) {

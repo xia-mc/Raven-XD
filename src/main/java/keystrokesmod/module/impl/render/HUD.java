@@ -35,8 +35,6 @@ import java.util.*;
 import java.util.List;
 
 public class HUD extends Module {
-    public static final String VERSION = "1.17.1";
-    public static final HashMap<String, ResourceLocation> WATERMARK = new HashMap<>();
     public static ModeSetting theme;
 //    public static SliderSetting font;
 //    public static SliderSetting fontSize;
@@ -46,11 +44,8 @@ public class HUD extends Module {
     private static ButtonSetting alignRight;
     private static ButtonSetting lowercase;
     public static ButtonSetting showInfo;
-    public static ButtonSetting showWatermark;
-    public static ModeSetting watermarkMode;
     public static int hudX = 5;
     public static int hudY = 70;
-    public static String bName = "s";
     private boolean isAlphabeticalSort;
     private boolean canShowInfo;
 
@@ -71,16 +66,6 @@ public class HUD extends Module {
         this.registerSetting(background = new ButtonSetting("Background", false));
         this.registerSetting(lowercase = new ButtonSetting("Lowercase", false));
         this.registerSetting(showInfo = new ButtonSetting("Show module info", true));
-        this.registerSetting(showWatermark = new ButtonSetting("Show Watermark", true));
-        this.registerSetting(watermarkMode = new ModeSetting("Watermark mode", new String[]{"Text", "Augustus", "Enders", "Augustus 2"}, 0, showWatermark::isToggled));
-
-        for (String s : Arrays.asList("enders", "augustus")) {
-            try (InputStream stream = Objects.requireNonNull(Raven.class.getResourceAsStream("/assets/keystrokesmod/textures/watermarks/" + s + ".png"))) {
-                BufferedImage image = ImageIO.read(stream);
-                WATERMARK.put(s, Minecraft.getMinecraft().renderEngine.getDynamicTextureLocation(s, new DynamicTexture(image)));
-            } catch (NullPointerException | IOException ignored) {
-            }
-        }
     }
 
     public void onEnable() {
@@ -112,20 +97,6 @@ public class HUD extends Module {
         int n = hudY;
         double n2 = 0.0;
         try {
-            if (showWatermark.isToggled()) {
-                int input = (int) watermarkMode.getInput();
-                switch (input) {
-                    case 2:
-                        RenderUtils.drawImage(WATERMARK.get("enders"), hudX, (float) n, 150, 45, new Color(255, 255, 255));
-                        n += 45;
-                        break;
-                    case 3:
-                        RenderUtils.drawImage(WATERMARK.get("augustus"), hudX, (float) n, 50, 50, new Color(255, 255, 255));
-                        n += 50;
-                        break;
-                }
-            }
-
             List<String> texts = getDrawTexts();
 
             for (String text : texts) {
@@ -158,24 +129,6 @@ public class HUD extends Module {
     private List<String> getDrawTexts() {
         List<Module> modules = ModuleManager.organizedModules;
         List<String> texts = new ArrayList<>(modules.size());
-
-        if (showWatermark.isToggled()) {
-            String text = "";
-            switch ((int) watermarkMode.getInput()) {
-                case 0:
-                    text = "§r§f§lRaven §bX§9D §7" + VERSION;
-                    break;
-                case 1:
-                    text = "§f§lAugustus " + VERSION;
-                    break;
-            }
-
-            if (!text.isEmpty()) {
-                if (lowercase.isToggled())
-                    text = text.toLowerCase();
-                texts.add(text);
-            }
-        }
 
         for (Module module : modules) {
             if (!module.isEnabled() || module == this)
@@ -222,14 +175,13 @@ public class HUD extends Module {
         GuiButtonExt resetPosition;
         boolean hoverHUD = false;
         boolean hoverTargetHUD = false;
+        boolean hoverWatermark = false;
         int miX = 0;
         int miY = 0;
         int maX = 0;
         int maY = 0;
         int curHudX = 5;
         int curHudY = 70;
-        int lastTargetHUDX = 70;
-        int lastTargetHUDY = 30;
         int laX = 0;
         int laY = 0;
         int lmX = 0;
@@ -241,8 +193,6 @@ public class HUD extends Module {
             this.buttonList.add(this.resetPosition = new GuiButtonExt(1, this.width - 90, 5, 85, 20, "Reset position"));
             this.curHudX = HUD.hudX;
             this.curHudY = HUD.hudY;
-            this.lastTargetHUDX = TargetHUD.posX;
-            this.lastTargetHUDY = TargetHUD.posY;
         }
 
         @Override
@@ -286,7 +236,8 @@ public class HUD extends Module {
 
         @SubscribeEvent
         public void onRenderTick(RenderTickEvent event) {
-            TargetHUD.drawTargetHUD(null, mc.thePlayer.getName(), mc.thePlayer.getHealth());
+            TargetHUD.drawTargetHUD(null, mc.thePlayer.getName(), 1);
+            ModuleManager.watermark.render();
         }
 
         private int @Nullable [] d(Font fr, String t) {
@@ -353,6 +304,9 @@ public class HUD extends Module {
                 } else if (this.hoverTargetHUD) {
                     TargetHUD.posX = this.laX + (mX - this.lmX);
                     TargetHUD.posY = this.laY + (mY - this.lmY);
+                } else if (this.hoverWatermark) {
+                    Watermark.posX = this.laX + (mX - this.lmX);
+                    Watermark.posY = this.laY + (mY - this.lmY);
                 } else if (mX > this.clickMinX && mX < this.maX && mY > this.miY && mY < this.maY) {
                     this.hoverHUD = true;
                     this.lmX = mX;
@@ -365,6 +319,12 @@ public class HUD extends Module {
                     this.lmY = mY;
                     this.laX = TargetHUD.posX;
                     this.laY = TargetHUD.posY;
+                } else if (mX > Watermark.current$minX && mX < Watermark.current$maxX && mY > Watermark.current$minY && mY < Watermark.current$maxY) {
+                    this.hoverWatermark = true;
+                    this.lmX = mX;
+                    this.lmY = mY;
+                    this.laX = Watermark.posX;
+                    this.laY = Watermark.posY;
                 }
 
             }
@@ -375,6 +335,7 @@ public class HUD extends Module {
             if (s == 0) {
                 this.hoverHUD = false;
                 this.hoverTargetHUD = false;
+                this.hoverWatermark = false;
             }
 
         }
@@ -383,8 +344,10 @@ public class HUD extends Module {
             if (b == this.resetPosition) {
                 this.curHudX = HUD.hudX = 5;
                 this.curHudY = HUD.hudY = 70;
-                this.lastTargetHUDX = TargetHUD.posX = 70;
-                this.lastTargetHUDY = TargetHUD.posY = 30;
+                TargetHUD.posX = 70;
+                TargetHUD.posY = 30;
+                Watermark.posX = 5;
+                Watermark.posY = 5;
             }
 
         }

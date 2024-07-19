@@ -12,6 +12,7 @@ import keystrokesmod.module.impl.movement.Fly;
 import keystrokesmod.module.impl.other.FakeChat;
 import keystrokesmod.module.impl.other.NameHider;
 import keystrokesmod.module.impl.render.HUD;
+import keystrokesmod.module.impl.render.Watermark;
 import keystrokesmod.utility.font.Font;
 import keystrokesmod.utility.profile.Profile;
 import keystrokesmod.utility.render.RenderUtils;
@@ -307,7 +308,7 @@ public class Commands {
                 }
 
                 PacketUtils.sendPacketNoEvent(new C01PacketChatMessage(c.substring(firstArg.length() + 1)));
-            } else if (firstArg.equals("setbname")) {
+            } else if (firstArg.equals("clientname")) {
                 if (!hasArgs) {
                     print(invSyn, 1);
                     return;
@@ -318,9 +319,9 @@ public class Commands {
                     return;
                 }
 
-                HUD.bName = args.get(1);
+                Watermark.customName = args.get(1);
 
-                print("&aSet BName to " + HUD.bName, 1);
+                print("&aSet client name to " + Watermark.customName, 1);
             } else if (firstArg.equals("binds")) {
                 for (Module module : Raven.getModuleManager().getModules()) {
                     if (module.getKeycode() != 0) {
@@ -498,7 +499,7 @@ public class Commands {
                 print("2 " + FakeChat.command + " [msg]", 0);
                 print("3 setspeed [fly] [value]", 0);
                 print("4 setvelocity [h/v] [value]", 0);
-                print("5 setBName [name (default is 's')]", 0);
+                print(String.format("5 clientname [name (current is '%s')]", Watermark.customName), 0);
             }
 
         }
