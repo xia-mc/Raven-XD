@@ -1,16 +1,22 @@
 package keystrokesmod.module.impl.render;
 
 import keystrokesmod.module.Module;
+import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
+import keystrokesmod.utility.BlockUtils;
 import keystrokesmod.utility.CoolDown;
 import keystrokesmod.utility.ShaderUtils;
 import keystrokesmod.utility.Utils;
+import net.minecraft.block.BlockBed;
+import net.minecraft.block.properties.IProperty;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
 import net.minecraft.block.Block;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
@@ -19,7 +25,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -29,66 +35,91 @@ public class BedPlates extends Module {
 
     public static SliderSetting updateRate, yShift, layers;
     private final CoolDown updateCooldown = new CoolDown(0);
+    private BlockPos[] bed = null;
+    private SliderSetting range;
     private final List<BlockPos> beds = new ArrayList<>();
+    private ButtonSetting firstBed;
     private final List<List<Block>> bedBlocks = new ArrayList<>();
-    private BlockPos ownBed;
     public BedPlates() {
         super("Bed Plates", category.render);
         this.registerSetting(yShift = new SliderSetting("Y-shift", 2, -5, 10, 1));
         this.registerSetting(updateRate = new SliderSetting("Update rate (ms)", 1000, 250, 5000, 250));
+        this.registerSetting(range = new SliderSetting("Range", 10.0, 2.0, 30.0, 1.0));
         this.registerSetting(layers = new SliderSetting("Layers", 3, 3, 10, 1));
+        this.registerSetting(firstBed = new ButtonSetting("Only render first bed", false));
     }
-
-    public void onEnable() {
-        for (int i = 0; i < 8; i++) {
-            this.beds.add(null);
-            this.bedBlocks.add(new ArrayList<>());
+    public void onUpdate() {
+        if (Utils.nullCheck()) {
+            if (updateCooldown.hasFinished()) {
+                updateCooldown.setCooldown((long) updateRate.getInput());
+                updateCooldown.start();
+            }
+            int i;
+            priorityLoop:
+            for (int n = i = (int) range.getInput(); i >= -n; --i) {
+                for (int j = -n; j <= n; ++j) {
+                    for (int k = -n; k <= n; ++k) {
+                        final BlockPos blockPos = new BlockPos(mc.thePlayer.posX + j, mc.thePlayer.posY + i, mc.thePlayer.posZ + k);
+                        final IBlockState getBlockState = mc.theWorld.getBlockState(blockPos);
+                        if (getBlockState.getBlock() == Blocks.bed && getBlockState.getValue((IProperty) BlockBed.PART) == BlockBed.EnumPartType.FOOT) {
+                            if (firstBed.isToggled()) {
+                                if (this.bed != null && BlockUtils.isSamePos(blockPos, this.bed[0])) {
+                                    return;
+                                }
+                                this.bed = new BlockPos[]{blockPos, blockPos.offset((EnumFacing) getBlockState.getValue((IProperty) BlockBed.FACING))};
+                                return;
+                            } else {
+                                for (int l = 0; l < this.beds.size(); ++l) {
+                                    if (BlockUtils.isSamePos(blockPos, ((BlockPos) this.beds.get(l)))) {
+                                        continue priorityLoop;
+                                    }
+                                }
+                                this.beds.add(blockPos);
+                                this.bedBlocks.add(new ArrayList<>());
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
-
     public void onDisable() {
         this.beds.clear();
         this.bedBlocks.clear();
-        this.ownBed = null;
-    }
-
-    public void updateBeds() {
-        if (Utils.nullCheck()) {
-            findOwnBed();
-            if (ownBed != null) {
-                findBed(ownBed.getZ(), ownBed.getY(), ownBed.getX(), 1);
-                findBed(-ownBed.getZ(), ownBed.getY(), ownBed.getX(), 2);
-                findBed(ownBed.getZ(), ownBed.getY(), -ownBed.getX(), 3);
-                findBed(-ownBed.getZ(), ownBed.getY(), -ownBed.getX(), 4);
-                findBed(-ownBed.getX(), ownBed.getY(), ownBed.getZ(), 5);
-                findBed(ownBed.getX(), ownBed.getY(), -ownBed.getZ(), 6);
-                findBed(-ownBed.getX(), ownBed.getY(), -ownBed.getZ(), 7);
-            }
-        }
     }
 
     @SubscribeEvent
     public void onEntityJoin(EntityJoinWorldEvent e) {
         if (e.entity == mc.thePlayer) {
-            this.onDisable();
-            this.onEnable();
+            this.beds.clear();
+            this.bedBlocks.clear();
+            this.bed = null;
         }
     }
 
     @SubscribeEvent
     public void onRenderWorld(RenderWorldLastEvent e) {
-        if (Utils.nullCheck() && !this.beds.isEmpty()) {
-            int index = 0;
-            if (updateCooldown.hasFinished()) {
-                updateBeds();
-                updateCooldown.setCooldown((long) updateRate.getInput());
-                updateCooldown.start();
-            }
-            for (BlockPos blockPos : this.beds) {
-                if (beds.get(index) != null) {
-                    this.drawPlate(blockPos, index);
-                    index++;
+        if (Utils.nullCheck()) {
+            if (firstBed.isToggled() && this.bed != null) {
+                if (!(mc.theWorld.getBlockState(bed[0]).getBlock() instanceof BlockBed)) {
+                    this.bed = null;
+                    return;
                 }
+                findBed(bed[0].getX(), bed[0].getY(), bed[0].getZ(), 0);
+                this.drawPlate(bed[0], 0);
+            }
+            if (this.beds.isEmpty()) {
+                return;
+            }
+            Iterator<BlockPos> iterator = this.beds.iterator();
+            while (iterator.hasNext()) {
+                BlockPos blockPos = iterator.next();
+                if (!(mc.theWorld.getBlockState(blockPos).getBlock() instanceof BlockBed)) {
+                    iterator.remove();
+                    continue;
+                }
+                findBed(blockPos.getX(), blockPos.getY(), blockPos.getZ(), this.beds.indexOf(blockPos));
+                this.drawPlate(blockPos, this.beds.indexOf(blockPos));
             }
         }
     }
@@ -116,34 +147,15 @@ public class BedPlates extends Module {
         glPopMatrix();
     }
 
-    private void findOwnBed() {
-        if (this.ownBed == null) {
-            for (int y = 2; y >= -2; --y) {
-                for (int x = 0; x <= 20; ++x) {
-                    for (int z = 0; z <= 20; ++z) {
-                        if (findBed(Module.mc.thePlayer.posX - Module.mc.thePlayer.posX / Math.abs(Module.mc.thePlayer.posX) * x,
-                                Module.mc.thePlayer.posY + (double) y,
-                                Module.mc.thePlayer.posZ - Module.mc.thePlayer.posZ / Math.abs(Module.mc.thePlayer.posZ) * z, 0)) {
-                            this.ownBed = this.beds.get(0);
-                            return;
-                        }
-                    }
-                }
-            }
-        } else {
-            findBed(ownBed.getX(), ownBed.getY(), ownBed.getZ(), 0);
-        }
-    }
-
     private boolean findBed(double x, double y, double z, int index) {
         BlockPos bedPos = new BlockPos(x, y, z);
-        Block bed = Module.mc.theWorld.getBlockState(bedPos).getBlock();
+        Block Bed = Module.mc.theWorld.getBlockState(bedPos).getBlock();
         bedBlocks.get(index).clear();
         beds.set(index, null);
         if (beds.contains(bedPos)) {
             return false;
         }
-        if (bed.equals(Blocks.bed)) {
+        if (Bed.equals(Blocks.bed)) {
             for (int yi = 0; yi <= layers.getInput(); ++yi) {
                 for (int xi = (int) -layers.getInput(); xi <= layers.getInput(); ++xi) {
                     for (int zi = (int) -layers.getInput(); zi <= layers.getInput(); ++zi) {
