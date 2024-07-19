@@ -33,6 +33,7 @@ public class Notifications extends Module {
         super("Notifications", category.client);
         this.registerSetting(chatNoti = new ButtonSetting("Show in chat", false));
         this.registerSetting(moduleToggled = new ButtonSetting("Module toggled", true));
+        this.canBeEnabled = false;
     }
 
     public static void sendNotification(NotificationTypes notificationType, String message) {
