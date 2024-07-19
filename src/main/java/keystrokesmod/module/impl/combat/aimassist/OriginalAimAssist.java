@@ -10,6 +10,7 @@ import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.script.classes.Vec3;
 import keystrokesmod.utility.AimSimulator;
+import keystrokesmod.utility.RotationUtils;
 import keystrokesmod.utility.Utils;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.AxisAlignedBB;
@@ -23,36 +24,29 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public class OriginalAimAssist extends SubMode<AimAssist> {
-    private final ButtonSetting clickAim;
-    private final ButtonSetting aimWhileOnTarget;
-    private final ButtonSetting strafeIncrease;
-    private final ButtonSetting checkBlockBreak;
-    private final ButtonSetting aimVertically;
-    private final SliderSetting verticalSpeed;
-    private final SliderSetting horizontalSpeed;
-    private final SliderSetting maxAngle;
-    private final SliderSetting distance;
-    private final ButtonSetting weaponOnly;
-    private final ButtonSetting ignoreTeammates;
+   private final ButtonSetting clickAim, aimWhileOnTarget, strafeIncrease, checkBlockBreak, aimVertically, weaponOnly, ignoreTeammates, throughBlock;
+private final SliderSetting verticalSpeed, horizontalSpeed, maxAngle, distance;
+private Double yawNoise = null;
+private Double pitchNoise = null;
+private long nextNoiseRefreshTime = -1;
+private long nextNoiseEmptyTime = 200;
 
-    private Double yawNoise = null;
-    private Double pitchNoise = null;
-    private long nextNoiseRefreshTime = -1;
-    private long nextNoiseEmptyTime = 200;
-    public OriginalAimAssist(String name, AimAssist parent) {
-        super(name, parent);
-        this.registerSetting(clickAim = new ButtonSetting("Click aim", true));
-        this.registerSetting(aimWhileOnTarget = new ButtonSetting("Aim while on target", true));
-        this.registerSetting(strafeIncrease = new ButtonSetting("Strafe increase", false));
-        this.registerSetting(checkBlockBreak = new ButtonSetting("Check block break", true));
-        this.registerSetting(aimVertically = new ButtonSetting("Aim vertically", false));
-        this.registerSetting(verticalSpeed = new SliderSetting("Vertical speed", 5, 1, 10, 0.1, aimVertically::isToggled));
-        this.registerSetting(horizontalSpeed = new SliderSetting("Horizontal speed", 5, 1, 10, 0.1));
-        this.registerSetting(maxAngle = new SliderSetting("Max angle", 180, 1, 360, 5));
-        this.registerSetting(distance = new SliderSetting("Distance", 5, 1, 8, 0.1));
-        this.registerSetting(weaponOnly = new ButtonSetting("Weapon only", false));
-        this.registerSetting(ignoreTeammates = new ButtonSetting("Ignore teammates", false));
-    }
+public OriginalAimAssist(String name, AimAssist parent) {
+    super(name, parent);
+    this.registerSetting(clickAim = new ButtonSetting("Click aim", true));
+    this.registerSetting(aimWhileOnTarget = new ButtonSetting("Aim while on target", true));
+    this.registerSetting(strafeIncrease = new ButtonSetting("Strafe increase", false));
+    this.registerSetting(checkBlockBreak = new ButtonSetting("Check block break", true));
+    this.registerSetting(aimVertically = new ButtonSetting("Aim vertically", false));
+    this.registerSetting(weaponOnly = new ButtonSetting("Weapon only", false));
+    this.registerSetting(ignoreTeammates = new ButtonSetting("Ignore teammates", false));
+    this.registerSetting(throughBlock = new ButtonSetting("Through block", true));
+    this.registerSetting(verticalSpeed = new SliderSetting("Vertical speed", 5, 1, 10, 0.1, aimVertically::isToggled));
+    this.registerSetting(horizontalSpeed = new SliderSetting("Horizontal speed", 5, 1, 10, 0.1));
+    this.registerSetting(maxAngle = new SliderSetting("Max angle", 180, 1, 360, 5));
+    this.registerSetting(distance = new SliderSetting("Distance", 5, 1, 8, 0.1));
+}
+
     @Override
     public void onDisable() {
         yawNoise = pitchNoise = null;
@@ -209,17 +203,19 @@ public class OriginalAimAssist extends SubMode<AimAssist> {
         double targetFov = Double.MAX_VALUE;
         for (final EntityPlayer entityPlayer : players) {
             if (entityPlayer != mc.thePlayer && entityPlayer.deathTime == 0) {
+                double dist = playerPos.distanceTo(entityPlayer);
                 if (Utils.isFriended(entityPlayer))
                     continue;
                 if (AntiBot.isBot(entityPlayer))
                     continue;
                 if (ignoreTeammates.isToggled() && Utils.isTeamMate(entityPlayer))
                     continue;
-                if (playerPos.distanceTo(entityPlayer) > distance.getInput())
+                if (dist > distance.getInput())
                     continue;
                 if (fov != 360 && !Utils.inFov(fov, entityPlayer))
                     continue;
-
+                if (!throughBlock.isToggled() && RotationUtils.rayCast(dist, mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch) != null)
+                    continue;
                 double curFov = Math.abs(Utils.getFov(entityPlayer.posX, entityPlayer.posZ));
                 if (curFov < targetFov) {
                     target = entityPlayer;

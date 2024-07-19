@@ -12,9 +12,10 @@ public class AimAssist extends Module {
         super("AimAssist", category.combat, 0);
         this.registerSetting(mode = new ModeValue("Mode", this)
                 .add(new OriginalAimAssist("Original", this))
-                .add(new RavenBPlusPlusAimAssist("RavenB++", this))
+                .add(new TejasAssist("TejasAssist", this))
                 .setDefaultValue("Original"));
     }
+
     public String getInfo() {
         return mode.getSubModeValues().get((int) mode.getInput()).getName();
     }
