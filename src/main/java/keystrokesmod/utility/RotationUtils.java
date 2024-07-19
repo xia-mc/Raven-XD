@@ -13,9 +13,7 @@ import org.apache.commons.lang3.tuple.Triple;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class RotationUtils {
     public static final Minecraft mc = Minecraft.getMinecraft();
@@ -319,7 +317,13 @@ public class RotationUtils {
         return false;
     }
 
+    private static final Set<EnumFacing> FACINGS = new HashSet<>(Arrays.asList(EnumFacing.VALUES));
+
     public static @NotNull Optional<Triple<BlockPos, EnumFacing, keystrokesmod.script.classes.Vec3>> getPlaceSide(@NotNull BlockPos blockPos) {
+        return getPlaceSide(blockPos, FACINGS);
+    }
+
+    public static @NotNull Optional<Triple<BlockPos, EnumFacing, keystrokesmod.script.classes.Vec3>> getPlaceSide(@NotNull BlockPos blockPos, Set<EnumFacing> limitFacing) {
         final List<BlockPos> possible = Arrays.asList(
                 blockPos.down(), blockPos.east(), blockPos.west(),
                 blockPos.north(), blockPos.south(), blockPos.up()
@@ -348,6 +352,8 @@ public class RotationUtils {
                     facing = EnumFacing.DOWN;
                     hitPos = new keystrokesmod.script.classes.Vec3(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
                 }
+
+                if (!limitFacing.contains(facing)) continue;
 
                 return Optional.of(Triple.of(pos, facing, hitPos));
             }

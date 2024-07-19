@@ -46,7 +46,6 @@ public class HUD extends Module {
     public static ButtonSetting showInfo;
     public static int hudX = 5;
     public static int hudY = 70;
-    public static String bName = "s";
     private boolean isAlphabeticalSort;
     private boolean canShowInfo;
 

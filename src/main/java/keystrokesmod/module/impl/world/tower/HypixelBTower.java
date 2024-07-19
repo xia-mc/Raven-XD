@@ -19,6 +19,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.apache.commons.lang3.tuple.Triple;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -32,6 +34,7 @@ import static keystrokesmod.module.ModuleManager.tower;
  * @author Alan34
  */
 public class HypixelBTower extends SubMode<Tower> {
+    public static final HashSet<EnumFacing> LIMIT_FACING = new HashSet<>(Collections.singleton(EnumFacing.SOUTH));
     private int vr;
     private int er;
     boolean Im = false;
@@ -58,19 +61,21 @@ public class HypixelBTower extends SubMode<Tower> {
         else
             offGroundTicks++;
 
-        if (blockPlaceRequest && !Utils.isMoving()) {
+        if (blockPlaceRequest && !Utils.isMoving() && !onlyWhileMoving.isToggled()) {
             MovingObjectPosition lastScaffoldPlace = ModuleManager.scaffold.placeBlock;
             if (lastScaffoldPlace == null)
                 return;
-            Optional<Triple<BlockPos, EnumFacing, Vec3>> optionalPlaceSide = RotationUtils.getPlaceSide(lastScaffoldPlace.getBlockPos().add(deltaPlace));
+            Optional<Triple<BlockPos, EnumFacing, Vec3>> optionalPlaceSide = RotationUtils.getPlaceSide(
+                    lastScaffoldPlace.getBlockPos().add(deltaPlace),
+                    LIMIT_FACING
+            );
             if (!optionalPlaceSide.isPresent())
                 return;
 
             Triple<BlockPos, EnumFacing, Vec3> placeSide = optionalPlaceSide.get();
 
-
             Raven.getExecutor().schedule(() -> ModuleManager.scaffold.place(
-                    new MovingObjectPosition(placeSide.getRight().toVec3(), EnumFacing.NORTH, placeSide.getLeft()),
+                    new MovingObjectPosition(placeSide.getRight().toVec3(), placeSide.getMiddle(), placeSide.getLeft()),
                     false
             ), 50, TimeUnit.MILLISECONDS);
 //            ModuleManager.scaffold.tower$noBlockPlace = true;
@@ -80,8 +85,6 @@ public class HypixelBTower extends SubMode<Tower> {
 
     @SubscribeEvent
     public void onPreMotion(PreMotionEvent event) {
-        if (onlyWhileMoving.isToggled() && !MoveUtil.isMoving()) return;
-
         if (!tower.canTower()) {
             this.Io = mc.thePlayer.rotationYaw;
             this.er = 100;
@@ -99,7 +102,7 @@ public class HypixelBTower extends SubMode<Tower> {
             }
 
             blockPlaceRequest = true;  // place a block on x+1
-            if (!MoveUtil.isMoving()) {
+            if (!MoveUtil.isMoving() && !onlyWhileMoving.isToggled()) {
                 if (!this.Im) {
                     this.Ip = Math.floor(mc.thePlayer.posZ) + 0.99999999999998;
                     this.Im = true;
