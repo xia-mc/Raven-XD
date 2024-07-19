@@ -75,7 +75,7 @@ public class HypixelBTower extends SubMode<Tower> {
             Triple<BlockPos, EnumFacing, Vec3> placeSide = optionalPlaceSide.get();
 
             Raven.getExecutor().schedule(() -> ModuleManager.scaffold.place(
-                    new MovingObjectPosition(placeSide.getRight().toVec3(), placeSide.getMiddle(), placeSide.getLeft()),
+                    new MovingObjectPosition(placeSide.getRight().toVec3(), EnumFacing.NORTH, placeSide.getLeft()),
                     false
             ), 50, TimeUnit.MILLISECONDS);
 //            ModuleManager.scaffold.tower$noBlockPlace = true;
