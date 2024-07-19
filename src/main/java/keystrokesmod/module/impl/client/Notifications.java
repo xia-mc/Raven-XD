@@ -41,6 +41,10 @@ public class Notifications extends Module {
         sendNotification(notificationType, message, 2000);
     }
 
+    public static void sendNotification(NotificationTypes notificationType, String message) {
+        sendNotification(notificationType, message, 2000);
+    }
+
     public static void sendNotification(NotificationTypes notificationType, String message, long duration) {
         if (!ModuleManager.notifications.isEnabled()) return;
 
