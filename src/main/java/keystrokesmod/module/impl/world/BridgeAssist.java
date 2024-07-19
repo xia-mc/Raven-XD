@@ -51,11 +51,11 @@ public class BridgeAssist extends Module {
 
     @SubscribeEvent
     public void onRenderTick(TickEvent.RenderTickEvent e) {
-        if (!Utils.nullCheck()) {
+        if (!Utils.isPlayerInGame()) {
             return;
         }
 
-        if (!(Utils.overAir() && mc.thePlayer.onGround)) {
+        if (!(Utils.Player.playerOverAir() && mc.thePlayer.onGround)) {
             return;
         }
 
