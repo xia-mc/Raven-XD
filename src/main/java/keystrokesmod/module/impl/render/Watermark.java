@@ -5,6 +5,7 @@ import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.ModeSetting;
 import keystrokesmod.module.setting.utils.ModeOnly;
+import keystrokesmod.utility.Theme;
 import keystrokesmod.utility.font.Font;
 import keystrokesmod.utility.font.FontManager;
 import keystrokesmod.utility.render.RenderUtils;
@@ -38,6 +39,7 @@ public class Watermark extends Module {
     private final ModeSetting mode;
     private final ModeSetting watermarkText;
     private final ModeSetting watermarkPhoto;
+    private final ModeSetting theme;
     private final ButtonSetting showVersion;
     private final ButtonSetting lowercase;
     private final ButtonSetting shadow;
@@ -49,6 +51,7 @@ public class Watermark extends Module {
         final ModeOnly photoMode = new ModeOnly(mode, 1);
         this.registerSetting(watermarkText = new ModeSetting("Watermark", new String[]{"Default", "Augustus", "Custom"}, 0, textMode));
         this.registerSetting(watermarkPhoto = new ModeSetting("Watermark", new String[]{"Enders", "Augustus"}, 0, photoMode));
+        this.registerSetting(theme = new ModeSetting("Theme", Theme.themes, 0, textMode.extend(new ModeOnly(watermarkText, 2))));
         this.registerSetting(showVersion = new ButtonSetting("Show version", true, textMode));
         this.registerSetting(lowercase = new ButtonSetting("Lowercase", false, textMode));
         this.registerSetting(shadow = new ButtonSetting("Shadow", true, textMode));
@@ -90,7 +93,7 @@ public class Watermark extends Module {
                         text = text.toLowerCase();
 
                     Font font = FontManager.getMinecraft();
-                    font.drawString(text, posX, posY, 0, shadow.isToggled());
+                    font.drawString(text, posX, posY, Theme.getGradient((int) theme.getInput(), 0), shadow.isToggled());
 
                     current$minX = posX;
                     current$maxX = current$minX + font.getStringWidth(text);

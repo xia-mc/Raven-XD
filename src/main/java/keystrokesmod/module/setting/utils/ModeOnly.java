@@ -1,6 +1,7 @@
 package keystrokesmod.module.setting.utils;
 
 import keystrokesmod.module.setting.interfaces.InputSetting;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -34,5 +35,14 @@ public class ModeOnly implements Supplier<Boolean> {
                 .mapToObj(i -> (double) i)
                 .collect(Collectors.toList());
         return new ModeOnly(mode, options);
+    }
+
+    @Contract(pure = true)
+    @SafeVarargs
+    public final @NotNull Supplier<Boolean> extend(Supplier<Boolean>... suppliers) {
+        if (suppliers == null || suppliers.length == 0) {
+            return this;
+        }
+        return () -> this.get() && Arrays.stream(suppliers).allMatch(Supplier::get);
     }
 }
