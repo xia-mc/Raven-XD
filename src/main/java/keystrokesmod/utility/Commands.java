@@ -314,13 +314,9 @@ public class Commands {
                     return;
                 }
 
-                if (args.size() != 2) {
-                    print(invSyn, 1);
-                    return;
-                }
-
-                Watermark.customName = args.get(1);
-
+                String s = c.substring(10);
+                s = s.replace('&', '§');
+                Watermark.customName = s;
                 print("&aSet client name to " + Watermark.customName, 1);
             } else if (firstArg.equals("binds")) {
                 for (Module module : Raven.getModuleManager().getModules()) {

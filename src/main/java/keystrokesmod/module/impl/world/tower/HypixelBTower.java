@@ -85,7 +85,7 @@ public class HypixelBTower extends SubMode<Tower> {
 
     @SubscribeEvent
     public void onPreMotion(PreMotionEvent event) {
-        if (!tower.canTower()) {
+        if (!tower.canTower() || (!MoveUtil.isMoving() && onlyWhileMoving.isToggled())) {
             this.Io = mc.thePlayer.rotationYaw;
             this.er = 100;
         } else {
@@ -102,7 +102,7 @@ public class HypixelBTower extends SubMode<Tower> {
             }
 
             blockPlaceRequest = true;  // place a block on x+1
-            if (!MoveUtil.isMoving() && !onlyWhileMoving.isToggled()) {
+            if (!MoveUtil.isMoving()) {
                 if (!this.Im) {
                     this.Ip = Math.floor(mc.thePlayer.posZ) + 0.99999999999998;
                     this.Im = true;
