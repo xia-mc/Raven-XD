@@ -24,7 +24,9 @@
   ],
   "client": [
     "client.GuiConnectingAccessor",
+    "client.GuiScreenAccessor",
     "client.KeyBindingAccessor",
+    "client.MinecraftAccessor",
     "client.MixinMinecraft",
     "client.MixinMovementInputFromOptions",
     "client.MixinPlayerControllerMP",

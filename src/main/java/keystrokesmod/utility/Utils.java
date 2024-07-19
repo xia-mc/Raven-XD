@@ -3,13 +3,16 @@ package keystrokesmod.utility;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.mojang.realmsclient.gui.ChatFormatting;
+import keystrokesmod.event.ClickEvent;
+import keystrokesmod.mixins.impl.client.GuiScreenAccessor;
 import keystrokesmod.module.impl.other.SlotHandler;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.settings.KeyBinding;
 import net.minecraftforge.client.event.MouseEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.client.NyaProxy;
 import keystrokesmod.module.impl.client.Settings;
-import keystrokesmod.module.impl.combat.AutoClicker;
 import keystrokesmod.module.impl.combat.HitSelect;
 import keystrokesmod.module.impl.minigames.DuelsStats;
 import keystrokesmod.module.setting.impl.SliderSetting;
@@ -660,7 +663,7 @@ public class Utils {
 
     public static boolean isLeftClicking() {
         if (ModuleManager.autoClicker.isEnabled()) {
-            return AutoClicker.leftClick.isToggled() && Mouse.isButtonDown(0);
+            return Mouse.isButtonDown(0);
         } else return CPSCalculator.f() > 1 && System.currentTimeMillis() - CPSCalculator.LL < 300L;
     }
 
@@ -979,5 +982,30 @@ public class Utils {
     public static boolean isInRange(double value, double target, double range) {
         return value - range <= target && value + range >= target;
 
+    }
+
+    /**
+     * Sends a click to Minecraft legitimately
+     */
+    public static void sendClick(final int button, final boolean state) {
+        final int keyBind = button == 0 ? mc.gameSettings.keyBindAttack.getKeyCode() : mc.gameSettings.keyBindUseItem.getKeyCode();
+
+        KeyBinding.setKeyBindState(keyBind, state);
+
+        if (state) {
+            KeyBinding.onTick(keyBind);
+        }
+    }
+
+    public static void inventoryClick(@NotNull GuiScreen s) {
+        int x = Mouse.getX() * s.width / mc.displayWidth;
+        int y = s.height - Mouse.getY() * s.height / mc.displayHeight - 1;
+
+        ClickEvent event = new ClickEvent();
+        MinecraftForge.EVENT_BUS.post(event);
+        if (event.isCanceled())
+            return;
+
+        ((GuiScreenAccessor) s).mouseClicked(x, y, 0);
     }
 }
