@@ -1,6 +1,5 @@
 package keystrokesmod.module.impl.combat;
 
-import keystrokesmod.event.ClickEvent;
 import keystrokesmod.event.RightClickEvent;
 import keystrokesmod.module.impl.combat.autoclicker.DragClickAutoClicker;
 import keystrokesmod.module.impl.combat.autoclicker.IAutoClicker;
@@ -9,6 +8,7 @@ import keystrokesmod.module.impl.combat.autoclicker.RecordAutoClicker;
 import keystrokesmod.module.setting.impl.ModeSetting;
 import keystrokesmod.module.setting.impl.ModeValue;
 import keystrokesmod.utility.CoolDown;
+import keystrokesmod.utility.Utils;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class RightClicker extends IAutoClicker {
@@ -20,9 +20,9 @@ public class RightClicker extends IAutoClicker {
     public RightClicker() {
         super("RightClicker", category.combat);
         this.registerSetting(mode = new ModeValue("Mode", this)
-                .add(new NormalAutoClicker("Normal", this, false))
-                .add(new DragClickAutoClicker("Drag Click", this, false))
-                .add(new RecordAutoClicker("Record", this, false))
+                .add(new NormalAutoClicker("Normal", this, false, false))
+                .add(new DragClickAutoClicker("Drag Click", this, false, false))
+                .add(new RecordAutoClicker("Record", this, false, false))
                 .setDefaultValue("Normal")
         );
         this.registerSetting(clickSound = new ModeSetting("Click sound", new String[]{"None", "Standard", "Double", "Alan"}, 0));
@@ -51,7 +51,8 @@ public class RightClicker extends IAutoClicker {
     }
 
     @Override
-    public boolean isInventoryFill() {
-        return false;
+    public boolean click() {
+        Utils.sendClick(1, true);
+        return true;
     }
 }

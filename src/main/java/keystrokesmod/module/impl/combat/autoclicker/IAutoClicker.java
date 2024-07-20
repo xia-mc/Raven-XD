@@ -8,5 +8,5 @@ public abstract class IAutoClicker extends Module {
         super(name, moduleCategory);
     }
 
-    public abstract boolean isInventoryFill();
+    public abstract boolean click();
 }

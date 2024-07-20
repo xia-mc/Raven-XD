@@ -16,7 +16,7 @@ public class FakeLag extends Module {
     }
 
     public String getInfo() {
-        return mode.getSubModeValues().get((int) mode.getInput()).getName();
+        return mode.getSubModeValues().get((int) mode.getInput()).getPrettyName();
     }
 
     public void onEnable() {

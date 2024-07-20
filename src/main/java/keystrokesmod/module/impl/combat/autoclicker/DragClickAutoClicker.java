@@ -3,7 +3,6 @@ package keystrokesmod.module.impl.combat.autoclicker;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.Utils;
-import net.minecraft.client.gui.inventory.GuiContainer;
 import org.jetbrains.annotations.NotNull;
 
 public class DragClickAutoClicker extends SubMode<IAutoClicker> {
@@ -15,17 +14,25 @@ public class DragClickAutoClicker extends SubMode<IAutoClicker> {
     private int nextLength, nextDelay;
 
     private final boolean left;
+    private final boolean always;
 
-    public DragClickAutoClicker(String name, @NotNull IAutoClicker parent, boolean left) {
+    public DragClickAutoClicker(String name, @NotNull IAutoClicker parent, boolean left, boolean always) {
         super(name, parent);
         this.left = left;
+        this.always = always;
 
         this.registerSetting(minLength, maxLength, minDelay, maxDelay);
     }
 
     @Override
+    public void guiUpdate() {
+        Utils.correctValue(minLength, maxLength);
+        Utils.correctValue(minDelay, maxDelay);
+    }
+
+    @Override
     public void onUpdate() {
-        if (left ? !mc.gameSettings.keyBindAttack.isKeyDown() : !mc.gameSettings.keyBindUseItem.isKeyDown())
+        if (!always && left ? !mc.gameSettings.keyBindAttack.isKeyDown() : !mc.gameSettings.keyBindUseItem.isKeyDown())
             return;
 
         if (nextLength < 0) {
@@ -37,11 +44,7 @@ public class DragClickAutoClicker extends SubMode<IAutoClicker> {
             }
         } else if (Math.random() < 0.95) {
             nextLength--;
-            if (mc.currentScreen == null)
-                Utils.sendClick(left ? 0 : 1, true);
-            else if (mc.currentScreen instanceof GuiContainer && parent.isInventoryFill()) {
-                Utils.inventoryClick(mc.currentScreen);
-            }
+            parent.click();
         }
     }
 }
