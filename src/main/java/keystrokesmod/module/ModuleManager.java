@@ -98,6 +98,7 @@ public class ModuleManager {
     public static Disabler disabler;
     public static BridgeAssist bridgeAssist;
     public static Watermark watermark;
+    public static RightClicker rightClicker;
 
     public void register() {
 
@@ -114,6 +115,7 @@ public class ModuleManager {
         // combat
         this.addModule(new AimAssist());
         this.addModule(autoClicker = new AutoClicker());
+        this.addModule(rightClicker = new RightClicker());
         this.addModule(blockHit = new BlockHit());
         this.addModule(new BurstClicker());
         this.addModule(new ClickAssist());

@@ -25,12 +25,15 @@ public class Notifications extends Module {
     private static final List<AnimationUtils> animationsX = new ArrayList<>();
     private static final List<AnimationUtils> animationsY = new ArrayList<>();
     public static ButtonSetting chatNoti;
+    public static ButtonSetting moduleToggled;
     private final Font fontRegular = FontManager.getRegular(16);
     private final Font fontIcon = FontManager.getIcons(20);
 
     public Notifications() {
         super("Notifications", category.client);
         this.registerSetting(chatNoti = new ButtonSetting("Show in chat", false));
+        this.registerSetting(moduleToggled = new ButtonSetting("Module toggled", true));
+        this.canBeEnabled = false;
     }
 
     public static void sendNotification(NotificationTypes notificationType, String message) {

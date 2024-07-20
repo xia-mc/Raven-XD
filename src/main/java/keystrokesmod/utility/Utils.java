@@ -3,13 +3,16 @@ package keystrokesmod.utility;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.mojang.realmsclient.gui.ChatFormatting;
+import keystrokesmod.event.ClickEvent;
+import keystrokesmod.mixins.impl.client.GuiScreenAccessor;
 import keystrokesmod.module.impl.other.SlotHandler;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.settings.KeyBinding;
 import net.minecraftforge.client.event.MouseEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.client.NyaProxy;
 import keystrokesmod.module.impl.client.Settings;
-import keystrokesmod.module.impl.combat.AutoClicker;
 import keystrokesmod.module.impl.combat.HitSelect;
 import keystrokesmod.module.impl.minigames.DuelsStats;
 import keystrokesmod.module.setting.impl.SliderSetting;
@@ -155,7 +158,7 @@ public class Utils {
         } else return fovToPoint > -fov;
     }
 
-    public static @Range(from = -180, to = 180) double getFov(final double posX, final double posZ)  {
+    public static @Range(from = -180, to = 180) double getFov(final double posX, final double posZ) {
         return MathHelper.wrapAngleTo180_double((mc.thePlayer.rotationYaw - RotationUtils.angle(posX, posZ)) % 360.0f);
     }
 
@@ -176,8 +179,7 @@ public class Utils {
         boolean attack = HitSelect.canAttack(e);
         if (clientSwing) {
             if (attack || HitSelect.canSwing()) mc.thePlayer.swingItem();
-        }
-        else {
+        } else {
             if (attack || HitSelect.canSwing()) mc.thePlayer.sendQueue.addToSendQueue(new C0APacketAnimation());
         }
         if (attack) mc.playerController.attackEntity(mc.thePlayer, e);
@@ -221,26 +223,27 @@ public class Utils {
         }
         return n2;
     }
+
     public static int getWeapon() {
         int weaponIndex = -1;
         double highestPriority = 0.0;
-    
+
         for (int i = 0; i < InventoryPlayer.getHotbarSize(); ++i) {
             ItemStack item = mc.thePlayer.inventory.getStackInSlot(i);
             if (item == null) continue;
-    
+
             double priority = 0.0;
             double typePriority = 0.0;
-    
+
             if (Settings.weaponSword.isToggled() && item.getItem() instanceof ItemSword) {
                 priority = getDamage(item);
-                typePriority = 0.4; 
+                typePriority = 0.4;
             } else if (Settings.weaponAxe.isToggled() && item.getItem() instanceof ItemAxe) {
                 priority = getDamage(item);
                 typePriority = 0.3;
             } else if (Settings.weaponStick.isToggled() && item.getItem() == Items.stick) {
                 priority = getDamage(item);
-                typePriority = 0.2; 
+                typePriority = 0.2;
             } else if (Settings.weaponRod.isToggled() && item.getItem() == Items.fishing_rod) {
                 priority = getDamage(item);
                 typePriority = 0.1;
@@ -250,15 +253,16 @@ public class Utils {
             // sword > axe > stick > rod) is selected. This helps in making a more informed
             // choice when weapons have identical damage values.
             priority += typePriority;
-    
+
             if (priority > highestPriority) {
                 highestPriority = priority;
                 weaponIndex = i;
             }
         }
-    
+
         return weaponIndex;
     }
+
     public static float getEfficiency(final ItemStack itemStack, final Block block) {
         float getStrVsBlock = itemStack.getStrVsBlock(block);
         if (getStrVsBlock > 1.0f) {
@@ -280,7 +284,7 @@ public class Utils {
 
     public static String getColorForHealth(double n, double n2) {
         double health = rnd(n2, 1);
-        return ((n < 0.3) ? "§c" : ((n < 0.5) ? "§6" : ((n < 0.7) ? "§e" : "§a"))) + (isWholeNumber(health) ? (int) health + "": health);
+        return ((n < 0.3) ? "§c" : ((n < 0.5) ? "§6" : ((n < 0.7) ? "§e" : "§a"))) + (isWholeNumber(health) ? (int) health + "" : health);
     }
 
     public static int getColorForHealth(double health) {
@@ -327,17 +331,19 @@ public class Utils {
                 && (mc.getCurrentServerData().serverIP.contains("hypixel.net")
                 || NyaProxy.isNyaProxy(mc.getCurrentServerData().serverIP).isPresent());
     }
+
     public static boolean isCraftiGames() {
         return !mc.isSingleplayer() && mc.getCurrentServerData() != null
                 && ((mc.getCurrentServerData().serverIP.contains("pika-network.net") || mc.getCurrentServerData().serverIP.contains("pikasys.net") || mc.getCurrentServerData().serverIP.contains("pika.host") || mc.getCurrentServerData().serverIP.contains("jartexsys.net") || mc.getCurrentServerData().serverIP.contains("jartexnetwork.com"))
                 || NyaProxy.isNyaProxy(mc.getCurrentServerData().serverIP).isPresent());
     }
+
     public static net.minecraft.util.Timer getTimer() {
         return ObfuscationReflectionHelper.getPrivateValue(Minecraft.class, Minecraft.getMinecraft(), "timer", "field_71428_T");
     }
 
     public static String getHitsToKill(final EntityPlayer entityPlayer, final ItemStack itemStack) {
-        final int n = (int)Math.ceil(ap(entityPlayer, itemStack));
+        final int n = (int) Math.ceil(ap(entityPlayer, itemStack));
         return "§" + ((n <= 1) ? "c" : ((n <= 3) ? "6" : ((n <= 5) ? "e" : "a"))) + n;
     }
 
@@ -352,7 +358,7 @@ public class Utils {
             final ItemStack armorItemInSlot = entityPlayer.inventory.armorItemInSlot(i);
             if (armorItemInSlot != null) {
                 if (armorItemInSlot.getItem() instanceof ItemArmor) {
-                    n2 += ((ItemArmor)armorItemInSlot.getItem()).damageReduceAmount * 0.04;
+                    n2 += ((ItemArmor) armorItemInSlot.getItem()).damageReduceAmount * 0.04;
                     final int getEnchantmentLevel = EnchantmentHelper.getEnchantmentLevel(Enchantment.protection.effectId, armorItemInSlot);
                     if (getEnchantmentLevel != 0) {
                         n3 += Math.floor(0.75 * (6 + getEnchantmentLevel * getEnchantmentLevel) / 3.0);
@@ -360,7 +366,7 @@ public class Utils {
                 }
             }
         }
-        return rnd((double)getCompleteHealth(entityPlayer) / (n * (1.0 - (n2 + 0.04 * Math.min(Math.ceil(Math.min(n3, 25.0) * 0.75), 20.0) * (1.0 - n2)))), 1);
+        return rnd((double) getCompleteHealth(entityPlayer) / (n * (1.0 - (n2 + 0.04 * Math.min(Math.ceil(Math.min(n3, 25.0) * 0.75), 20.0) * (1.0 - n2)))), 1);
     }
 
     public static float n() {
@@ -471,7 +477,7 @@ public class Utils {
         return validated.toString();
     }
 
-public static List<String> getSidebarLines() {
+    public static List<String> getSidebarLines() {
         final List<String> lines = new ArrayList<>();
         if (mc.theWorld == null) {
             return lines;
@@ -507,6 +513,7 @@ public static List<String> getSidebarLines() {
         }
         return lines;
     }
+
     public static Random getRandom() {
         return rand;
     }
@@ -522,7 +529,7 @@ public static List<String> getSidebarLines() {
      */
     public static void aim(Entity en, float ps, boolean pc) {
         if (en != null) {
-            float[] t = gr(en);
+            float[] t = getRotation(en);
             if (t != null) {
                 float y = t[0];
                 float p = t[1] + 4.0F + ps;
@@ -537,7 +544,7 @@ public static List<String> getSidebarLines() {
         }
     }
 
-    public static float[] gr(Entity q) {
+    public static float[] getRotation(Entity q) {
         if (q == null) {
             return null;
         } else {
@@ -654,14 +661,16 @@ public static List<String> getSidebarLines() {
         return str.replace("§k", "").replace("§l", "").replace("§m", "").replace("§n", "").replace("§o", "").replace("§r", "");
     }
 
-    public static boolean ilc() {
+    public static boolean isLeftClicking() {
         if (ModuleManager.autoClicker.isEnabled()) {
-            return AutoClicker.leftClick.isToggled() && Mouse.isButtonDown(0);
+            return Mouse.isButtonDown(0);
         } else return CPSCalculator.f() > 1 && System.currentTimeMillis() - CPSCalculator.LL < 300L;
     }
+
     public static boolean tryingToCombo() {
         return Mouse.isButtonDown(0) && Mouse.isButtonDown(1);
     }
+
     public static void setMouseButtonState(int mouseButton, boolean held) {
         MouseEvent m = new MouseEvent();
 
@@ -670,10 +679,11 @@ public static List<String> getSidebarLines() {
         MinecraftForge.EVENT_BUS.post(m);
 
         ByteBuffer buttons = ObfuscationReflectionHelper.getPrivateValue(Mouse.class, null, "buttons");
-        buttons.put(mouseButton, (byte)(held ? 1 : 0));
+        buttons.put(mouseButton, (byte) (held ? 1 : 0));
         ObfuscationReflectionHelper.setPrivateValue(Mouse.class, null, buttons, "buttons");
 
     }
+
     public static long getDifference(long n, long n2) {
         return Math.abs(n2 - n);
     }
@@ -684,23 +694,23 @@ public static List<String> getSidebarLines() {
 
     public static EntityLivingBase raytrace(final int n) {
         Entity entity = null;
-        MovingObjectPosition rayTrace = mc.thePlayer.rayTrace((double)n, 1.0f);
+        MovingObjectPosition rayTrace = mc.thePlayer.rayTrace((double) n, 1.0f);
         final Vec3 getPositionEyes = mc.thePlayer.getPositionEyes(1.0f);
         final float rotationYaw = mc.thePlayer.rotationYaw;
         final float rotationPitch = mc.thePlayer.rotationPitch;
         final float cos = MathHelper.cos(-rotationYaw * 0.017453292f - 3.1415927f);
         final float sin = MathHelper.sin(-rotationYaw * 0.017453292f - 3.1415927f);
         final float n2 = -MathHelper.cos(-rotationPitch * 0.017453292f);
-        final Vec3 vec3 = new Vec3((double)(sin * n2), (double)MathHelper.sin(-rotationPitch * 0.017453292f), (double)(cos * n2));
-        final Vec3 addVector = getPositionEyes.addVector(vec3.xCoord * (double)n, vec3.yCoord * (double)n, vec3.zCoord * (double)n);
+        final Vec3 vec3 = new Vec3((double) (sin * n2), (double) MathHelper.sin(-rotationPitch * 0.017453292f), (double) (cos * n2));
+        final Vec3 addVector = getPositionEyes.addVector(vec3.xCoord * (double) n, vec3.yCoord * (double) n, vec3.zCoord * (double) n);
         Vec3 vec4 = null;
-        final List getEntitiesWithinAABBExcludingEntity = mc.theWorld.getEntitiesWithinAABBExcludingEntity(mc.getRenderViewEntity(), mc.getRenderViewEntity().getEntityBoundingBox().addCoord(vec3.xCoord * (double)n, vec3.yCoord * (double)n, vec3.zCoord * (double)n).expand(1.0, 1.0, 1.0));
-        double n3 = (double)n;
+        final List getEntitiesWithinAABBExcludingEntity = mc.theWorld.getEntitiesWithinAABBExcludingEntity(mc.getRenderViewEntity(), mc.getRenderViewEntity().getEntityBoundingBox().addCoord(vec3.xCoord * (double) n, vec3.yCoord * (double) n, vec3.zCoord * (double) n).expand(1.0, 1.0, 1.0));
+        double n3 = (double) n;
         for (int i = 0; i < getEntitiesWithinAABBExcludingEntity.size(); ++i) {
-            final Entity entity2 = (Entity)getEntitiesWithinAABBExcludingEntity.get(i);
+            final Entity entity2 = (Entity) getEntitiesWithinAABBExcludingEntity.get(i);
             if (entity2.canBeCollidedWith()) {
                 final float getCollisionBorderSize = entity2.getCollisionBorderSize();
-                final AxisAlignedBB expand = entity2.getEntityBoundingBox().expand((double)getCollisionBorderSize, (double)getCollisionBorderSize, (double)getCollisionBorderSize);
+                final AxisAlignedBB expand = entity2.getEntityBoundingBox().expand((double) getCollisionBorderSize, (double) getCollisionBorderSize, (double) getCollisionBorderSize);
                 final MovingObjectPosition calculateIntercept = expand.calculateIntercept(getPositionEyes, addVector);
                 if (expand.isVecInside(getPositionEyes)) {
                     if (0.0 < n3 || n3 == 0.0) {
@@ -708,8 +718,7 @@ public static List<String> getSidebarLines() {
                         vec4 = ((calculateIntercept == null) ? getPositionEyes : calculateIntercept.hitVec);
                         n3 = 0.0;
                     }
-                }
-                else if (calculateIntercept != null) {
+                } else if (calculateIntercept != null) {
                     final double distanceTo = getPositionEyes.distanceTo(calculateIntercept.hitVec);
                     if (distanceTo < n3 || n3 == 0.0) {
                         if (entity2 == mc.getRenderViewEntity().ridingEntity && !entity2.canRiderInteract()) {
@@ -717,8 +726,7 @@ public static List<String> getSidebarLines() {
                                 entity = entity2;
                                 vec4 = calculateIntercept.hitVec;
                             }
-                        }
-                        else {
+                        } else {
                             entity = entity2;
                             vec4 = calculateIntercept.hitVec;
                             n3 = distanceTo;
@@ -731,7 +739,7 @@ public static List<String> getSidebarLines() {
             rayTrace = new MovingObjectPosition(entity, vec4);
         }
         if (rayTrace != null && rayTrace.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY && rayTrace.entityHit instanceof EntityLivingBase) {
-            return (EntityLivingBase)rayTrace.entityHit;
+            return (EntityLivingBase) rayTrace.entityHit;
         }
         return null;
     }
@@ -749,7 +757,29 @@ public static List<String> getSidebarLines() {
             return (double) Math.round(n * p) / p;
         }
     }
+    public static double PitchFromEntity(EntityPlayer en, float f) {
+        return (double) (mc.thePlayer.rotationPitch - pitchToEntity(en, f));
+    }
+    public static double fovFromEntity(EntityPlayer en) {
+        return ((((double) (mc.thePlayer.rotationYaw - fovToEntity(en)) % 360.0D) + 540.0D) % 360.0D) - 180.0D;
+    }
 
+    public static float fovFromEntityf(EntityPlayer en) {
+        return (float) (((((float) (mc.thePlayer.rotationYaw - fovToEntity(en)) % 360.0D) + 540.0D) % 360.0D) - 180.0D);
+    }
+
+    public static float fovToEntity(EntityPlayer ent) {
+        double x = ent.posX - mc.thePlayer.posX;
+        double z = ent.posZ - mc.thePlayer.posZ;
+        double yaw = Math.atan2(x, z) * 57.2957795D;
+        return (float) (yaw * -1.0D);
+    }
+    public static float pitchToEntity(EntityPlayer ent, float f) {
+        double x = mc.thePlayer.getDistanceToEntity(ent);
+        double y = mc.thePlayer.posY - (ent.posY + f);
+        double pitch = (((Math.atan2(x, y) * 180.0D) / 3.141592653589793D));
+        return (float) (90 - pitch);
+    }
     public static String stripColor(final String s) {
         if (s.isEmpty()) {
             return s;
@@ -809,7 +839,7 @@ public static List<String> getSidebarLines() {
         }
     }
 
-    public static void rsa() {
+    public static void playerSwing() {
         EntityPlayerSP p = mc.thePlayer;
         int armSwingEnd = p.isPotionActive(Potion.digSpeed) ? 6 - (1 + p.getActivePotionEffect(Potion.digSpeed).getAmplifier()) : (p.isPotionActive(Potion.digSlowdown) ? 6 + (1 + p.getActivePotionEffect(Potion.digSlowdown).getAmplifier()) * 2 : 6);
         if (!p.isSwingInProgress || p.swingProgressInt >= armSwingEnd / 2 || p.swingProgressInt < 0) {
@@ -951,5 +981,31 @@ public static List<String> getSidebarLines() {
 
     public static boolean isInRange(double value, double target, double range) {
         return value - range <= target && value + range >= target;
+
+    }
+
+    /**
+     * Sends a click to Minecraft legitimately
+     */
+    public static void sendClick(final int button, final boolean state) {
+        final int keyBind = button == 0 ? mc.gameSettings.keyBindAttack.getKeyCode() : mc.gameSettings.keyBindUseItem.getKeyCode();
+
+        KeyBinding.setKeyBindState(keyBind, state);
+
+        if (state) {
+            KeyBinding.onTick(keyBind);
+        }
+    }
+
+    public static void inventoryClick(@NotNull GuiScreen s) {
+        int x = Mouse.getX() * s.width / mc.displayWidth;
+        int y = s.height - Mouse.getY() * s.height / mc.displayHeight - 1;
+
+        ClickEvent event = new ClickEvent();
+        MinecraftForge.EVENT_BUS.post(event);
+        if (event.isCanceled())
+            return;
+
+        ((GuiScreenAccessor) s).mouseClicked(x, y, 0);
     }
 }

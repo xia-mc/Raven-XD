@@ -1,7 +1,6 @@
 package keystrokesmod.module.impl.movement;
 
 import keystrokesmod.event.JumpEvent;
-import keystrokesmod.event.MoveInputEvent;
 import keystrokesmod.event.PrePlayerInputEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.combat.KillAura;

@@ -3,15 +3,16 @@ package keystrokesmod.module.impl.combat;
 import akka.japi.Pair;
 import keystrokesmod.Raven;
 import keystrokesmod.event.*;
-import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
+import keystrokesmod.module.impl.combat.autoclicker.DragClickAutoClicker;
+import keystrokesmod.module.impl.combat.autoclicker.IAutoClicker;
+import keystrokesmod.module.impl.combat.autoclicker.NormalAutoClicker;
+import keystrokesmod.module.impl.combat.autoclicker.RecordAutoClicker;
 import keystrokesmod.module.impl.other.RecordClick;
 import keystrokesmod.module.impl.other.RotationHandler;
 import keystrokesmod.module.impl.other.SlotHandler;
 import keystrokesmod.module.impl.world.AntiBot;
-import keystrokesmod.module.setting.impl.ButtonSetting;
-import keystrokesmod.module.setting.impl.ModeSetting;
-import keystrokesmod.module.setting.impl.SliderSetting;
+import keystrokesmod.module.setting.impl.*;
 import keystrokesmod.module.setting.utils.ModeOnly;
 import keystrokesmod.script.classes.Vec3;
 import keystrokesmod.utility.*;
@@ -38,11 +39,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static net.minecraft.util.EnumFacing.DOWN;
 
-public class KillAura extends Module {
+public class KillAura extends IAutoClicker {
     public static EntityLivingBase target;
-    private final ModeSetting clickMode;
-    private final SliderSetting minCPS;
-    private final SliderSetting maxCPS;
+    private final ModeValue clickMode;
     public ModeSetting autoBlockMode;
     private final SliderSetting fov;
     private final SliderSetting attackRange;
@@ -78,16 +77,7 @@ public class KillAura extends Module {
     private long lastSwitched = System.currentTimeMillis();
     private boolean switchTargets;
     private byte entityIndex;
-    public boolean swing;
-    // autoclicker vars
-    private long nextReleaseClickTime;
-    private long nextClickTime;
-    private long k;
-    private long l;
-    private double m;
-    private boolean n;
-    private Random rand;
-    // autoclicker vars end
+    private boolean swing;
     private boolean attack;
     private boolean blocking;
     public boolean blinking;
@@ -102,10 +92,12 @@ public class KillAura extends Module {
 
     public KillAura() {
         super("KillAura", category.combat);
-        this.registerSetting(clickMode = new ModeSetting("Click mode", new String[]{"CPS", "Record"}, 0));
-        ModeOnly cpsMode = new ModeOnly(clickMode, 0);
-        this.registerSetting(minCPS = new SliderSetting("Min CPS", 12.0, 1.0, 20.0, 0.5, cpsMode));
-        this.registerSetting(maxCPS = new SliderSetting("Max CPS", 16.0, 1.0, 20.0, 0.5, cpsMode));
+        this.registerSetting(clickMode = new ModeValue("Click mode", this)
+                .add(new NormalAutoClicker("Normal", this, true, true))
+                .add(new DragClickAutoClicker("Drag Click", this, true, true))
+                .add(new RecordAutoClicker("Record", this, true, true))
+                .setDefaultValue("Normal")
+        );
         String[] autoBlockModes = new String[]{"Manual", "Vanilla", "Post", "Swap", "Interact A", "Interact B", "Fake", "Partial"};
         this.registerSetting(autoBlockMode = new ModeSetting("Autoblock", autoBlockModes, 0));
         this.registerSetting(fov = new SliderSetting("FOV", 360.0, 30.0, 360.0, 4.0));
@@ -143,18 +135,18 @@ public class KillAura extends Module {
     }
 
     public void onEnable() {
+        clickMode.enable();
         this.rotations = new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch};
-        this.rand = new Random();
     }
 
     @Override
     public void guiUpdate() {
-        Utils.correctValue(minCPS, maxCPS);
         Utils.correctValue(attackRange, swingRange);
         Utils.correctValue(swingRange, preAimRange);
     }
 
     public void onDisable() {
+        clickMode.disable();
         resetVariables();
         if (Utils.nullCheck()) mc.thePlayer.stopUsingItem();
     }
@@ -199,9 +191,6 @@ public class KillAura extends Module {
         }
         if (ev.phase != TickEvent.Phase.START) {
             return;
-        }
-        if (canAttack()) {
-            attack = true;
         }
         if (target != null) {
             rotations = getRotations();
@@ -419,8 +408,6 @@ public class KillAura extends Module {
         swing = false;
         rmbDown = false;
         attack = false;
-        this.nextReleaseClickTime = 0L;
-        this.nextClickTime = 0L;
         block();
         resetBlinkState(true);
         swapped = false;
@@ -608,58 +595,6 @@ public class KillAura extends Module {
         return Mouse.isButtonDown(0) && mc.objectMouseOver != null && mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK;
     }
 
-    private boolean canAttack() {
-        if (this.nextClickTime > 0L && this.nextReleaseClickTime > 0L) {
-            if (System.currentTimeMillis() > this.nextClickTime) {
-                this.gd();
-                return true;
-            } else if (System.currentTimeMillis() > this.nextReleaseClickTime) {
-                return false;
-            }
-        } else {
-            this.gd();
-        }
-        return false;
-    }
-
-    public void gd() {
-        switch ((int) clickMode.getInput()) {
-            case 0:
-                double c = Utils.getRandomValue(minCPS, maxCPS, this.rand) + 0.4D * this.rand.nextDouble();
-                long d = (int) Math.round(1000.0D / c);
-                if (System.currentTimeMillis() > this.k) {
-                    if (!this.n && this.rand.nextInt(100) >= 85) {
-                        this.n = true;
-                        this.m = 1.1D + this.rand.nextDouble() * 0.15D;
-                    } else {
-                        this.n = false;
-                    }
-
-                    this.k = System.currentTimeMillis() + 500L + (long) this.rand.nextInt(1500);
-                }
-
-                if (this.n) {
-                    d = (long) ((double) d * this.m);
-                }
-
-                if (System.currentTimeMillis() > this.l) {
-                    if (this.rand.nextInt(100) >= 80) {
-                        d += 50L + (long) this.rand.nextInt(100);
-                    }
-
-                    this.l = System.currentTimeMillis() + 500L + (long) this.rand.nextInt(1500);
-                }
-
-                this.nextClickTime = System.currentTimeMillis() + d;
-                this.nextReleaseClickTime = System.currentTimeMillis() + d / 2L - (long) this.rand.nextInt(10);
-                break;
-            case 1:
-                this.nextClickTime = RecordClick.getNextClickTime();
-                this.nextReleaseClickTime = this.nextClickTime + 1;
-                break;
-        }
-    }
-
     private void unBlock() {
         if (!Utils.holdingSword()) {
             return;
@@ -712,5 +647,11 @@ public class KillAura extends Module {
         } catch (NullPointerException ignored) {
         }
         return false;
+    }
+
+    @Override
+    public boolean click() {
+        attack = true;
+        return swing;
     }
 }

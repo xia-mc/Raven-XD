@@ -1,8 +1,7 @@
 package keystrokesmod.module.impl.player;
 
 import keystrokesmod.module.Module;
-import keystrokesmod.module.impl.player.fakelag.DynamicFakeLag;
-import keystrokesmod.module.impl.player.fakelag.LatencyFakeLag;
+import keystrokesmod.module.impl.player.fakelag.*;
 import keystrokesmod.module.setting.impl.ModeValue;
 
 public class FakeLag extends Module {
@@ -17,7 +16,7 @@ public class FakeLag extends Module {
     }
 
     public String getInfo() {
-        return mode.getSubModeValues().get((int) mode.getInput()).getName();
+        return mode.getSubModeValues().get((int) mode.getInput()).getPrettyName();
     }
 
     public void onEnable() {
