@@ -6,19 +6,16 @@ import keystrokesmod.module.impl.movement.Phase;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.MoveUtil;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockAir;
-import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S08PacketPlayerPosLook;
 import net.minecraft.network.play.server.S12PacketEntityVelocity;
 import net.minecraft.potion.Potion;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.MathHelper;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
+
+import static keystrokesmod.utility.BlockUtils.insideBlock;
 
 public class VulcanPhase extends SubMode<Phase> {
     private final ButtonSetting fast = new ButtonSetting("Fast", false);
@@ -49,33 +46,6 @@ public class VulcanPhase extends SubMode<Phase> {
             parent.toggle();
         }
         yMoving = false;
-    }
-
-    /**
-     * Checks if the player is inside a block
-     *
-     * @return inside block
-     */
-    public boolean insideBlock() {
-        if (mc.thePlayer.ticksExisted < 5) {
-            return false;
-        }
-
-        final EntityPlayerSP player = mc.thePlayer;
-        final WorldClient world = mc.theWorld;
-        final AxisAlignedBB bb = player.getEntityBoundingBox();
-        for (int x = MathHelper.floor_double(bb.minX); x < MathHelper.floor_double(bb.maxX) + 1; ++x) {
-            for (int y = MathHelper.floor_double(bb.minY); y < MathHelper.floor_double(bb.maxY) + 1; ++y) {
-                for (int z = MathHelper.floor_double(bb.minZ); z < MathHelper.floor_double(bb.maxZ) + 1; ++z) {
-                    final Block block = world.getBlockState(new BlockPos(x, y, z)).getBlock();
-                    final AxisAlignedBB boundingBox;
-                    if (block != null && !(block instanceof BlockAir) && (boundingBox = block.getCollisionBoundingBox(world, new BlockPos(x, y, z), world.getBlockState(new BlockPos(x, y, z)))) != null && player.getEntityBoundingBox().intersectsWith(boundingBox)) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
     }
 
     @SubscribeEvent

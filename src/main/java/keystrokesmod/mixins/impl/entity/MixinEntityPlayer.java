@@ -2,6 +2,7 @@ package keystrokesmod.mixins.impl.entity;
 
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.combat.Reduce;
+import keystrokesmod.module.impl.combat.Velocity;
 import keystrokesmod.module.impl.movement.KeepSprint;
 import keystrokesmod.module.impl.render.Particles;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -115,6 +116,7 @@ public abstract class MixinEntityPlayer extends EntityLivingBase {
                                 this.motionZ *= 0.6D;
                                 this.setSprinting(false);
                             }
+                            Velocity.slowDown = true;
                         }
 
                         if (p_attackTargetEntityWithCurrentItem_1_ instanceof EntityPlayerMP && p_attackTargetEntityWithCurrentItem_1_.velocityChanged) {

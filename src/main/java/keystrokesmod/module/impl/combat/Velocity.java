@@ -39,13 +39,16 @@ import java.util.concurrent.TimeUnit;
 import static keystrokesmod.utility.Utils.isLobby;
 
 public class Velocity extends Module {
-    private static final String[] MODES = new String[]{"Normal", "Hypixel", "Old Intave", "GrimAC", "Karhu", "Tick", "7-Zip"};
+    private static final String[] MODES = new String[]{"Normal", "Hypixel", "Intave", "GrimAC", "Karhu", "Tick", "7-Zip", "Matrix"};
     public static ModeSetting mode;
     public static SliderSetting horizontal;
     public static SliderSetting vertical;
-    private final SliderSetting reduce;
-    private final SliderSetting tickDelay;
-    private final SliderSetting zipDelay;
+    public static SliderSetting chance;
+    private final SliderSetting intave$xzOnHit;
+    private final SliderSetting intave$xzOnSprintHit;
+    private final SliderSetting grimAC$reduce;
+    private final SliderSetting tick$delay;
+    private final SliderSetting zip$delay;
     private final ButtonSetting cancelExplosion;
     private final ButtonSetting cancelAir;
     private final ButtonSetting damageBoost;
@@ -58,6 +61,7 @@ public class Velocity extends Module {
     private final ButtonSetting debug;
 
     private boolean attacked = false;
+    public static boolean slowDown = false;
     private EntityLivingBase lastAttack = null;
     private long lastVelocityTime = -1;
     private boolean gotVelocity = false;
@@ -71,9 +75,12 @@ public class Velocity extends Module {
         final ModeOnly canChangeMode = new ModeOnly(mode, 0, 1, 5);
         this.registerSetting(horizontal = new SliderSetting("Horizontal", 0.0, -100.0, 100.0, 1.0, canChangeMode));
         this.registerSetting(vertical = new SliderSetting("Vertical", 0.0, 0.0, 100.0, 1.0, canChangeMode));
-        this.registerSetting(reduce = new SliderSetting("Reduce", 5, 0, 5, 1, new ModeOnly(mode, 3)));
-        this.registerSetting(tickDelay = new SliderSetting("Delay", 50, 10, 400, 10, "ms", new ModeOnly(mode, 5)));
-        this.registerSetting(zipDelay = new SliderSetting("Delay", 1000, 500, 10000, 250, "ms", new ModeOnly(mode, 6)));
+        this.registerSetting(chance = new SliderSetting("Chance", 100, 0, 100, 1, "%", canChangeMode));
+        this.registerSetting(intave$xzOnHit = new SliderSetting("XZ on hit", 0.6, 0, 1, 0.01, new ModeOnly(mode, 2)));
+        this.registerSetting(intave$xzOnSprintHit = new SliderSetting("XZ on sprint hit", 0.6, 0, 1, 0.01, new ModeOnly(mode, 2)));
+        this.registerSetting(grimAC$reduce = new SliderSetting("Reduce", 5, 0, 5, 1, new ModeOnly(mode, 3)));
+        this.registerSetting(tick$delay = new SliderSetting("Delay", 50, 10, 400, 10, "ms", new ModeOnly(mode, 5)));
+        this.registerSetting(zip$delay = new SliderSetting("Delay", 1000, 500, 10000, 250, "ms", new ModeOnly(mode, 6)));
         this.registerSetting(cancelExplosion = new ButtonSetting("Cancel explosion packet", true, canChangeMode));
         this.registerSetting(cancelAir = new ButtonSetting("Cancel air", false, canChangeMode));
         this.registerSetting(damageBoost = new ButtonSetting("Damage boost", false));
@@ -81,9 +88,10 @@ public class Velocity extends Module {
         this.registerSetting(boostDelay = new SliderSetting("Boost delay", 0, 0, 1000, 5, "ms", damageBoost::isToggled));
         this.registerSetting(groundCheck = new ButtonSetting("Ground check", false, damageBoost::isToggled));
         this.registerSetting(lobbyCheck = new ButtonSetting("Lobby check", false));
-        this.registerSetting(onlyFirstHit = new ButtonSetting("Only first hit", false));
-        this.registerSetting(resetTime = new SliderSetting("Reset time", 5000, 500, 10000, 500, "ms", onlyFirstHit::isToggled));
-        this.registerSetting(debug = new ButtonSetting("Debug", false, new ModeOnly(mode, 2, 3, 6)));
+        ModeOnly onlyFirstHitModes = new ModeOnly(mode, 0, 1, 5, 6);
+        this.registerSetting(onlyFirstHit = new ButtonSetting("Only first hit", false, onlyFirstHitModes));
+        this.registerSetting(resetTime = new SliderSetting("Reset time", 5000, 500, 10000, 500, "ms", onlyFirstHitModes.extend(onlyFirstHit::isToggled)));
+        this.registerSetting(debug = new ButtonSetting("Debug", false, new ModeOnly(mode, 2, 3, 6, 7)));
     }
 
     @SubscribeEvent
@@ -93,22 +101,48 @@ public class Velocity extends Module {
         }
 
         try {
-            if (!delayedPacket.isEmpty() && System.currentTimeMillis() - startDelayTime > zipDelay.getInput()) {
+            if (!delayedPacket.isEmpty() && System.currentTimeMillis() - startDelayTime > zip$delay.getInput()) {
                 releasePackets();
             }
 
-            if (mode.getInput() == 2) {
-                if (mc.objectMouseOver.typeOfHit.equals(MovingObjectPosition.MovingObjectType.ENTITY) && mc.thePlayer.hurtTime > 0 && !attacked) {
-                    final double motionX = mc.thePlayer.motionX;
-                    final double motionZ = mc.thePlayer.motionZ;
+            switch ((int) mode.getInput()) {
+                case 2:
+                    if (attacked && !slowDown && mc.thePlayer.hurtTime > 0) {
+                        final double motionX = mc.thePlayer.motionX;
+                        final double motionZ = mc.thePlayer.motionZ;
 
-                    mc.thePlayer.motionX = motionX * 0.6;
-                    mc.thePlayer.motionZ = motionZ * 0.6;
-                    mc.thePlayer.setSprinting(false);
-                    if (debug.isToggled()) Utils.sendMessage(String.format("reduced %.2f %.2f", motionX - mc.thePlayer.motionX, motionZ - mc.thePlayer.motionZ));
-                }
-                attacked = false;
+                        if (mc.thePlayer.isSprinting()) {
+                            mc.thePlayer.motionX = motionX * intave$xzOnSprintHit.getInput();
+                            mc.thePlayer.motionZ = motionZ * intave$xzOnSprintHit.getInput();
+                            mc.thePlayer.setSprinting(false);
+                        } else {
+                            mc.thePlayer.motionX = motionX * intave$xzOnHit.getInput();
+                            mc.thePlayer.motionZ = motionZ * intave$xzOnHit.getInput();
+                        }
+                        if (debug.isToggled()) Utils.sendMessage(String.format("reduced %.2f %.2f", motionX - mc.thePlayer.motionX, motionZ - mc.thePlayer.motionZ));
+                    }
+                    break;
+                case 7:
+                    if (attacked && !slowDown && mc.thePlayer.hurtTime > 0) {
+                        final double motionX = mc.thePlayer.motionX;
+                        final double motionZ = mc.thePlayer.motionZ;
+
+                        if (mc.thePlayer.isSprinting()) {
+                            if (Math.abs(motionX) < 0.625 && Math.abs(motionZ) < 0.625) {
+                                mc.thePlayer.motionX = motionX * 0.4;
+                                mc.thePlayer.motionZ = motionZ * 0.4;
+                            } else if (Math.abs(motionX) < 1.25 && Math.abs(motionZ) < 1.25) {
+                                mc.thePlayer.motionX = motionX * 0.67;
+                                mc.thePlayer.motionZ = motionZ * 0.67;
+                            }
+                            mc.thePlayer.setSprinting(false);
+                        }
+                        if (debug.isToggled()) Utils.sendMessage(String.format("reduced %.2f %.2f", motionX - mc.thePlayer.motionX, motionZ - mc.thePlayer.motionZ));
+                    }
+                    break;
             }
+            attacked = false;
+            slowDown = false;
         } catch (NullPointerException e) {
             Utils.sendMessage(e.getLocalizedMessage());
         }
@@ -139,7 +173,7 @@ public class Velocity extends Module {
     }
 
     private void grimAC$reduce() {
-        for (int i = 0; i < (int) reduce.getInput(); i++) {
+        for (int i = 0; i < (int) grimAC$reduce.getInput(); i++) {
             PacketUtils.sendPacketNoEvent(new C0APacketAnimation());
             PacketUtils.sendPacketNoEvent(new C02PacketUseEntity(lastAttack, C02PacketUseEntity.Action.ATTACK));
             mc.thePlayer.motionX *= 0.6;
@@ -169,9 +203,12 @@ public class Velocity extends Module {
         if (!Utils.nullCheck() || LongJump.stopModules || e.isCanceled()) {
             return;
         }
+        if (chance.getInput() != 100 && Math.random() * 100 > chance.getInput()) {
+            return;
+        }
         final long time = System.currentTimeMillis();
         if (e.getPacket() instanceof S32PacketConfirmTransaction && mode.getInput() == 6) {
-            if (time - startDelayTime <= zipDelay.getInput()) {
+            if (time - startDelayTime <= zip$delay.getInput()) {
                 e.setCanceled(true);
                 delayedPacket.add((S32PacketConfirmTransaction) e.getPacket());
             }
@@ -224,14 +261,14 @@ public class Velocity extends Module {
                                 mc.thePlayer.motionY *= vertical.getInput() / 100;
                                 mc.thePlayer.motionZ *= horizontal.getInput() / 100;
                             }
-                        }, (long) tickDelay.getInput(), TimeUnit.MILLISECONDS);
+                        }, (long) tick$delay.getInput(), TimeUnit.MILLISECONDS);
                         break;
                     case 6:
                         e.setCanceled(true);
                         if (startDelayTime == -1) {
                             startDelayTime = time;
                         }
-                        if (time - startDelayTime <= zipDelay.getInput()) {
+                        if (time - startDelayTime <= zip$delay.getInput()) {
                             e.setCanceled(true);
                             delayedPacket.add((S12PacketEntityVelocity) e.getPacket());
                         }

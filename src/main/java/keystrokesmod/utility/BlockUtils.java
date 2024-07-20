@@ -6,6 +6,8 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
+import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.init.Blocks;
@@ -224,5 +226,29 @@ public class BlockUtils {
 //                .filter(blockPos -> !((blockPos.getY() == minY || blockPos.getY() == maxY)
 //                        && (blockPos.getX() == minX || blockPos.getX() == maxX || blockPos.getZ() == minZ || blockPos.getZ() == maxZ)))
                 .collect(Collectors.toSet());
+    }
+
+    public static boolean insideBlock() {
+        if (mc.thePlayer.ticksExisted < 5) {
+            return false;
+        }
+
+        return insideBlock(mc.thePlayer.getEntityBoundingBox());
+    }
+
+    public static boolean insideBlock(@NotNull final AxisAlignedBB bb) {
+        final WorldClient world = mc.theWorld;
+        for (int x = MathHelper.floor_double(bb.minX); x < MathHelper.floor_double(bb.maxX) + 1; ++x) {
+            for (int y = MathHelper.floor_double(bb.minY); y < MathHelper.floor_double(bb.maxY) + 1; ++y) {
+                for (int z = MathHelper.floor_double(bb.minZ); z < MathHelper.floor_double(bb.maxZ) + 1; ++z) {
+                    final Block block = world.getBlockState(new BlockPos(x, y, z)).getBlock();
+                    final AxisAlignedBB boundingBox;
+                    if (block != null && !(block instanceof BlockAir) && (boundingBox = block.getCollisionBoundingBox(world, new BlockPos(x, y, z), world.getBlockState(new BlockPos(x, y, z)))) != null && bb.intersectsWith(boundingBox)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 }
