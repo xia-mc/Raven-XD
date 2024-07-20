@@ -177,6 +177,7 @@ public class ModuleManager {
         this.addModule(new ScreenshotHelper());
         this.addModule(slotHandler = new SlotHandler());
         this.addModule(staffDetector = new StaffDetector());
+        this.addModule(new BedProximityAlert());
 
         // player
         this.addModule(new AntiAFK());

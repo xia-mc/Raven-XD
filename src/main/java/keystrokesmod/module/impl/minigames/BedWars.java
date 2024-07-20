@@ -38,7 +38,7 @@ public class BedWars extends Module {
     private final ButtonSetting fireball;
     private final ButtonSetting obsidian;
     private final ButtonSetting shouldPing;
-    private BlockPos spawnPos;
+    private static BlockPos spawnPos;
     private boolean check;
     public static boolean outsideSpawn = true;
     private final List<String> armoredPlayer = new CopyOnWriteArrayList<>();
@@ -209,6 +209,9 @@ public class BedWars extends Module {
         if (shouldPing.isToggled()) {
             mc.thePlayer.playSound("note.pling", 1.0f, 1.0f);
         }
+    }
+    public static BlockPos getSpawnPos() {
+        return spawnPos;
     }
 
     @Override
