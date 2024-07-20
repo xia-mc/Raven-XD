@@ -53,8 +53,6 @@ public class ModuleManager {
     public static Speed speed;
     public static InvManager invManager;
     public static Scaffold scaffold;
-    public static MotionSkidder motionSkidder;
-    public static MotionModifier motionModifier;
     public static AntiVoid antiVoid;
     public static Criticals criticals;
     public static TimerRange timerRange;
@@ -100,6 +98,7 @@ public class ModuleManager {
     public static Watermark watermark;
     public static RightClicker rightClicker;
     public static Notifications notifications;
+    public static WallClimb wallClimb;
 
     public void register() {
 
@@ -152,7 +151,6 @@ public class ModuleManager {
         this.addModule(new InvMove());
         this.addModule(keepSprint = new KeepSprint());
         this.addModule(longJump = new LongJump());
-        this.addModule(motionModifier = new MotionModifier());
         this.addModule(noSlow = new NoSlow());
         this.addModule(phase = new Phase());
         this.addModule(speed = new Speed());
@@ -162,6 +160,7 @@ public class ModuleManager {
         this.addModule(targetStrafe = new TargetStrafe());
         this.addModule(timer = new Timer());
         this.addModule(new VClip());
+        this.addModule(wallClimb = new WallClimb());
 
         // other
         this.addModule(new Anticheat());
@@ -170,7 +169,6 @@ public class ModuleManager {
         this.addModule(clickRecorder = new ClickRecorder());
         this.addModule(new FakeChat());
         this.addModule(new LatencyAlerts());
-        this.addModule(motionSkidder = new MotionSkidder());
         this.addModule(nameHider = new NameHider());
         this.addModule(panic = new Panic());
         this.addModule(recordClick = new RecordClick());

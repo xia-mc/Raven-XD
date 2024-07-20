@@ -1,5 +1,6 @@
 package keystrokesmod.mixins.impl.entity;
 
+import keystrokesmod.event.MoveEvent;
 import keystrokesmod.event.PrePlayerInputEvent;
 import keystrokesmod.event.StepEvent;
 import keystrokesmod.module.ModuleManager;
@@ -134,6 +135,18 @@ public abstract class MixinEntity {
      */
     @Overwrite
     public void moveEntity(double x, double y, double z) {
+        if ((Object) this instanceof EntityPlayerSP) {
+            MoveEvent event = new MoveEvent(x, y, z);
+            MinecraftForge.EVENT_BUS.post(event);
+
+            if (event.isCanceled())
+                return;
+
+            x = event.getX();
+            y = event.getY();
+            z = event.getZ();
+        }
+
         if (this.noClip) {
             this.setEntityBoundingBox(this.getEntityBoundingBox().offset(x, y, z));
             this.resetPositionToBB();
