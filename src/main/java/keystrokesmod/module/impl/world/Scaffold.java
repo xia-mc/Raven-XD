@@ -64,6 +64,8 @@ public class Scaffold extends Module { // from b4 :)
     public final ButtonSetting fast;
     public final ButtonSetting sameY;
     public final ButtonSetting autoJump;
+    private final ButtonSetting expand;
+    private final SliderSetting expandDistance;
 
     public MovingObjectPosition placeBlock;
     private int lastSlot;
@@ -117,6 +119,8 @@ public class Scaffold extends Module { // from b4 :)
         this.registerSetting(fast = new ButtonSetting("Fast", false));
         this.registerSetting(sameY = new ButtonSetting("SameY", false));
         this.registerSetting(autoJump = new ButtonSetting("Auto jump", false));
+        this.registerSetting(expand = new ButtonSetting("Expand", false));
+        this.registerSetting(expandDistance = new SliderSetting("Expand distance", 4.5, 0, 6, 0.1, expand::isToggled));
     }
 
     public void onDisable() {
@@ -368,12 +372,35 @@ public class Scaffold extends Module { // from b4 :)
         targetPos = targetPos.add(enumFacing.getOffset().xCoord, enumFacing.getOffset().yCoord, enumFacing.getOffset().zCoord);
         float[] targetRotation = RotationUtils.getRotations(targetPos);
         float[] searchPitch = new float[]{78, 12};
+
         for (int i = 0; i < 2; i++) {
             if (i == 1 && Utils.overPlaceable(-1)) {
                 searchYaw = 180;
                 searchPitch = new float[]{65, 25};
-            }
-            else if (i == 1) {
+            } else if (i == 1) {
+                if (expand.isToggled()) {
+                    final keystrokesmod.script.classes.Vec3 eyePos = Utils.getEyePos();
+                    for (int j = 0; j < Math.round(expandDistance.getInput()); j++) {
+                        targetPos = targetPos.offset(mc.thePlayer.getHorizontalFacing());
+
+                        if (sameY.isToggled() && !Utils.jumpDown()) {
+                            targetPos = new BlockPos(targetPos.getX(), startPos, targetPos.getZ());
+                        }
+
+                        if (!BlockUtils.replaceable(targetPos))
+                            continue;
+
+                        Optional<Triple<BlockPos, EnumFacing, keystrokesmod.script.classes.Vec3>> optional = RotationUtils.getPlaceSide(targetPos);
+                        if (!optional.isPresent()) continue;
+
+                        Triple<BlockPos, EnumFacing, keystrokesmod.script.classes.Vec3> placeSide = optional.get();
+
+                        if (placeSide.getRight().distanceTo(eyePos) > expandDistance.getInput()) break;
+
+                        rayCasted = new MovingObjectPosition(placeSide.getRight().toVec3(), placeSide.getMiddle(), placeSide.getLeft());
+                        break;
+                    }
+                }
                 break;
             }
             for (float checkYaw : generateSearchSequence(searchYaw)) {

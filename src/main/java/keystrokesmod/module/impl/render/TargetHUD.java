@@ -18,6 +18,7 @@ import net.minecraftforge.event.entity.player.AttackEntityEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Range;
 
 import java.awt.*;
 
@@ -27,6 +28,7 @@ public class TargetHUD extends Module {
     public static int posX = 70;
     public static int posY = 30;
     public static final Color jellocolor = new Color(255, 255, 255, 128);
+    private static final ModeSetting mode = new ModeSetting("Mode", new String[]{"Raven"}, 0);
     private final ButtonSetting onlyKillAura;
     private final SliderSetting maxDistance;
     private static final ModeSetting theme = new ModeSetting("Theme", Theme.themes, 0);
@@ -49,6 +51,7 @@ public class TargetHUD extends Module {
 
     public TargetHUD() {
         super("TargetHUD", category.render);
+        this.registerSetting(mode);
         this.registerSetting(onlyKillAura = new ButtonSetting("Only KillAura", true));
         this.registerSetting(maxDistance = new SliderSetting("Max distance", 6, 3, 20, 1, "blocks", () -> !onlyKillAura.isToggled()));
         this.registerSetting(theme);
@@ -140,7 +143,15 @@ public class TargetHUD extends Module {
         }
     }
 
-    public static void drawTargetHUD(Timer cd, String string, double health) {
+    public static void drawTargetHUD(Timer cd, String string, @Range(from = 0, to = 1) double health) {
+        switch ((int) mode.getInput()) {
+            case 0:
+                drawRavenTargetHUD(cd, string, health);
+                break;
+        }
+    }
+
+    private static void drawRavenTargetHUD(Timer cd, String string, double health) {
         if (showStatus.isToggled()) {
             string = string + " " + ((health <= Utils.getCompleteHealth(mc.thePlayer) / mc.thePlayer.getMaxHealth()) ? "§aW" : "§cL");
         }

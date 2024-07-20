@@ -79,16 +79,20 @@ public class AutoClicker extends IAutoClicker {
 
     @Override
     public boolean click() {
-        if (!breakBlocks.isToggled() || mc.objectMouseOver == null || mc.objectMouseOver.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK) {
-            if (mc.currentScreen == null) {
-                Utils.sendClick(0, true);
-                return true;
-            } else if (inventoryFill.isToggled() && mc.currentScreen instanceof GuiContainer) {
-                Utils.inventoryClick(mc.currentScreen);
-                return true;
+        if (mc.objectMouseOver != null && mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
+            if (breakBlocks.isToggled()) {
+                return false;
+            } else {
+                ((PlayerControllerMPAccessor) mc.playerController).setCurBlockDamageMP(0);
             }
-        } else {
-            ((PlayerControllerMPAccessor) mc.playerController).setCurBlockDamageMP(0);
+        }
+
+        if (mc.currentScreen == null) {
+            Utils.sendClick(0, true);
+            return true;
+        } else if (inventoryFill.isToggled() && mc.currentScreen instanceof GuiContainer) {
+            Utils.inventoryClick(mc.currentScreen);
+            return true;
         }
         return false;
     }
