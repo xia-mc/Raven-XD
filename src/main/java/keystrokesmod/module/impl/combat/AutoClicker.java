@@ -80,7 +80,7 @@ public class AutoClicker extends IAutoClicker {
     public boolean click() {
         if (mc.objectMouseOver != null && mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
             if (breakBlocks.isToggled()) {
-                return false;
+                return true;
             } else {
                 ((PlayerControllerMPAccessor) mc.playerController).setCurBlockDamageMP(0);
             }
