@@ -378,12 +378,12 @@ public class Scaffold extends Module { // from b4 :)
                 searchYaw = 180;
                 searchPitch = new float[]{65, 25};
             } else if (i == 1) {
-                if (expand.isToggled()) {
+                if (expand.isToggled() && !(tower.isToggled() && Utils.jumpDown())) {
                     final keystrokesmod.script.classes.Vec3 eyePos = Utils.getEyePos();
                     for (int j = 0; j < Math.round(expandDistance.getInput()); j++) {
                         targetPos = targetPos.offset(mc.thePlayer.getHorizontalFacing());
 
-                        if (sameY.isToggled() && !Utils.jumpDown()) {
+                        if (sameY.isToggled()) {
                             targetPos = new BlockPos(targetPos.getX(), startPos, targetPos.getZ());
                         }
 

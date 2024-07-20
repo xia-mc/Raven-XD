@@ -3,7 +3,6 @@ package keystrokesmod.module.impl.combat;
 import keystrokesmod.event.ClickEvent;
 import keystrokesmod.mixins.impl.client.MinecraftAccessor;
 import keystrokesmod.mixins.impl.client.PlayerControllerMPAccessor;
-import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.combat.autoclicker.DragClickAutoClicker;
 import keystrokesmod.module.impl.combat.autoclicker.IAutoClicker;
 import keystrokesmod.module.impl.combat.autoclicker.NormalAutoClicker;
@@ -71,7 +70,7 @@ public class AutoClicker extends IAutoClicker {
     public void onUpdate() {
         ((MinecraftAccessor) mc).setLeftClickCounter(-1);
 
-        if (!coolDown.hasFinished() && this.jitter.isToggled() && mc.gameSettings.keyBindUseItem.isKeyDown()) {
+        if (!coolDown.hasFinished() && this.jitter.isToggled()) {
             mc.thePlayer.rotationYaw += (float) (((Math.random() - 0.5) * 400 / Minecraft.getDebugFPS()) * directionX);
             mc.thePlayer.rotationPitch += (float) (((Math.random() - 0.5) * 400 / Minecraft.getDebugFPS()) * directionY) * mc.gameSettings.mouseSensitivity * 2;
         }

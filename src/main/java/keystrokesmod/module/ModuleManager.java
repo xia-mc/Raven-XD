@@ -99,6 +99,7 @@ public class ModuleManager {
     public static BridgeAssist bridgeAssist;
     public static Watermark watermark;
     public static RightClicker rightClicker;
+    public static Notifications notifications;
 
     public void register() {
 
@@ -110,7 +111,7 @@ public class ModuleManager {
         // this.addModule(new NyaProxy());
         this.addModule(new Settings());
         this.addModule(new MiddleClick());
-        this.addModule(new Notifications());
+        this.addModule(notifications = new Notifications());
 
         // combat
         this.addModule(new AimAssist());
@@ -256,6 +257,7 @@ public class ModuleManager {
         // enable
         antiBot.enable();
         commandChat.enable();
+        notifications.enable();
         modules.sort(Comparator.comparing(Module::getPrettyName));
     }
 

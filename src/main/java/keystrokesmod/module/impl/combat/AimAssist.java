@@ -16,10 +16,6 @@ public class AimAssist extends Module {
                 .setDefaultValue("Original"));
     }
 
-    public String getInfo() {
-        return mode.getSubModeValues().get((int) mode.getInput()).getPrettyName();
-    }
-
     public void onEnable() {
         mode.enable();
     }
