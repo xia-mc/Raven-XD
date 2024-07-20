@@ -2,10 +2,7 @@ package keystrokesmod.module.impl.world;
 
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
-import keystrokesmod.module.impl.world.tower.BlocksMCTower;
-import keystrokesmod.module.impl.world.tower.HypixelATower;
-import keystrokesmod.module.impl.world.tower.HypixelBTower;
-import keystrokesmod.module.impl.world.tower.VanillaTower;
+import keystrokesmod.module.impl.world.tower.*;
 import keystrokesmod.module.setting.impl.*;
 import keystrokesmod.utility.Utils;
 import org.lwjgl.input.Keyboard;
@@ -26,6 +23,7 @@ public class Tower extends Module {
                 .add(new HypixelATower("Hypixel A", this))
                 .add(new BlocksMCTower("BlocksMC", this))
                 .add(new HypixelBTower("Hypixel B", this))
+                .add(new ConstantMotionTower("ConstantMotion", this))
                 .setDefaultValue("Vanilla")
         );
 
@@ -53,14 +51,10 @@ public class Tower extends Module {
     }
 
     public boolean modulesEnabled() {
-        return  ((ModuleManager.safeWalk.isEnabled() && ModuleManager.safeWalk.tower.isToggled() && SafeWalk.canSafeWalk()) || (scaffold.isEnabled() && scaffold.tower.isToggled()));
+        return ((ModuleManager.safeWalk.isEnabled() && ModuleManager.safeWalk.tower.isToggled() && SafeWalk.canSafeWalk()) || (scaffold.isEnabled() && scaffold.tower.isToggled()));
     }
 
     public boolean canSprint() {
         return canTower() && this.sprintJumpForward.isToggled() && Keyboard.isKeyDown(mc.gameSettings.keyBindForward.getKeyCode()) && Utils.jumpDown();
-    }
-
-    public boolean diagonal() {
-        return (Math.abs(mc.thePlayer.motionX) > 0.05 && Math.abs(mc.thePlayer.motionZ) > 0.05);
     }
 }

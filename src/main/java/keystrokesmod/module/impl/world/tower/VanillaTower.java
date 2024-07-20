@@ -8,8 +8,6 @@ import keystrokesmod.utility.Utils;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
-import static keystrokesmod.module.ModuleManager.tower;
-
 public class VanillaTower extends SubMode<Tower> {
     private final SliderSetting speed;
     private final SliderSetting diagonalSpeed;
@@ -33,12 +31,12 @@ public class VanillaTower extends SubMode<Tower> {
 
     @SubscribeEvent
     public void onPreMotion(PreMotionEvent e) throws IllegalAccessException {
-        if (tower.canTower()) {
+        if (parent.canTower()) {
             wasTowering = true;
-                Utils.setSpeed(Math.max((tower.diagonal() ? diagonalSpeed.getInput() : speed.getInput()) * 0.1 - 0.25, 0));
-                mc.thePlayer.jump();
+            Utils.setSpeed(Math.max((diagonal() ? diagonalSpeed.getInput() : speed.getInput()) * 0.1 - 0.25, 0));
+            mc.thePlayer.jump();
         } else {
-            if (wasTowering && slowedTicks.getInput() > 0 && tower.modulesEnabled()) {
+            if (wasTowering && slowedTicks.getInput() > 0) {
                 if (slowTicks++ < slowedTicks.getInput()) {
                     Utils.setSpeed(Math.max(slowedSpeed.getInput() * 0.1 - 0.25, 0));
                 }
@@ -56,4 +54,7 @@ public class VanillaTower extends SubMode<Tower> {
         }
     }
 
+    public boolean diagonal() {
+        return (Math.abs(mc.thePlayer.motionX) > 0.05 && Math.abs(mc.thePlayer.motionZ) > 0.05);
+    }
 }

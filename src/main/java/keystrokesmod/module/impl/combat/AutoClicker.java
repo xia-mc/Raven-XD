@@ -3,7 +3,6 @@ package keystrokesmod.module.impl.combat;
 import keystrokesmod.event.ClickEvent;
 import keystrokesmod.mixins.impl.client.MinecraftAccessor;
 import keystrokesmod.mixins.impl.client.PlayerControllerMPAccessor;
-import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.combat.autoclicker.DragClickAutoClicker;
 import keystrokesmod.module.impl.combat.autoclicker.IAutoClicker;
 import keystrokesmod.module.impl.combat.autoclicker.NormalAutoClicker;
@@ -71,7 +70,7 @@ public class AutoClicker extends IAutoClicker {
     public void onUpdate() {
         ((MinecraftAccessor) mc).setLeftClickCounter(-1);
 
-        if (!coolDown.hasFinished() && this.jitter.isToggled() && mc.gameSettings.keyBindUseItem.isKeyDown()) {
+        if (!coolDown.hasFinished() && this.jitter.isToggled()) {
             mc.thePlayer.rotationYaw += (float) (((Math.random() - 0.5) * 400 / Minecraft.getDebugFPS()) * directionX);
             mc.thePlayer.rotationPitch += (float) (((Math.random() - 0.5) * 400 / Minecraft.getDebugFPS()) * directionY) * mc.gameSettings.mouseSensitivity * 2;
         }
@@ -79,16 +78,20 @@ public class AutoClicker extends IAutoClicker {
 
     @Override
     public boolean click() {
-        if (!breakBlocks.isToggled() || mc.objectMouseOver == null || mc.objectMouseOver.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK) {
-            if (mc.currentScreen == null) {
-                Utils.sendClick(0, true);
-                return true;
-            } else if (inventoryFill.isToggled() && mc.currentScreen instanceof GuiContainer) {
-                Utils.inventoryClick(mc.currentScreen);
-                return true;
+        if (mc.objectMouseOver != null && mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
+            if (breakBlocks.isToggled()) {
+                return false;
+            } else {
+                ((PlayerControllerMPAccessor) mc.playerController).setCurBlockDamageMP(0);
             }
-        } else {
-            ((PlayerControllerMPAccessor) mc.playerController).setCurBlockDamageMP(0);
+        }
+
+        if (mc.currentScreen == null) {
+            Utils.sendClick(0, true);
+            return true;
+        } else if (inventoryFill.isToggled() && mc.currentScreen instanceof GuiContainer) {
+            Utils.inventoryClick(mc.currentScreen);
+            return true;
         }
         return false;
     }

@@ -53,8 +53,6 @@ public class ModuleManager {
     public static Speed speed;
     public static InvManager invManager;
     public static Scaffold scaffold;
-    public static MotionSkidder motionSkidder;
-    public static MotionModifier motionModifier;
     public static AntiVoid antiVoid;
     public static Criticals criticals;
     public static TimerRange timerRange;
@@ -99,6 +97,8 @@ public class ModuleManager {
     public static BridgeAssist bridgeAssist;
     public static Watermark watermark;
     public static RightClicker rightClicker;
+    public static Notifications notifications;
+    public static WallClimb wallClimb;
 
     public void register() {
 
@@ -110,7 +110,7 @@ public class ModuleManager {
         // this.addModule(new NyaProxy());
         this.addModule(new Settings());
         this.addModule(new MiddleClick());
-        this.addModule(new Notifications());
+        this.addModule(notifications = new Notifications());
 
         // combat
         this.addModule(new AimAssist());
@@ -151,7 +151,6 @@ public class ModuleManager {
         this.addModule(new InvMove());
         this.addModule(keepSprint = new KeepSprint());
         this.addModule(longJump = new LongJump());
-        this.addModule(motionModifier = new MotionModifier());
         this.addModule(noSlow = new NoSlow());
         this.addModule(phase = new Phase());
         this.addModule(speed = new Speed());
@@ -161,6 +160,7 @@ public class ModuleManager {
         this.addModule(targetStrafe = new TargetStrafe());
         this.addModule(timer = new Timer());
         this.addModule(new VClip());
+        this.addModule(wallClimb = new WallClimb());
 
         // other
         this.addModule(new Anticheat());
@@ -169,7 +169,6 @@ public class ModuleManager {
         this.addModule(clickRecorder = new ClickRecorder());
         this.addModule(new FakeChat());
         this.addModule(new LatencyAlerts());
-        this.addModule(motionSkidder = new MotionSkidder());
         this.addModule(nameHider = new NameHider());
         this.addModule(panic = new Panic());
         this.addModule(recordClick = new RecordClick());
@@ -177,6 +176,7 @@ public class ModuleManager {
         this.addModule(new ScreenshotHelper());
         this.addModule(slotHandler = new SlotHandler());
         this.addModule(staffDetector = new StaffDetector());
+        this.addModule(new BedProximityAlert());
 
         // player
         this.addModule(new AntiAFK());
@@ -255,6 +255,7 @@ public class ModuleManager {
         // enable
         antiBot.enable();
         commandChat.enable();
+        notifications.enable();
         modules.sort(Comparator.comparing(Module::getPrettyName));
     }
 

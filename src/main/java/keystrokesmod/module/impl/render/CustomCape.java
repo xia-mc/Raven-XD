@@ -12,6 +12,7 @@ import net.minecraft.util.ResourceLocation;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
@@ -52,25 +53,16 @@ public final class CustomCape extends Module {
             return;
         }
 
-        CAPES_NAME = new String[files.length + 12];
-        LOADED_CAPES.clear();
-        String[] builtinCapes = new String[]{
+        final String[] builtinCapes = new String[]{
                 "RavenAnime", "RavenAqua", "RavenGreen", "RavenPurple", "RavenRed", "RavenWhite", "RavenYellow",
                 "Cherry", "Die",
                 "Astolfo", "AugustusCandy", "Esound"
         };
+        CAPES_NAME = new String[files.length + builtinCapes.length];
+        LOADED_CAPES.clear();
         System.arraycopy(builtinCapes, 0, CAPES_NAME, 0, builtinCapes.length);
 
-        for (int i = 0, filesLength = files.length; i < filesLength; i++) {
-            File file = files[i];
-            if (!file.exists() || !file.isFile()) continue;
-            if (!file.getName().endsWith(".png")) continue;
-            String fileName = file.getName().substring(0, file.getName().length() - 4);
-
-            CAPES_NAME[builtinCapes.length + i] = fileName;
-        }
-
-        for (String s : CAPES_NAME) {
+        for (String s : builtinCapes) {
             String name = s.toLowerCase();
             try {
                 InputStream stream = Raven.class.getResourceAsStream("/assets/keystrokesmod/textures/capes/" + name + ".png");
@@ -83,6 +75,22 @@ public final class CustomCape extends Module {
                 stream.close();
             } catch (Exception e) {
                 Utils.sendMessage(RED + "Failed to load cape '" + RESET + s + RED + "'");
+            }
+        }
+
+        for (int i = 0, filesLength = files.length; i < filesLength; i++) {
+            File file = files[i];
+            if (!file.exists() || !file.isFile()) continue;
+            if (!file.getName().endsWith(".png")) continue;
+            String fileName = file.getName().substring(0, file.getName().length() - 4);
+
+            CAPES_NAME[builtinCapes.length + i] = fileName;
+
+            try {
+                BufferedImage bufferedImage = ImageIO.read(file);
+                LOADED_CAPES.add(Minecraft.getMinecraft().renderEngine.getDynamicTextureLocation(fileName, new DynamicTexture(bufferedImage)));
+            } catch (IOException e) {
+                Utils.sendMessage(RED + "Failed to load cape '" + RESET + fileName + RED + "'");
             }
         }
 

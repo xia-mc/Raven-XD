@@ -31,7 +31,7 @@ public class Timer extends Module {
         super("Timer", Module.category.movement, 0);
         this.registerSetting(mode = new ModeSetting("Mode", new String[]{"Normal", "Balance", "Hypixel", "None"}, 0));
         final ModeOnly mode1 = new ModeOnly(mode, 1);
-        this.registerSetting(speed = new SliderSetting("Speed", 1.00, 0.01, 10.0, 0.05, new ModeOnly(mode, 0, 1)));
+        this.registerSetting(speed = new SliderSetting("Speed", 1.00, 0.01, 10.0, 0.01, new ModeOnly(mode, 0, 1)));
         this.registerSetting(slowTimer = new SliderSetting("Slow timer", 0, 0, 1, 0.01, "x", mode1));
         this.registerSetting(maxBalance = new SliderSetting("Max balance", 1000, 0, 3000, 10, "ms", mode1));
         this.registerSetting(costMultiplier = new SliderSetting("Cost multiplier", 1, 0.5, 5, 0.05, "x", mode1));
