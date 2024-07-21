@@ -128,7 +128,7 @@ public class Timer extends Module {
 
     @Override
     public String getInfo() {
-        return String.valueOf(Utils.getTimer().timerSpeed);
+        return String.format("%.2f", Utils.getTimer().timerSpeed);
     }
 
     @Override

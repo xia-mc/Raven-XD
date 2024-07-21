@@ -92,39 +92,42 @@ public class Raven {
     @SubscribeEvent
     public void onTick(@NotNull ClientTickEvent e) {
         if (e.phase == Phase.END) {
-            if (Utils.nullCheck()) {
-                if (Reflection.sendMessage) {
-                    Utils.sendMessage("&cThere was an error, relaunch the game.");
-                    Reflection.sendMessage = false;
-                }
-                for (Module module : getModuleManager().getModules()) {
-                    if (mc.currentScreen == null && module.canBeEnabled()) {
-                        module.keybind();
-                    } else if (mc.currentScreen instanceof ClickGui) {
-                        module.guiUpdate();
+            try {
+                if (Utils.nullCheck()) {
+                    if (Reflection.sendMessage) {
+                        Utils.sendMessage("&cThere was an error, relaunch the game.");
+                        Reflection.sendMessage = false;
                     }
+                    for (Module module : getModuleManager().getModules()) {
+                        if (mc.currentScreen == null && module.canBeEnabled()) {
+                            module.keybind();
+                        } else if (mc.currentScreen instanceof ClickGui) {
+                            module.guiUpdate();
+                        }
 
-                    if (module.isEnabled()) {
-                        module.onUpdate();
+                        if (module.isEnabled()) {
+                            module.onUpdate();
+                        }
                     }
-                }
-                synchronized (Raven.profileManager.profiles) {
-                    for (Profile profile : Raven.profileManager.profiles) {
+                    synchronized (Raven.profileManager.profiles) {
+                        for (Profile profile : Raven.profileManager.profiles) {
+                            if (mc.currentScreen == null) {
+                                profile.getModule().keybind();
+                            }
+                        }
+                    }
+                    for (Module module : Raven.scriptManager.scripts.values()) {
                         if (mc.currentScreen == null) {
-                            profile.getModule().keybind();
+                            module.keybind();
                         }
                     }
                 }
-                for (Module module : Raven.scriptManager.scripts.values()) {
-                    if (mc.currentScreen == null) {
-                        module.keybind();
-                    }
-                }
-            }
 
-            if (isKeyStrokeConfigGuiToggled) {
-                isKeyStrokeConfigGuiToggled = false;
-                mc.displayGuiScreen(new KeyStrokeConfigGui());
+                if (isKeyStrokeConfigGuiToggled) {
+                    isKeyStrokeConfigGuiToggled = false;
+                    mc.displayGuiScreen(new KeyStrokeConfigGui());
+                }
+            } catch (Exception ignored) {
             }
         }
     }

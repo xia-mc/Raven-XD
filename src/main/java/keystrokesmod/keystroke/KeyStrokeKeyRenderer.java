@@ -23,7 +23,7 @@ public class KeyStrokeKeyRenderer {
     }
 
     public void renderKey(int l, int m, int color) {
-        boolean o = this.keyBinding.isKeyDown();
+        boolean o = Keyboard.isKeyDown(this.keyBinding.getKeyCode()) || this.keyBinding.isKeyDown();
         String p = Keyboard.getKeyName(this.keyBinding.getKeyCode());
         if (o != this.e) {
             this.e = o;
