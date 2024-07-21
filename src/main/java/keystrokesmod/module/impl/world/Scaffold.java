@@ -25,7 +25,6 @@ import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.client.C0APacketAnimation;
-import net.minecraft.network.play.server.S22PacketMultiBlockChange;
 import net.minecraft.network.play.server.S23PacketBlockChange;
 import net.minecraft.util.*;
 import net.minecraftforge.client.event.MouseEvent;
@@ -185,6 +184,8 @@ public class Scaffold extends IAutoClicker {
         if (!Utils.nullCheck()) {
             return;
         }
+        if (expand.isToggled() && polar.isToggled() && !polar$waitingForExpand)
+            return;
         float yaw = event.getYaw();
         float pitch = event.getPitch();
         switch ((int) rotation.getInput()) {
@@ -267,6 +268,18 @@ public class Scaffold extends IAutoClicker {
                 mc.thePlayer.setSprinting(false);
             }
         }
+
+        if (expand.isToggled() && polar.isToggled()) {
+            if (!mc.thePlayer.onGround) {
+                polar$waitingForExpand = false;
+                return;
+            }
+
+            if (!polar$waitingForExpand && BlockUtils.replaceable(RotationUtils.getExtendedPos(new BlockPos(mc.thePlayer).down(), mc.thePlayer.rotationYaw, 1))) {
+                final double pos = EnumFacing.fromAngle(getYaw()).getAxis() == EnumFacing.Axis.X ? Math.abs(mc.thePlayer.posX % 1) : Math.abs(mc.thePlayer.posZ % 1);
+                polar$waitingForExpand = pos > 0.75 && pos < 0.95 || pos > 0.05 && pos < 0.25;
+            }
+        }
     }
 
     @SubscribeEvent
@@ -281,23 +294,12 @@ public class Scaffold extends IAutoClicker {
             event.setSneakSlowDownMultiplier(1);
         }
         if (expand.isToggled() && polar.isToggled()) {
-            if (!mc.thePlayer.onGround) {
-                polar$waitingForExpand = false;
-                Utils.resetTimer();
-                return;
-            }
-            
-            if (!polar$waitingForExpand && BlockUtils.replaceable(new BlockPos(mc.thePlayer).down().offset(EnumFacing.fromAngle(getYaw())))) {
-                final double pos = EnumFacing.fromAngle(getYaw()).getAxis() == EnumFacing.Axis.X ? Math.abs(mc.thePlayer.posX % 1) : Math.abs(mc.thePlayer.posZ % 1);
-                polar$waitingForExpand = pos > 0.75 && pos < 0.95 || pos > 0.05 && pos < 0.25;
-            }
-
             if (polar$waitingForExpand) {
                 event.setSneak(true);
-                Utils.getTimer().timerSpeed = (float) (Math.random() * 0.05 + 0.4);
+                event.setForward(0);
+                event.setStrafe(0);
             } else {
                 event.setSneak(false);
-                Utils.resetTimer();
             }
         }
     }
@@ -454,9 +456,10 @@ public class Scaffold extends IAutoClicker {
             } else if (i == 1) {
                 if (expand.isToggled() && !(tower.isToggled() && Utils.jumpDown()) && (!polar.isToggled() || polar$waitingForExpand)) {
                     final keystrokesmod.script.classes.Vec3 eyePos = Utils.getEyePos();
-                    targetPos = new BlockPos(mc.thePlayer).down();
-                    for (int j = 0; j < Math.round(expandDistance.getInput()); j++) {
-                        targetPos = targetPos.offset(mc.thePlayer.getHorizontalFacing());
+                    final BlockPos groundPos = new BlockPos(mc.thePlayer).down();
+                    long expDist = Math.round(expandDistance.getInput());
+                    for (int j = 0; j < expDist; j++) {
+                        targetPos = RotationUtils.getExtendedPos(groundPos, mc.thePlayer.rotationYaw, j);
 
                         if (sameY.isToggled()) {
                             targetPos = new BlockPos(targetPos.getX(), startPos, targetPos.getZ());
@@ -497,7 +500,7 @@ public class Scaffold extends IAutoClicker {
                         if (raycast.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
                             if (raycast.getBlockPos().equals(targetPos) && raycast.sideHit == enumFacing.getEnumFacing()) {
                                 if (rayCasted == null || !BlockUtils.isSamePos(raycast.getBlockPos(), rayCasted.getBlockPos())) {
-                                    if (((ItemBlock) heldItem.getItem()).canPlaceBlockOnSide(mc.theWorld, raycast.getBlockPos(), raycast.sideHit, mc.thePlayer, heldItem)) {
+                                    if (heldItem != null && ((ItemBlock) heldItem.getItem()).canPlaceBlockOnSide(mc.theWorld, raycast.getBlockPos(), raycast.sideHit, mc.thePlayer, heldItem)) {
                                         if (rayCasted == null) {
                                             forceStrict = (forceStrict(checkYaw)) && i == 1;
                                             rayCasted = raycast;
@@ -555,7 +558,7 @@ public class Scaffold extends IAutoClicker {
             else {
                 color = "";
             }
-            mc.fontRendererObj.drawStringWithShadow(color + blocks + " §rblock" + (blocks == 1 ? "" : "s"), scaledResolution.getScaledWidth()/2 + 8, scaledResolution.getScaledHeight()/2 + 4, -1);
+            mc.fontRendererObj.drawStringWithShadow(color + blocks + " §rblock" + (blocks == 1 ? "" : "s"), (float) scaledResolution.getScaledWidth() /2 + 8, (float) scaledResolution.getScaledHeight() /2 + 4, -1);
         }
     }
 
@@ -636,8 +639,8 @@ public class Scaffold extends IAutoClicker {
 
     public double groundDistance() {
         for (int i = 1; i <= 20; i++) {
-            if (!mc.thePlayer.onGround && !(BlockUtils.getBlock(new BlockPos(mc.thePlayer.posX, mc.thePlayer.posY - (i / 10), mc.thePlayer.posZ)) instanceof BlockAir)) {
-                return (i / 10);
+            if (!mc.thePlayer.onGround && !(BlockUtils.getBlock(new BlockPos(mc.thePlayer.posX, mc.thePlayer.posY - ((double) i / 10), mc.thePlayer.posZ)) instanceof BlockAir)) {
+                return ((double) i / 10);
             }
         }
         return -1;
