@@ -57,6 +57,9 @@ public class Scaffold extends IAutoClicker {
     private final ButtonSetting sneak;
     private final SliderSetting sneakEveryBlocks;
     private final SliderSetting sneakTime;
+    private final ButtonSetting rotateWithMovement;
+    private final ButtonSetting staticYaw;
+    private final ButtonSetting reserveYaw;
     private final ModeSetting precision;
     private final ButtonSetting autoSwap;
     private final ButtonSetting useBiggestStack;
@@ -123,6 +126,9 @@ public class Scaffold extends IAutoClicker {
         this.registerSetting(sneak = new ButtonSetting("Sneak", false));
         this.registerSetting(sneakEveryBlocks = new SliderSetting("Sneak every blocks", 1, 1, 10, 1, sneak::isToggled));
         this.registerSetting(sneakTime = new SliderSetting("Sneak time", 50, 0, 500, 10, "ms", sneak::isToggled));
+        this.registerSetting(rotateWithMovement = new ButtonSetting("Rotate with movement", true));
+        this.registerSetting(staticYaw = new ButtonSetting("Static yaw", false));
+        this.registerSetting(reserveYaw = new ButtonSetting("Reserve yaw", false));
         this.registerSetting(autoSwap = new ButtonSetting("AutoSwap", true));
         this.registerSetting(useBiggestStack = new ButtonSetting("Use biggest stack", true, autoSwap::isToggled));
         this.registerSetting(delayOnJump = new ButtonSetting("Delay on jump", true));
@@ -137,7 +143,7 @@ public class Scaffold extends IAutoClicker {
         this.registerSetting(sameY = new ButtonSetting("SameY", false));
         this.registerSetting(autoJump = new ButtonSetting("Auto jump", false));
         this.registerSetting(expand = new ButtonSetting("Expand", false));
-        this.registerSetting(expandDistance = new SliderSetting("Expand distance", 4.5, 0, 6, 0.1, expand::isToggled));
+        this.registerSetting(expandDistance = new SliderSetting("Expand distance", 4.5, 0, 10, 0.1, expand::isToggled));
         this.registerSetting(polar = new ButtonSetting("Polar", false, expand::isToggled));
     }
 
@@ -210,7 +216,7 @@ public class Scaffold extends IAutoClicker {
                 }
                 break;
             case 5:
-                yaw = RotationUtils.normalize(getYaw() + (expand.isToggled() ? 180 : 0)) + (float) strafe.getInput();
+                yaw = RotationUtils.normalize(getYaw()) + (float) strafe.getInput();
                 pitch = placePitch;
                 break;
             case 6:
@@ -450,7 +456,7 @@ public class Scaffold extends IAutoClicker {
                     final keystrokesmod.script.classes.Vec3 eyePos = Utils.getEyePos();
                     targetPos = new BlockPos(mc.thePlayer).down();
                     for (int j = 0; j < Math.round(expandDistance.getInput()); j++) {
-                        targetPos = targetPos.offset(EnumFacing.fromAngle(getYaw()));
+                        targetPos = targetPos.offset(mc.thePlayer.getHorizontalFacing());
 
                         if (sameY.isToggled()) {
                             targetPos = new BlockPos(targetPos.getX(), startPos, targetPos.getZ());
@@ -709,43 +715,48 @@ public class Scaffold extends IAutoClicker {
     }
 
     public float getYaw() {
-        float yaw = 0.0f;
+        float yaw = 0;
         double moveForward = mc.thePlayer.movementInput.moveForward;
         double moveStrafe = mc.thePlayer.movementInput.moveStrafe;
-        if (moveForward == 0.0) {
-            if (moveStrafe == 0.0) {
-                yaw = 180.0f;
-            }
-            else if (moveStrafe > 0.0) {
-                yaw = 90.0f;
-            }
-            else if (moveStrafe < 0.0) {
-                yaw = -90.0f;
-            }
-        }
-        else if (moveForward > 0.0) {
-            if (moveStrafe == 0.0) {
-                yaw = 180.0f;
-            }
-            else if (moveStrafe > 0.0) {
-                yaw = 135.0f;
-            }
-            else if (moveStrafe < 0.0) {
-                yaw = -135.0f;
-            }
-        }
-        else if (moveForward < 0.0) {
-            if (moveStrafe == 0.0) {
-                yaw = 0.0f;
-            }
-            else if (moveStrafe > 0.0) {
-                yaw = 45.0f;
-            }
-            else if (moveStrafe < 0.0) {
-                yaw = -45.0f;
+        if (rotateWithMovement.isToggled()) {
+            if (moveForward > 0.0) {
+                if (moveStrafe > 0.0) {
+                    yaw = 135.0f;
+                } else if (moveStrafe < 0.0) {
+                    yaw = -135.0f;
+                } else {
+                    yaw = 180.0f;
+                }
+
+            } else if (moveForward < 0.0) {
+                if (moveStrafe > 0.0) {
+                    yaw = 45.0f;
+                } else if (moveStrafe < 0.0) {
+                    yaw = -45.0f;
+                } else {
+                    yaw = 0.0f;
+                }
+            } else {
+                if (moveStrafe > 0.0) {
+                    yaw = 90.0f;
+                }
+                else if (moveStrafe < 0.0) {
+                    yaw = -90.0f;
+                } else {
+                    yaw = 180.0f;
+                }
             }
         }
-        return mc.thePlayer.rotationYaw + yaw;
+
+        if (reserveYaw.isToggled())
+            yaw += 180;
+
+        float finalYaw = mc.thePlayer.rotationYaw + yaw;
+        if (staticYaw.isToggled()) {
+            finalYaw -= finalYaw % 45;
+        }
+
+        return finalYaw;
     }
 
     private @Nullable EnumFacingOffset getEnumFacing(final Vec3 position) {

@@ -12,7 +12,6 @@ import keystrokesmod.utility.render.AnimationUtils;
 import keystrokesmod.utility.render.ColorUtils;
 import keystrokesmod.utility.render.RRectUtils;
 import net.minecraft.client.gui.ScaledResolution;
-import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
@@ -21,11 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Notifications extends Module {
-    public static final List<NotificationTypes> notifs = new ArrayList<>();
-    private static final List<String> messages = new ArrayList<>();
-    private static final List<CoolDown> durations = new ArrayList<>();
-    private static final List<AnimationUtils> animationsX = new ArrayList<>();
-    private static final List<AnimationUtils> animationsY = new ArrayList<>();
+    public static final List<Notification> notifs = new ArrayList<>();
     public static ButtonSetting chatNoti;
     public static ButtonSetting moduleToggled;
     private final Font fontRegular = FontManager.getRegular(16);
@@ -46,13 +41,15 @@ public class Notifications extends Module {
 
         if (!chatNoti.isToggled()) {
             ScaledResolution sr = new ScaledResolution(mc);
-            notifs.add(notificationType);
-            messages.add(message);
-            durations.add(new CoolDown(duration));
-            durations.get(notifs.size() - 1).start();
-            animationsX.add(new AnimationUtils(sr.getScaledWidth()));
-            animationsY.add(new AnimationUtils(sr.getScaledHeight() - (notifs.size() * 30)));
-            animationsX.get(notifs.size() - 1).setAnimation(sr.getScaledWidth(), 16);
+            CoolDown coolDown = new CoolDown(duration);
+            coolDown.start();
+            AnimationUtils animationX = new AnimationUtils(sr.getScaledWidth());
+            animationX.setAnimation(sr.getScaledWidth(), 16);
+            new Notification(notificationType,
+                    message, coolDown,
+                    animationX,
+                    new AnimationUtils(sr.getScaledHeight() - (notifs.size() * 30))
+            );
         } else {
             Utils.sendMessage("&7[&1LI&7-" + ((notificationType == NotificationTypes.INFO) ? "&1" : notificationType == NotificationTypes.WARN ? "&e" : "&4") + notificationType.toString() + "&7]&r " + message);
         }
@@ -62,21 +59,18 @@ public class Notifications extends Module {
     public void onTick(TickEvent.RenderTickEvent event) {
         ScaledResolution sr = new ScaledResolution(mc);
         for (int index = 0; index < notifs.size(); index++) {
-            animationsY.get(index).setAnimation(sr.getScaledHeight() - ((index + 1) * 30), 16);
-            RRectUtils.drawRound(animationsX.get(index).getValue(), animationsY.get(index).getValue(), 120, 25, 3, new Color(0, 0, 0, 128));
-            fontIcon.drawString(notifs.get(index) == NotificationTypes.INFO ? "G" : "R", animationsX.get(index).getValue() + 12.5, animationsY.get(index).getValue() + 15.5, MinecraftFontRenderer.CenterMode.XY, false, ColorUtils.getFontColor(2).getRGB());
-            fontRegular.wrapText(messages.get(index), animationsX.get(index).getValue() + 25, animationsY.get(index).getValue() + 12.5, MinecraftFontRenderer.CenterMode.Y, false, ColorUtils.getFontColor(2).getRGB(), 95);
-            if (durations.get(index).hasFinished()) {
+            Notification noti = notifs.get(index);
+            noti.animationY.setAnimation(sr.getScaledHeight() - ((index + 1) * 30), 16);
+            RRectUtils.drawRound(noti.animationX.getValue(), noti.animationY.getValue(), 120, 25, 3, new Color(0, 0, 0, 128));
+            fontIcon.drawString(noti.type == NotificationTypes.INFO ? "G" : "R", noti.animationX.getValue() + 12.5, noti.animationY.getValue() + 15.5, MinecraftFontRenderer.CenterMode.XY, false, ColorUtils.getFontColor(2).getRGB());
+            fontRegular.wrapText(noti.message, noti.animationX.getValue() + 25, noti.animationY.getValue() + 12.5, MinecraftFontRenderer.CenterMode.Y, false, ColorUtils.getFontColor(2).getRGB(), 95);
+            if (noti.duration.hasFinished()) {
                 notifs.remove(index);
-                messages.remove(index);
-                durations.remove(index);
-                animationsX.remove(index);
-                animationsY.remove(index);
                 index--;
-            } else if (durations.get(index).getTimeLeft() < 500) {
-                animationsX.get(index).setAnimation(sr.getScaledWidth(), 16);
+            } else if (noti.duration.getTimeLeft() < 500) {
+                noti.animationX.setAnimation(sr.getScaledWidth(), 16);
             } else {
-                animationsX.get(index).setAnimation(sr.getScaledWidth() - 125, 16);
+                noti.animationX.setAnimation(sr.getScaledWidth() - 125, 16);
             }
         }
     }
@@ -85,5 +79,21 @@ public class Notifications extends Module {
         INFO,
         WARN,
         ERROR
+    }
+
+    public static class Notification {
+        public final NotificationTypes type;
+        public final String message;
+        public final CoolDown duration;
+        public final AnimationUtils animationX;
+        public final AnimationUtils animationY;
+
+        public Notification(NotificationTypes type, String message, CoolDown duration, AnimationUtils animationX, AnimationUtils animationY) {
+            this.type = type;
+            this.message = message;
+            this.duration = duration;
+            this.animationX = animationX;
+            this.animationY = animationY;
+        }
     }
 }
