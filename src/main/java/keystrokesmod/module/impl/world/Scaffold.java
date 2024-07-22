@@ -53,6 +53,7 @@ public class Scaffold extends IAutoClicker {
     private final ModeSetting fastScaffold;
     private final ButtonSetting cancelSprint;
     private final ButtonSetting rayCast;
+    private final ButtonSetting recycleRotation;
     private final ButtonSetting sneak;
     private final SliderSetting sneakEveryBlocks;
     private final SliderSetting sneakTime;
@@ -112,9 +113,9 @@ public class Scaffold extends IAutoClicker {
                 .setDefaultValue("Basic")
         );
         this.registerSetting(aimSpeed = new SliderSetting("Aim speed", 20, 5, 20, 0.1));
-        this.registerSetting(motion = new SliderSetting("Motion", 1.0, 0.5, 1.2, 0.01));
-        this.registerSetting(rotation = new ModeSetting("Rotation", rotationModes, 1));
         this.registerSetting(moveFix = new ButtonSetting("MoveFix", false));
+        this.registerSetting(motion = new SliderSetting("Motion", 1.0, 0.5, 1.2, 0.01, () -> !moveFix.isToggled()));
+        this.registerSetting(rotation = new ModeSetting("Rotation", rotationModes, 1));
         this.registerSetting(tellyStartTick = new SliderSetting("Telly start", 3, 0, 11, 1, "tick", new ModeOnly(rotation, 4)));
         this.registerSetting(tellyStopTick = new SliderSetting("Telly stop", 8, 0, 11, 1, "tick", new ModeOnly(rotation, 4)));
         this.registerSetting(strafe = new SliderSetting("Strafe", 0, -45, 45, 5));
@@ -122,6 +123,7 @@ public class Scaffold extends IAutoClicker {
         this.registerSetting(precision = new ModeSetting("Precision", precisionModes, 4));
         this.registerSetting(cancelSprint = new ButtonSetting("Cancel sprint", false, new ModeOnly(fastScaffold, 0).reserve()));
         this.registerSetting(rayCast = new ButtonSetting("Ray cast", false));
+        this.registerSetting(recycleRotation = new ButtonSetting("Recycle rotation", false));
         this.registerSetting(sneak = new ButtonSetting("Sneak", false));
         this.registerSetting(sneakEveryBlocks = new SliderSetting("Sneak every blocks", 1, 1, 10, 1, sneak::isToggled));
         this.registerSetting(sneakTime = new SliderSetting("Sneak time", 50, 0, 500, 10, "ms", sneak::isToggled));
@@ -407,7 +409,7 @@ public class Scaffold extends IAutoClicker {
         }
         BlockPos targetPos = new BlockPos(targetVec3.xCoord, targetVec3.yCoord, targetVec3.zCoord);
 
-        if (mc.thePlayer.onGround && Utils.isMoving() && motion.getInput() != 1.0) {
+        if (mc.thePlayer.onGround && Utils.isMoving() && motion.getInput() != 1.0 && !moveFix.isToggled()) {
             Utils.setSpeed(Utils.getHorizontalSpeed() * motion.getInput());
         }
         if (lastSlot == -1) {
@@ -423,6 +425,8 @@ public class Scaffold extends IAutoClicker {
             }
             SlotHandler.setCurrentSlot(slot);
         }
+        if (SlotHandler.getHeldItem() == null || !(SlotHandler.getHeldItem().getItem() instanceof ItemBlock))
+            return;
         MovingObjectPosition rayCasted = null;
         float searchYaw = 25;
         switch ((int) precision.getInput()) {
@@ -500,10 +504,19 @@ public class Scaffold extends IAutoClicker {
                         if (raycast.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
                             if (raycast.getBlockPos().equals(targetPos) && raycast.sideHit == enumFacing.getEnumFacing()) {
                                 if (rayCasted == null || !BlockUtils.isSamePos(raycast.getBlockPos(), rayCasted.getBlockPos())) {
-                                    if (heldItem != null && ((ItemBlock) heldItem.getItem()).canPlaceBlockOnSide(mc.theWorld, raycast.getBlockPos(), raycast.sideHit, mc.thePlayer, heldItem)) {
+                                    if (heldItem != null && heldItem.getItem() instanceof ItemBlock && ((ItemBlock) heldItem.getItem()).canPlaceBlockOnSide(mc.theWorld, raycast.getBlockPos(), raycast.sideHit, mc.thePlayer, heldItem)) {
                                         if (rayCasted == null) {
                                             forceStrict = (forceStrict(checkYaw)) && i == 1;
                                             rayCasted = raycast;
+                                            if (recycleRotation.isToggled()) {
+                                                Optional<Triple<BlockPos, EnumFacing, keystrokesmod.script.classes.Vec3>> placeSide = RotationUtils.getPlaceSide(targetPos);
+                                                if (placeSide.isPresent()) {
+//                                                    rayCasted = new MovingObjectPosition(placeSide.get().getRight().toVec3(), placeSide.get().getMiddle(), placeSide.get().getLeft());
+                                                    placeYaw = PlayerRotation.getYaw(placeSide.get().getRight());
+                                                    placePitch = PlayerRotation.getPitch(placeSide.get().getRight());
+                                                    break;
+                                                }
+                                            }
                                             placeYaw = fixedYaw;
                                             placePitch = fixedPitch;
                                             break;
@@ -718,7 +731,7 @@ public class Scaffold extends IAutoClicker {
     }
 
     public float getYaw() {
-        float yaw = 0;
+        float yaw = 180.0f;
         double moveForward = mc.thePlayer.movementInput.moveForward;
         double moveStrafe = mc.thePlayer.movementInput.moveStrafe;
         if (rotateWithMovement.isToggled()) {
@@ -727,10 +740,7 @@ public class Scaffold extends IAutoClicker {
                     yaw = 135.0f;
                 } else if (moveStrafe < 0.0) {
                     yaw = -135.0f;
-                } else {
-                    yaw = 180.0f;
                 }
-
             } else if (moveForward < 0.0) {
                 if (moveStrafe > 0.0) {
                     yaw = 45.0f;
@@ -745,8 +755,6 @@ public class Scaffold extends IAutoClicker {
                 }
                 else if (moveStrafe < 0.0) {
                     yaw = -90.0f;
-                } else {
-                    yaw = 180.0f;
                 }
             }
         }

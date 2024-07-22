@@ -3,8 +3,10 @@ package keystrokesmod.module.impl.movement;
 import keystrokesmod.event.PreMotionEvent;
 import keystrokesmod.event.PreUpdateEvent;
 import keystrokesmod.module.Module;
+import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.ModeSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
+import keystrokesmod.module.setting.utils.ModeOnly;
 import keystrokesmod.utility.MoveUtil;
 import keystrokesmod.utility.Utils;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -12,6 +14,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 public class Step extends Module {
     private final ModeSetting mode = new ModeSetting("Mode", new String[]{"Hypixel 1.5"}, 0);
     private final SliderSetting delay = new SliderSetting("Delay", 1000, 0, 5000, 250, "ms");
+    private final ButtonSetting test = new ButtonSetting("Test", false, new ModeOnly(mode, 0));
 
     private int offGroundTicks = -1;
     private boolean stepping = false;
@@ -19,7 +22,7 @@ public class Step extends Module {
 
     public Step() {
         super("Step", category.movement);
-        this.registerSetting(mode, delay);
+        this.registerSetting(mode, delay, test);
     }
 
     @Override
@@ -51,7 +54,7 @@ public class Step extends Module {
                 return;
             }
 
-            switch (offGroundTicks) {
+            switch (test.isToggled() ? offGroundTicks % 16 : offGroundTicks) {
                 case 0:
                     MoveUtil.stop();
                     MoveUtil.strafe();

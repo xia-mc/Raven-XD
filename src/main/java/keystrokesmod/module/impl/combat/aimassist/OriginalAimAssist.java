@@ -38,13 +38,13 @@ public OriginalAimAssist(String name, AimAssist parent) {
     this.registerSetting(strafeIncrease = new ButtonSetting("Strafe increase", false));
     this.registerSetting(checkBlockBreak = new ButtonSetting("Check block break", true));
     this.registerSetting(aimVertically = new ButtonSetting("Aim vertically", false));
-    this.registerSetting(weaponOnly = new ButtonSetting("Weapon only", false));
-    this.registerSetting(ignoreTeammates = new ButtonSetting("Ignore teammates", false));
-    this.registerSetting(throughBlock = new ButtonSetting("Through block", true));
     this.registerSetting(verticalSpeed = new SliderSetting("Vertical speed", 5, 1, 10, 0.1, aimVertically::isToggled));
     this.registerSetting(horizontalSpeed = new SliderSetting("Horizontal speed", 5, 1, 10, 0.1));
     this.registerSetting(maxAngle = new SliderSetting("Max angle", 180, 1, 360, 5));
     this.registerSetting(distance = new SliderSetting("Distance", 5, 1, 8, 0.1));
+    this.registerSetting(weaponOnly = new ButtonSetting("Weapon only", false));
+    this.registerSetting(ignoreTeammates = new ButtonSetting("Ignore teammates", false));
+    this.registerSetting(throughBlock = new ButtonSetting("Through block", true));
 }
 
     @Override

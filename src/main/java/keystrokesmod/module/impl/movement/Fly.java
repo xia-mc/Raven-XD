@@ -1,6 +1,7 @@
 package keystrokesmod.module.impl.movement;
 
 import keystrokesmod.event.*;
+import keystrokesmod.mixins.impl.network.S12PacketEntityVelocityAccessor;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.other.RotationHandler;
 import keystrokesmod.module.impl.other.SlotHandler;
@@ -50,10 +51,12 @@ public class Fly extends Module {
     private double airStuck$posX, airStuck$posY, airStuck$posZ;
     private float airStuck$yaw;
 
+    private int velocityTicks = -1;
+
     public Fly() {
         super("Fly", category.movement);
-        this.registerSetting(mode = new ModeSetting("Mode", new String[]{"Vanilla", "Fast", "Fast 2", "AirWalk", "Old GrimAC", "BlocksMC", "GrimACBoat", "MMC", "Matrix"}, 0));
-        final ModeOnly canChangeSpeed = new ModeOnly(mode, 0, 1, 2, 6);
+        this.registerSetting(mode = new ModeSetting("Mode", new String[]{"Vanilla", "Fast", "Fast 2", "AirWalk", "Old GrimAC", "BlocksMC", "GrimACBoat", "MMC", "Matrix A", "Matrix B"}, 0));
+        final ModeOnly canChangeSpeed = new ModeOnly(mode, 0, 1, 2, 6, 9);
         final ModeOnly balanceMode = new ModeOnly(mode, 4);
         this.registerSetting(horizontalSpeed = new SliderSetting("Horizontal speed", 2.0, 0.0, 9.0, 0.1, canChangeSpeed));
         this.registerSetting(verticalSpeed = new SliderSetting("Vertical speed", 2.0, 0.0, 9.0, 0.1, canChangeSpeed));
@@ -78,6 +81,7 @@ public class Fly extends Module {
         if ((int) mode.getInput() == 5) {
             Utils.sendMessage("Start the fly under the block and walk forward.");
         }
+        velocityTicks = -1;
     }
 
     @SubscribeEvent
@@ -102,6 +106,22 @@ public class Fly extends Module {
                 );
                 mc.thePlayer.setVelocity(addMotion.x, addMotion.y, addMotion.z);
             }
+        } else if (mode.getInput() == 9 && event.getPacket() instanceof S12PacketEntityVelocity) {
+            S12PacketEntityVelocity packet = (S12PacketEntityVelocity) event.getPacket();
+            if (packet.getEntityID() == mc.thePlayer.getEntityId()) {
+                ((S12PacketEntityVelocityAccessor) packet).setMotionX((int) (packet.getMotionX() * horizontalSpeed.getInput()));
+                ((S12PacketEntityVelocityAccessor) packet).setMotionY(80);
+                ((S12PacketEntityVelocityAccessor) packet).setMotionZ((int) (packet.getMotionZ() * horizontalSpeed.getInput()));
+                velocityTicks = 0;
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public void onMoveInput(MoveInputEvent event) {
+        if (mode.getInput() == 9 && velocityTicks != -1) {
+            event.setForward(0);
+            event.setStrafe(0);
         }
     }
 
@@ -266,6 +286,18 @@ public class Fly extends Module {
                     airStuck = true;
                 } else {
                     airStuck = false;
+                }
+                break;
+            case 9:
+                if (velocityTicks >= 0)
+                    velocityTicks++;
+                if (velocityTicks == 30)
+                    disable();
+
+                if (velocityTicks != -1) {
+                    mc.thePlayer.motionY = verticalSpeed.getInput() / 10 - Math.random() / 1000;
+                    mc.thePlayer.motionX *= 1.15 - Math.random() / 1000;
+                    mc.thePlayer.motionZ *= 1.15 - Math.random() / 1000;
                 }
                 break;
         }

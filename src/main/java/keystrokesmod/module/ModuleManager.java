@@ -99,6 +99,7 @@ public class ModuleManager {
     public static RightClicker rightClicker;
     public static Notifications notifications;
     public static WallClimb wallClimb;
+    public static Jesus jesus;
 
     public void register() {
 
@@ -161,6 +162,7 @@ public class ModuleManager {
         this.addModule(timer = new Timer());
         this.addModule(new VClip());
         this.addModule(wallClimb = new WallClimb());
+        this.addModule(jesus = new Jesus());
 
         // other
         this.addModule(new Anticheat());

@@ -1,19 +1,21 @@
 package keystrokesmod.module.impl.movement;
 
 import keystrokesmod.module.Module;
-import keystrokesmod.module.impl.movement.wallclimb.IntaveWallClimb;
-import keystrokesmod.module.impl.movement.wallclimb.VulcanWallClimb;
+import keystrokesmod.module.impl.movement.jesus.KarhuJesus;
+import keystrokesmod.module.impl.movement.jesus.OldNCPJesus;
+import keystrokesmod.module.impl.movement.jesus.VulcanJesus;
 import keystrokesmod.module.setting.impl.ModeValue;
 
-public class WallClimb extends Module {
+public class Jesus extends Module {
     private final ModeValue mode;
 
-    public WallClimb() {
-        super("WallClimb", category.movement);
+    public Jesus() {
+        super("Jesus", category.movement);
         this.registerSetting(mode = new ModeValue("Mode", this)
-                .add(new IntaveWallClimb("Intave", this))
-                .add(new VulcanWallClimb("Vulcan", this))
-                .setDefaultValue("Intave")
+                .add(new KarhuJesus("Karhu", this))
+                .add(new OldNCPJesus("Old NCP", this))
+                .add(new VulcanJesus("Vulcan", this))
+                .setDefaultValue("Karhu")
         );
     }
 
