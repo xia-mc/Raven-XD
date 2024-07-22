@@ -45,11 +45,11 @@ public class Notifications extends Module {
             coolDown.start();
             AnimationUtils animationX = new AnimationUtils(sr.getScaledWidth());
             animationX.setAnimation(sr.getScaledWidth(), 16);
-            new Notification(notificationType,
+            notifs.add(new Notification(notificationType,
                     message, coolDown,
                     animationX,
                     new AnimationUtils(sr.getScaledHeight() - (notifs.size() * 30))
-            );
+            ));
         } else {
             Utils.sendMessage("&7[&1LI&7-" + ((notificationType == NotificationTypes.INFO) ? "&1" : notificationType == NotificationTypes.WARN ? "&e" : "&4") + notificationType.toString() + "&7]&r " + message);
         }
