@@ -256,4 +256,13 @@ public class MoveUtil {
     public static double predictedMotion(final double motion, final int ticks) {
         return PlayerMove.predictedMotion(motion, ticks);
     }
+
+    /**
+     * Calculates the default player jump motion
+     *
+     * @return player jump motion
+     */
+    public static double jumpMotion() {
+        return jumpBoostMotion(JUMP_HEIGHT);
+    }
 }

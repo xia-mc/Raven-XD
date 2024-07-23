@@ -99,6 +99,8 @@ public class ModuleManager {
     public static RightClicker rightClicker;
     public static Notifications notifications;
     public static WallClimb wallClimb;
+    public static Jesus jesus;
+    public static ExploitFixer exploitFixer;
 
     public void register() {
 
@@ -161,6 +163,7 @@ public class ModuleManager {
         this.addModule(timer = new Timer());
         this.addModule(new VClip());
         this.addModule(wallClimb = new WallClimb());
+        this.addModule(jesus = new Jesus());
 
         // other
         this.addModule(new Anticheat());
@@ -251,6 +254,7 @@ public class ModuleManager {
         this.addModule(infiniteAura = new InfiniteAura());
         this.addModule(modSpoofer = new ModSpoofer());
         this.addModule(pingSpoof = new PingSpoof());
+        this.addModule(exploitFixer = new ExploitFixer());
 
         // enable
         antiBot.enable();

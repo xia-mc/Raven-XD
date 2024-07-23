@@ -18,7 +18,7 @@ public class ModeOnly implements Supplier<Boolean> {
         this.activeMode = Arrays.stream(activeMode).boxed().collect(Collectors.toSet());
     }
 
-    public ModeOnly(@NotNull InputSetting mode, @NotNull List<Double> activeMode) {
+    public ModeOnly(@NotNull InputSetting mode, @NotNull Collection<Double> activeMode) {
         this.mode = mode;
         this.activeMode = new HashSet<>(activeMode);
     }
@@ -44,5 +44,12 @@ public class ModeOnly implements Supplier<Boolean> {
             return this;
         }
         return () -> this.get() && Arrays.stream(suppliers).allMatch(Supplier::get);
+    }
+
+    @Contract("_ -> new")
+    public final @NotNull ModeOnly extend(double @NotNull ... activeMode) {
+        Set<Double> modes = Arrays.stream(activeMode).boxed().collect(Collectors.toSet());
+        modes.addAll(this.activeMode);
+        return new ModeOnly(mode, modes);
     }
 }

@@ -360,4 +360,15 @@ public class RotationUtils {
         }
         return Optional.empty();
     }
+
+    public static BlockPos getExtendedPos(@NotNull BlockPos startPos, float yaw, int distance) {
+        // Convert yaw to radians
+        double radians = Math.toRadians(yaw);
+
+        // Calculate the offset
+        int xOffset = -(int) (distance * Math.sin(radians));
+        int zOffset = (int) (distance * Math.cos(radians));
+
+        return startPos.add(xOffset, 0, zOffset);
+    }
 }

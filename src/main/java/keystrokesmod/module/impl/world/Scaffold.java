@@ -3,14 +3,17 @@ package keystrokesmod.module.impl.world;
 import keystrokesmod.Raven;
 import keystrokesmod.event.*;
 import keystrokesmod.mixins.impl.client.KeyBindingAccessor;
-import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
+import keystrokesmod.module.impl.client.Notifications;
+import keystrokesmod.module.impl.combat.autoclicker.DragClickAutoClicker;
+import keystrokesmod.module.impl.combat.autoclicker.IAutoClicker;
+import keystrokesmod.module.impl.combat.autoclicker.NormalAutoClicker;
+import keystrokesmod.module.impl.combat.autoclicker.RecordAutoClicker;
 import keystrokesmod.module.impl.other.RotationHandler;
 import keystrokesmod.module.impl.other.SlotHandler;
+import keystrokesmod.module.impl.other.anticheats.utils.world.PlayerRotation;
 import keystrokesmod.module.impl.render.HUD;
-import keystrokesmod.module.setting.impl.ButtonSetting;
-import keystrokesmod.module.setting.impl.ModeSetting;
-import keystrokesmod.module.setting.impl.SliderSetting;
+import keystrokesmod.module.setting.impl.*;
 import keystrokesmod.module.setting.utils.ModeOnly;
 import keystrokesmod.utility.*;
 import keystrokesmod.utility.Timer;
@@ -22,6 +25,7 @@ import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.client.C0APacketAnimation;
+import net.minecraft.network.play.server.S23PacketBlockChange;
 import net.minecraft.util.*;
 import net.minecraftforge.client.event.MouseEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
@@ -37,7 +41,8 @@ import org.lwjgl.input.Mouse;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-public class Scaffold extends Module { // from b4 :)
+public class Scaffold extends IAutoClicker {
+    private final ModeValue clickMode;
     private final SliderSetting aimSpeed;
     private final SliderSetting motion;
     private final ModeSetting rotation;
@@ -48,11 +53,16 @@ public class Scaffold extends Module { // from b4 :)
     private final ModeSetting fastScaffold;
     private final ButtonSetting cancelSprint;
     private final ButtonSetting rayCast;
+    private final ButtonSetting recycleRotation;
     private final ButtonSetting sneak;
     private final SliderSetting sneakEveryBlocks;
     private final SliderSetting sneakTime;
+    private final ButtonSetting rotateWithMovement;
+    private final ButtonSetting staticYaw;
+    private final ButtonSetting reserveYaw;
     private final ModeSetting precision;
     private final ButtonSetting autoSwap;
+    private final ButtonSetting useBiggestStack;
     private final ButtonSetting fastOnRMB;
     private final ButtonSetting highlightBlocks;
     private final ButtonSetting multiPlace;
@@ -66,6 +76,7 @@ public class Scaffold extends Module { // from b4 :)
     public final ButtonSetting autoJump;
     private final ButtonSetting expand;
     private final SliderSetting expandDistance;
+    private final ButtonSetting polar;
 
     public MovingObjectPosition placeBlock;
     private int lastSlot;
@@ -73,7 +84,7 @@ public class Scaffold extends Module { // from b4 :)
     private static final String[] fastScaffoldModes = new String[]{"Disabled", "Sprint", "Edge", "Jump A", "Jump B", "Jump C", "Float", "Side", "Legit", "GrimAC", "Sneak"};
     private static final String[] precisionModes = new String[]{"Very low", "Low", "Moderate", "High", "Very high"};
     public float placeYaw;
-    public float placePitch;
+    public float placePitch = 85;
     public int at;
     public int index;
     public boolean rmbDown;
@@ -91,12 +102,20 @@ public class Scaffold extends Module { // from b4 :)
     private boolean telly$noBlockPlace = false;
     public boolean tower$noBlockPlace = false;
     private Float lastYaw = null, lastPitch = null;
+    private boolean polar$waitingForExpand = false;
     public Scaffold() {
         super("Scaffold", category.world);
+        this.registerSetting(clickMode = new ModeValue("Click mode", this)
+                .add(new LiteralSubMode("Basic", this))
+                .add(new NormalAutoClicker("Normal", this, false, true))
+                .add(new DragClickAutoClicker("Drag Click", this, false, true))
+                .add(new RecordAutoClicker("Record", this, false, true))
+                .setDefaultValue("Basic")
+        );
         this.registerSetting(aimSpeed = new SliderSetting("Aim speed", 20, 5, 20, 0.1));
-        this.registerSetting(motion = new SliderSetting("Motion", 1.0, 0.5, 1.2, 0.01));
-        this.registerSetting(rotation = new ModeSetting("Rotation", rotationModes, 1));
         this.registerSetting(moveFix = new ButtonSetting("MoveFix", false));
+        this.registerSetting(motion = new SliderSetting("Motion", 1.0, 0.5, 1.2, 0.01, () -> !moveFix.isToggled()));
+        this.registerSetting(rotation = new ModeSetting("Rotation", rotationModes, 1));
         this.registerSetting(tellyStartTick = new SliderSetting("Telly start", 3, 0, 11, 1, "tick", new ModeOnly(rotation, 4)));
         this.registerSetting(tellyStopTick = new SliderSetting("Telly stop", 8, 0, 11, 1, "tick", new ModeOnly(rotation, 4)));
         this.registerSetting(strafe = new SliderSetting("Strafe", 0, -45, 45, 5));
@@ -104,10 +123,15 @@ public class Scaffold extends Module { // from b4 :)
         this.registerSetting(precision = new ModeSetting("Precision", precisionModes, 4));
         this.registerSetting(cancelSprint = new ButtonSetting("Cancel sprint", false, new ModeOnly(fastScaffold, 0).reserve()));
         this.registerSetting(rayCast = new ButtonSetting("Ray cast", false));
+        this.registerSetting(recycleRotation = new ButtonSetting("Recycle rotation", false));
         this.registerSetting(sneak = new ButtonSetting("Sneak", false));
         this.registerSetting(sneakEveryBlocks = new SliderSetting("Sneak every blocks", 1, 1, 10, 1, sneak::isToggled));
         this.registerSetting(sneakTime = new SliderSetting("Sneak time", 50, 0, 500, 10, "ms", sneak::isToggled));
+        this.registerSetting(rotateWithMovement = new ButtonSetting("Rotate with movement", true));
+        this.registerSetting(staticYaw = new ButtonSetting("Static yaw", false));
+        this.registerSetting(reserveYaw = new ButtonSetting("Reserve yaw", false));
         this.registerSetting(autoSwap = new ButtonSetting("AutoSwap", true));
+        this.registerSetting(useBiggestStack = new ButtonSetting("Use biggest stack", true, autoSwap::isToggled));
         this.registerSetting(delayOnJump = new ButtonSetting("Delay on jump", true));
         this.registerSetting(fastOnRMB = new ButtonSetting("Fast on RMB", false));
         this.registerSetting(highlightBlocks = new ButtonSetting("Highlight blocks", true));
@@ -120,10 +144,13 @@ public class Scaffold extends Module { // from b4 :)
         this.registerSetting(sameY = new ButtonSetting("SameY", false));
         this.registerSetting(autoJump = new ButtonSetting("Auto jump", false));
         this.registerSetting(expand = new ButtonSetting("Expand", false));
-        this.registerSetting(expandDistance = new SliderSetting("Expand distance", 4.5, 0, 6, 0.1, expand::isToggled));
+        this.registerSetting(expandDistance = new SliderSetting("Expand distance", 4.5, 0, 10, 0.1, expand::isToggled));
+        this.registerSetting(polar = new ButtonSetting("Polar", false, expand::isToggled));
     }
 
     public void onDisable() {
+        clickMode.disable();
+
         placeBlock = null;
         if (lastSlot != -1) {
             SlotHandler.setCurrentSlot(lastSlot);
@@ -143,9 +170,13 @@ public class Scaffold extends Module { // from b4 :)
         telly$noBlockPlace = false;
         tower$noBlockPlace = false;
         lastYaw = lastPitch = null;
+        polar$waitingForExpand = false;
+        Utils.resetTimer();
     }
 
     public void onEnable() {
+        clickMode.enable();
+
         lastSlot = -1;
         startPos = mc.thePlayer.posY;
     }
@@ -155,6 +186,8 @@ public class Scaffold extends Module { // from b4 :)
         if (!Utils.nullCheck()) {
             return;
         }
+        if (expand.isToggled() && polar.isToggled() && !polar$waitingForExpand)
+            return;
         float yaw = event.getYaw();
         float pitch = event.getPitch();
         switch ((int) rotation.getInput()) {
@@ -186,7 +219,7 @@ public class Scaffold extends Module { // from b4 :)
                 }
                 break;
             case 5:
-                yaw = getYaw();
+                yaw = RotationUtils.normalize(getYaw()) + (float) strafe.getInput();
                 pitch = placePitch;
                 break;
             case 6:
@@ -214,7 +247,14 @@ public class Scaffold extends Module { // from b4 :)
         event.setPitch(lastPitch = instant ? pitch : AimSimulator.rotMove(pitch, lastPitch, (float) aimSpeed.getInput()));
         event.setMoveFix(moveFix.isToggled() ? RotationHandler.MoveFix.SILENT : RotationHandler.MoveFix.NONE);
 
+        if (clickMode.getInput() == 0)
+            place = true;
+    }
+
+    @Override
+    public boolean click() {
         place = true;
+        return true;
     }
 
     @SubscribeEvent
@@ -230,6 +270,18 @@ public class Scaffold extends Module { // from b4 :)
                 mc.thePlayer.setSprinting(false);
             }
         }
+
+        if (expand.isToggled() && polar.isToggled()) {
+            if (!mc.thePlayer.onGround) {
+                polar$waitingForExpand = false;
+                return;
+            }
+
+            if (!polar$waitingForExpand && BlockUtils.replaceable(RotationUtils.getExtendedPos(new BlockPos(mc.thePlayer).down(), mc.thePlayer.rotationYaw, 1))) {
+                final double pos = EnumFacing.fromAngle(getYaw()).getAxis() == EnumFacing.Axis.X ? Math.abs(mc.thePlayer.posX % 1) : Math.abs(mc.thePlayer.posZ % 1);
+                polar$waitingForExpand = pos > 0.75 && pos < 0.95 || pos > 0.05 && pos < 0.25;
+            }
+        }
     }
 
     @SubscribeEvent
@@ -242,6 +294,30 @@ public class Scaffold extends Module { // from b4 :)
         if (fastScaffold.getInput() == 10) {
             event.setSneak(true);
             event.setSneakSlowDownMultiplier(1);
+        }
+        if (expand.isToggled() && polar.isToggled()) {
+            if (polar$waitingForExpand) {
+                event.setSneak(true);
+                event.setForward(0);
+                event.setStrafe(0);
+            } else {
+                event.setSneak(false);
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public void onReceivePacket(ReceivePacketEvent event) {
+        if (expand.isToggled() && polar.isToggled()) {
+            if (event.getPacket() instanceof S23PacketBlockChange && polar$waitingForExpand) {
+                S23PacketBlockChange packet = (S23PacketBlockChange) event.getPacket();
+                double distance = expandDistance.getInput();
+                if (packet.getBlockState().getBlock() instanceof BlockAir
+                        && mc.thePlayer.getDistanceSqToCenter(packet.getBlockPosition()) <= distance * distance) {
+                    polar$waitingForExpand = false;
+                    Notifications.sendNotification(Notifications.NotificationTypes.WARN, "Polar cancel a place!");
+                }
+            }
         }
     }
 
@@ -333,20 +409,24 @@ public class Scaffold extends Module { // from b4 :)
         }
         BlockPos targetPos = new BlockPos(targetVec3.xCoord, targetVec3.yCoord, targetVec3.zCoord);
 
-        if (mc.thePlayer.onGround && Utils.isMoving() && motion.getInput() != 1.0) {
+        if (mc.thePlayer.onGround && Utils.isMoving() && motion.getInput() != 1.0 && !moveFix.isToggled()) {
             Utils.setSpeed(Utils.getHorizontalSpeed() * motion.getInput());
-        }
-        int slot = getSlot();
-        if (slot == -1) {
-            return;
         }
         if (lastSlot == -1) {
             lastSlot = SlotHandler.getCurrentSlot();
         }
-        SlotHandler.setCurrentSlot(slot);
-        if (heldItem == null || !(heldItem.getItem() instanceof ItemBlock)) {
-            return;
+        if ((useBiggestStack.isToggled() && autoSwap.isToggled())
+                || SlotHandler.getHeldItem() == null
+                || !(SlotHandler.getHeldItem().getItem() instanceof ItemBlock)
+                || !ContainerUtils.canBePlaced((ItemBlock) SlotHandler.getHeldItem().getItem())) {
+            int slot = getSlot();
+            if (slot == -1) {
+                return;
+            }
+            SlotHandler.setCurrentSlot(slot);
         }
+        if (SlotHandler.getHeldItem() == null || !(SlotHandler.getHeldItem().getItem() instanceof ItemBlock))
+            return;
         MovingObjectPosition rayCasted = null;
         float searchYaw = 25;
         switch ((int) precision.getInput()) {
@@ -378,10 +458,12 @@ public class Scaffold extends Module { // from b4 :)
                 searchYaw = 180;
                 searchPitch = new float[]{65, 25};
             } else if (i == 1) {
-                if (expand.isToggled() && !(tower.isToggled() && Utils.jumpDown())) {
+                if (expand.isToggled() && !(tower.isToggled() && Utils.jumpDown()) && (!polar.isToggled() || polar$waitingForExpand)) {
                     final keystrokesmod.script.classes.Vec3 eyePos = Utils.getEyePos();
-                    for (int j = 0; j < Math.round(expandDistance.getInput()); j++) {
-                        targetPos = targetPos.offset(mc.thePlayer.getHorizontalFacing());
+                    final BlockPos groundPos = new BlockPos(mc.thePlayer).down();
+                    long expDist = Math.round(expandDistance.getInput());
+                    for (int j = 0; j < expDist; j++) {
+                        targetPos = RotationUtils.getExtendedPos(groundPos, mc.thePlayer.rotationYaw, j);
 
                         if (sameY.isToggled()) {
                             targetPos = new BlockPos(targetPos.getX(), startPos, targetPos.getZ());
@@ -398,7 +480,12 @@ public class Scaffold extends Module { // from b4 :)
                         if (placeSide.getRight().distanceTo(eyePos) > expandDistance.getInput()) break;
 
                         rayCasted = new MovingObjectPosition(placeSide.getRight().toVec3(), placeSide.getMiddle(), placeSide.getLeft());
+                        placeYaw = PlayerRotation.getYaw(placeSide.getRight());
+                        placePitch = PlayerRotation.getPitch(placeSide.getRight());
                         break;
+                    }
+                    if (polar.isToggled() && rayCasted == null) {
+                        polar$waitingForExpand = false;
                     }
                 }
                 break;
@@ -417,10 +504,19 @@ public class Scaffold extends Module { // from b4 :)
                         if (raycast.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
                             if (raycast.getBlockPos().equals(targetPos) && raycast.sideHit == enumFacing.getEnumFacing()) {
                                 if (rayCasted == null || !BlockUtils.isSamePos(raycast.getBlockPos(), rayCasted.getBlockPos())) {
-                                    if (((ItemBlock) heldItem.getItem()).canPlaceBlockOnSide(mc.theWorld, raycast.getBlockPos(), raycast.sideHit, mc.thePlayer, heldItem)) {
+                                    if (heldItem != null && heldItem.getItem() instanceof ItemBlock && ((ItemBlock) heldItem.getItem()).canPlaceBlockOnSide(mc.theWorld, raycast.getBlockPos(), raycast.sideHit, mc.thePlayer, heldItem)) {
                                         if (rayCasted == null) {
                                             forceStrict = (forceStrict(checkYaw)) && i == 1;
                                             rayCasted = raycast;
+                                            if (recycleRotation.isToggled()) {
+                                                Optional<Triple<BlockPos, EnumFacing, keystrokesmod.script.classes.Vec3>> placeSide = RotationUtils.getPlaceSide(targetPos);
+                                                if (placeSide.isPresent()) {
+//                                                    rayCasted = new MovingObjectPosition(placeSide.get().getRight().toVec3(), placeSide.get().getMiddle(), placeSide.get().getLeft());
+                                                    placeYaw = PlayerRotation.getYaw(placeSide.get().getRight());
+                                                    placePitch = PlayerRotation.getPitch(placeSide.get().getRight());
+                                                    break;
+                                                }
+                                            }
                                             placeYaw = fixedYaw;
                                             placePitch = fixedPitch;
                                             break;
@@ -436,7 +532,7 @@ public class Scaffold extends Module { // from b4 :)
                 break;
             }
         }
-        if (rayCasted != null && (place || rotation.getInput() == 0)) {
+        if (rayCasted != null && place) {
             KeyBinding.setKeyBindState(mc.gameSettings.keyBindUseItem.getKeyCode(), false);
             placeBlock = rayCasted;
             if (multiPlace.isToggled()) {
@@ -475,7 +571,7 @@ public class Scaffold extends Module { // from b4 :)
             else {
                 color = "";
             }
-            mc.fontRendererObj.drawStringWithShadow(color + blocks + " §rblock" + (blocks == 1 ? "" : "s"), scaledResolution.getScaledWidth()/2 + 8, scaledResolution.getScaledHeight()/2 + 4, -1);
+            mc.fontRendererObj.drawStringWithShadow(color + blocks + " §rblock" + (blocks == 1 ? "" : "s"), (float) scaledResolution.getScaledWidth() /2 + 8, (float) scaledResolution.getScaledHeight() /2 + 4, -1);
         }
     }
 
@@ -556,8 +652,8 @@ public class Scaffold extends Module { // from b4 :)
 
     public double groundDistance() {
         for (int i = 1; i <= 20; i++) {
-            if (!mc.thePlayer.onGround && !(BlockUtils.getBlock(new BlockPos(mc.thePlayer.posX, mc.thePlayer.posY - (i / 10), mc.thePlayer.posZ)) instanceof BlockAir)) {
-                return (i / 10);
+            if (!mc.thePlayer.onGround && !(BlockUtils.getBlock(new BlockPos(mc.thePlayer.posX, mc.thePlayer.posY - ((double) i / 10), mc.thePlayer.posZ)) instanceof BlockAir)) {
+                return ((double) i / 10);
             }
         }
         return -1;
@@ -635,43 +731,43 @@ public class Scaffold extends Module { // from b4 :)
     }
 
     public float getYaw() {
-        float yaw = 0.0f;
+        float yaw = 180.0f;
         double moveForward = mc.thePlayer.movementInput.moveForward;
         double moveStrafe = mc.thePlayer.movementInput.moveStrafe;
-        if (moveForward == 0.0) {
-            if (moveStrafe == 0.0) {
-                yaw = 180.0f;
-            }
-            else if (moveStrafe > 0.0) {
-                yaw = 90.0f;
-            }
-            else if (moveStrafe < 0.0) {
-                yaw = -90.0f;
-            }
-        }
-        else if (moveForward > 0.0) {
-            if (moveStrafe == 0.0) {
-                yaw = 180.0f;
-            }
-            else if (moveStrafe > 0.0) {
-                yaw = 135.0f;
-            }
-            else if (moveStrafe < 0.0) {
-                yaw = -135.0f;
-            }
-        }
-        else if (moveForward < 0.0) {
-            if (moveStrafe == 0.0) {
-                yaw = 0.0f;
-            }
-            else if (moveStrafe > 0.0) {
-                yaw = 45.0f;
-            }
-            else if (moveStrafe < 0.0) {
-                yaw = -45.0f;
+        if (rotateWithMovement.isToggled()) {
+            if (moveForward > 0.0) {
+                if (moveStrafe > 0.0) {
+                    yaw = 135.0f;
+                } else if (moveStrafe < 0.0) {
+                    yaw = -135.0f;
+                }
+            } else if (moveForward < 0.0) {
+                if (moveStrafe > 0.0) {
+                    yaw = 45.0f;
+                } else if (moveStrafe < 0.0) {
+                    yaw = -45.0f;
+                } else {
+                    yaw = 0.0f;
+                }
+            } else {
+                if (moveStrafe > 0.0) {
+                    yaw = 90.0f;
+                }
+                else if (moveStrafe < 0.0) {
+                    yaw = -90.0f;
+                }
             }
         }
-        return mc.thePlayer.rotationYaw + yaw;
+
+        if (reserveYaw.isToggled())
+            yaw += 180;
+
+        float finalYaw = mc.thePlayer.rotationYaw + yaw;
+        if (staticYaw.isToggled()) {
+            finalYaw -= finalYaw % 45;
+        }
+
+        return finalYaw;
     }
 
     private @Nullable EnumFacingOffset getEnumFacing(final Vec3 position) {
@@ -727,8 +823,8 @@ public class Scaffold extends Module { // from b4 :)
         }
 
         if (rayCast.isToggled()) {
-            MovingObjectPosition hitResult = RotationUtils.rayCast(4.5, lastYaw, lastPitch);
-            if (hitResult != null && hitResult.getBlockPos().equals(block.getBlockPos())) {
+            MovingObjectPosition hitResult = RotationUtils.rayCast(4.5, RotationHandler.getRotationYaw(), RotationHandler.getRotationPitch());
+            if (hitResult != null && hitResult.getBlockPos().equals(block.getBlockPos()) && hitResult.sideHit == block.sideHit) {
                 block.hitVec = hitResult.hitVec;
             } else {
                 return;
