@@ -3,6 +3,7 @@ package keystrokesmod.module.impl.render;
 import keystrokesmod.event.PreMotionEvent;
 import keystrokesmod.event.ReceivePacketEvent;
 import keystrokesmod.module.Module;
+import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.setting.impl.ModeSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.utility.Utils;
@@ -10,6 +11,7 @@ import net.minecraft.network.play.server.S03PacketTimeUpdate;
 import net.minecraft.network.play.server.S2BPacketChangeGameState;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+import org.jetbrains.annotations.NotNull;
 
 public class Ambience extends Module {
     private final SliderSetting time;
@@ -53,10 +55,9 @@ public class Ambience extends Module {
         if (mc.thePlayer.ticksExisted % 20 == 0) {
 
             switch ((int) this.weather.getInput()) {
-                case 1: {
+                case 1:
                     reset();
                     break;
-                }
                 case 2:
                     mc.theWorld.setRainStrength(1);
                     mc.theWorld.getWorldInfo().setCleanWeatherTime(0);
@@ -64,12 +65,13 @@ public class Ambience extends Module {
                     mc.theWorld.getWorldInfo().setThunderTime(Integer.MAX_VALUE);
                     mc.theWorld.getWorldInfo().setRaining(true);
                     mc.theWorld.getWorldInfo().setThundering(false);
+                    break;
             }
         }
     }
 
     @SubscribeEvent
-    public void onReceivePacket(ReceivePacketEvent event) {
+    public void onReceivePacket(@NotNull ReceivePacketEvent event) {
         if (event.getPacket() instanceof S03PacketTimeUpdate) {
             event.setCanceled(true);
         }
