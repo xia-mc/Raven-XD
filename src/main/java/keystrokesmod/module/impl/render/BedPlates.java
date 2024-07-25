@@ -24,8 +24,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.*;
 import java.util.List;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -35,19 +34,23 @@ public class BedPlates extends Module {
 
     public static SliderSetting updateRate, yShift, layers;
     private final CoolDown updateCooldown = new CoolDown(0);
+    private ButtonSetting showDistance;
     private BlockPos[] bed = null;
     private SliderSetting range;
     private final List<BlockPos> beds = new ArrayList<>();
     private ButtonSetting firstBed;
     private final List<List<Block>> bedBlocks = new ArrayList<>();
+
     public BedPlates() {
         super("Bed Plates", category.render);
         this.registerSetting(yShift = new SliderSetting("Y-shift", 2, -5, 10, 1));
         this.registerSetting(updateRate = new SliderSetting("Update rate (ms)", 1000, 250, 5000, 250));
+        this.registerSetting(showDistance = new ButtonSetting("Show distance", true));
         this.registerSetting(range = new SliderSetting("Range", 10.0, 2.0, 30.0, 1.0));
-        this.registerSetting(layers = new SliderSetting("Layers", 3, 3, 10, 1));
+        this.registerSetting(layers = new SliderSetting("Layers", 3, 1, 10, 1));
         this.registerSetting(firstBed = new ButtonSetting("Only render first bed", false));
     }
+
     public void onUpdate() {
         if (Utils.nullCheck()) {
             if (updateCooldown.hasFinished()) {
@@ -83,6 +86,7 @@ public class BedPlates extends Module {
             }
         }
     }
+
     public void onDisable() {
         this.beds.clear();
         this.bedBlocks.clear();
@@ -123,85 +127,95 @@ public class BedPlates extends Module {
             }
         }
     }
+
     private void drawPlate(BlockPos blockPos, int index) {
         float rotateX = mc.gameSettings.thirdPersonView == 2 ? -1.0F : 1.0F;
         glPushMatrix();
         glDisable(GL_DEPTH_TEST);
+        GlStateManager.enableBlend();
+        GlStateManager.blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glTranslatef((float) (blockPos.getX() - mc.getRenderManager().viewerPosX + 0.5), (float) (blockPos.getY() - mc.getRenderManager().viewerPosY + yShift.getInput() + 1), (float) (blockPos.getZ() - mc.getRenderManager().viewerPosZ + 0.5));
         glNormal3f(0.0F, 1.0F, 0.0F);
         glRotatef(-mc.getRenderManager().playerViewY, 0.0F, 1.0F, 0.0F);
         glRotatef(mc.getRenderManager().playerViewX, rotateX, 0.0F, 0.0F);
         glScaled(-0.01666666753590107D * Math.sqrt(mc.thePlayer.getDistance(blockPos.getX(), blockPos.getY(), blockPos.getZ())), -0.01666666753590107D * Math.sqrt(mc.thePlayer.getDistance(blockPos.getX(), blockPos.getY(), blockPos.getZ())), 0.01666666753590107D * Math.sqrt(mc.thePlayer.getDistance(blockPos.getX(), blockPos.getY(), blockPos.getZ())));
-        String dist = Math.round(mc.thePlayer.getDistance(blockPos.getX(), blockPos.getY(), blockPos.getZ())) + "m";
-        drawRound(Math.max(17.5, bedBlocks.get(index).size() * 17.5) / -2, -0.5, Math.max(17.5, bedBlocks.get(index).size() * 17.5) - 2.5, 26.5, 3, new Color(0, 0, 0, 90));
-        mc.fontRendererObj.drawString(dist, -mc.fontRendererObj.getStringWidth(dist) / 2, 0, new Color(255, 255, 255, 255).getRGB());
-        double offset = (bedBlocks.get(index).size() * -17.5) / 2;
         List<Block> blocks = bedBlocks.get(index);
-        for (int i = blocks.size() - 1; i >= 0; i--) {
-            Block block = blocks.get(i);
+        drawRound(Math.max(17.5, blocks.size() * 17.5) / -2, -0.5, Math.max(17.5, blocks.size() * 17.5) - 2.5, 26.5, 3, new Color(0, 0, 0, 90));
+        if(showDistance.isToggled()) {
+            String dist = Math.round(mc.thePlayer.getDistance(blockPos.getX(), blockPos.getY(), blockPos.getZ())) + "m";
+            mc.fontRendererObj.drawString(dist, -mc.fontRendererObj.getStringWidth(dist) / 2, 0, new Color(255, 255, 255, 255).getRGB());
+        }
+        double offset = (blocks.size() * -17.5) / 2;
+        for (Block block :blocks) {
             mc.getTextureManager().bindTexture(new ResourceLocation("keystrokesmod:images/" + block.getLocalizedName() + ".png"));
             Gui.drawModalRectWithCustomSizedTexture((int) offset, 10, 0, 0, 15, 15, 15, 15);
             offset += 17.5;
         }
+        GlStateManager.disableBlend();
         glEnable(GL_DEPTH_TEST);
         glPopMatrix();
     }
 
     private boolean findBed(double x, double y, double z, int index) {
         BlockPos bedPos = new BlockPos(x, y, z);
-        Block Bed = Module.mc.theWorld.getBlockState(bedPos).getBlock();
+        Block bedBlock = Module.mc.theWorld.getBlockState(bedPos).getBlock();
         bedBlocks.get(index).clear();
         beds.set(index, null);
-        if (beds.contains(bedPos)) {
+
+        if (beds.contains(bedPos) || !bedBlock.equals(Blocks.bed)) {
             return false;
         }
-        if (Bed.equals(Blocks.bed)) {
-            for (int yi = 0; yi <= layers.getInput(); ++yi) {
-                for (int xi = (int) -layers.getInput(); xi <= layers.getInput(); ++xi) {
-                    for (int zi = (int) -layers.getInput(); zi <= layers.getInput(); ++zi) {
-                        if (mc.theWorld.getBlockState(new BlockPos(bedPos.getX() + xi, bedPos.getY() + yi, bedPos.getZ() + zi)).getBlock().equals(Blocks.wool) && !bedBlocks.get(index).contains(Blocks.wool)) {
-                            bedBlocks.get(index).add(Blocks.wool);
-                        } else if (mc.theWorld.getBlockState(new BlockPos(bedPos.getX() + xi, bedPos.getY() + yi, bedPos.getZ() + zi)).getBlock().equals(Blocks.stained_hardened_clay) && !bedBlocks.get(index).contains(Blocks.stained_hardened_clay)) {
-                            bedBlocks.get(index).add(Blocks.stained_hardened_clay);
-                        } else if (mc.theWorld.getBlockState(new BlockPos(bedPos.getX() + xi, bedPos.getY() + yi, bedPos.getZ() + zi)).getBlock().equals(Blocks.stained_glass) && !bedBlocks.get(index).contains(Blocks.stained_glass)) {
-                            bedBlocks.get(index).add(Blocks.stained_glass);
-                        } else if (mc.theWorld.getBlockState(new BlockPos(bedPos.getX() + xi, bedPos.getY() + yi, bedPos.getZ() + zi)).getBlock().equals(Blocks.planks) && !bedBlocks.get(index).contains(Blocks.planks)) {
-                            bedBlocks.get(index).add(Blocks.planks);
-                        } else if (mc.theWorld.getBlockState(new BlockPos(bedPos.getX() + xi, bedPos.getY() + yi, bedPos.getZ() + zi)).getBlock().equals(Blocks.log) && !bedBlocks.get(index).contains(Blocks.planks)) {
-                            bedBlocks.get(index).add(Blocks.planks);
-                        } else if (mc.theWorld.getBlockState(new BlockPos(bedPos.getX() + xi, bedPos.getY() + yi, bedPos.getZ() + zi)).getBlock().equals(Blocks.log2) && !bedBlocks.get(index).contains(Blocks.planks)) {
-                            bedBlocks.get(index).add(Blocks.planks);
-                        } else if (mc.theWorld.getBlockState(new BlockPos(bedPos.getX() + xi, bedPos.getY() + yi, bedPos.getZ() + zi)).getBlock().equals(Blocks.end_stone) && !bedBlocks.get(index).contains(Blocks.end_stone)) {
-                            bedBlocks.get(index).add(Blocks.end_stone);
-                        } else if (mc.theWorld.getBlockState(new BlockPos(bedPos.getX() + xi, bedPos.getY() + yi, bedPos.getZ() + zi)).getBlock().equals(Blocks.obsidian) && !bedBlocks.get(index).contains(Blocks.obsidian)) {
-                            bedBlocks.get(index).add(Blocks.obsidian);
-                        } else if (mc.theWorld.getBlockState(new BlockPos(bedPos.getX() + xi, bedPos.getY() + yi, bedPos.getZ() + zi)).getBlock().equals(Blocks.water) && !bedBlocks.get(index).contains(Blocks.water)) {
-                            bedBlocks.get(index).add(Blocks.water);
-                        }
-                    }
+
+        // Add bed to bedBlocks list
+        bedBlocks.get(index).add(Blocks.bed);
+        beds.set(index, bedPos);
+
+        // Directions to check around the bed
+        int[][] directions = {
+                {0, 1, 0}, // Above
+                {1, 0, 0}, // Right
+                {-1, 0, 0}, // Left
+                {0, 0, 1}, // Front
+                {0, 0, -1}  // Back
+        };
+
+        int layersCount = (int) layers.getInput();
+
+        for (int[] dir : directions) {
+            for (int layer = 1; layer <= layersCount; layer++) {
+                BlockPos currentPos = bedPos.add(dir[0] * layer, dir[1] * layer, dir[2] * layer);
+                Block currentBlock = mc.theWorld.getBlockState(currentPos).getBlock();
+
+                if (currentBlock.equals(Blocks.air)) {
+                    break;
+                }
+
+                if (isValidBedBlock(currentBlock) && !bedBlocks.get(index).contains(currentBlock)) {
+                    bedBlocks.get(index).add(currentBlock);
                 }
             }
-            if(!bedBlocks.get(index).contains(Blocks.bed)) {
-                bedBlocks.get(index).add(Blocks.bed);
-            }
-            beds.set(index, bedPos);
-            return true;
         }
-        return false;
+
+        return true;
+    }
+
+    private boolean isValidBedBlock(Block block) {
+        return block.equals(Blocks.wool) || block.equals(Blocks.stained_hardened_clay) ||
+                block.equals(Blocks.stained_glass) || block.equals(Blocks.planks) ||
+                block.equals(Blocks.log) || block.equals(Blocks.log2) ||
+                block.equals(Blocks.end_stone) || block.equals(Blocks.obsidian) ||
+                block.equals(Blocks.water);
     }
 
     public static void drawRound(double x, double y, double width, double height, double radius, @NotNull Color color) {
         GlStateManager.color(1, 1, 1, 1);
-        GlStateManager.enableBlend();
-        GlStateManager.blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         roundedShader.init();
 
         setupRoundedRectUniforms(x, y, width, height, radius);
-            roundedShader.setUniformf("color", color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, color.getAlpha() / 255f);
+        roundedShader.setUniformf("color", color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, color.getAlpha() / 255f);
 
         ShaderUtils.drawQuads(x - 1, y - 1, width + 2, height + 2);
         roundedShader.unload();
-        GlStateManager.disableBlend();
     }
 
     private static void setupRoundedRectUniforms(double x, double y, double width, double height, double radius) {
