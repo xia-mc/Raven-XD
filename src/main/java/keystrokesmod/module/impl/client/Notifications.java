@@ -63,7 +63,22 @@ public class Notifications extends Module {
             noti.animationY.setAnimation(sr.getScaledHeight() - ((index + 1) * 30), 16);
             RRectUtils.drawRound(noti.animationX.getValue(), noti.animationY.getValue(), 120, 25, 3, new Color(0, 0, 0, 128));
             fontIcon.drawString(noti.type == NotificationTypes.INFO ? "G" : "R", noti.animationX.getValue() + 12.5, noti.animationY.getValue() + 15.5, MinecraftFontRenderer.CenterMode.XY, false, ColorUtils.getFontColor(2).getRGB());
-            fontRegular.wrapText(noti.message, noti.animationX.getValue() + 25, noti.animationY.getValue() + 12.5, MinecraftFontRenderer.CenterMode.Y, false, ColorUtils.getFontColor(2).getRGB(), 95);
+            String[] messageParts = noti.message.split("§");
+            double x = noti.animationX.getValue() + 25;
+            double y = noti.animationY.getValue() + 12.5;
+            if (messageParts.length == 1) {
+                fontRegular.drawString(noti.message, x, y, MinecraftFontRenderer.CenterMode.Y, false, Color.WHITE.getRGB());
+            } else {
+                for (String part : messageParts) {
+                    if (part.isEmpty()) continue;
+                    char colorCode = part.charAt(0);
+                    String text = part.substring(1);
+                    Color color = ColorUtils.getColorFromCode("§" + colorCode);
+                    fontRegular.drawString(text, x, y, MinecraftFontRenderer.CenterMode.Y, false, color.getRGB());
+                    x += fontRegular.getStringWidth(text);
+                }
+            }
+            //fontRegular.wrapText(noti.message, noti.animationX.getValue() + 25, noti.animationY.getValue() + 12.5, MinecraftFontRenderer.CenterMode.Y, false, ColorUtils.getFontColor(2).getRGB(), 95);
             if (noti.duration.hasFinished()) {
                 notifs.remove(index);
                 index--;

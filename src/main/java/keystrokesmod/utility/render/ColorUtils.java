@@ -5,6 +5,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ColorUtils {
@@ -15,8 +16,8 @@ public class ColorUtils {
             animation.add(new AnimationUtils(0.0F));
         }
     }
-    // fixing this never >:(
     private static final Pattern COLOR_PATTERN = Pattern.compile("(?i)§[0-9A-FK-OR]");
+    private static final Pattern COLOR_CODE_PATTERN = Pattern.compile("(?i)§([0-9A-FK-OR])");
 
     public static Color getBackgroundColor(int id) {
         switch (id) {
@@ -88,5 +89,31 @@ public class ColorUtils {
 
     public static String stripColor(String input) {
         return COLOR_PATTERN.matcher(input).replaceAll("");
+    }
+    public static Color getColorFromCode(String input) {
+        Matcher matcher = COLOR_CODE_PATTERN.matcher(input);
+        if (matcher.find()) {
+            char code = matcher.group(1).charAt(0);
+            switch (code) {
+                case '0': return new Color(0, 0, 0);
+                case '1': return new Color(0, 0, 170);
+                case '2': return new Color(0, 170, 0);
+                case '3': return new Color(0, 170, 170);
+                case '4': return new Color(170, 0, 0);
+                case '5': return new Color(170, 0, 170);
+                case '6': return new Color(255, 170, 0);
+                case '7': return new Color(170, 170, 170);
+                case '8': return new Color(85, 85, 85);
+                case '9': return new Color(85, 85, 255);
+                case 'a': return new Color(85, 255, 85);
+                case 'b': return new Color(85, 255, 255);
+                case 'c': return new Color(255, 85, 85);
+                case 'd': return new Color(255, 85, 255);
+                case 'e': return new Color(255, 255, 85);
+                case 'f': return new Color(255, 255, 255);
+                default: return new Color(255, 255, 255); // Default to white if no match
+            }
+        }
+        return new Color(255, 255, 255); // Default to white if no color code is found
     }
 }

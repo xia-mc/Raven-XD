@@ -214,12 +214,12 @@ public class Module {
             this.disable();
             if (Settings.toggleSound.getInput() != 0) mc.thePlayer.playSound(Settings.getToggleSound(false), 1, 1);
             if (Notifications.moduleToggled.isToggled())
-                Notifications.sendNotification(Notifications.NotificationTypes.INFO, "Disabled " + this.getPrettyName());
+                Notifications.sendNotification(Notifications.NotificationTypes.INFO, "§4Disabled " + this.getPrettyName());
         } else {
             this.enable();
             if (Settings.toggleSound.getInput() != 0) mc.thePlayer.playSound(Settings.getToggleSound(true), 1, 1);
             if (Notifications.moduleToggled.isToggled())
-                Notifications.sendNotification(Notifications.NotificationTypes.INFO, "Enabled " + this.getPrettyName());
+                Notifications.sendNotification(Notifications.NotificationTypes.INFO, "§2Enabled " + this.getPrettyName());
         }
 
     }
