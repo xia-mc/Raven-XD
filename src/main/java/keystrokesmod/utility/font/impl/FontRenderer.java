@@ -23,11 +23,9 @@ import java.util.List;
 public class FontRenderer implements keystrokesmod.utility.font.Font {
 
     private static final String ALPHABET = "ABCDEFGHOKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-    private static final String COLOR_CODE_CHARACTERS = "0123456789abcdefklmnor";
     private static final Color TRANSPARENT_COLOR = new Color(255, 255, 255, 0);
     private static final float SCALE = 0.5f;
     private static final float SCALE_INVERSE = 1 / SCALE;
-    private static final char COLOR_INVOKER = '\247';
     private static final int[] COLOR_CODES = new int[32];
     private static final int LATIN_MAX_AMOUNT = 256;
     private static final int INTERNATIONAL_MAX_AMOUNT = 65535;
@@ -239,7 +237,6 @@ public class FontRenderer implements keystrokesmod.utility.font.Font {
         y -= fontHeight / 5;
 
         final double startX = x;
-
         final int length = text.length();
         glColor(shadow ? 50 : color);
 

@@ -13,12 +13,14 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+import org.lwjgl.input.Mouse;
 
 
 public class AutoWeapon extends Module {
     private final SliderSetting hoverDelay;
     private final ButtonSetting swap;
     private final ButtonSetting ignoreTeammates;
+    private final ButtonSetting onlyWhenHoldingDown;
     private int previousSlot = -1;
     private int ticksHovered;
     private Entity currentEntity;
@@ -26,6 +28,7 @@ public class AutoWeapon extends Module {
         super("AutoWeapon", category.world);
         this.registerSetting(hoverDelay = new SliderSetting("Hover delay", 0.0, 0.0, 20.0, 1.0));
         this.registerSetting(swap = new ButtonSetting("Swap to previous slot", true));
+        this.registerSetting(onlyWhenHoldingDown = new ButtonSetting("Only when holding lmb", true));
         this.registerSetting(ignoreTeammates = new ButtonSetting("Ignore teammates", true));
         this.registerSetting(new DescriptionSetting("Configure your weapons in the Settings tab."));
     }
@@ -52,7 +55,7 @@ public class AutoWeapon extends Module {
         if (!(hoveredEntity instanceof EntityLivingBase)
                 || (hoveredEntity instanceof EntityPlayer && AntiBot.isBot(hoveredEntity))
                 || (hoveredEntity instanceof EntityPlayer && Utils.isFriended((EntityPlayer) hoveredEntity))
-                || (ignoreTeammates.isToggled() && Utils.isTeamMate(hoveredEntity))
+                || (ignoreTeammates.isToggled() && Utils.isTeamMate(hoveredEntity) || (onlyWhenHoldingDown.isToggled() && !Mouse.isButtonDown(0)))
         ) {
             resetSlot();
             resetVariables();

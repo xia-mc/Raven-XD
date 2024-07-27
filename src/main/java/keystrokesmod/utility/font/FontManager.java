@@ -13,7 +13,7 @@ public class FontManager {
     // FOR ANYONE WHO VISITS THIS CLASS: CREATE A HASHMAP FOR EACH FONT AND BASICALLY COPY THE GIVEN METHOD
 
     private static final HashMap<Integer, FontRenderer> INTERNATIONAL = new HashMap<>();
-    private static final HashMap<Integer, FontRenderer> MONTSERRAT_MAP = new HashMap<>();
+    private static final HashMap<Integer, FontRenderer> NBPINFORMA_MAP = new HashMap<>();
     private static final HashMap<Integer, FontRenderer> ROBOTO_MAP = new HashMap<>();
     private static final HashMap<Integer, FontRenderer> Regular = new HashMap<>();
     private static final HashMap<Integer, FontRenderer> LIGHT_MAP = new HashMap<>();
@@ -59,8 +59,8 @@ public class FontManager {
     private static final HashMap<Integer, FontRenderer> HACK = new HashMap<>();
 
     // COPY THIS METHOD FOR EACH METHOD AND REPLACE FONTNAME WITH THE USED FONT FILE NAME
-    public static Font getMontserratMedium(final int size) {
-        return get(MONTSERRAT_MAP, size, "Montserrat-Medium", true, true);
+    public static Font getNbpInformaFivesix(final int size) {
+        return get(NBPINFORMA_MAP, size, "nbp-informa-fivesix", true, true);
     }
     public static Font getRegular(final int size) {
         return get(Regular, size, "regular", true, true);
