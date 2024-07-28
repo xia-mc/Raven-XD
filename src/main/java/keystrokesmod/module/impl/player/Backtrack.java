@@ -129,9 +129,9 @@ public class Backtrack extends Module {
         final net.minecraft.util.Vec3 pos = currentLatency > 0 ? vec3.toVec3() : target.getPositionVector();
 
         if (animationX == null || animationY == null || animationZ == null) {
-            animationX = new Animation(Easing.EASE_OUT_CIRC, 100);
-            animationY = new Animation(Easing.EASE_OUT_CIRC, 100);
-            animationZ = new Animation(Easing.EASE_OUT_CIRC, 100);
+            animationX = new Animation(Easing.EASE_OUT_CIRC, 50);
+            animationY = new Animation(Easing.EASE_OUT_CIRC, 50);
+            animationZ = new Animation(Easing.EASE_OUT_CIRC, 50);
 
             animationX.setValue(pos.xCoord);
             animationY.setValue(pos.yCoord);
