@@ -50,7 +50,7 @@ public class LongJump extends Module {
         this.registerSetting(mode = new ModeSetting("Mode", MODES, 0));
         this.registerSetting(horizonBoost = new SliderSetting("Horizon boost", 1.0, 1.0, 1.5, 0.01));
         this.registerSetting(horizonMotionMultiplier = new SliderSetting("Horizon motion multiplier", 1.0, 0.9, 1.1, 0.005));
-        this.registerSetting(verticalMotion = new SliderSetting("Vertical motion", 0.01, 0.01, 0.6, 0.01));
+        this.registerSetting(verticalMotion = new SliderSetting("Vertical motion", 0.01, 0.01, 0.7, 0.01));
         this.registerSetting(stopAtFirst = new ButtonSetting("Stop at first", false));
         ModeOnly mode1 = new ModeOnly(mode, 1);
         this.registerSetting(reverseYaw = new ButtonSetting("Reverse yaw", false, mode1));

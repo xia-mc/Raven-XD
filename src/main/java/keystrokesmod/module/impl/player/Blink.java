@@ -3,6 +3,7 @@ package keystrokesmod.module.impl.player;
 import keystrokesmod.event.SendPacketEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.ButtonSetting;
+import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.utility.PacketUtils;
 import keystrokesmod.utility.render.RenderUtils;
 import keystrokesmod.utility.Utils;
@@ -26,24 +27,39 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Blink extends Module {
+    private final ButtonSetting pulse;
+    private final SliderSetting pulseDelay;
     private final ButtonSetting initialPosition;
     private final ButtonSetting overlay;
+
     public final List<Packet<?>> blinkedPackets = new ArrayList<>();
+    private long startTime = -1;
     private Vec3 pos;
     public static final int color = new Color(72, 125, 227).getRGB();
     public Blink() {
         super("Blink", category.player);
+        this.registerSetting(pulse = new ButtonSetting("Pulse", false));
+        this.registerSetting(pulseDelay = new SliderSetting("Pulse delay", 1000, 0, 10000, 100, pulse::isToggled));
         this.registerSetting(initialPosition = new ButtonSetting("Show initial position", true));
         this.registerSetting(overlay = new ButtonSetting("Overlay", false));
     }
 
     @Override
     public void onEnable() {
+        start();
+    }
+
+    private void start() {
         blinkedPackets.clear();
         pos = new Vec3(mc.thePlayer.posX, mc.thePlayer.posY, mc.thePlayer.posZ);
+        startTime = System.currentTimeMillis();
     }
 
     public void onDisable() {
+        reset();
+    }
+
+    private void reset() {
         synchronized (blinkedPackets) {
             for (Packet<?> packet : blinkedPackets) {
                 PacketUtils.sendPacketNoEvent(packet);
@@ -86,6 +102,13 @@ public class Blink extends Module {
         }
         blinkedPackets.add(packet);
         e.setCanceled(true);
+
+        if (pulse.isToggled()) {
+            if (System.currentTimeMillis() - startTime >= pulseDelay.getInput()) {
+                reset();
+                start();
+            }
+        }
     }
 
     @SubscribeEvent

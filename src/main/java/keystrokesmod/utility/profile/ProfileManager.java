@@ -13,6 +13,7 @@ import keystrokesmod.module.setting.Setting;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.ModeValue;
 import keystrokesmod.module.setting.impl.SliderSetting;
+import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.module.setting.interfaces.InputSetting;
 import keystrokesmod.script.Manager;
 import keystrokesmod.utility.Utils;
@@ -187,6 +188,9 @@ public class ProfileManager {
                         case "SuperKB":
                             moduleName = "MoreKB";
                             break;
+                        case "Reduce":
+                            moduleName = "KeepSprint";
+                            break;
                     }
 
                     if (moduleName.isEmpty()) {
@@ -203,6 +207,10 @@ public class ProfileManager {
                     }
 
                     if (module == null) {
+                        continue;
+                    }
+
+                    if (module instanceof SubMode) {
                         continue;
                     }
 

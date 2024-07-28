@@ -1,43 +1,39 @@
 package keystrokesmod.utility.font.impl;
 
 import keystrokesmod.Raven;
+import static keystrokesmod.Raven.mc;
+import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
-import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Map;
 
 public class FontUtil {
 
     private static final IResourceManager RESOURCE_MANAGER = Raven.mc.getResourceManager();
 
-    /**
-     * Enhanced method, which gets a font by a resource name with better error handling.
-     *
-     * @param resource resource name
-     * @param size     font size
-     * @return font by resource or null if an error occurs
-     */
-    public static @Nullable Font getResource(final String resource, final int size) {
+    public static Font getResource(Map<String, Font> locationMap, String location, int size) {
+        Font font;
+
+        ScaledResolution sr = new ScaledResolution(mc);
+
+        size = (int) (size * ((double) sr.getScaleFactor() / 2));
+
         try {
-            Font font = Font.createFont(Font.TRUETYPE_FONT, RESOURCE_MANAGER.getResource(new ResourceLocation(resource)).getInputStream()).deriveFont((float) size);
-            if (font != null) {
-                System.out.println("Font loaded successfully: " + resource);
-                return font;
+            if (locationMap.containsKey(location)) {
+                font = locationMap.get(location).deriveFont(Font.PLAIN, size);
             } else {
-                System.out.println("Font loaded but is null: " + resource);
+                InputStream is = mc.getResourceManager().getResource(new ResourceLocation("keystrokesmod:fonts/" + location)).getInputStream();
+                locationMap.put(location, font = Font.createFont(0, is));
+                font = font.deriveFont(Font.PLAIN, size);
             }
-        } catch (FontFormatException e) {
-            System.out.println("Font format is not supported: " + resource);
-            e.printStackTrace();
-        } catch (IOException e) {
-            System.out.println("Error accessing the font file: " + resource);
-            e.printStackTrace();
-        } catch (Exception e) {
-            System.out.println("Unexpected error loading font: " + resource);
-            e.printStackTrace();
+        } catch (Exception exception) {
+            exception.printStackTrace();
+            font = new Font("default", Font.PLAIN, size);
         }
-        return null;
+        return font;
     }
 }

@@ -6,7 +6,7 @@ import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.client.Gui;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.Timer;
-import keystrokesmod.utility.font.Font;
+import keystrokesmod.utility.font.impl.MinecraftFontRenderer;
 import keystrokesmod.utility.render.RenderUtils;
 import keystrokesmod.utility.Utils;
 import keystrokesmod.utility.profile.Manager;
@@ -148,7 +148,7 @@ public class CategoryComponent {
         this.openCloseAnimation.setDestinationValue(on ? 1 : 0);
     }
 
-    public void rf(Font renderer) {
+    public void rf(MinecraftFontRenderer renderer) {
         this.width = 92;
         int h = 0;
         if (!this.modules.isEmpty() && this.categoryOpened) {

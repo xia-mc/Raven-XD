@@ -10,11 +10,13 @@ import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.util.ResourceLocation;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.List;
 
 import static com.mojang.realmsclient.gui.ChatFormatting.*;
 
@@ -40,6 +42,16 @@ public final class CustomCape extends Module {
                 System.out.println("There was an issue creating customCapes directory.");
             }
         }
+
+        this.registerSetting(new ButtonSetting("Open folder", () -> {
+            try {
+                Desktop.getDesktop().open(directory);
+            }
+            catch (IOException ex) {
+                Raven.profileManager.directory.mkdirs();
+                Utils.sendMessage("&cError locating folder, recreated.");
+            }
+        }));
 
         loadCapes();
     }

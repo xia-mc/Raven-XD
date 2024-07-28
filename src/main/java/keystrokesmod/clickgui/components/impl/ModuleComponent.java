@@ -129,7 +129,7 @@ public class ModuleComponent implements IComponent {
         if (this.po && !this.settings.isEmpty()) {
             for (Component c : this.settings) {
                 Setting setting = c.getSetting();
-                if (setting == null || setting.isVisible()) {
+                if (setting != null && setting.isVisible()) {
                     c.render();
                 }
             }

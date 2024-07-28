@@ -28,7 +28,7 @@ public abstract class MixinBlock {
      *
      */
     @Inject(method = "addCollisionBoxesToList", at = @At("HEAD"), cancellable = true)
-    public void addCollisionBoxesToList(World worldIn, BlockPos pos, IBlockState state, AxisAlignedBB mask, List<AxisAlignedBB> list,
+    public void onAddCollisionBoxesToList(World worldIn, BlockPos pos, IBlockState state, AxisAlignedBB mask, List<AxisAlignedBB> list,
                                         Entity collidingEntity, CallbackInfo ci) {
         if (collidingEntity == Raven.mc.thePlayer) {
             ci.cancel();

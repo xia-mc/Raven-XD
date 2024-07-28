@@ -12,8 +12,8 @@ import keystrokesmod.module.impl.client.Gui;
 import keystrokesmod.utility.Commands;
 import keystrokesmod.utility.Timer;
 import keystrokesmod.utility.Utils;
-import keystrokesmod.utility.font.Font;
 import keystrokesmod.utility.font.FontManager;
+import keystrokesmod.utility.font.impl.MinecraftFontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
@@ -40,7 +40,7 @@ public class ClickGui extends GuiScreen {
     private ScaledResolution sr;
     private GuiButtonExt s;
     private GuiTextField c;
-    private final Font fontRendererObj = FontManager.getMinecraft();
+    private final MinecraftFontRenderer fontRendererObj = FontManager.getMinecraft();
     public static Map<Module.category, CategoryComponent> categories;
     public static List<Module.category> clickHistory;
 

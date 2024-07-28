@@ -7,9 +7,7 @@ import keystrokesmod.module.impl.other.RotationHandler;
 import keystrokesmod.module.impl.other.SlotHandler;
 import keystrokesmod.module.impl.other.anticheats.utils.world.PlayerMove;
 import keystrokesmod.module.impl.world.Scaffold;
-import keystrokesmod.module.setting.impl.ButtonSetting;
-import keystrokesmod.module.setting.impl.ModeSetting;
-import keystrokesmod.module.setting.impl.SliderSetting;
+import keystrokesmod.module.setting.impl.*;
 import keystrokesmod.module.setting.utils.ModeOnly;
 import keystrokesmod.utility.*;
 import keystrokesmod.utility.render.RenderUtils;
@@ -30,7 +28,7 @@ import org.apache.commons.lang3.RandomUtils;
 import org.jetbrains.annotations.NotNull;
 
 public class Fly extends Module {
-    private final ModeSetting mode;
+    public final ModeValue mode;
     public static SliderSetting horizontalSpeed;
     private final SliderSetting verticalSpeed;
     private final SliderSetting maxBalance;
@@ -55,7 +53,17 @@ public class Fly extends Module {
 
     public Fly() {
         super("Fly", category.movement);
-        this.registerSetting(mode = new ModeSetting("Mode", new String[]{"Vanilla", "Fast", "Fast 2", "AirWalk", "Old GrimAC", "BlocksMC", "GrimACBoat", "MMC", "Matrix A", "Matrix B"}, 0));
+        this.registerSetting(mode = new ModeValue("Mode", this)
+                .add(new LiteralSubMode("Vanilla", this))
+                .add(new LiteralSubMode("Fast", this))
+                .add(new LiteralSubMode("Fast 2", this))
+                .add(new LiteralSubMode("AirWalk", this))
+                .add(new LiteralSubMode("Old GrimAC", this))
+                .add(new LiteralSubMode("BlocksMC", this))
+                .add(new LiteralSubMode("MMC", this))
+                .add(new LiteralSubMode("Matrix A", this))
+                .add(new LiteralSubMode("Matrix B", this))
+        );
         final ModeOnly canChangeSpeed = new ModeOnly(mode, 0, 1, 2, 6, 9);
         final ModeOnly balanceMode = new ModeOnly(mode, 4);
         this.registerSetting(horizontalSpeed = new SliderSetting("Horizontal speed", 2.0, 0.0, 9.0, 0.1, canChangeSpeed));
@@ -68,10 +76,12 @@ public class Fly extends Module {
 
     @Override
     public String getInfo() {
-        return mode.getOptions()[(int) mode.getInput()];
+        return mode.getSubModeValues().get((int) mode.getInput()).getPrettyName();
     }
 
     public void onEnable() {
+        mode.enable();
+
         this.d = mc.thePlayer.capabilities.isFlying;
 
         notUnder = false;
@@ -296,8 +306,8 @@ public class Fly extends Module {
 
                 if (velocityTicks != -1) {
                     mc.thePlayer.motionY = verticalSpeed.getInput() / 10 - Math.random() / 1000;
-                    mc.thePlayer.motionX *= 1.15 - Math.random() / 1000;
-                    mc.thePlayer.motionZ *= 1.15 - Math.random() / 1000;
+                    mc.thePlayer.motionX *= 1.2 - Math.random() / 1000;
+                    mc.thePlayer.motionZ *= 1.2 - Math.random() / 1000;
                 }
                 break;
         }
@@ -324,6 +334,8 @@ public class Fly extends Module {
     }
 
     public void onDisable() {
+        mode.disable();
+
         balance$reset();
         if (!Utils.nullCheck()) return;
 

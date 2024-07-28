@@ -1,7 +1,6 @@
 package keystrokesmod.mixins.impl.entity;
 
 import keystrokesmod.module.ModuleManager;
-import keystrokesmod.module.impl.combat.Reduce;
 import keystrokesmod.module.impl.combat.Velocity;
 import keystrokesmod.module.impl.movement.KeepSprint;
 import keystrokesmod.module.impl.render.Particles;
@@ -102,10 +101,7 @@ public abstract class MixinEntityPlayer extends EntityLivingBase {
                     if (flag2) {
                         if (i > 0) {
                             p_attackTargetEntityWithCurrentItem_1_.addVelocity((double) (-MathHelper.sin(this.rotationYaw * 3.1415927F / 180.0F) * (float) i * 0.5F), 0.1, (double) (MathHelper.cos(this.rotationYaw * 3.1415927F / 180.0F) * (float) i * 0.5F));
-                            if (ModuleManager.reduce != null && ModuleManager.reduce.isEnabled()) {
-                                Reduce.reduce(p_attackTargetEntityWithCurrentItem_1_);
-                            }
-                            else if (ModuleManager.keepSprint != null && ModuleManager.keepSprint.isEnabled()) {
+                            if (ModuleManager.keepSprint != null && ModuleManager.keepSprint.isEnabled()) {
                                 KeepSprint.keepSprint(p_attackTargetEntityWithCurrentItem_1_);
                             }
 //                            else if (ModuleManager.hitSelect != null && ModuleManager.hitSelect.isEnabled()) {

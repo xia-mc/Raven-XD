@@ -11,9 +11,8 @@ import keystrokesmod.module.impl.minigames.DuelsStats;
 import keystrokesmod.module.impl.movement.Fly;
 import keystrokesmod.module.impl.other.FakeChat;
 import keystrokesmod.module.impl.other.NameHider;
-import keystrokesmod.module.impl.render.HUD;
 import keystrokesmod.module.impl.render.Watermark;
-import keystrokesmod.utility.font.Font;
+import keystrokesmod.utility.font.impl.MinecraftFontRenderer;
 import keystrokesmod.utility.profile.Profile;
 import keystrokesmod.utility.render.RenderUtils;
 import net.minecraft.client.Minecraft;
@@ -521,7 +520,7 @@ public class Commands {
         }
     }
 
-    public static void rc(Font fr, int h, int w, int s) {
+    public static void rc(MinecraftFontRenderer fr, int h, int w, int s) {
         int x = w - 195;
         int y = h - 130;
         int sY = h - 345;
@@ -534,7 +533,7 @@ public class Commands {
         GL11.glDisable(3089);
     }
 
-    private static void rss(Font fr, List<String> rs, int x, int y) {
+    private static void rss(MinecraftFontRenderer fr, List<String> rs, int x, int y) {
         if (f) {
             f = false;
             print("Welcome,", 0);

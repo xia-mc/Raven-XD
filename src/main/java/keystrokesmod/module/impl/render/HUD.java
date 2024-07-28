@@ -7,8 +7,8 @@ import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.DescriptionSetting;
 import keystrokesmod.module.setting.impl.ModeSetting;
 import keystrokesmod.module.setting.impl.SubMode;
-import keystrokesmod.utility.font.Font;
 import keystrokesmod.utility.font.FontManager;
+import keystrokesmod.utility.font.impl.MinecraftFontRenderer;
 import keystrokesmod.utility.render.RenderUtils;
 import keystrokesmod.utility.Theme;
 import keystrokesmod.utility.Utils;
@@ -117,7 +117,7 @@ public class HUD extends Module {
                     n2 -= 12;
                 }
                 int n3 = hudX;
-                int width = getFontRenderer().getStringWidth(text);
+                int width = getFontRenderer().width(text);
                 if (alignRight.isToggled()) {
                     n3 -= width;
                 }
@@ -158,7 +158,7 @@ public class HUD extends Module {
         return texts;
     }
 
-    public static int getLongestModule(Font fr) {
+    public static int getLongestModule(MinecraftFontRenderer fr) {
         int length = 0;
 
         for (Module module : ModuleManager.organizedModules) {
@@ -170,8 +170,8 @@ public class HUD extends Module {
                 if (lowercase.isToggled()) {
                     moduleName = moduleName.toLowerCase();
                 }
-                if (fr.getStringWidth(moduleName) > length) {
-                    length = fr.getStringWidth(moduleName);
+                if (fr.width(moduleName) > length) {
+                    length = fr.width(moduleName);
                 }
             }
         }
@@ -248,7 +248,7 @@ public class HUD extends Module {
             ModuleManager.watermark.render();
         }
 
-        private int @Nullable [] d(Font fr, String t) {
+        private int @Nullable [] d(MinecraftFontRenderer fr, String t) {
             if (empty()) {
                 int x = this.miX;
                 int y = this.miY;
@@ -256,7 +256,7 @@ public class HUD extends Module {
 
                 for (String s : var5) {
                     if (HUD.alignRight.isToggled()) {
-                        x += getFontRenderer().getStringWidth(var5[0]) - getFontRenderer().getStringWidth(s);
+                        x += getFontRenderer().width(var5[0]) - getFontRenderer().width(s);
                     }
                     fr.drawString(s, (float) x, (float) y, Color.white.getRGB(), HUD.dropShadow.isToggled());
                     y += Math.round(fr.height() + 2);
@@ -285,7 +285,7 @@ public class HUD extends Module {
                     }
                     int n3 = this.miX;
                     if (alignRight.isToggled()) {
-                        n3 -= getFontRenderer().getStringWidth(moduleName);
+                        n3 -= getFontRenderer().width(moduleName);
                     }
                     getFontRenderer().drawString(moduleName, n3, (float) n, e, dropShadow.isToggled());
                     n += Math.round(getFontRenderer().height() + 2);
@@ -397,7 +397,7 @@ public class HUD extends Module {
         return module == ModuleManager.commandLine;
     }
 
-    private static Font getFontRenderer() {
+    private static MinecraftFontRenderer getFontRenderer() {
         return FontManager.getMinecraft();
     }
 }

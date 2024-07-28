@@ -5,9 +5,8 @@ import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.utility.CoolDown;
 import keystrokesmod.utility.Utils;
-import keystrokesmod.utility.font.Font;
 import keystrokesmod.utility.font.FontManager;
-import keystrokesmod.utility.font.impl.MinecraftFontRenderer;
+import keystrokesmod.utility.font.impl.FontRenderer;
 import keystrokesmod.utility.render.AnimationUtils;
 import keystrokesmod.utility.render.ColorUtils;
 import keystrokesmod.utility.render.RRectUtils;
@@ -23,9 +22,6 @@ public class Notifications extends Module {
     public static final List<Notification> notifs = new ArrayList<>();
     public static ButtonSetting chatNoti;
     public static ButtonSetting moduleToggled;
-    private final Font fontRegular = FontManager.getRegular(16);
-    private final Font fontIcon = FontManager.getIcons(20);
-
     public Notifications() {
         super("Notifications", category.client);
         this.registerSetting(chatNoti = new ButtonSetting("Show in chat", false));
@@ -62,20 +58,20 @@ public class Notifications extends Module {
             Notification noti = notifs.get(index);
             noti.animationY.setAnimation(sr.getScaledHeight() - ((index + 1) * 30), 16);
             RRectUtils.drawRound(noti.animationX.getValue(), noti.animationY.getValue(), 120, 25, 3, new Color(0, 0, 0, 128));
-            fontIcon.drawString(noti.type == NotificationTypes.INFO ? "G" : "R", noti.animationX.getValue() + 12.5, noti.animationY.getValue() + 15.5, MinecraftFontRenderer.CenterMode.XY, false, ColorUtils.getFontColor(2).getRGB());
+            FontManager.icon20.drawString(noti.type == NotificationTypes.INFO ? "G" : "R", noti.animationX.getValue() + 12.5, noti.animationY.getValue() + 15.5, FontRenderer.CenterMode.XY, false, ColorUtils.getFontColor(2).getRGB());
             String[] messageParts = noti.message.split("§");
             double x = noti.animationX.getValue() + 25;
-            double y = noti.animationY.getValue() + 12.5;
+            double y = noti.animationY.getValue() + 15.5;
             if (messageParts.length == 1) {
-                fontRegular.drawString(noti.message, x, y, MinecraftFontRenderer.CenterMode.Y, false, Color.WHITE.getRGB());
+                FontManager.regular16.drawString(noti.message, x, y, FontRenderer.CenterMode.Y, false, Color.WHITE.getRGB());
             } else {
                 for (String part : messageParts) {
                     if (part.isEmpty()) continue;
                     char colorCode = part.charAt(0);
                     String text = part.substring(1);
                     Color color = ColorUtils.getColorFromCode("§" + colorCode);
-                    fontRegular.drawString(text, x, y, MinecraftFontRenderer.CenterMode.Y, false, color.getRGB());
-                    x += fontRegular.getStringWidth(text);
+                    FontManager.regular16.drawString(text, x, y, FontRenderer.CenterMode.Y, false, color.getRGB());
+                    x += FontManager.regular16.getStringWidth(text);
                 }
             }
             //fontRegular.wrapText(noti.message, noti.animationX.getValue() + 25, noti.animationY.getValue() + 12.5, MinecraftFontRenderer.CenterMode.Y, false, ColorUtils.getFontColor(2).getRGB(), 95);
