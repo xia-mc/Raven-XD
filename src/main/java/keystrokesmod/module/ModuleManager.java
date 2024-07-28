@@ -113,6 +113,7 @@ public class ModuleManager {
         this.addModule(new Settings());
         this.addModule(new MiddleClick());
         this.addModule(notifications = new Notifications());
+        this.addModule(new DiscordRpc());
 
         // combat
         this.addModule(new AimAssist());
