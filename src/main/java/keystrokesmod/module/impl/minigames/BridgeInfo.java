@@ -3,7 +3,8 @@ package keystrokesmod.module.impl.minigames;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.DescriptionSetting;
-import keystrokesmod.utility.font.Font;
+import keystrokesmod.utility.font.FontManager;
+import keystrokesmod.utility.font.impl.MinecraftFontRenderer;
 import keystrokesmod.utility.render.RenderUtils;
 import keystrokesmod.utility.Utils;
 import net.minecraft.client.gui.FontRenderer;
@@ -221,7 +222,7 @@ public class BridgeInfo extends Module {
             ScaledResolution res = new ScaledResolution(this.mc);
             int x = res.getScaledWidth() / 2 - 84;
             int y = res.getScaledHeight() / 2 - 20;
-            RenderUtils.dct("Edit the HUD position by dragging.", '-', x, y, 2L, 0L, true, (Font) this.mc.fontRendererObj);
+            RenderUtils.dct("Edit the HUD position by dragging.", '-', x, y, 2L, 0L, true, FontManager.getMinecraft());
 
             try {
                 this.handleInput();

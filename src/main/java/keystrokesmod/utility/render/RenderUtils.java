@@ -6,7 +6,7 @@ import keystrokesmod.module.impl.render.HUD;
 import keystrokesmod.script.classes.Vec3;
 import keystrokesmod.utility.Theme;
 import keystrokesmod.utility.Utils;
-import keystrokesmod.utility.font.Font;
+import keystrokesmod.utility.font.impl.MinecraftFontRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
@@ -543,7 +543,7 @@ public class RenderUtils {
         net.minecraft.client.gui.Gui.drawRect(0, 0, w, h, c);
     }
 
-    public static void dct(String text, char lineSplit, int x, int y, long s, long shift, boolean rect, Font fontRenderer) {
+    public static void dct(String text, char lineSplit, int x, int y, long s, long shift, boolean rect, MinecraftFontRenderer fontRenderer) {
         int bX = x;
         int l = 0;
         long r = 0L;
@@ -557,7 +557,7 @@ public class RenderUtils {
                 r = shift * (long) l;
             } else {
                 fontRenderer.drawString(String.valueOf(c), (float) x, (float) y, Utils.getChroma(s, r), rect);
-                x += fontRenderer.getCharWidth(c);
+                x += fontRenderer.width(String.valueOf(c));
                 if (c != ' ') {
                     r -= 90L;
                 }
