@@ -96,13 +96,15 @@ public class AutoPot extends Module {
                                 } else {
                                     mc.thePlayer.inventory.currentItem = i-36;
                                     final MovingObjectPosition hitResult = RotationUtils.rayCast(1, event.getPitch(), event.getYaw());
-                                    mc.playerController.onPlayerRightClick(
-                                            mc.thePlayer, mc.theWorld,
-                                            mc.thePlayer.getHeldItem(),
-                                            hitResult.getBlockPos(),
-                                            hitResult.sideHit,
-                                            hitResult.hitVec
-                                    );
+                                    if (hitResult != null) {
+                                        mc.playerController.onPlayerRightClick(
+                                                mc.thePlayer, mc.theWorld,
+                                                mc.thePlayer.getHeldItem(),
+                                                hitResult.getBlockPos(),
+                                                hitResult.sideHit,
+                                                hitResult.hitVec
+                                        );
+                                    }
                                     switchBack = true;
 
                                     ticksSinceLastSplash = 0;

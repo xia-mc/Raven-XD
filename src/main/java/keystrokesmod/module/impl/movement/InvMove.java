@@ -1,5 +1,6 @@
 package keystrokesmod.module.impl.movement;
 
+import keystrokesmod.event.PreUpdateEvent;
 import keystrokesmod.event.SendPacketEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.ButtonSetting;
@@ -42,8 +43,8 @@ public class InvMove extends Module {
         this.registerSetting(targetNearbyCheck = new ButtonSetting("Target nearby check", true));
     }
 
-    @Override
-    public void onUpdate() {
+    @SubscribeEvent
+    public void onPreUpdate(PreUpdateEvent event) {
         if (mc.currentScreen instanceof GuiContainer && nameCheck() && targetNearbyCheck() && !scaffold.isEnabled()) {
             switch ((int) mode.getInput()) {
                 case 1:

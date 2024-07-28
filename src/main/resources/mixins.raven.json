@@ -39,7 +39,8 @@
     "render.MixinGuiConnecting",
     "render.MixinGuiContainer",
     "render.MixinGuiScreen",
-    "render.MixinItemRenderer"
+    "render.MixinItemRenderer",
+    "render.RenderManagerAccessor"
   ],
   "server": [],
   "injectors": {

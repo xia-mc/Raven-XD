@@ -44,7 +44,7 @@ public class ModeValue extends Setting implements InputSetting {
         Optional<SubMode<?>> subMode = subModes.stream().filter(mode -> Objects.equals(mode.getName(), name)).findFirst();
         if (!subMode.isPresent()) return this;
 
-        setValue(subModes.indexOf(subMode.get()));
+        setValueRaw(subModes.indexOf(subMode.get()));
         return this;
     }
     @Override
@@ -53,7 +53,7 @@ public class ModeValue extends Setting implements InputSetting {
             JsonPrimitive jsonPrimitive = profile.getAsJsonPrimitive(getName());
             if (jsonPrimitive.isNumber()) {
                 int newValue = jsonPrimitive.getAsInt();
-                setValue(newValue);
+                setValueRaw(newValue);
             }
         }
     }
@@ -80,7 +80,6 @@ public class ModeValue extends Setting implements InputSetting {
     }
     public void setValueRaw(int n) {
         disable();
-        this.selected = n;
         this.setValue(n);
     }
     public double getMax() {

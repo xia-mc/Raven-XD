@@ -13,6 +13,9 @@ public interface RenderManagerAccessor {
     @Accessor("renderPosY")
     double getRenderPosY();
 
+    @Accessor("renderPosY")
+    void setRenderPosY(double renderPosY);
+
     @Accessor("renderPosZ")
     double getRenderPosZ();
 }

@@ -44,7 +44,6 @@ public class ModuleManager {
     public static Potions potions;
     public static NoFall noFall;
     public static PlayerESP playerESP;
-    public static Reduce reduce;
     public static SafeWalk safeWalk;
     public static KeepSprint keepSprint;
     public static Velocity velocity;
@@ -101,6 +100,7 @@ public class ModuleManager {
     public static WallClimb wallClimb;
     public static Jesus jesus;
     public static ExploitFixer exploitFixer;
+    public static AutoRegister autoRegister;
 
     public void register() {
 
@@ -129,7 +129,6 @@ public class ModuleManager {
         this.addModule(killAuraV2 = new KillAuraV2());
         this.addModule(moreKB = new MoreKB());
         this.addModule(reach = new Reach());
-        this.addModule(reduce = new Reduce());
         this.addModule(new RodAimbot());
         this.addModule(timerRange = new TimerRange());
         this.addModule(velocity = new Velocity());
@@ -180,6 +179,7 @@ public class ModuleManager {
         this.addModule(slotHandler = new SlotHandler());
         this.addModule(staffDetector = new StaffDetector());
         this.addModule(new BedProximityAlert());
+        this.addModule(autoRegister = new AutoRegister());
 
         // player
         this.addModule(new AntiAFK());

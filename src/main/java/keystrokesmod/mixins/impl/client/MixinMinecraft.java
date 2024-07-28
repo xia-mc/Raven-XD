@@ -4,13 +4,16 @@ import keystrokesmod.event.ClickEvent;
 import keystrokesmod.event.PreTickEvent;
 import keystrokesmod.event.RightClickEvent;
 import keystrokesmod.module.ModuleManager;
+import keystrokesmod.module.impl.client.Notifications;
 import keystrokesmod.module.impl.combat.HitBox;
 import keystrokesmod.module.impl.combat.Reach;
+import keystrokesmod.module.impl.exploit.ExploitFixer;
 import keystrokesmod.module.impl.render.Animations;
 import keystrokesmod.module.impl.render.FreeLook;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.settings.GameSettings;
+import net.minecraft.crash.CrashReport;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraftforge.common.MinecraftForge;
 import org.spongepowered.asm.mixin.Mixin;
@@ -79,5 +82,15 @@ public abstract class MixinMinecraft {
         MinecraftForge.EVENT_BUS.post(event);
         if (event.isCanceled())
             ci.cancel();
+    }
+
+    @Inject(method = "crashed", at = @At("HEAD"), cancellable = true)
+    private void onCrashed(CrashReport crashReport, CallbackInfo ci) {
+        try {
+            if (ExploitFixer.onCrash(crashReport)) {
+                ci.cancel();
+            }
+        } catch (Throwable ignored) {
+        }
     }
 }

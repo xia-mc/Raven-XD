@@ -11,7 +11,6 @@ import net.minecraft.client.settings.KeyBinding;
 import net.minecraftforge.client.event.MouseEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
-import keystrokesmod.module.impl.client.NyaProxy;
 import keystrokesmod.module.impl.client.Settings;
 import keystrokesmod.module.impl.combat.HitSelect;
 import keystrokesmod.module.impl.minigames.DuelsStats;
@@ -328,14 +327,12 @@ public class Utils {
 
     public static boolean isHypixel() {
         return !mc.isSingleplayer() && mc.getCurrentServerData() != null
-                && (mc.getCurrentServerData().serverIP.contains("hypixel.net")
-                || NyaProxy.isNyaProxy(mc.getCurrentServerData().serverIP).isPresent());
+                && mc.getCurrentServerData().serverIP.contains("hypixel.net");
     }
 
     public static boolean isCraftiGames() {
         return !mc.isSingleplayer() && mc.getCurrentServerData() != null
-                && ((mc.getCurrentServerData().serverIP.contains("pika-network.net") || mc.getCurrentServerData().serverIP.contains("pikasys.net") || mc.getCurrentServerData().serverIP.contains("pika.host") || mc.getCurrentServerData().serverIP.contains("jartexsys.net") || mc.getCurrentServerData().serverIP.contains("jartexnetwork.com"))
-                || NyaProxy.isNyaProxy(mc.getCurrentServerData().serverIP).isPresent());
+                && (mc.getCurrentServerData().serverIP.contains("pika-network.net") || mc.getCurrentServerData().serverIP.contains("pikasys.net") || mc.getCurrentServerData().serverIP.contains("pika.host") || mc.getCurrentServerData().serverIP.contains("jartexsys.net") || mc.getCurrentServerData().serverIP.contains("jartexnetwork.com"));
     }
 
     public static net.minecraft.util.Timer getTimer() {

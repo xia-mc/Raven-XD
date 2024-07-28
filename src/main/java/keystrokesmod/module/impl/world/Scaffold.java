@@ -29,6 +29,7 @@ import net.minecraft.network.play.server.S23PacketBlockChange;
 import net.minecraft.util.*;
 import net.minecraftforge.client.event.MouseEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -830,6 +831,13 @@ public class Scaffold extends IAutoClicker {
                 return;
             }
         }
+
+        ScaffoldPlaceEvent event = new ScaffoldPlaceEvent(block, extra);
+        MinecraftForge.EVENT_BUS.post(event);
+        if (event.isCanceled()) return;
+
+        block = event.getHitResult();
+        extra = event.isExtra();
 
         if (mc.playerController.onPlayerRightClick(mc.thePlayer, mc.theWorld, heldItem, block.getBlockPos(), block.sideHit, block.hitVec)) {
             sneak$bridged++;
