@@ -13,6 +13,7 @@ import keystrokesmod.module.ModuleManager;
 import keystrokesmod.script.ScriptManager;
 import keystrokesmod.utility.*;
 import keystrokesmod.utility.clicks.CPSCalculator;
+import keystrokesmod.utility.font.FontManager;
 import keystrokesmod.utility.profile.Profile;
 import keystrokesmod.utility.profile.ProfileManager;
 import net.minecraft.client.Minecraft;
@@ -62,6 +63,7 @@ public class Raven {
         FMLCommonHandler.instance().bus().register(badPacketsHandler = new BadPacketsHandler());
         Reflection.getFields();
         Reflection.getMethods();
+        FontManager.init();
         moduleManager.register();
         scriptManager = new ScriptManager();
         keySrokeRenderer = new KeySrokeRenderer();
