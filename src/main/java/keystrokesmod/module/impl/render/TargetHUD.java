@@ -10,6 +10,8 @@ import keystrokesmod.utility.render.RenderUtils;
 import keystrokesmod.utility.Theme;
 import keystrokesmod.utility.Timer;
 import keystrokesmod.utility.Utils;
+import net.minecraft.client.entity.AbstractClientPlayer;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.EntityLivingBase;
@@ -23,12 +25,14 @@ import org.jetbrains.annotations.Range;
 import java.awt.*;
 
 import static keystrokesmod.utility.render.RenderUtils.renderMode;
+import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
 
 public class TargetHUD extends Module {
     public static int posX = 70;
     public static int posY = 30;
     public static final Color jellocolor = new Color(255, 255, 255, 128);
-    private static final ModeSetting mode = new ModeSetting("Mode", new String[]{"Raven"}, 0);
+    private static final ModeSetting mode = new ModeSetting("Mode", new String[]{"Raven", "Test", "None"}, 0);
     private final ButtonSetting onlyKillAura;
     private final SliderSetting maxDistance;
     private static final ModeSetting theme = new ModeSetting("Theme", Theme.themes, 0);
@@ -145,8 +149,13 @@ public class TargetHUD extends Module {
 
     public static void drawTargetHUD(Timer cd, String string, @Range(from = 0, to = 1) double health) {
         switch ((int) mode.getInput()) {
-            case 0:
+            case 0: // Raven
                 drawRavenTargetHUD(cd, string, health);
+                break;
+            case 1: // Test
+                drawTestTargetHUD(cd, string, health);
+                break;
+            case 2: // None
                 break;
         }
     }
@@ -204,6 +213,78 @@ public class TargetHUD extends Module {
             GlStateManager.popMatrix();
         }
         else {
+            target = null;
+            healthBarTimer = null;
+        }
+    }
+
+    private static void drawTestTargetHUD(Timer cd, String string, double health) {
+        string = string + " ❤ ";
+
+        if (showStatus.isToggled()) {
+            String status = (health <= Utils.getCompleteHealth(mc.thePlayer) / mc.thePlayer.getMaxHealth()) ? "§aW" : "§cL";
+            string = string + status;
+        }
+
+        final ScaledResolution scaledResolution = new ScaledResolution(mc);
+        final int n2 = 8;
+        final int n3 = mc.fontRendererObj.getStringWidth(string) + n2 + 30;
+        final int n4 = scaledResolution.getScaledWidth() / 2 - n3 / 2 + posX;
+        final int n5 = scaledResolution.getScaledHeight() / 2 + 15 + posY;
+        current$minX = n4 - n2;
+        current$minY = n5 - n2;
+        current$maxX = n4 + n3;
+        current$maxY = n5 + (mc.fontRendererObj.FONT_HEIGHT + 5) - 6 + n2;
+        final int n10 = (cd == null) ? 255 : (255 - cd.getValueInt(0, 255, 1));
+
+        if (n10 > 0) {
+            final int n11 = (n10 > 110) ? 110 : n10;
+            final int n12 = (n10 > 210) ? 210 : n10;
+            final int[] array = Theme.getGradients((int) theme.getInput());
+
+            RenderUtils.drawRoundedRectangle((float) current$minX, (float) current$minY, (float) current$maxX, (float) (current$maxY + 13), 10.0f, Utils.merge(Color.black.getRGB(), n11));
+            final int n13 = current$minX + 6 + 30;
+            final int n14 = current$maxX - 6;
+            final int n15 = current$maxY;
+
+            RenderUtils.drawRoundedRectangle((float) n13, (float) n15, (float) n14, (float) (n15 + 5), 4.0f, Utils.merge(Color.black.getRGB(), n11));
+            int k = Utils.merge(array[0], n12);
+            int n16 = Utils.merge(array[1], n12);
+            float healthBar = (float) (int) (n14 + (n13 - n14) * (1.0 - ((health < 0.05) ? 0.05 : health)));
+
+            if (healthBar - n13 < 3) {
+                healthBar = n13 + 3;
+            }
+
+            if (healthBar != lastHealthBar && lastHealthBar - n13 >= 3 && healthBarTimer != null) {
+                float diff = lastHealthBar - healthBar;
+                if (diff > 0) {
+                    lastHealthBar = lastHealthBar - healthBarTimer.getValueFloat(0, diff, 1);
+                } else {
+                    lastHealthBar = healthBarTimer.getValueFloat(lastHealthBar, healthBar, 1);
+                }
+            } else {
+                lastHealthBar = healthBar;
+            }
+
+            if (healthColor.isToggled()) {
+                k = n16 = Utils.merge(Utils.getColorForHealth(health), n12);
+            }
+
+            RenderUtils.drawRoundedGradientRect((float) n13, (float) n15, lastHealthBar, (float) (n15 + 5), 4.0f, k, k, k, n16);
+
+            GlStateManager.pushMatrix();
+            GlStateManager.enableBlend();
+            GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
+            mc.fontRendererObj.drawString(string, (float) (n4 + 30), (float) n5, (new Color(220, 220, 220, 255).getRGB() & 0xFFFFFF) | Utils.clamp(n10 + 15) << 24, true);
+            GlStateManager.disableBlend();
+            GlStateManager.popMatrix();
+
+            if (target instanceof AbstractClientPlayer) {
+                RenderUtils.renderPlayer2D(current$minX + 5, current$minY + 4, 25, 25, (AbstractClientPlayer) target);
+                GlStateManager.disableBlend();
+            }
+        } else {
             target = null;
             healthBarTimer = null;
         }
