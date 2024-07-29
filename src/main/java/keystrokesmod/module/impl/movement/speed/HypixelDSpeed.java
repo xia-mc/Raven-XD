@@ -65,6 +65,8 @@ public class HypixelDSpeed extends SubMode<Speed> {
 
     @SubscribeEvent
     public void onPreMotion(PreMotionEvent event) {
+        if (parent.noAction()) return;
+
         if (BlockUtils.getBlock(mc.thePlayer.posX, mc.thePlayer.posY + mc.thePlayer.motionY, 0.0) != Blocks.air) {
             this.wT = false;
         }
@@ -86,6 +88,8 @@ public class HypixelDSpeed extends SubMode<Speed> {
 
     @SubscribeEvent
     public void onStrafe(PrePlayerInputEvent event) {
+        if (parent.noAction()) return;
+
         switch (mode.getOptions()[(int) mode.getInput()]) {
             case "Ground Strafe":
                 if (!MoveUtil.isMoving()) {

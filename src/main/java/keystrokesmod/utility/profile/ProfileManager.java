@@ -118,10 +118,10 @@ public class ProfileManager {
             moduleInformation.add("catPos", jsonArray);
         }
         for (Setting setting : module.getSettings()) {
+            if (setting.viewOnly && !(module instanceof SubMode)) continue;
+
             if (setting instanceof ButtonSetting && !((ButtonSetting) setting).isMethodButton) {
                 moduleInformation.addProperty(setting.getName(), ((ButtonSetting) setting).isToggled());
-            } else if (setting instanceof ModeValue) {
-                moduleInformation.addProperty(setting.getName(), (int) ((ModeValue) setting).getInput());
             } else if (setting instanceof InputSetting) {
                 moduleInformation.addProperty(setting.getName(), ((InputSetting) setting).getInput());
             }

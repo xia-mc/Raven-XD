@@ -8,6 +8,8 @@ import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.ModeValue;
 import keystrokesmod.script.Script;
 import keystrokesmod.utility.Utils;
+import lombok.Getter;
+import lombok.Setter;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import org.jetbrains.annotations.NotNull;
@@ -18,16 +20,21 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 public class Module {
+    @Getter
     protected final ArrayList<Setting> settings;
     private final String moduleName;
     private String prettyName;
     private final Module.category moduleCategory;
+    @Getter
+    @Setter
     private boolean enabled;
     private int keycode;
     protected static Minecraft mc;
     private boolean isToggled = false;
     public boolean canBeEnabled = true;
     public boolean ignoreOnSave = false;
+    @Setter
+    @Getter
     public boolean hidden = false;
     public Script script = null;
 
@@ -102,14 +109,6 @@ public class Module {
         return this.canBeEnabled;
     }
 
-    public boolean isHidden() {
-        return hidden;
-    }
-
-    public void setHidden(boolean hidden) {
-        this.hidden = hidden;
-    }
-
     public void enable() {
         if (!this.canBeEnabled() || this.isEnabled()) {
             return;
@@ -148,10 +147,6 @@ public class Module {
         return "";
     }
 
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-    }
-
     public String getName() {
         return this.moduleName;
     }
@@ -167,10 +162,6 @@ public class Module {
     public void setPrettyName(String name) {
         this.prettyName = name;
         ModuleManager.sort();
-    }
-
-    public ArrayList<Setting> getSettings() {
-        return this.settings;
     }
 
     public void registerSetting(Setting setting) {
@@ -197,10 +188,6 @@ public class Module {
 
     public Module.category moduleCategory() {
         return this.moduleCategory;
-    }
-
-    public boolean isEnabled() {
-        return this.enabled;
     }
 
     public void onEnable() {
