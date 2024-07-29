@@ -111,9 +111,9 @@ public class ColorUtils {
                 case 'd': return new Color(255, 85, 255);
                 case 'e': return new Color(255, 255, 85);
                 case 'f': return new Color(255, 255, 255);
-                default: return new Color(255, 255, 255); // Default to white if no match
+                default: return new Color(255, 255, 255);
             }
         }
-        return new Color(255, 255, 255); // Default to white if no color code is found
+        return new Color(255, 255, 255);
     }
 }
