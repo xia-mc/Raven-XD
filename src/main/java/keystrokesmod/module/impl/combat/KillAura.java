@@ -109,7 +109,7 @@ public class KillAura extends IAutoClicker {
         this.registerSetting(rotationMode = new ModeSetting("Rotation", rotationModes, 1));
         final ModeOnly doRotation = new ModeOnly(rotationMode, 1, 2);
         this.registerSetting(moveFixMode = new ModeSetting("Move fix", RotationHandler.MoveFix.MODES, 0, new ModeOnly(rotationMode, 1)));
-        this.registerSetting(rayCastMode = new ModeSetting("Ray cast", new String[]{"None", "Normal", "Strict"}, 1));
+        this.registerSetting(rayCastMode = new ModeSetting("Ray cast", new String[]{"None", "Normal", "Strict"}, 1, new ModeOnly(rotationMode, 0).reserve()));
         String[] rotationTargets = new String[]{"Head", "Nearest", "Constant"};
         this.registerSetting(rotationTarget = new ModeSetting("Rotation target", rotationTargets, 0, doRotation));
         String[] rotationSimulators = new String[]{"None", "Lazy", "Noise"};
