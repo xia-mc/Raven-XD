@@ -120,6 +120,8 @@ public class ProfileManager {
         for (Setting setting : module.getSettings()) {
             if (setting instanceof ButtonSetting && !((ButtonSetting) setting).isMethodButton) {
                 moduleInformation.addProperty(setting.getName(), ((ButtonSetting) setting).isToggled());
+            } else if (setting instanceof ModeValue) {
+                moduleInformation.addProperty(setting.getName(), (int) ((ModeValue) setting).getInput());
             } else if (setting instanceof InputSetting) {
                 moduleInformation.addProperty(setting.getName(), ((InputSetting) setting).getInput());
             }

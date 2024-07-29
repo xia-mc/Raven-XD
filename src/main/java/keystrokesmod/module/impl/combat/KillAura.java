@@ -50,6 +50,7 @@ public class KillAura extends IAutoClicker {
     private final SliderSetting preAimRange;
     private final ModeSetting rotationMode;
     private final ModeSetting moveFixMode;
+    private final ModeSetting rayCastMode;
     private final ModeSetting rotationTarget;
     private final ModeSetting rotationSimulator;
     private final SliderSetting rotationSpeed;
@@ -105,9 +106,10 @@ public class KillAura extends IAutoClicker {
         this.registerSetting(swingRange = new SliderSetting("Swing range", 3.2, 3.0, 8.0, 0.1));
         this.registerSetting(blockRange = new SliderSetting("Block range", 6.0, 3.0, 12.0, 0.1));
         this.registerSetting(preAimRange = new SliderSetting("PreAim range", 6.0, 3.0, 12.0, 0.1));
-        this.registerSetting(rotationMode = new ModeSetting("Rotation mode", rotationModes, 0));
+        this.registerSetting(rotationMode = new ModeSetting("Rotation", rotationModes, 1));
         final ModeOnly doRotation = new ModeOnly(rotationMode, 1, 2);
-        this.registerSetting(moveFixMode = new ModeSetting("MoveFix mode", RotationHandler.MoveFix.MODES, 0, new ModeOnly(rotationMode, 1)));
+        this.registerSetting(moveFixMode = new ModeSetting("Move fix", RotationHandler.MoveFix.MODES, 0, new ModeOnly(rotationMode, 1)));
+        this.registerSetting(rayCastMode = new ModeSetting("Ray cast", new String[]{"None", "Normal", "Strict"}, 1));
         String[] rotationTargets = new String[]{"Head", "Nearest", "Constant"};
         this.registerSetting(rotationTarget = new ModeSetting("Rotation target", rotationTargets, 0, doRotation));
         String[] rotationSimulators = new String[]{"None", "Lazy", "Noise"};
@@ -394,10 +396,20 @@ public class KillAura extends IAutoClicker {
     }
 
     private boolean noAimToEntity() {
-        if ((rotationMode.getInput() == 0)) return false;
-        // TODO i need to recode this..
-        Object[] rayCasted = Reach.getEntity(attackRange.getInput(), -0.05, rotationMode.getInput() == 1 ? rotations : null);
-        return rayCasted == null || rayCasted[0] != target;
+        if (rotationMode.getInput() == 0) return false;
+
+        boolean noAim = false;
+        switch ((int) rayCastMode.getInput()) {
+            default:
+            case 2:
+                noAim = !RotationUtils.isMouseOver(RotationHandler.getRotationYaw(), RotationHandler.getRotationPitch(), target, (float) attackRange.getInput());
+            case 1:
+                if (noAim) break;
+                Object[] rayCasted = Reach.getEntity(attackRange.getInput(), -0.05, rotationMode.getInput() == 1 ? rotations : null);
+                noAim = rayCasted == null || rayCasted[0] != target;
+        }
+
+        return noAim;
     }
 
     private void resetVariables() {
@@ -640,7 +652,7 @@ public class KillAura extends IAutoClicker {
         try {
             Vec3 eyePos = Utils.getEyePos();
             MovingObjectPosition hitResult = RotationUtils.rayCast(
-                    RotationUtils.getNearestPoint(target.getEntityBoundingBox(), eyePos).distanceTo(eyePos) + 0.05,
+                    RotationUtils.getNearestPoint(target.getEntityBoundingBox(), eyePos).distanceTo(eyePos) - 0.01,
                     RotationHandler.getRotationYaw(), RotationHandler.getRotationPitch()
             );
             return hitResult != null;
