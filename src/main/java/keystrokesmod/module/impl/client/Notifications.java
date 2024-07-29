@@ -29,7 +29,7 @@ public class Notifications extends Module {
     }
 
     public static void sendNotification(NotificationTypes notificationType, String message) {
-        sendNotification(notificationType, message, 2000);
+        sendNotification(notificationType, message, 3000);
     }
 
     public static void sendNotification(NotificationTypes notificationType, String message, long duration) {
@@ -61,7 +61,7 @@ public class Notifications extends Module {
             FontManager.icon20.drawString(noti.type == NotificationTypes.INFO ? "G" : "R", noti.animationX.getValue() + 12.5, noti.animationY.getValue() + 15.5, FontRenderer.CenterMode.XY, false, ColorUtils.getFontColor(2).getRGB());
             String[] messageParts = noti.message.split("§");
             double x = noti.animationX.getValue() + 25;
-            double y = noti.animationY.getValue() + 15.5;
+            double y = noti.animationY.getValue() + 15;
             if (messageParts.length == 1) {
                 FontManager.regular16.drawString(noti.message, x, y, FontRenderer.CenterMode.Y, false, Color.WHITE.getRGB());
             } else {

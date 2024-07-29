@@ -120,6 +120,8 @@ public class ProfileManager {
         for (Setting setting : module.getSettings()) {
             if (setting instanceof ButtonSetting && !((ButtonSetting) setting).isMethodButton) {
                 moduleInformation.addProperty(setting.getName(), ((ButtonSetting) setting).isToggled());
+            } else if (setting instanceof ModeValue) {
+                moduleInformation.addProperty(setting.getName(), (int) ((ModeValue) setting).getInput());
             } else if (setting instanceof InputSetting) {
                 moduleInformation.addProperty(setting.getName(), ((InputSetting) setting).getInput());
             }
@@ -210,15 +212,11 @@ public class ProfileManager {
                         continue;
                     }
 
-                    if (module instanceof SubMode) {
-                        continue;
-                    }
-
                     if (moduleInformation.has("prettyName")) {
                         module.setPrettyName(moduleInformation.get("prettyName").getAsString());
                     }
 
-                    if (module.canBeEnabled()) {
+                    if (module.canBeEnabled() && !(module instanceof SubMode)) {
                         if (moduleInformation.has("enabled")) {
                             boolean enabled = moduleInformation.get("enabled").getAsBoolean();
                             if (enabled) {

@@ -101,6 +101,7 @@ public class ModuleManager {
     public static Jesus jesus;
     public static ExploitFixer exploitFixer;
     public static AutoRegister autoRegister;
+    public static NoteBot noteBot;
 
     public void register() {
 
@@ -139,6 +140,7 @@ public class ModuleManager {
         this.addModule(new FlameTrail());
         this.addModule(new SlyPort());
         this.addModule(new Spin());
+        this.addModule(noteBot = new NoteBot());
 
         // minigames
         this.addModule(new AutoWho());

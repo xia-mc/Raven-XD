@@ -44,7 +44,7 @@ public class LunarClientRPC extends SubMode<DiscordRpc> {
     public void onUpdate() {
         String currentServerIP = mc.getCurrentServerData() != null ? mc.getCurrentServerData().serverIP : null;
 
-        if (!started || (Utils.nullCheck() && DEFAULT_SERVER_NAME.equals(serverName)) ||
+        if (!started || (!Utils.nullCheck() && DEFAULT_SERVER_NAME.equals(serverName)) ||
                 (currentServerIP != null && !currentServerIP.endsWith(serveraddresses))) {
             if (started) {
                 onDisable();
@@ -58,13 +58,13 @@ public class LunarClientRPC extends SubMode<DiscordRpc> {
             }
             if (Utils.nullCheck()) {
                 if (findServerData(currentServerIP)) {
-                    DiscordRPC.discordUpdatePresence(makeRPC(DEFAULT_SMALL_IMAGE, "Lunar Client", serverName));
+                    DiscordRPC.discordUpdatePresence(makeRPC(DEFAULT_SMALL_IMAGE, "Lunar Client", serverName, "On Minecraft 1.8.9"));
                 } else {
-                    updateDefaultRPC("version-1_8", "Minecraft 1.8.9", "Lunar Client");
+                    updatePrivateRPC();
                 }
             } else {
                 serveraddresses = null;
-                updateDefaultRPC("", "", "");
+                updateLaucherRPC();
             }
 
             DiscordEventHandlers handlers = new DiscordEventHandlers();
@@ -147,15 +147,21 @@ public class LunarClientRPC extends SubMode<DiscordRpc> {
     }
 
 
-    private void updateDefaultRPC(String small, String smallText, String bigText) {
+    private void updatePrivateRPC() {
         bigImage = DEFAULT_IMAGE;
         serverName = "Playing Private Server";
-        DiscordRPC.discordUpdatePresence(makeRPC(small, smallText, bigText));
+        DiscordRPC.discordUpdatePresence(makeRPC("version-1_8", "Minecraft 1.8.9", "Lunar Client", "On Minecraft 1.8.9"));
     }
 
-    public DiscordRichPresence makeRPC(String small, String smallText, String bigText) {
+    private void updateLaucherRPC() {
+        bigImage = DEFAULT_IMAGE;
+        serverName = "Active in Launcher";
+        DiscordRPC.discordUpdatePresence(makeRPC("", "", "", ""));
+    }
+
+    public DiscordRichPresence makeRPC(String small, String smallText, String bigText, String state) {
         if (bigText.startsWith("Playing")) bigText = bigText.substring(8);
-        return new DiscordRichPresence.Builder("")
+        return new DiscordRichPresence.Builder(state)
                 .setDetails(serverName)
                 .setBigImage(bigImage, bigText)
                 .setSmallImage(small, smallText)

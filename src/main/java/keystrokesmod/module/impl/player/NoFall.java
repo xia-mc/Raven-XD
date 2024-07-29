@@ -120,7 +120,7 @@ public class NoFall extends Module {
                 } catch (Exception exception) {
                     Utils.sendMessage("&cFailed to get fall distance.");
                 }
-                if (extra$fallDistance - mc.thePlayer.motionY > minFallDistance.getInput()) {
+                if (mc.thePlayer.motionY < 0 && extra$fallDistance - mc.thePlayer.motionY > minFallDistance.getInput()) {
                     Utils.getTimer().timerSpeed = (float) 0.5;
                     mc.getNetHandler().addToSendQueue(new C03PacketPlayer(true));
                     try {

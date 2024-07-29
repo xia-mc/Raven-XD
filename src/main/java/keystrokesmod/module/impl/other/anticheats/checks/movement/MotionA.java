@@ -102,7 +102,7 @@ public class MotionA extends Check {
                     flag(String.format("Invalid jump motion at tick %s. should: %.2f  current: %.2f", tick, should, current));
                 }
             }
-        } catch (IndexOutOfBoundsException ignored) {
+        } catch (IndexOutOfBoundsException | NullPointerException ignored) {
             readyToJump = false;
         }
     }

@@ -73,7 +73,11 @@ public class ModeValue extends Setting implements InputSetting {
 
     @Override
     public void setValue(double value) {
-        this.selected = (int) value;
+        if (value > getMax() || value < getMin()) {
+            this.selected = (int) getMin();
+        } else {
+            this.selected = (int) value;
+        }
         if (this.parent.isEnabled() || !parent.canBeEnabled) {
             this.subModes.get(selected).enable();
         }
