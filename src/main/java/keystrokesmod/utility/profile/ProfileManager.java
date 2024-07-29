@@ -210,15 +210,11 @@ public class ProfileManager {
                         continue;
                     }
 
-                    if (module instanceof SubMode) {
-                        continue;
-                    }
-
                     if (moduleInformation.has("prettyName")) {
                         module.setPrettyName(moduleInformation.get("prettyName").getAsString());
                     }
 
-                    if (module.canBeEnabled()) {
+                    if (module.canBeEnabled() && !(module instanceof SubMode)) {
                         if (moduleInformation.has("enabled")) {
                             boolean enabled = moduleInformation.get("enabled").getAsBoolean();
                             if (enabled) {
