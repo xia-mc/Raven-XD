@@ -233,6 +233,7 @@ public class ModuleManager {
         this.addModule(new Xray());
         this.addModule(new BedPlates());
         this.addModule(watermark = new Watermark());
+        this.addModule(new Explosions());
 
         // world
         this.addModule(antiBot = new AntiBot());
