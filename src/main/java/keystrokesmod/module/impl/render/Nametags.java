@@ -147,16 +147,9 @@ public class Nametags extends Module {
                 RenderUtils.drawOutline(x1, y1, x2, y2, 2, enemyColor);
             }
             if (drawBackground.isToggled()) {
-                float n11 = 0.0f;
-                float n12 = 0.0f;
-                final Tessellator getInstance = Tessellator.getInstance();
-                final WorldRenderer getWorldRenderer = getInstance.getWorldRenderer();
-                getWorldRenderer.begin(7, DefaultVertexFormats.POSITION_COLOR);
-                getWorldRenderer.pos(-n10 - 1, -1, 0.0).color(n11, n12, 0.0f, 0.25f).endVertex();
-                getWorldRenderer.pos(-n10 - 1, 8, 0.0).color(n11, n12, 0.0f, 0.25f).endVertex();
-                getWorldRenderer.pos(n10 + 1, 8, 0.0).color(n11, n12, 0.0f, 0.25f).endVertex();
-                getWorldRenderer.pos(n10 + 1, -1, 0.0).color(n11, n12, 0.0f, 0.25f).endVertex();
-                getInstance.draw();
+                final int backgroundColor = new Color(0, 0, 0, 64).getRGB();
+                final float radius = 3f;
+                RenderUtils.drawRoundedRectangle(-n10 - 1, -1, n10 + 1, 8, radius, backgroundColor);
             }
             GlStateManager.enableTexture2D();
             mc.fontRendererObj.drawString(name, -n10, 0, -1, dropShadow.isToggled());
