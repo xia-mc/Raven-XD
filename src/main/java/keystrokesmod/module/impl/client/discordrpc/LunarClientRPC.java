@@ -155,7 +155,7 @@ public class LunarClientRPC extends SubMode<DiscordRpc> {
 
     private void updateLaucherRPC() {
         bigImage = DEFAULT_IMAGE;
-        serverName = "Playing Private Server";
+        serverName = "Active in Launcher";
         DiscordRPC.discordUpdatePresence(makeRPC("", "", "", ""));
     }
 
