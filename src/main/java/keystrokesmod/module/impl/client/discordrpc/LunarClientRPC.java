@@ -44,7 +44,7 @@ public class LunarClientRPC extends SubMode<DiscordRpc> {
     public void onUpdate() {
         String currentServerIP = mc.getCurrentServerData() != null ? mc.getCurrentServerData().serverIP : null;
 
-        if (!started || (Utils.nullCheck() && DEFAULT_SERVER_NAME.equals(serverName)) ||
+        if (!started || (!Utils.nullCheck() && DEFAULT_SERVER_NAME.equals(serverName)) ||
                 (currentServerIP != null && !currentServerIP.endsWith(serveraddresses))) {
             if (started) {
                 onDisable();
