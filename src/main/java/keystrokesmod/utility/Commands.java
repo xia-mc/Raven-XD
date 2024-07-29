@@ -7,6 +7,7 @@ import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.client.Settings;
 import keystrokesmod.module.impl.combat.Velocity;
+import keystrokesmod.module.impl.fun.NoteBot;
 import keystrokesmod.module.impl.minigames.DuelsStats;
 import keystrokesmod.module.impl.movement.Fly;
 import keystrokesmod.module.impl.other.FakeChat;
@@ -313,7 +314,7 @@ public class Commands {
                     return;
                 }
 
-                String s = c.substring(10);
+                String s = c.substring(11);
                 s = s.replace('&', '§');
                 Watermark.customName = s;
                 print("&aSet client name to " + Watermark.customName, 1);
@@ -354,6 +355,14 @@ public class Commands {
 
                 targetModule.setBind(keyCode);
                 print(ChatFormatting.GREEN + "Bind '" + ChatFormatting.RESET + args.get(2) + ChatFormatting.GREEN + "' to " + targetModule.getPrettyName() + ".", 1);
+            } else if (firstArg.equals("notebot")) {
+                if (!hasArgs) {
+                    print(invSyn, 1);
+                    return;
+                }
+
+                NoteBot.fileName = c.substring(8);
+                print("&aSet noteBot file to " + NoteBot.fileName, 1);
             } else if (firstArg.equals("friend") || firstArg.equals("f")) {
                 if (!hasArgs) {
                     print(invSyn, 1);

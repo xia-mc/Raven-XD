@@ -13,6 +13,7 @@ buildscript {
         classpath 'net.minecraftforge.gradle:ForgeGradle:2.1-SNAPSHOT'
         classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.1'
         classpath 'org.spongepowered:mixingradle:0.6-SNAPSHOT'
+        classpath "org.projectlombok:lombok:1.18.22"
     }
 }
 
@@ -73,6 +74,7 @@ dependencies {
         exclude module: 'asm-commons'
         exclude module: 'slf4j-api'
     }
+    implementation 'org.projectlombok:lombok:1.18.22'
     implementation 'org.jetbrains:annotations:24.1.0'
     implementation files('libraries/snakeyaml-2.1.jar')
     implementation files('libraries/ViaRewind-3.1.2.jar')
@@ -88,7 +90,6 @@ dependencies {
 //    embed files('libraries/ViaVersion-4.10.2.jar')
     embed files("libraries/discord-rpc.jar")
     embed files('libraries/json-20220924.jar')
-
 }
 
 processResources {
