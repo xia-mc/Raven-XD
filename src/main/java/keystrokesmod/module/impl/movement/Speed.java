@@ -252,7 +252,7 @@ public class Speed extends Module {
         return entity != mc.thePlayer && entity instanceof EntityLivingBase;
     }
 
-    private boolean noAction() {
+    public boolean noAction() {
         return ((mc.thePlayer.isInWater()
                 || mc.thePlayer.isInLava()) && liquidDisable.isToggled())
                 || (mc.thePlayer.isSneaking() && sneakDisable.isToggled())

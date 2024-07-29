@@ -5,6 +5,7 @@ import com.google.gson.JsonPrimitive;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.Setting;
 import keystrokesmod.module.setting.interfaces.InputSetting;
+import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -14,7 +15,9 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 public class ModeValue extends Setting implements InputSetting {
+    @Getter
     private final String settingName;
+    @Getter
     private final Module parent;
     private final List<SubMode<?>> subModes = new ArrayList<>();
     private int selected = 0;
@@ -33,6 +36,7 @@ public class ModeValue extends Setting implements InputSetting {
         for (Setting setting : subMode.getSettings()) {
             final Supplier<Boolean> fromVisibleCheck = setting.visibleCheck;
             setting.visibleCheck = () -> subModes.get((int) this.getInput()) == subMode && fromVisibleCheck.get();
+            setting.viewOnly = true;
             parent.registerSetting(setting);
         }
         return this;
@@ -56,14 +60,6 @@ public class ModeValue extends Setting implements InputSetting {
                 setValueRaw(newValue);
             }
         }
-    }
-
-    public String getSettingName() {
-        return settingName;
-    }
-
-    public Module getParent() {
-        return parent;
     }
 
     @Override
