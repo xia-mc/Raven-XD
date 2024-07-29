@@ -1,10 +1,10 @@
 package keystrokesmod.module.impl.render;
 
 import keystrokesmod.module.Module;
-import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.utility.Reflection;
+import keystrokesmod.utility.render.ColorUtils;
 import keystrokesmod.utility.render.RenderUtils;
 import keystrokesmod.utility.Utils;
 import net.minecraft.client.gui.ScaledResolution;
@@ -85,7 +85,7 @@ public class Indicators extends Module {
                 GL11.glPushMatrix();
                 GL11.glTranslated(x, y, 0.0);
                 GL11.glPopMatrix();
-                int color = arrowColor.isToggled() ? ModuleManager.playerESP.getColorFromTags(e.getDisplayName().getFormattedText()) : -1;
+                int color = arrowColor.isToggled() ? ColorUtils.getColorFromCode(e.getDisplayName().getFormattedText()).getRGB() : -1;
                 if (renderItem.isToggled()) {
                     ItemStack entityItem = null;
                     if (e instanceof EntityEnderPearl) {
