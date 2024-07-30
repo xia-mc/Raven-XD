@@ -1,6 +1,7 @@
 package keystrokesmod.module.impl.player;
 
 import keystrokesmod.event.ReceivePacketEvent;
+import keystrokesmod.mixins.impl.network.S08PacketPlayerPosLookAccessor;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.other.RotationHandler;
 import keystrokesmod.module.setting.impl.ModeSetting;
@@ -18,24 +19,18 @@ public class NoRotate extends Module {
     }
 
     @SubscribeEvent
-    public void onReceivePacket(ReceivePacketEvent event) { // from croat
-        if (!Utils.nullCheck()) {
-            return;
-        }
-        if (event.getPacket() instanceof S08PacketPlayerPosLook) {
-            S08PacketPlayerPosLook packet = (S08PacketPlayerPosLook) event.getPacket();
+    public void onReceivePacket(ReceivePacketEvent event) {
+        if (Utils.nullCheck() && event.getPacket() instanceof S08PacketPlayerPosLook) {
+            final S08PacketPlayerPosLook packet = (S08PacketPlayerPosLook) event.getPacket();
             switch ((int) mode.getInput()) {
                 case 1:
                     RotationHandler.setRotationYaw(packet.getYaw());
                     RotationHandler.setRotationPitch(packet.getPitch());
                 case 0:
-                    try {
-                        Reflection.S08PacketPlayerPosLookYaw.set(packet, mc.thePlayer.rotationYaw);
-                        Reflection.S08PacketPlayerPosLookPitch.set(packet, mc.thePlayer.rotationPitch);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        Utils.sendModuleMessage(this, "&cFailed to modify S08PacketPlayerPosLookPitch. Relaunch your game.");
-                    }
+                    // Reflection is TOO SLOW
+                    final S08PacketPlayerPosLookAccessor p = (S08PacketPlayerPosLookAccessor) packet;
+                    p.setYaw(mc.thePlayer.rotationYaw);
+                    p.setPitch(mc.thePlayer.rotationPitch);
                     break;
             }
         }

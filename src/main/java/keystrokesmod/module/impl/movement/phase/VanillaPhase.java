@@ -12,11 +12,11 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
-public class NormalPhase extends SubMode<Phase> {
+public class VanillaPhase extends SubMode<Phase> {
 
     private boolean phasing;
 
-    public NormalPhase(String name, Phase parent) {
+    public VanillaPhase(String name, Phase parent) {
         super(name, parent);
     }
 

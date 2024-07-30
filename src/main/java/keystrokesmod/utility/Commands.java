@@ -155,39 +155,6 @@ public class Commands {
                     }
 
                 });
-            } else if (firstArg.equals("setspeed")) {
-                if (!hasArgs) {
-                    print(invSyn, 1);
-                    return;
-                }
-
-                if (args.size() != 3) {
-                    print(invSyn, 1);
-                    return;
-                }
-
-                double value;
-
-                try {
-                    value = Double.parseDouble(args.get(2));
-                } catch (Exception e) {
-                    print("&cInvalid value. [0 - 100)", 1);
-                    return;
-                }
-
-                if (value > 100 || value < 0) {
-                    print("&cInvalid value. [0 - 100)", 1);
-                    return;
-                }
-
-                if (args.get(1).equals("fly")) {
-                    Fly.horizontalSpeed.setValueRaw(value);
-                } else {
-                    print(invSyn, 1);
-                    return;
-                }
-                print("&aSet speed to ", 1);
-                print(args.get(2), 0);
             } else if (firstArg.equals("setvelocity")) {
                 if (!hasArgs) {
                     print(invSyn, 1);
@@ -501,8 +468,7 @@ public class Commands {
                 print("&eModule-specific:", 0);
                 print("1 cname [name]", 0);
                 print("2 " + FakeChat.command + " [msg]", 0);
-                print("3 setspeed [fly] [value]", 0);
-                print("4 setvelocity [h/v] [value]", 0);
+                print("3 setvelocity [h/v] [value]", 0);
                 print(String.format("5 clientname [name (current is '%s')]", Watermark.customName), 0);
             }
 

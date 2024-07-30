@@ -109,16 +109,14 @@ public class Scaffold extends IAutoClicker {
         this.registerSetting(clickMode = new ModeValue("Click mode", this)
                 .add(new LiteralSubMode("Basic", this))
                 .add(new NormalAutoClicker("Normal", this, false, true))
-                .add(new DragClickAutoClicker("Drag Click", this, false, true))
-                .add(new RecordAutoClicker("Record", this, false, true))
                 .setDefaultValue("Basic")
         );
-        this.registerSetting(aimSpeed = new SliderSetting("Aim speed", 20, 5, 20, 0.1));
-        this.registerSetting(moveFix = new ButtonSetting("MoveFix", false));
-        this.registerSetting(motion = new SliderSetting("Motion", 1.0, 0.5, 1.2, 0.01, () -> !moveFix.isToggled()));
         this.registerSetting(rotation = new ModeSetting("Rotation", rotationModes, 1));
+        this.registerSetting(aimSpeed = new SliderSetting("Aim speed", 20, 5, 20, 0.1, new ModeOnly(rotation, 0).reserve()));
         this.registerSetting(tellyStartTick = new SliderSetting("Telly start", 3, 0, 11, 1, "tick", new ModeOnly(rotation, 4)));
         this.registerSetting(tellyStopTick = new SliderSetting("Telly stop", 8, 0, 11, 1, "tick", new ModeOnly(rotation, 4)));
+        this.registerSetting(moveFix = new ButtonSetting("MoveFix", false, new ModeOnly(rotation, 0).reserve()));
+        this.registerSetting(motion = new SliderSetting("Motion", 1.0, 0.5, 1.2, 0.01, () -> !moveFix.isToggled()));
         this.registerSetting(strafe = new SliderSetting("Strafe", 0, -45, 45, 5));
         this.registerSetting(fastScaffold = new ModeSetting("Fast scaffold", fastScaffoldModes, 0));
         this.registerSetting(precision = new ModeSetting("Precision", precisionModes, 4));

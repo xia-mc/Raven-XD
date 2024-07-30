@@ -5,6 +5,7 @@ import keystrokesmod.event.*;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.movement.NoSlow;
 import keystrokesmod.module.impl.movement.Sprint;
+import keystrokesmod.module.impl.movement.fly.SpoofFly;
 import keystrokesmod.module.impl.other.RotationHandler;
 import keystrokesmod.utility.RotationUtils;
 import net.minecraft.client.Minecraft;
@@ -176,8 +177,13 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
                 preMotionEvent.setRenderYaw(false);
             }
 
-            RotationUtils.renderPitch = preMotionEvent.getPitch();
-            RotationUtils.renderYaw = preMotionEvent.getYaw();
+            if (SpoofFly.hideRotation()) {
+                RotationUtils.renderPitch = rotationPitch;
+                RotationUtils.renderYaw = rotationYaw;
+            } else {
+                RotationUtils.renderPitch = preMotionEvent.getPitch();
+                RotationUtils.renderYaw = preMotionEvent.getYaw();
+            }
 
             double d0 = preMotionEvent.getPosX() - this.lastReportedPosX;
             double d1 = preMotionEvent.getPosY() - this.lastReportedPosY;

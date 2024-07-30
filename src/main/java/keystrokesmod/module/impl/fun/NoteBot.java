@@ -22,6 +22,7 @@ import keystrokesmod.utility.notebot.song.Note;
 import keystrokesmod.utility.notebot.song.Song;
 import lombok.Getter;
 import lombok.var;
+import net.minecraft.block.BlockNote;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
@@ -500,7 +501,7 @@ public class NoteBot extends Module {
     }
 
     private boolean isValidScanSpot(BlockPos pos) {
-        if (mc.theWorld.getBlockState(pos).getBlock() != Blocks.noteblock) return false;
+        if (!(mc.theWorld.getBlockState(pos).getBlock() instanceof BlockNote)) return false;
         IBlockState state = mc.theWorld.getBlockState(pos.up());
         return state.getBlock() == Blocks.air;
     }
