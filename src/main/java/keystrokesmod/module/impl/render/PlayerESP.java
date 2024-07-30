@@ -7,6 +7,7 @@ import keystrokesmod.module.impl.world.AntiBot;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.DescriptionSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
+import keystrokesmod.utility.render.ColorUtils;
 import keystrokesmod.utility.render.RenderUtils;
 import keystrokesmod.utility.Utils;
 import net.minecraft.entity.Entity;
@@ -128,43 +129,11 @@ public class PlayerESP extends Module {
         }
     }
 
-    public int getColorFromTags(String displayName) {
+    public static int getColorFromTags(String displayName) {
         displayName = Utils.removeFormatCodes(displayName);
         if (displayName.isEmpty() || !displayName.startsWith("§") || displayName.charAt(1) == 'f') {
-            return -1;
+            return new Color(255, 255, 255).getRGB();
         }
-        switch (displayName.charAt(1)) {
-            case '0':
-                return -16777216;
-            case '1':
-                return -16777046;
-            case '2':
-                return -16733696;
-            case '3':
-                return -16733526;
-            case '4':
-                return -5636096;
-            case '5':
-                return -5635926;
-            case '6':
-                return -22016;
-            case '7':
-                return -5592406;
-            case '8':
-                return -11184811;
-            case '9':
-                return -11184641;
-            case 'a':
-                return -11141291;
-            case 'b':
-                return -11141121;
-            case 'c':
-                return -43691;
-            case 'd':
-                return -43521;
-            case 'e':
-                return -171;
-        }
-        return -1;
+        return ColorUtils.getColorFromCode(displayName).getRGB();
     }
 }

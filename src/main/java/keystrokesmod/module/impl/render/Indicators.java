@@ -4,6 +4,7 @@ import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.utility.Reflection;
+import keystrokesmod.utility.render.ColorUtils;
 import keystrokesmod.utility.render.RenderUtils;
 import keystrokesmod.utility.Utils;
 import net.minecraft.client.gui.ScaledResolution;
@@ -32,7 +33,7 @@ public class Indicators extends Module {
     private ButtonSetting renderFireballs;
     private ButtonSetting renderPlayers;
     private SliderSetting radius;
-    private ButtonSetting itemColors;
+    private ButtonSetting itemColors, arrowColor;
     private ButtonSetting renderItem;
     private ButtonSetting threatsOnly;
     private HashSet<Entity> threats = new HashSet<>();
@@ -48,6 +49,7 @@ public class Indicators extends Module {
         this.registerSetting(renderPlayers = new ButtonSetting("Render players", true));
         this.registerSetting(radius = new SliderSetting("Circle radius", 50, 5, 250, 2));
         this.registerSetting(itemColors = new ButtonSetting("Item colors", true));
+        this.registerSetting(arrowColor = new ButtonSetting("Arrow color", true));
         this.registerSetting(renderItem = new ButtonSetting("Render item", true));
         this.registerSetting(threatsOnly = new ButtonSetting("Render only threats", true));
     }
@@ -83,7 +85,7 @@ public class Indicators extends Module {
                 GL11.glPushMatrix();
                 GL11.glTranslated(x, y, 0.0);
                 GL11.glPopMatrix();
-                int color = -1;
+                int color = arrowColor.isToggled() ? ColorUtils.getColorFromCode(e.getDisplayName().getFormattedText()).getRGB() : -1;
                 if (renderItem.isToggled()) {
                     ItemStack entityItem = null;
                     if (e instanceof EntityEnderPearl) {
