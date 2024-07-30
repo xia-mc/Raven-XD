@@ -112,8 +112,11 @@ public class HypixelBTower extends SubMode<Tower> {
                 if (Math.abs((double)this.Iq - mc.thePlayer.posY) >= 1.0) {
                     if (this.In == 1) {
                         MoveUtil.stop();
-                        mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY, (mc.thePlayer.posZ + this.Ip) / 2.0);
+                        mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY, (mc.thePlayer.posZ + (mc.thePlayer.posZ + this.Ip) / 2.0) / 2.0);
                     } else if (this.In == 2) {
+                        MoveUtil.stop();
+                        mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY, (mc.thePlayer.posZ + this.Ip) / 2.0);
+                    } else if (this.In == 3) {
                         MoveUtil.stop();
                         mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY, this.Ip);
                         this.et();
