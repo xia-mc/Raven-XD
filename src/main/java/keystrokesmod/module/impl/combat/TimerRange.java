@@ -42,18 +42,21 @@ public class TimerRange extends Module {
 
     @SubscribeEvent
     public void onRender(TickEvent.RenderTickEvent e) {
-        if (!shouldStart()) return;
+        if (!shouldStart()) {
+            reset();
+            return;
+        }
 
         if (hasLag < lagTicks.getInput()) {
-            Utils.getTimer().timerSpeed = 0.0F;
             if (System.currentTimeMillis() - lastLagTime >= 50) {
                 hasLag++;
                 lastLagTime = System.currentTimeMillis();
+                Utils.getTimer().timerSpeed = 0.0F;
             }
             return;
         }
 
-        Utils.getTimer().timerSpeed = 1.0F;
+        Utils.resetTimer();
         for (int i = 0; i < timerTicks.getInput(); i++) {
             mc.thePlayer.onUpdate();
         }
@@ -64,8 +67,14 @@ public class TimerRange extends Module {
 
     @Override
     public void onDisable() {
+        reset();
+    }
+
+    private void reset() {
         lastTimerTime = 0;
         lastLagTime = 0;
+        if (hasLag > 0)
+            Utils.resetTimer();
         hasLag = 0;
     }
 
