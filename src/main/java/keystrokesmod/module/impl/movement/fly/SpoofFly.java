@@ -8,6 +8,7 @@ import keystrokesmod.module.setting.impl.SubMode;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
@@ -24,6 +25,15 @@ public class SpoofFly extends SubMode<Fly> {
     public SpoofFly(String name, @NotNull Fly parent) {
         super(name, parent);
         this.registerSetting(keep = new ButtonSetting("Keep", true));
+
+        FMLCommonHandler.instance().bus().register(new Object() {
+            @SubscribeEvent
+            public void onWorldChange(@NotNull EntityJoinWorldEvent event) {
+                if (event.entity == mc.thePlayer) {
+                    hiddenPos.clear();
+                }
+            }
+        });
     }
 
     public static boolean isHidden(BlockPos pos) {
@@ -54,13 +64,6 @@ public class SpoofFly extends SubMode<Fly> {
     public void onUpdate() {
         scaffold.setHidden(true);
         scaffold.enable();
-    }
-
-    @SubscribeEvent
-    public void onWorldChange(@NotNull EntityJoinWorldEvent event) {
-        if (event.entity == mc.thePlayer) {
-            hiddenPos.clear();
-        }
     }
 
     @SubscribeEvent
