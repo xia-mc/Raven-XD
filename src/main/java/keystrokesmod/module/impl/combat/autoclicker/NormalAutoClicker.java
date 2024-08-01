@@ -9,8 +9,8 @@ import keystrokesmod.utility.Utils;
 import org.jetbrains.annotations.NotNull;
 
 public class NormalAutoClicker extends SubMode<IAutoClicker> {
-    private final SliderSetting minCPS = new SliderSetting("Min CPS", 8, 1, 20, 0.1);
-    private final SliderSetting maxCPS = new SliderSetting("Max CPS", 14, 1, 20, 0.1);
+    private final SliderSetting minCPS = new SliderSetting("Min CPS", 8, 1, 40, 0.1);
+    private final SliderSetting maxCPS = new SliderSetting("Max CPS", 14, 1, 40, 0.1);
     private final ButtonSetting butterFly = new ButtonSetting("Butterfly", true);
     private final boolean leftClick;
     private final boolean rightClick;
