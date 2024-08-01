@@ -102,6 +102,7 @@ public class ModuleManager {
     public static ExploitFixer exploitFixer;
     public static AutoRegister autoRegister;
     public static NoteBot noteBot;
+    public static ViewPackets viewPackets;
 
     public void register() {
 
@@ -183,6 +184,7 @@ public class ModuleManager {
         this.addModule(staffDetector = new StaffDetector());
         this.addModule(new BedProximityAlert());
         this.addModule(autoRegister = new AutoRegister());
+        this.addModule(viewPackets = new ViewPackets());
 
         // player
         this.addModule(new AntiAFK());

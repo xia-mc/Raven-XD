@@ -30,7 +30,7 @@ public class WatchdogAutoPhase extends SubMode<Phase> {
 
     @SubscribeEvent
     public void onBlockAABBEvent(BlockAABBEvent event) {
-        if (phase && blink.isEnabled() && event.getBlock() instanceof BlockGlass) event.setCanceled(true);
+        if (phase && event.getBlock() instanceof BlockGlass) event.setCanceled(true);
     }
 
     @SubscribeEvent
@@ -46,6 +46,7 @@ public class WatchdogAutoPhase extends SubMode<Phase> {
                 case "§r§r§r                               §r§f§lSkyWars Duel§r":
                 case "§r§eCages opened! §r§cFIGHT!§r":
                     phase = false;
+                    blink.disable();
                     break;
 
                 case "The game starts in 3 seconds!":
@@ -56,5 +57,10 @@ public class WatchdogAutoPhase extends SubMode<Phase> {
                     break;
             }
         }
+    }
+
+    @Override
+    public void onDisable() {
+        blink.disable();
     }
 }

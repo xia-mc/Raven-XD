@@ -5,10 +5,8 @@ import keystrokesmod.event.*;
 import keystrokesmod.mixins.impl.client.KeyBindingAccessor;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.client.Notifications;
-import keystrokesmod.module.impl.combat.autoclicker.DragClickAutoClicker;
 import keystrokesmod.module.impl.combat.autoclicker.IAutoClicker;
 import keystrokesmod.module.impl.combat.autoclicker.NormalAutoClicker;
-import keystrokesmod.module.impl.combat.autoclicker.RecordAutoClicker;
 import keystrokesmod.module.impl.other.RotationHandler;
 import keystrokesmod.module.impl.other.SlotHandler;
 import keystrokesmod.module.impl.other.anticheats.utils.world.PlayerRotation;
@@ -57,10 +55,16 @@ public class Scaffold extends IAutoClicker {
     private final ButtonSetting recycleRotation;
     private final ButtonSetting sneak;
     private final SliderSetting sneakEveryBlocks;
+    private final ButtonSetting jump;
+    private final SliderSetting jumpEveryBlocks;
     private final SliderSetting sneakTime;
     private final ButtonSetting rotateWithMovement;
     private final ButtonSetting staticYaw;
     private final ButtonSetting reserveYaw;
+    private final ButtonSetting staticPitch;
+    private final ButtonSetting staticPitchOnJump;
+    private final SliderSetting straightPitch;
+    private final SliderSetting diagonalPitch;
     private final ModeSetting precision;
     private final ButtonSetting autoSwap;
     private final ButtonSetting useBiggestStack;
@@ -98,6 +102,7 @@ public class Scaffold extends IAutoClicker {
     private int add = 0;
     private int sameY$bridged = 1;
     private int sneak$bridged = 0;
+    private int jump$bridged = 0;
     private boolean placedUp;
     private int offGroundTicks = 0;
     private boolean telly$noBlockPlace = false;
@@ -124,11 +129,17 @@ public class Scaffold extends IAutoClicker {
         this.registerSetting(rayCast = new ButtonSetting("Ray cast", false));
         this.registerSetting(recycleRotation = new ButtonSetting("Recycle rotation", false));
         this.registerSetting(sneak = new ButtonSetting("Sneak", false));
-        this.registerSetting(sneakEveryBlocks = new SliderSetting("Sneak every blocks", 1, 1, 10, 1, sneak::isToggled));
+        this.registerSetting(sneakEveryBlocks = new SliderSetting("Sneak every blocks", 0, 1, 10, 1, sneak::isToggled));
         this.registerSetting(sneakTime = new SliderSetting("Sneak time", 50, 0, 500, 10, "ms", sneak::isToggled));
+        this.registerSetting(jump = new ButtonSetting("Jump", false));
+        this.registerSetting(jumpEveryBlocks = new SliderSetting("Jump every blocks", 0, 1, 10, 1, jump::isToggled));
         this.registerSetting(rotateWithMovement = new ButtonSetting("Rotate with movement", true));
         this.registerSetting(staticYaw = new ButtonSetting("Static yaw", false));
         this.registerSetting(reserveYaw = new ButtonSetting("Reserve yaw", false));
+        this.registerSetting(staticPitch = new ButtonSetting("Static pitch", false));
+        this.registerSetting(staticPitchOnJump = new ButtonSetting("Static pitch on jump", false, staticPitch::isToggled));
+        this.registerSetting(straightPitch = new SliderSetting("Straight pitch", 75.7, 45, 90, 0.1, staticPitch::isToggled));
+        this.registerSetting(diagonalPitch = new SliderSetting("Diagonal pitch", 75.6, 45, 90, 0.1, staticPitch::isToggled));
         this.registerSetting(autoSwap = new ButtonSetting("AutoSwap", true));
         this.registerSetting(useBiggestStack = new ButtonSetting("Use biggest stack", true, autoSwap::isToggled));
         this.registerSetting(delayOnJump = new ButtonSetting("Delay on jump", true));
@@ -178,6 +189,8 @@ public class Scaffold extends IAutoClicker {
 
         lastSlot = -1;
         startPos = mc.thePlayer.posY;
+        sneak$bridged = 0;
+        jump$bridged = 0;
     }
 
     @SubscribeEvent
@@ -240,6 +253,32 @@ public class Scaffold extends IAutoClicker {
         if (lastYaw == null || lastPitch == null) {
             lastYaw = event.getYaw();
             lastPitch = event.getPitch();
+        }
+
+        if (staticYaw.isToggled()) {
+            float delta = yaw % 45;
+            if (delta > 22.5 && delta <= 45)
+                yaw += 45 - delta;
+            else if (delta < -22.5 && delta >= -45)
+                yaw -= 45 + delta;
+            else if (delta <= 22.5 && delta > 0)
+                yaw -= delta;
+            else if (delta >= -22.5 && delta < 0)
+                yaw -= delta;
+        }
+
+        if (reserveYaw.isToggled())
+            yaw += 180;
+
+        if (staticPitch.isToggled() && (staticPitchOnJump.isToggled() || mc.thePlayer.onGround)) {
+            double direction = MoveUtil.direction();
+            double movingYaw = Math.round(direction / 45) * 45;
+            boolean isMovingStraight = movingYaw % 90 == 0f;
+
+            if (isMovingStraight)
+                pitch = (float) straightPitch.getInput();
+            else
+                pitch = (float) diagonalPitch.getInput();
         }
 
         event.setYaw(lastYaw = instant ? yaw : AimSimulator.rotMove(yaw, lastYaw, (float) aimSpeed.getInput()));
@@ -758,15 +797,7 @@ public class Scaffold extends IAutoClicker {
             }
         }
 
-        if (reserveYaw.isToggled())
-            yaw += 180;
-
-        float finalYaw = mc.thePlayer.rotationYaw + yaw;
-        if (staticYaw.isToggled()) {
-            finalYaw -= finalYaw % 45;
-        }
-
-        return finalYaw;
+        return mc.thePlayer.rotationYaw + yaw;
     }
 
     private @Nullable EnumFacingOffset getEnumFacing(final Vec3 position) {
@@ -816,6 +847,14 @@ public class Scaffold extends IAutoClicker {
             }
         }
 
+        if (jump.isToggled()) {
+            if (jump$bridged >= jumpEveryBlocks.getInput()) {
+                jump$bridged = 0;
+                if (mc.thePlayer.onGround)
+                    mc.thePlayer.jump();
+            }
+        }
+
         ItemStack heldItem = SlotHandler.getHeldItem();
         if (heldItem == null || !(heldItem.getItem() instanceof ItemBlock)) {
             return;
@@ -823,7 +862,8 @@ public class Scaffold extends IAutoClicker {
 
         if (rayCast.isToggled()) {
             MovingObjectPosition hitResult = RotationUtils.rayCast(4.5, RotationHandler.getRotationYaw(), RotationHandler.getRotationPitch());
-            if (hitResult != null && hitResult.getBlockPos().equals(block.getBlockPos()) && hitResult.sideHit == block.sideHit) {
+            if (hitResult != null && hitResult.getBlockPos().equals(block.getBlockPos())) {
+                block.sideHit = hitResult.sideHit;
                 block.hitVec = hitResult.hitVec;
             } else {
                 return;
@@ -839,6 +879,7 @@ public class Scaffold extends IAutoClicker {
 
         if (mc.playerController.onPlayerRightClick(mc.thePlayer, mc.theWorld, heldItem, block.getBlockPos(), block.sideHit, block.hitVec)) {
             sneak$bridged++;
+            jump$bridged++;
             if (silentSwing.isToggled()) {
                 mc.thePlayer.sendQueue.addToSendQueue(new C0APacketAnimation());
             }

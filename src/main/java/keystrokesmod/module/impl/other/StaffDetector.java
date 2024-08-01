@@ -41,6 +41,15 @@ public class StaffDetector extends Module {
     }
 
     @Override
+    public void onEnable() {
+        int counter = 0;
+        for (Set<String> staffs : STAFFS) {
+            counter += staffs.size();
+        }
+        Utils.sendMessage(String.format("Loaded %s names", counter));
+    }
+
+    @Override
     public void onUpdate() {
         for (EntityPlayer player : mc.theWorld.playerEntities) {
             final String name = player.getName();
