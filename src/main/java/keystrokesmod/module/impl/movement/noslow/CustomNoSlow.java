@@ -36,7 +36,7 @@ public class CustomNoSlow extends INoSlow {
         this.registerSetting(startSlow = new ButtonSetting("Start slow", false));
         this.registerSetting(switchMode = new ModeSetting("Switch mode", new String[]{"PreAttack", "PostAttack", "PrePosition", "PostPosition"}, 0));
         this.registerSetting(slotMode = new ModeSetting("Slot mode", new String[]{"PreAttack", "PostAttack", "PrePosition", "PostPosition"}, 0));
-        this.registerSetting(mode = new ModeSetting("Mode", new String[]{"Legit", "LegitMotion", "AllDirection", "AllDirectionMotion"}, 0));
+        this.registerSetting(mode = new ModeSetting("Sprint mode", new String[]{"Legit", "LegitMotion", "AllDirection", "AllDirectionMotion"}, 0));
         this.registerSetting(new DescriptionSetting("Sword"));
         this.registerSetting(sword = new ModeValue("Sword", this, () -> false).add(new SimpleCustomNoSlow("Sword", this)));
         this.registerSetting(new DescriptionSetting("Bow"));
