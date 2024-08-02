@@ -549,7 +549,7 @@ public class Scaffold extends IAutoClicker {
                                             if (recycleRotation.isToggled()) {
                                                 Optional<Triple<BlockPos, EnumFacing, keystrokesmod.script.classes.Vec3>> placeSide = RotationUtils.getPlaceSide(targetPos);
                                                 if (placeSide.isPresent()) {
-//                                                    rayCasted = new MovingObjectPosition(placeSide.get().getRight().toVec3(), placeSide.get().getMiddle(), placeSide.get().getLeft());
+                                                    rayCasted = new MovingObjectPosition(placeSide.get().getRight().toVec3(), placeSide.get().getMiddle(), placeSide.get().getLeft());
                                                     placeYaw = PlayerRotation.getYaw(placeSide.get().getRight());
                                                     placePitch = PlayerRotation.getPitch(placeSide.get().getRight());
                                                     break;

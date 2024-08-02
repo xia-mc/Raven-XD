@@ -28,6 +28,11 @@ public class Notifications extends Module {
         this.registerSetting(moduleToggled = new ButtonSetting("Module toggled", true));
     }
 
+    @Override
+    public void onEnable() {
+        notifs.clear();
+    }
+
     public static void sendNotification(NotificationTypes notificationType, String message) {
         sendNotification(notificationType, message, 3000);
     }

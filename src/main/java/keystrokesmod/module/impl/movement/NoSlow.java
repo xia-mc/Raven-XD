@@ -207,11 +207,6 @@ public class NoSlow extends Module {
                 C08PacketPlayerBlockPlacement blockPlacement = (C08PacketPlayerBlockPlacement) event.getPacket();
                 if (SlotHandler.getHeldItem() != null && blockPlacement.getPlacedBlockDirection() == 255
                         && ContainerUtils.isRest(SlotHandler.getHeldItem().getItem()) && offGroundTicks < 2) {
-                    if (mc.thePlayer.onGround) {
-                        mc.thePlayer.setJumping(false);
-                        mc.thePlayer.jump();
-                    }
-                    send = true;
                     event.setCanceled(true);
                 }
             }

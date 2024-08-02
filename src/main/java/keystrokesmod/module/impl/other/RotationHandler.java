@@ -98,7 +98,7 @@ public final class RotationHandler extends Module {
      */
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onPreMotion(MoveInputEvent event) {
-        if (isSet) {
+        if (isSet && mc.currentScreen == null) {
             float viewYaw = RotationUtils.normalize(mc.thePlayer.rotationYaw);
             float viewPitch = RotationUtils.normalize(mc.thePlayer.rotationPitch);
             switch ((int) smoothBack.getInput()) {

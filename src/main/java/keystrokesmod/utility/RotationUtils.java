@@ -145,16 +145,21 @@ public class RotationUtils {
         return (float) (Math.atan2(n - mc.thePlayer.posX, n2 - mc.thePlayer.posZ) * 57.295780181884766 * -1.0);
     }
 
-    public static MovingObjectPosition rayCast(final double distance, final float yaw, final float pitch) {
-        final Vec3 getPositionEyes = mc.thePlayer.getPositionEyes(1.0f);
+    public static MovingObjectPosition rayCast(final Vec3 from, final double distance, final float yaw, final float pitch) {
         final float n4 = -yaw * 0.017453292f;
         final float n5 = -pitch * 0.017453292f;
         final float cos = MathHelper.cos(n4 - 3.1415927f);
         final float sin = MathHelper.sin(n4 - 3.1415927f);
         final float n6 = -MathHelper.cos(n5);
         final Vec3 vec3 = new Vec3(sin * n6, MathHelper.sin(n5), cos * n6);
-        return mc.theWorld.rayTraceBlocks(getPositionEyes, getPositionEyes.addVector(vec3.xCoord * distance, vec3.yCoord * distance, vec3.zCoord * distance), false, false, false);
+        return mc.theWorld.rayTraceBlocks(from, from.addVector(vec3.xCoord * distance, vec3.yCoord * distance, vec3.zCoord * distance), false, false, false);
     }
+
+    public static MovingObjectPosition rayCast(final double distance, final float yaw, final float pitch) {
+        final Vec3 getPositionEyes = mc.thePlayer.getPositionEyes(1.0f);
+        return rayCast(getPositionEyes, distance, yaw, pitch);
+    }
+
     public static MovingObjectPosition rayTraceCustom(double blockReachDistance, float yaw, float pitch) {
         final Vec3 vec3 = mc.thePlayer.getPositionEyes(1.0F);
         final Vec3 vec31 = getVectorForRotation(pitch, yaw);

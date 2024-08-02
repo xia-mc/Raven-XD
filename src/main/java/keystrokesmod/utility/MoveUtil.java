@@ -265,4 +265,13 @@ public class MoveUtil {
     public static double jumpMotion() {
         return jumpBoostMotion(JUMP_HEIGHT);
     }
+
+    public static double predictedMotionXZ(double motion, int tick) {
+        for (int i = 0; i < tick; i++) {
+            motion /= 0.5;
+            if (motion < 0.005)
+                return 0;
+        }
+        return motion;
+    }
 }
