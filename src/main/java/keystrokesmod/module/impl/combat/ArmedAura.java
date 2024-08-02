@@ -203,9 +203,9 @@ public class ArmedAura extends IAutoClicker {
     private @NotNull Vec3 doPrediction(@NotNull Vec3 pos, Vec3 motion) {
         Vec3 result = new Vec3(pos.toVec3());
         for (int i = 0; i < predTicks; i++) {
-            result.add(
+            result = result.add(
                     MoveUtil.predictedMotionXZ(motion.x(), i),
-                    MoveUtil.predictedMotion(motion.y(), i),
+                    mc.thePlayer.onGround ? 0 : MoveUtil.predictedMotion(motion.y(), i),
                     MoveUtil.predictedMotionXZ(motion.z(), i)
             );
         }

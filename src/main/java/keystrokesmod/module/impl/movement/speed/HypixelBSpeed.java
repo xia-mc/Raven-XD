@@ -33,7 +33,7 @@ import org.jetbrains.annotations.NotNull;
  * @see hackclient.rise.nb
  * @author Alan34
  */
-public class HypixelDSpeed extends SubMode<Speed> {
+public class HypixelBSpeed extends SubMode<Speed> {
     private final ModeSetting mode = new ModeSetting("Mode", new String[]{"Ground Strafe", "Autism"}, 0);
     public final ButtonSetting fastFall = new ButtonSetting("Fast Fall", false, new ModeOnly(mode, 1));
     public final SliderSetting ticksToGlide = new SliderSetting("Ticks to Glide", 29, 1, 29, 1, new ModeOnly(mode, 1));
@@ -45,7 +45,7 @@ public class HypixelDSpeed extends SubMode<Speed> {
     
     private int offGroundTicks = 0;
 
-    public HypixelDSpeed(String name, Speed parent) {
+    public HypixelBSpeed(String name, Speed parent) {
         super(name, parent);
         this.registerSetting(mode, fastFall, ticksToGlide);
     }

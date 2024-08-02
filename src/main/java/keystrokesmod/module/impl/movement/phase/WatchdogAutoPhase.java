@@ -30,7 +30,7 @@ public class WatchdogAutoPhase extends SubMode<Phase> {
 
     @SubscribeEvent
     public void onBlockAABBEvent(BlockAABBEvent event) {
-        if (phase && event.getBlock() instanceof BlockGlass) event.setCanceled(true);
+        if (phase && event.getBlock() instanceof BlockGlass) event.setBoundingBox(null);
     }
 
     @SubscribeEvent

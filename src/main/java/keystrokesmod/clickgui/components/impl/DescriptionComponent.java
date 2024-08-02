@@ -1,15 +1,21 @@
 package keystrokesmod.clickgui.components.impl;
 
 import keystrokesmod.clickgui.components.Component;
+import keystrokesmod.module.setting.Setting;
 import keystrokesmod.module.setting.impl.DescriptionSetting;
 import keystrokesmod.utility.Theme;
 import net.minecraft.client.Minecraft;
+import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL11;
-
-import java.awt.*;
 
 public class DescriptionComponent extends Component {
     private final DescriptionSetting desc;
+
+    @Nullable
+    @Override
+    public Setting getSetting() {
+        return desc;
+    }
 
     public DescriptionComponent(DescriptionSetting desc, ModuleComponent b, int o) {
         super(b);

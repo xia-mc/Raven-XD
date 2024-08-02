@@ -31,7 +31,7 @@ public class ModuleManager {
     public static Module antiShuffle;
     public static Module commandLine;
     public static Module antiBot;
-    public static Module noSlow;
+    public static NoSlow noSlow;
     public static KillAura killAura;
     public static AutoClicker autoClicker;
     public static HitBox hitBox;
