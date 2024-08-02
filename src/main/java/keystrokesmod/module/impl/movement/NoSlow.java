@@ -34,11 +34,13 @@ public class NoSlow extends Module {
 
     public static float getForwardSlowed() {
         if (!mc.thePlayer.isUsingItem()) return 1;
+        if (!ModuleManager.noSlow.isEnabled()) return 0.2f;
         return ((INoSlow) ModuleManager.noSlow.mode.getSubModeValues().get((int) ModuleManager.noSlow.mode.getInput())).getSlowdown();
     }
 
     public static float getStrafeSlowed() {
         if (!mc.thePlayer.isUsingItem()) return 1;
+        if (!ModuleManager.noSlow.isEnabled()) return 0.2f;
         return ((INoSlow) ModuleManager.noSlow.mode.getSubModeValues().get((int) ModuleManager.noSlow.mode.getInput())).getStrafeSlowdown();
     }
 }
