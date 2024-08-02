@@ -26,6 +26,7 @@ public class HypixelNoSlow extends INoSlow {
 
     @Override
     public void onUpdate() {
+        if (!mc.thePlayer.isUsingItem()) return;
         if (mc.thePlayer.ticksExisted % 3 == 0 && !Raven.badPacketsHandler.C07) {
             mc.thePlayer.sendQueue.addToSendQueue(new C08PacketPlayerBlockPlacement(new BlockPos(-1, -1, -1), 1, null, 0, 0, 0));
         }
