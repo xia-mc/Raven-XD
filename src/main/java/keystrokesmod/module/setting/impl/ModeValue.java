@@ -22,11 +22,15 @@ public class ModeValue extends Setting implements InputSetting {
     private final List<SubMode<?>> subModes = new ArrayList<>();
     private int selected = 0;
     public ModeValue(String settingName, Module parent) {
-        super(settingName, () -> true);
+        this(settingName, parent, () -> true);
+    }
+
+    public ModeValue(String settingName, Module parent, Supplier<Boolean> visibleCheck) {
+        super(settingName, visibleCheck);
         this.settingName = settingName;
         this.parent = parent;
-
     }
+
     public ModeValue add(final SubMode<?> subMode) {
         if (subMode == null)
             return this;

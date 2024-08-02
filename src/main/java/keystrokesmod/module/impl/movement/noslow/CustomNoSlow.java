@@ -38,11 +38,11 @@ public class CustomNoSlow extends INoSlow {
         this.registerSetting(slotMode = new ModeSetting("Slot mode", new String[]{"PreAttack", "PostAttack", "PrePosition", "PostPosition"}, 0));
         this.registerSetting(mode = new ModeSetting("Mode", new String[]{"Legit", "LegitMotion", "AllDirection", "AllDirectionMotion"}, 0));
         this.registerSetting(new DescriptionSetting("Sword"));
-        this.registerSetting(sword = new ModeValue("Sword", this).add(new SimpleCustomNoSlow("Sword", this)));
+        this.registerSetting(sword = new ModeValue("Sword", this, () -> false).add(new SimpleCustomNoSlow("Sword", this)));
         this.registerSetting(new DescriptionSetting("Bow"));
-        this.registerSetting(bow = new ModeValue("Bow", this).add(new SimpleCustomNoSlow("Bow", this)));
+        this.registerSetting(bow = new ModeValue("Bow", this, () -> false).add(new SimpleCustomNoSlow("Bow", this)));
         this.registerSetting(new DescriptionSetting("Rest"));
-        this.registerSetting(rest = new ModeValue("Rest", this).add(new SimpleCustomNoSlow("Rest", this)));
+        this.registerSetting(rest = new ModeValue("Rest", this, () -> false).add(new SimpleCustomNoSlow("Rest", this)));
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)

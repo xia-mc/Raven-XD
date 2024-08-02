@@ -43,24 +43,24 @@ public class SimpleCustomNoSlow extends SubMode<CustomNoSlow> {
     public SimpleCustomNoSlow(String name, @NotNull CustomNoSlow parent) {
         super(name, parent);
         this.registerSetting(slowDown = new ButtonSetting("Slowdown", false));
-        this.registerSetting(slowDownForward = new SliderSetting("SlowdownForward", 1, 0.2, 1, 0.01));
-        this.registerSetting(slowDownStrafe = new SliderSetting("SlowdownStrafe", 1, 0.2, 1, 0.01));
+        this.registerSetting(slowDownForward = new SliderSetting("SlowdownForward", 1, 0.2, 1, 0.01, slowDown::isToggled));
+        this.registerSetting(slowDownStrafe = new SliderSetting("SlowdownStrafe", 1, 0.2, 1, 0.01, slowDown::isToggled));
         this.registerSetting(switch1 = new ButtonSetting("Switch", false));
         this.registerSetting(slot = new ButtonSetting("Slot", false));
         this.registerSetting(onGround = new ButtonSetting("OnGround", false));
         this.registerSetting(toggle = new ButtonSetting("Toggle", false));
         this.registerSetting(input = new ButtonSetting("Input", false));
-        this.registerSetting(inputForwardLegit = new ButtonSetting("InputForwardLegit", false));
-        this.registerSetting(inputForward = new SliderSetting("InputForward", 1, -1, 1, 0.01));
-        this.registerSetting(inputStrafeLegit = new ButtonSetting("InputStrafeLegit", false));
-        this.registerSetting(inputStrafe = new SliderSetting("InputStrafe", 0, -1, 1, 0.01));
-        this.registerSetting(inputJumpLegit = new ButtonSetting("InputJumpLegit", false));
-        this.registerSetting(inputJump = new ButtonSetting("InputJump", false));
-        this.registerSetting(inputSneakLegit = new ButtonSetting("InputSneakLegit", false));
-        this.registerSetting(inputSneak = new ButtonSetting("InputSneak", false));
+        this.registerSetting(inputForwardLegit = new ButtonSetting("InputForwardLegit", false, input::isToggled));
+        this.registerSetting(inputForward = new SliderSetting("InputForward", 1, -1, 1, 0.01, input::isToggled));
+        this.registerSetting(inputStrafeLegit = new ButtonSetting("InputStrafeLegit", false, input::isToggled));
+        this.registerSetting(inputStrafe = new SliderSetting("InputStrafe", 0, -1, 1, 0.01, input::isToggled));
+        this.registerSetting(inputJumpLegit = new ButtonSetting("InputJumpLegit", false, input::isToggled));
+        this.registerSetting(inputJump = new ButtonSetting("InputJump", false, input::isToggled));
+        this.registerSetting(inputSneakLegit = new ButtonSetting("InputSneakLegit", false, input::isToggled));
+        this.registerSetting(inputSneak = new ButtonSetting("InputSneak", false, input::isToggled));
         this.registerSetting(bug = new ButtonSetting("Bug", false));
         this.registerSetting(timer = new ButtonSetting("Timer", false));
-        this.registerSetting(timerValue = new SliderSetting("Timer", 0.2, 0.1, 2, 0.01));
+        this.registerSetting(timerValue = new SliderSetting("Timer", 0.2, 0.1, 2, 0.01, timer::isToggled));
         this.registerSetting(blink = new ButtonSetting("Blink", false));
     }
 
