@@ -1,4 +1,3 @@
-
 <div align="center">
   
 # Raven XD
@@ -105,4 +104,12 @@ Feel free to raise an issue or submit a pull request.
 
 If you want to co-develop this project with me, please contact me.
 
+You can also support us on [Patreon](https://www.patreon.com/xia__mc)!
+
+<div align="center">
+
+[!![-preview](https://github.com/user-attachments/assets/ac50e6e5-3227-4ee9-9881-2e7b8ba47861)](https://www.patreon.com/xia__mc)
+
 <img src="https://github.com/SAWARATSUKI/KawaiiLogos/blob/main/IntelliJ IDEA/IntelliJ IDEA.png" alt="Java" width="500" />
+
+</div>
