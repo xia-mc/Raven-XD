@@ -1,4 +1,4 @@
-package keystrokesmod.module.impl.movement;
+package keystrokesmod.module.impl.player;
 
 import keystrokesmod.clickgui.ClickGui;
 import keystrokesmod.module.Module;
@@ -28,7 +28,7 @@ public class Timer extends Module {
     private int enableTicks;
 
     public Timer() {
-        super("Timer", Module.category.movement, 0);
+        super("Timer", category.player, 0);
         this.registerSetting(mode = new ModeSetting("Mode", new String[]{"Normal", "Balance", "Hypixel", "None"}, 0));
         final ModeOnly mode1 = new ModeOnly(mode, 1);
         this.registerSetting(speed = new SliderSetting("Speed", 1.00, 0.01, 10.0, 0.01, new ModeOnly(mode, 0, 1)));
