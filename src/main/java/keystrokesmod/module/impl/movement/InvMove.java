@@ -108,6 +108,11 @@ public class InvMove extends Module {
     private void doInvMove() {
         if (allowSprint.isToggled()) {
             KeyBinding.setKeyBindState(mc.gameSettings.keyBindSprint.getKeyCode(), Keyboard.isKeyDown(mc.gameSettings.keyBindSprint.getKeyCode()));
+
+            // If sprint is enabled, set the sprint key to true
+            if (sprint.isEnabled()) {
+                KeyBinding.setKeyBindState(mc.gameSettings.keyBindSprint.getKeyCode(), true);
+            }
         }
         if (allowSneak.isToggled()) {
             KeyBinding.setKeyBindState(mc.gameSettings.keyBindSneak.getKeyCode(), Keyboard.isKeyDown(mc.gameSettings.keyBindSneak.getKeyCode()));
