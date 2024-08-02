@@ -45,7 +45,8 @@ public class VulcanFly extends SubMode<Fly> {
     @SubscribeEvent
     public void onReceivePacket(@NotNull ReceivePacketEvent event) {
         if (event.getPacket() instanceof S08PacketPlayerPosLook) {
-            event.setCanceled(true);
+            S08PacketPlayerPosLook packet = (S08PacketPlayerPosLook) event.getPacket();
+            mc.thePlayer.setPositionAndRotation(packet.getX(), packet.getY(), packet.getZ(), packet.getYaw(), packet.getPitch());
             shouldTimer = true;
         }
     }
