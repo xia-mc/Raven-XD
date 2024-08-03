@@ -43,6 +43,8 @@ public class VulcanFly extends SubMode<Fly> {
 
     @Override
     public void onUpdate() {
+        if (!Utils.nullCheck())
+            parent.disable();
         if (shouldTimer && timer.isToggled())
             Utils.getTimer().timerSpeed = (float) (timerSpeed.getInput() - Math.random() / 1000);
     }
