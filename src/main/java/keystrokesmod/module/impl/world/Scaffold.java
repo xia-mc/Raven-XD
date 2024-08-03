@@ -619,7 +619,7 @@ public class Scaffold extends IAutoClicker {
         for (int x = -range; x <= range; ++x) {
             for (int y = -range; y <= range; ++y) {
                 for (int z = -range; z <= range; ++z) {
-                    final Block block = blockRelativeToPlayer(x, y, z);
+                    final Block block = BlockUtils.blockRelativeToPlayer(x, y, z);
                     if (!block.getMaterial().isReplaceable()) {
                         for (int x2 = -1; x2 <= 1; x2 += 2) {
                             possibilities.add(new Vec3(mc.thePlayer.posX + x + x2, mc.thePlayer.posY + y, mc.thePlayer.posZ + z));
@@ -648,10 +648,6 @@ public class Scaffold extends IAutoClicker {
         }));
 
         return possibilities.get(0);
-    }
-
-    public Block blockRelativeToPlayer(final double offsetX, final double offsetY, final double offsetZ) {
-        return mc.theWorld.getBlockState(new BlockPos(mc.thePlayer).add(offsetX, offsetY, offsetZ)).getBlock();
     }
 
     public float[] generateSearchSequence(float value) {

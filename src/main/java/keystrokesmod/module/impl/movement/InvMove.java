@@ -6,6 +6,7 @@ import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.DescriptionSetting;
 import keystrokesmod.module.setting.impl.ModeSetting;
+import keystrokesmod.utility.MoveUtil;
 import keystrokesmod.utility.PacketUtils;
 import keystrokesmod.utility.Utils;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -20,7 +21,7 @@ import org.lwjgl.input.Keyboard;
 import static keystrokesmod.module.ModuleManager.*;
 
 public class InvMove extends Module {
-    public static final String[] MODES = {"Normal", "Blink", "LegitInv"};
+    public static final String[] MODES = {"Normal", "Blink", "LegitInv", "Hypixel"};
     private final ModeSetting mode;
     private final ButtonSetting noOpenPacket;
     private final ButtonSetting allowSprint;
@@ -58,6 +59,9 @@ public class InvMove extends Module {
                         noInvMove();
                         return;
                     }
+                    break;
+                case 3:
+                    MoveUtil.stop();
                     break;
             }
 

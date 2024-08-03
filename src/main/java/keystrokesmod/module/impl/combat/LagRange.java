@@ -68,4 +68,9 @@ public class LagRange extends Module {
         double distance = new Vec3(target).distanceTo(mc.thePlayer);
         return distance >= minRange.getInput() && distance <= maxRange.getInput();
     }
+
+    @Override
+    public String getInfo() {
+        return (int) lagTime.getInput() + "ms";
+    }
 }

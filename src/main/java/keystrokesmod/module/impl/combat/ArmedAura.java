@@ -49,6 +49,7 @@ public class ArmedAura extends IAutoClicker {
     private final SliderSetting fastFireAmount;
     private final ButtonSetting targetInvisible;
     private final ButtonSetting ignoreTeammates;
+    private final ButtonSetting notWhileKillAura;
 
     private boolean targeted = false;
     private Pair<Pair<EntityPlayer, Vec3>, Triple<Double, Float, Float>> target = null;
@@ -77,11 +78,12 @@ public class ArmedAura extends IAutoClicker {
         this.registerSetting(fastFireAmount = new SliderSetting("Fast fire amount", 1, 1, 4, 1, () -> autoSwitch.isToggled() && fastFire.isToggled()));
         this.registerSetting(targetInvisible = new ButtonSetting("Target invisible", false));
         this.registerSetting(ignoreTeammates = new ButtonSetting("Ignore teammates", true));
+        this.registerSetting(notWhileKillAura = new ButtonSetting("Not while killAura", true));
     }
 
     @SubscribeEvent
     public void onRotation(RotationEvent event) {
-        if (!targeted && !(perfect.isToggled() && mc.thePlayer.experience % 1 != 0)) {
+        if (!targeted && !(perfect.isToggled() && mc.thePlayer.experience % 1 != 0) && !(notWhileKillAura.isToggled() && KillAura.target != null)) {
             final Optional<Pair<Pair<EntityPlayer, Vec3>, Triple<Double, Float, Float>>> target = mc.theWorld.playerEntities.parallelStream()
                     .filter(p -> p != mc.thePlayer)
                     .filter(p -> !AntiBot.isBot(p))

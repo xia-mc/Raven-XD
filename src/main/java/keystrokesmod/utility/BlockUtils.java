@@ -251,4 +251,8 @@ public class BlockUtils {
         }
         return false;
     }
+
+    public static Block blockRelativeToPlayer(final double offsetX, final double offsetY, final double offsetZ) {
+        return mc.theWorld.getBlockState(new BlockPos(mc.thePlayer).add(offsetX, offsetY, offsetZ)).getBlock();
+    }
 }
