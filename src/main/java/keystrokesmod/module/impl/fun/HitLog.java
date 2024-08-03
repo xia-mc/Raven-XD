@@ -38,13 +38,15 @@ public class HitLog extends Module {
 
         Raven.getExecutor().schedule(() -> {
             if (target.hurtTime == 0) {
-                Reason reason = Reason.UNKNOWN;
+                Reason reason;
                 if (!target.getEntityBoundingBox().isVecInside(predHitPos.toVec3())) {
                     reason = Reason.PRED_FAIL;
                 } else if (Math.round(System.currentTimeMillis() - lastS08) <= predTicks) {
                     reason = Reason.WATCHDOG;
                 } else if (target.isBlocking()) {
                     reason = Reason.BLOCK;
+                } else {
+                    return;
                 }
 
                 switch ((int) language.getInput()) {
@@ -78,9 +80,8 @@ public class HitLog extends Module {
     @AllArgsConstructor
     @Getter
     enum Reason {
-        UNKNOWN("Unknown", "未知"),
-        WATCHDOG("Watchdog", "Watchdog"),
         PRED_FAIL("Predicted failed", "预测失败"),
+        WATCHDOG("Watchdog", "Watchdog"),
         BLOCK("Blocking", "格挡");
         
         final String english;

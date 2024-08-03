@@ -103,6 +103,7 @@ public class ArmedAura extends IAutoClicker {
                 targeted = true;
             } else {
                 targeted = false;
+                pos = null;
             }
         }
     }
@@ -127,7 +128,6 @@ public class ArmedAura extends IAutoClicker {
         }
 
         if (targeted && click) {
-            Notifications.sendNotification(Notifications.NotificationTypes.INFO, "attack");
             mc.playerController.sendUseItem(mc.thePlayer, mc.theWorld, SlotHandler.getHeldItem());
             if (fastFire.isToggled() && autoSwitch.isToggled()) {
                 for (int i = 0; i < (int) fastFireAmount.getInput(); i++) {

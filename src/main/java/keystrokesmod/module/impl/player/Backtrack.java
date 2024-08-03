@@ -123,7 +123,7 @@ public class Backtrack extends Module {
 
     @SubscribeEvent
     public void onRender(RenderWorldLastEvent e) {
-        if (target == null || vec3 == null)
+        if (target == null || vec3 == null || target.isDead)
             return;
 
         final net.minecraft.util.Vec3 pos = currentLatency > 0 ? vec3.toVec3() : target.getPositionVector();
