@@ -18,7 +18,8 @@ public class KarhuJesus extends SubMode<Jesus> {
 
     @SubscribeEvent
     public void onMoveInput(@NotNull MoveInputEvent event) {
-        event.setJump(false);
+        if (Utils.inLiquid())
+            event.setJump(false);
     }
 
     @SubscribeEvent
