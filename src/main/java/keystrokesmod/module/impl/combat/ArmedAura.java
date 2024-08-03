@@ -17,6 +17,7 @@ import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.ModeSetting;
 import keystrokesmod.module.setting.impl.ModeValue;
 import keystrokesmod.module.setting.impl.SliderSetting;
+import keystrokesmod.module.setting.utils.ModeOnly;
 import keystrokesmod.script.classes.Vec3;
 import keystrokesmod.utility.MoveUtil;
 import keystrokesmod.utility.RotationUtils;
@@ -37,6 +38,9 @@ import java.util.Optional;
 import java.util.Set;
 
 public class ArmedAura extends IAutoClicker {
+    private final ModeSetting mode;
+    private final SliderSetting switchDelay;
+    private final ModeSetting sortMode;
     private final ModeValue clickMode;
     private final SliderSetting range;
     private final ButtonSetting perfect;
@@ -59,10 +63,15 @@ public class ArmedAura extends IAutoClicker {
     private boolean click = false;
     private int predTicks = 0;
     private net.minecraft.util.Vec3 pos = null;
-    private final Set<Integer> fired = new HashSet<>();
+    private final Set<Integer> firedSlots = new HashSet<>();
+    private final Set<EntityLivingBase> switchedTarget = new HashSet<>();
+    private long lastSwitched = -1;
 
     public ArmedAura() {
         super("ArmedAura", category.combat);
+        this.registerSetting(mode = new ModeSetting("Mode", new String[]{"Single", "Switch"}, 0));
+        this.registerSetting(switchDelay = new SliderSetting("Switch delay", 200, 50, 1000, 50, "ms", new ModeOnly(mode, 1)));
+        this.registerSetting(sortMode = new ModeSetting("Sort mode", new String[]{"Distance", "Health", "Hurt time", "Yaw"}, 0));
         this.registerSetting(clickMode = new ModeValue("Click mode", this)
                 .add(new NormalAutoClicker("Normal", this, false, true))
                 .add(new DragClickAutoClicker("Drag Click", this, false, true))
@@ -93,6 +102,7 @@ public class ArmedAura extends IAutoClicker {
                     .filter(entity -> entity instanceof EntityLivingBase)
                     .map(entity -> (EntityLivingBase) entity)
                     .filter(entity -> entity != mc.thePlayer)
+                    .filter(entity -> !(mode.getInput() == 1 && switchedTarget.contains(entity)))
                     .filter(entity -> {
                         if (entity instanceof EntityArmorStand) return false;
                         if (entity instanceof EntityPlayer) {
@@ -111,7 +121,7 @@ public class ArmedAura extends IAutoClicker {
                     .map(p -> new Pair<>(p, doPrediction(Utils.getEyePos(p), new Vec3(p.motionX, p.motionY, p.motionZ))))
                     .map(pair -> new Pair<>(pair, Triple.of(pair.second().distanceTo(Utils.getEyePos()), PlayerRotation.getYaw(pair.second()), PlayerRotation.getPitch(pair.second()))))
                     .filter(pair -> RotationUtils.rayCast(pair.second().getLeft(), pair.second().getMiddle(), pair.second().getRight()) == null)
-                    .min(Comparator.comparingDouble(pair -> mc.thePlayer.getDistanceSqToEntity(pair.first().first())));
+                    .min(fromSortMode());
             if (target.isPresent()) {
                 if (SlotHandler.getHeldItem() != null && SlotHandler.getHeldItem().getItem() instanceof ItemHoe) {
                     event.setYaw(target.get().second().getMiddle());
@@ -119,12 +129,33 @@ public class ArmedAura extends IAutoClicker {
                     event.setMoveFix(RotationHandler.MoveFix.values()[(int) moveFix.getInput()]);
                     pos = target.get().first().second().add(0, -target.get().first().first().getEyeHeight(), 0).toVec3();
                     this.target = target.get();
+                    long time = System.currentTimeMillis();
+                    if (time - lastSwitched > switchDelay.getInput()) {
+                        switchedTarget.add(target.get().first().first());
+                        lastSwitched = time;
+                    }
                 }
                 targeted = true;
             } else {
+                if (!switchedTarget.isEmpty()) {
+                    switchedTarget.clear();
+                    onRotation(event);
+                }
                 targeted = false;
                 pos = null;
             }
+        }
+    }
+
+    private Comparator<Pair<Pair<EntityLivingBase, Vec3>, Triple<Double, Float, Float>>> fromSortMode() {
+        switch ((int) sortMode.getInput()) {
+            default:
+            case 0:
+                return Comparator.comparingDouble(pair -> mc.thePlayer.getDistanceSqToEntity(pair.first().first()));
+            case 1:
+                return Comparator.comparingDouble(pair -> pair.first().first().getHealth());
+            case 2:
+                return Comparator.comparingDouble(pair -> pair.first().first().hurtTime);
         }
     }
 
@@ -168,7 +199,7 @@ public class ArmedAura extends IAutoClicker {
         for (int i = 0; i < 9; i++) {
             ItemStack stack = mc.thePlayer.inventory.mainInventory[i];
             if (stack != null && stack.getItem() instanceof ItemHoe) {
-                if (fastFire.isToggled() && fired.contains(i))
+                if (fastFire.isToggled() && firedSlots.contains(i))
                     continue;
 
                 int curLevel;
@@ -199,11 +230,11 @@ public class ArmedAura extends IAutoClicker {
             }
         }
 
-        if (arm == -1 && !fired.isEmpty()) {
-            fired.clear();
+        if (arm == -1 && !firedSlots.isEmpty()) {
+            firedSlots.clear();
             return getBestArm();
         }
-        fired.add(arm);
+        firedSlots.add(arm);
         return arm;
     }
 
@@ -238,7 +269,7 @@ public class ArmedAura extends IAutoClicker {
         targeted = false;
         click = false;
         predTicks = 0;
-        fired.clear();
+        firedSlots.clear();
         pos = null;
     }
 

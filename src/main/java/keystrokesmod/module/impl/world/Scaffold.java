@@ -1025,8 +1025,6 @@ public class Scaffold extends IAutoClicker {
                                     this.placedUp = true;
                                 }
                             }
-
-                        }
                     }
                 }
             }
