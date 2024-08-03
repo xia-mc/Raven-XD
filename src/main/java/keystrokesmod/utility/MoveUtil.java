@@ -3,10 +3,12 @@ package keystrokesmod.utility;
 import keystrokesmod.mixins.impl.entity.EntityAccessor;
 import keystrokesmod.module.impl.movement.TargetStrafe;
 import keystrokesmod.module.impl.other.anticheats.utils.world.PlayerMove;
-import keystrokesmod.script.classes.Entity;
 import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.potion.Potion;
 import net.minecraft.util.MathHelper;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 import static keystrokesmod.Raven.mc;
 import static keystrokesmod.module.ModuleManager.scaffold;
@@ -205,7 +207,12 @@ public class MoveUtil {
      * @return player moving
      */
     public static boolean isMoving() {
-        return mc.thePlayer.moveForward != 0 || mc.thePlayer.moveStrafing != 0;
+        return isMoving(mc.thePlayer);
+    }
+
+    @Contract(pure = true)
+    public static boolean isMoving(@NotNull EntityLivingBase entity) {
+        return entity.moveForward != 0 || entity.moveStrafing != 0;
     }
 
     public static void moveFlying(double increase) {
@@ -266,9 +273,9 @@ public class MoveUtil {
         return jumpBoostMotion(JUMP_HEIGHT);
     }
 
-    public static double predictedMotionXZ(double motion, int tick) {
+    public static double predictedMotionXZ(double motion, int tick, boolean moving) {
         for (int i = 0; i < tick; i++) {
-            motion /= 0.5;
+            if (!moving) motion /= 0.5;
             if (motion < 0.005)
                 return 0;
         }

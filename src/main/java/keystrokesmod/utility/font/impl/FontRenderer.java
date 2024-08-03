@@ -1,12 +1,14 @@
 package keystrokesmod.utility.font.impl;
 
 import keystrokesmod.utility.font.FontManager;
+import keystrokesmod.utility.font.IFont;
 import keystrokesmod.utility.render.ColorUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 
+import org.jetbrains.annotations.NotNull;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
@@ -17,7 +19,7 @@ import java.util.List;
  * @author TejasLamba2006
  * @since 28/07/2024
  */
-public class FontRenderer extends CharRenderer {
+public class FontRenderer extends CharRenderer implements IFont {
 
     final CharData[] boldChars = new CharData[256];
     final CharData[] italicChars = new CharData[256];
@@ -32,35 +34,33 @@ public class FontRenderer extends CharRenderer {
         this.setupBoldItalicIDs();
     }
 
-    public void drawString(String text, double x, double y, CenterMode centerMode, boolean shadow, int color) {
+    public double drawString(String text, double x, double y, @NotNull CenterMode centerMode, boolean shadow, int color) {
         switch (centerMode) {
             case X:
                 if (shadow) {
                     this.drawString(text, x - this.getStringWidth(text) / 2 + 0.5, y + 0.5, color, true);
                 }
-                this.drawString(text, x - this.getStringWidth(text) / 2, y, color, false);
-                return;
+                return this.drawString(text, x - this.getStringWidth(text) / 2, y, color, false);
             case Y:
                 if (shadow) {
                     this.drawString(text, x + 0.5, y - this.getHeight() / 2 + 0.5, color, true);
                 }
-                this.drawString(text, x, y - this.getHeight() / 2, color, false);
-                return;
+                return this.drawString(text, x, y - this.getHeight() / 2, color, false);
             case XY:
                 if (shadow) {
                     this.drawString(text, x - this.getStringWidth(text) / 2 + 0.5, y - this.getHeight() / 2 + 0.5, color, true);
                 }
-                this.drawString(text, x - this.getStringWidth(text) / 2, y - this.getHeight() / 2, color, false);
-                return;
+                return this.drawString(text, x - this.getStringWidth(text) / 2, y - this.getHeight() / 2, color, false);
+            default:
             case NONE:
                 if (shadow) {
                     this.drawString(text, x + 0.5, y + 0.5, color, true);
                 }
-                this.drawString(text, x, y, color, false);
+                return this.drawString(text, x, y, color, false);
         }
     }
 
-    private double drawString(String text, double x, double y, int color, boolean shadow) {
+    public double drawString(String text, double x, double y, int color, boolean shadow) {
         ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());
 
         if (text == null) {
@@ -91,7 +91,7 @@ public class FontRenderer extends CharRenderer {
         for (int index = 0; index < text.length(); index++) {
             char character = text.charAt(index);
 
-            if (character == '\u00a7') {
+            if (character == '§') {
                 int colorIndex = 21;
 
                 try {
@@ -131,6 +131,26 @@ public class FontRenderer extends CharRenderer {
         GL11.glPopMatrix();
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         return x / 2f;
+    }
+
+    @Override
+    public double drawString(String text, double x, double y, int color) {
+        return drawString(text, x, y, color, false);
+    }
+
+    @Override
+    public double width(String text) {
+        return getStringWidth(text);
+    }
+
+    @Override
+    public double drawCenteredString(String text, double x, double y, int color) {
+        return drawString(text, x, y, CenterMode.X, false, color);
+    }
+
+    @Override
+    public double height() {
+        return getHeight();
     }
 
     private void drawLetter(double x, double y, CharData[] currentData, char character) {

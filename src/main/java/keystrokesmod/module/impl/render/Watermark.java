@@ -36,7 +36,7 @@ public class Watermark extends Module {
     public static int posX = 5;
     public static int posY = 5;
     public static int current$minX = 0;
-    public static int current$maxX = 0;
+    public static double current$maxX = 0;
     public static int current$minY = 0;
     public static int current$maxY = 0;
     private final ModeSetting mode;
@@ -103,7 +103,7 @@ public class Watermark extends Module {
                     current$minX = posX;
                     current$maxX = current$minX + font.width(text);
                     current$minY = posY;
-                    current$maxY = current$minY + Math.round(font.height());
+                    current$maxY = (int) (current$minY + Math.round(font.height()));
                 }
                 break;
             case 1:

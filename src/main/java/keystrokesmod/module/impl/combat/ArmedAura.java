@@ -19,6 +19,7 @@ import keystrokesmod.module.setting.impl.ModeValue;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.utils.ModeOnly;
 import keystrokesmod.script.classes.Vec3;
+import keystrokesmod.utility.BlockUtils;
 import keystrokesmod.utility.MoveUtil;
 import keystrokesmod.utility.RotationUtils;
 import keystrokesmod.utility.Utils;
@@ -27,6 +28,7 @@ import net.minecraft.entity.item.EntityArmorStand;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemHoe;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.BlockPos;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.apache.commons.lang3.tuple.Triple;
@@ -118,7 +120,7 @@ public class ArmedAura extends IAutoClicker {
                     })
                     .filter(entity -> targetInvisible.isToggled() || !entity.isInvisible())
                     .filter(p -> p.getDistanceToEntity(mc.thePlayer) < range.getInput())
-                    .map(p -> new Pair<>(p, doPrediction(Utils.getEyePos(p), new Vec3(p.motionX, p.motionY, p.motionZ))))
+                    .map(p -> new Pair<>(p, doPrediction(p, new Vec3(p.motionX, p.motionY, p.motionZ))))
                     .map(pair -> new Pair<>(pair, Triple.of(pair.second().distanceTo(Utils.getEyePos()), PlayerRotation.getYaw(pair.second()), PlayerRotation.getPitch(pair.second()))))
                     .filter(pair -> RotationUtils.rayCast(pair.second().getLeft(), pair.second().getMiddle(), pair.second().getRight()) == null)
                     .min(fromSortMode());
@@ -251,13 +253,13 @@ public class ArmedAura extends IAutoClicker {
         }
     }
 
-    private @NotNull Vec3 doPrediction(@NotNull Vec3 pos, Vec3 motion) {
-        Vec3 result = new Vec3(pos.toVec3());
+    private @NotNull Vec3 doPrediction(@NotNull EntityLivingBase entity, Vec3 motion) {
+        Vec3 result = Utils.getEyePos(entity);
         for (int i = 0; i < predTicks; i++) {
             result = result.add(
-                    MoveUtil.predictedMotionXZ(motion.x(), i),
-                    mc.thePlayer.onGround ? 0 : MoveUtil.predictedMotion(motion.y(), i),
-                    MoveUtil.predictedMotionXZ(motion.z(), i)
+                    MoveUtil.predictedMotionXZ(motion.x(), i, MoveUtil.isMoving(entity)),
+                    entity.onGround || !BlockUtils.replaceable(new BlockPos(result.toVec3())) ? 0 : MoveUtil.predictedMotion(motion.y(), i),
+                    MoveUtil.predictedMotionXZ(motion.z(), i, MoveUtil.isMoving(entity))
             );
         }
         return result;

@@ -6,6 +6,7 @@ import keystrokesmod.clickgui.ClickGui;
 import keystrokesmod.clickgui.components.impl.CategoryComponent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.client.Gui;
+import keystrokesmod.module.impl.other.KillMessage;
 import keystrokesmod.module.impl.render.HUD;
 import keystrokesmod.module.impl.render.TargetHUD;
 import keystrokesmod.module.impl.render.Watermark;
@@ -51,6 +52,7 @@ public class ProfileManager {
     public void saveProfile(Profile profile) {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("clientName", Watermark.customName);
+        jsonObject.addProperty("killmessage", KillMessage.killMessage);
         jsonObject.addProperty("keybind", profile.getModule().getKeycode());
         JsonArray jsonArray = new JsonArray();
         for (Module module : Raven.moduleManager.getModules()) {
@@ -176,6 +178,9 @@ public class ProfileManager {
                 if (profileJson.has("clientName")) {
                     Watermark.customName = profileJson.get("clientName").getAsString();
                 }
+                if (profileJson.has("killmessage")) {
+                    KillMessage.killMessage = profileJson.get("killmessage").getAsString();
+                }
 
                 for (JsonElement moduleJson : modules) {
                     JsonObject moduleInformation = moduleJson.getAsJsonObject();
@@ -189,9 +194,6 @@ public class ProfileManager {
                             break;
                         case "SuperKB":
                             moduleName = "MoreKB";
-                            break;
-                        case "Reduce":
-                            moduleName = "KeepSprint";
                             break;
                     }
 

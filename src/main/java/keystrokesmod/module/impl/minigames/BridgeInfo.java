@@ -4,7 +4,6 @@ import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.DescriptionSetting;
 import keystrokesmod.utility.font.FontManager;
-import keystrokesmod.utility.font.impl.MinecraftFontRenderer;
 import keystrokesmod.utility.render.RenderUtils;
 import keystrokesmod.utility.Utils;
 import net.minecraft.client.gui.FontRenderer;

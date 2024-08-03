@@ -36,12 +36,12 @@ public class FakePotion extends Module {
     public void onUpdate() {
         if (speed.isToggled()) {
             mc.thePlayer.addPotionEffect(
-                    new PotionEffect(Potion.moveSpeed.getId(), 999999, (int) speedLevel.getInput(), false, false)
+                    new PotionEffect(Potion.moveSpeed.getId(), 999999, (int) speedLevel.getInput() - 1, false, false)
             );
         }
         if (jump.isToggled()) {
             mc.thePlayer.addPotionEffect(
-                    new PotionEffect(Potion.jump.getId(), 999999, (int) jumpLevel.getInput(), false, false)
+                    new PotionEffect(Potion.jump.getId(), 999999, (int) jumpLevel.getInput() - 1, false, false)
             );
         }
     }
@@ -56,6 +56,9 @@ public class FakePotion extends Module {
 
     @Override
     public void onDisable() {
+        mc.thePlayer.removePotionEffect(Potion.moveSpeed.getId());
+        mc.thePlayer.removePotionEffect(Potion.jump.getId());
+
         if (!delayedPackets.isEmpty()) {
             for (Packet<?> p : delayedPackets) {
                 PacketUtils.sendPacket(p);
