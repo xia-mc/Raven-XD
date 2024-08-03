@@ -970,13 +970,6 @@ public class Scaffold extends IAutoClicker {
             Vec3 targetVec3 = this.getPlacePossibility(0.0, original);
             if (targetVec3 != null) {
                 BlockPos targetPos = new BlockPos(targetVec3.xCoord, targetVec3.yCoord, targetVec3.zCoord);
-                int slot = getSlot();
-                if (slot != -1) {
-                    if (this.lastSlot == -1) {
-                        this.lastSlot = mc.thePlayer.inventory.currentItem;
-                    }
-
-                    mc.thePlayer.inventory.currentItem = slot;
                     if (heldItem != null && heldItem.getItem() instanceof ItemBlock) {
                         MovingObjectPosition rayCasted = null;
                         float searchYaw = 25.0F;
