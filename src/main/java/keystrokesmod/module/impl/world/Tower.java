@@ -25,7 +25,6 @@ public class Tower extends Module {
                 .add(new HypixelBTower("HypixelB", this))
                 .add(new ConstantMotionTower("ConstantMotion", this))
                 .add(new HypixelCTower("HypixelC", this))
-                .add(new HypixelDTower("HypixelD", this))
                 .setDefaultValue("Vanilla")
         );
 

@@ -38,6 +38,8 @@ public class VanillaSpeed extends SubMode<Speed> {
 
     @SubscribeEvent
     public void onPreMotion(PreMotionEvent event) {
+        if (parent.noAction()) return;
+
         if (MoveUtil.isMoving()) {
             if (autoJump.isToggled() && mc.thePlayer.onGround) {
                 mc.thePlayer.jump();

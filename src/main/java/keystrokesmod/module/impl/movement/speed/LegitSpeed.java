@@ -22,6 +22,8 @@ public class LegitSpeed extends SubMode<Speed> {
 
     @SubscribeEvent
     public void onPreUpdate(@NotNull PreUpdateEvent event) {
+        if (parent.noAction()) return;
+
         if (!mc.thePlayer.onGround && rotation.isToggled()) {
             RotationHandler.setRotationYaw(mc.thePlayer.moveStrafing > 0 ? mc.thePlayer.rotationYaw - 45 : mc.thePlayer.rotationYaw + 45);
             RotationHandler.setMoveFix(RotationHandler.MoveFix.SILENT);

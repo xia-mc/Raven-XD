@@ -9,8 +9,8 @@ import keystrokesmod.module.impl.client.Settings;
 import keystrokesmod.module.impl.combat.Velocity;
 import keystrokesmod.module.impl.fun.NoteBot;
 import keystrokesmod.module.impl.minigames.DuelsStats;
-import keystrokesmod.module.impl.movement.Fly;
 import keystrokesmod.module.impl.other.FakeChat;
+import keystrokesmod.module.impl.other.KillMessage;
 import keystrokesmod.module.impl.other.NameHider;
 import keystrokesmod.module.impl.render.Watermark;
 import keystrokesmod.utility.font.impl.MinecraftFontRenderer;
@@ -285,6 +285,14 @@ public class Commands {
                 s = s.replace('&', '§');
                 Watermark.customName = s;
                 print("&aSet client name to " + Watermark.customName, 1);
+            } else if (firstArg.equals("killmessage")) {
+                if (!hasArgs) {
+                    print(invSyn, 1);
+                    return;
+                }
+
+                KillMessage.killMessage = c.substring(12);
+                print("&aSet killmessage to " + KillMessage.killMessage, 1);
             } else if (firstArg.equals("binds")) {
                 for (Module module : Raven.getModuleManager().getModules()) {
                     if (module.getKeycode() != 0) {
@@ -469,6 +477,7 @@ public class Commands {
                 print("1 cname [name]", 0);
                 print("2 " + FakeChat.command + " [msg]", 0);
                 print("3 setvelocity [h/v] [value]", 0);
+                print("4 killmessage [message]", 0);
                 print(String.format("5 clientname [name (current is '%s')]", Watermark.customName), 0);
             }
 

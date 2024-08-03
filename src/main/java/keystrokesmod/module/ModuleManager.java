@@ -106,6 +106,8 @@ public class ModuleManager {
     public static ArmedAura armedAura;
     public static HitLog hitLog;
     public static LagRange lagRange;
+    public static FakePotion fakePotion;
+    public static NoWeb noWeb;
 
     public void register() {
 
@@ -173,6 +175,7 @@ public class ModuleManager {
         this.addModule(new VClip());
         this.addModule(wallClimb = new WallClimb());
         this.addModule(jesus = new Jesus());
+        this.addModule(noWeb = new NoWeb());
 
         // other
         this.addModule(new Anticheat());
@@ -209,6 +212,7 @@ public class ModuleManager {
         this.addModule(invManager = new InvManager());
         this.addModule(noFall = new NoFall());
         this.addModule(new NoRotate());
+        this.addModule(fakePotion = new FakePotion());
 
         // render
         this.addModule(ambience = new Ambience());
@@ -242,6 +246,7 @@ public class ModuleManager {
         this.addModule(new BedPlates());
         this.addModule(watermark = new Watermark());
         this.addModule(new Explosions());
+        this.addModule(new KillMessage());
 
         // world
         this.addModule(antiBot = new AntiBot());

@@ -22,7 +22,8 @@
     "render.MixinModelBiped",
     "render.MixinRendererLivingEntity",
     "world.BlockNoteAccessor",
-    "world.MixinBlock"
+    "world.MixinBlock",
+    "world.MixinBlockWeb"
   ],
   "client": [
     "client.GuiConnectingAccessor",

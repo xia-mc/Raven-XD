@@ -41,7 +41,7 @@ public class PacketUtils {
         }
     }
 
-    public static void receivePacket(Packet<NetHandlerPlayClient> packet) {
+    public static void receivePacket(Packet<INetHandlerPlayClient> packet) {
         try {
             packet.processPacket(Raven.mc.getNetHandler());
         }
