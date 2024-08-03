@@ -152,7 +152,7 @@ public class FontRenderer extends CharRenderer {
         for (int index = 0; index < text.length(); index++) {
             char character = text.charAt(index);
 
-            if (character == '\u00a7') {
+            if (character == '§') {
                 index++;
             } else if (character < currentData.length) {
                 width += currentData[character].width - 8.3f + charOffset;

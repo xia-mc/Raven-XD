@@ -4,7 +4,6 @@ import keystrokesmod.Raven;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.other.SlotHandler;
 import keystrokesmod.module.setting.impl.ButtonSetting;
-import keystrokesmod.module.setting.impl.DescriptionSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.utility.Reflection;
 import keystrokesmod.utility.Utils;
@@ -14,7 +13,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent;
 
 public class BurstClicker extends Module {
-    public static DescriptionSetting artificialDragClicking;
     public static SliderSetting clicks;
     public static SliderSetting delay;
     public static ButtonSetting delayRandomizer;
@@ -23,8 +21,7 @@ public class BurstClicker extends Module {
     private boolean l_r = false;
 
     public BurstClicker() {
-        super("BurstClicker", Module.category.combat, 0);
-        this.registerSetting(artificialDragClicking = new DescriptionSetting("Artificial dragclicking."));
+        super("BurstClicker", Module.category.combat, "Artificial dragclicking");
         this.registerSetting(clicks = new SliderSetting("Clicks", 0.0D, 0.0D, 50.0D, 1.0D));
         this.registerSetting(delay = new SliderSetting("Delay (ms)", 5.0D, 1.0D, 40.0D, 1.0D));
         this.registerSetting(delayRandomizer = new ButtonSetting("Delay randomizer", true));

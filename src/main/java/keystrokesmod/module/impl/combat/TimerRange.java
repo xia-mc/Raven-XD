@@ -28,8 +28,7 @@ public class TimerRange extends Module {
     private long lastTimerTime = 0;
     private long lastLagTime = 0;
     public TimerRange() {
-        super("TimerRange", category.combat);
-        this.registerSetting(new DescriptionSetting("Use timer help you to beat opponent."));
+        super("TimerRange", category.combat, "Use timer help you to beat opponent.");
         this.registerSetting(lagTicks = new SliderSetting("Lag ticks", 2, 0, 10, 1));
         this.registerSetting(timerTicks = new SliderSetting("Timer ticks", 2, 0, 10, 1));
         this.registerSetting(minRange = new SliderSetting("Min range", 3.6, 0, 8, 0.1));

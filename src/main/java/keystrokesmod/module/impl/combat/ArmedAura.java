@@ -3,7 +3,6 @@ package keystrokesmod.module.impl.combat;
 import akka.japi.Pair;
 import keystrokesmod.event.PreUpdateEvent;
 import keystrokesmod.event.RotationEvent;
-import keystrokesmod.module.impl.client.Notifications;
 import keystrokesmod.module.impl.combat.autoclicker.DragClickAutoClicker;
 import keystrokesmod.module.impl.combat.autoclicker.IAutoClicker;
 import keystrokesmod.module.impl.combat.autoclicker.NormalAutoClicker;
@@ -22,6 +21,8 @@ import keystrokesmod.script.classes.Vec3;
 import keystrokesmod.utility.MoveUtil;
 import keystrokesmod.utility.RotationUtils;
 import keystrokesmod.utility.Utils;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.item.EntityArmorStand;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemHoe;
 import net.minecraft.item.ItemStack;
@@ -47,12 +48,14 @@ public class ArmedAura extends IAutoClicker {
     private final ButtonSetting autoSwitch;
     private final ButtonSetting fastFire;
     private final SliderSetting fastFireAmount;
+    private final ButtonSetting targetPlayers;
+    private final ButtonSetting targetEntities;
     private final ButtonSetting targetInvisible;
     private final ButtonSetting ignoreTeammates;
     private final ButtonSetting notWhileKillAura;
 
     private boolean targeted = false;
-    private Pair<Pair<EntityPlayer, Vec3>, Triple<Double, Float, Float>> target = null;
+    private Pair<Pair<EntityLivingBase, Vec3>, Triple<Double, Float, Float>> target = null;
     private boolean click = false;
     private int predTicks = 0;
     private net.minecraft.util.Vec3 pos = null;
@@ -76,6 +79,8 @@ public class ArmedAura extends IAutoClicker {
         this.registerSetting(autoSwitch = new ButtonSetting("Auto switch", true));
         this.registerSetting(fastFire = new ButtonSetting("Fast fire", false, autoSwitch::isToggled));
         this.registerSetting(fastFireAmount = new SliderSetting("Fast fire amount", 1, 1, 4, 1, () -> autoSwitch.isToggled() && fastFire.isToggled()));
+        this.registerSetting(targetPlayers = new ButtonSetting("Target players", true));
+        this.registerSetting(targetEntities = new ButtonSetting("Target entities", false));
         this.registerSetting(targetInvisible = new ButtonSetting("Target invisible", false));
         this.registerSetting(ignoreTeammates = new ButtonSetting("Ignore teammates", true));
         this.registerSetting(notWhileKillAura = new ButtonSetting("Not while killAura", true));
@@ -84,10 +89,23 @@ public class ArmedAura extends IAutoClicker {
     @SubscribeEvent
     public void onRotation(RotationEvent event) {
         if (!targeted && !(perfect.isToggled() && mc.thePlayer.experience % 1 != 0) && !(notWhileKillAura.isToggled() && KillAura.target != null)) {
-            final Optional<Pair<Pair<EntityPlayer, Vec3>, Triple<Double, Float, Float>>> target = mc.theWorld.playerEntities.parallelStream()
-                    .filter(p -> p != mc.thePlayer)
-                    .filter(p -> !AntiBot.isBot(p))
-                    .filter(p -> !Utils.isTeamMate(p) || !ignoreTeammates.isToggled())
+            final Optional<Pair<Pair<EntityLivingBase, Vec3>, Triple<Double, Float, Float>>> target = mc.theWorld.loadedEntityList.parallelStream()
+                    .filter(entity -> entity instanceof EntityLivingBase)
+                    .map(entity -> (EntityLivingBase) entity)
+                    .filter(entity -> entity != mc.thePlayer)
+                    .filter(entity -> {
+                        if (entity instanceof EntityArmorStand) return false;
+                        if (entity instanceof EntityPlayer) {
+                            if (!targetPlayers.isToggled()) return false;
+                            if (Utils.isFriended((EntityPlayer) entity)) {
+                                return false;
+                            }
+                            if (entity.deathTime != 0) {
+                                return false;
+                            }
+                            return !AntiBot.isBot(entity) && !(ignoreTeammates.isToggled() && Utils.isTeamMate(entity));
+                        } else return targetEntities.isToggled();
+                    })
                     .filter(entity -> targetInvisible.isToggled() || !entity.isInvisible())
                     .filter(p -> p.getDistanceToEntity(mc.thePlayer) < range.getInput())
                     .map(p -> new Pair<>(p, doPrediction(Utils.getEyePos(p), new Vec3(p.motionX, p.motionY, p.motionZ))))

@@ -28,6 +28,8 @@ public class Hypixel2Step extends SubMode<Step> {
 
         if (shouldStep()) {
             mc.thePlayer.stepHeight = 1.0F;
+        } else {
+            mc.thePlayer.stepHeight = 0.6F;
         }
 
     }

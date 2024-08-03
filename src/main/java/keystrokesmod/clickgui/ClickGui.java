@@ -14,10 +14,7 @@ import keystrokesmod.utility.Timer;
 import keystrokesmod.utility.Utils;
 import keystrokesmod.utility.font.FontManager;
 import keystrokesmod.utility.font.impl.MinecraftFontRenderer;
-import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.GuiTextField;
-import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.client.gui.*;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraftforge.fml.client.config.GuiButtonExt;
 import org.lwjgl.input.Keyboard;
@@ -43,6 +40,7 @@ public class ClickGui extends GuiScreen {
     private final MinecraftFontRenderer fontRendererObj = FontManager.getMinecraft();
     public static Map<Module.category, CategoryComponent> categories;
     public static List<Module.category> clickHistory;
+    private Runnable delayedAction = null;
 
     public ClickGui() {
         int y = 5;
@@ -59,6 +57,14 @@ public class ClickGui extends GuiScreen {
             clickHistory.add(c);
             y += 20;
         }
+    }
+
+    public FontRenderer getFont() {
+        return super.fontRendererObj;
+    }
+
+    public void run(Runnable task) {
+        delayedAction = task;
     }
 
     public void initMain() {
@@ -142,6 +148,9 @@ public class ClickGui extends GuiScreen {
             CommandLine.b = false;
         }
 
+        if (delayedAction != null)
+            delayedAction.run();
+        delayedAction = null;
     }
 
     @Override

@@ -1,12 +1,17 @@
 package keystrokesmod.clickgui.components;
 
+import keystrokesmod.Raven;
 import keystrokesmod.clickgui.components.impl.*;
+import keystrokesmod.module.impl.client.Gui;
 import keystrokesmod.module.setting.Setting;
 import keystrokesmod.module.setting.impl.*;
+import keystrokesmod.utility.render.RenderUtils;
+import net.minecraftforge.fml.client.config.GuiUtils;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
+import java.util.Collections;
 import java.util.NoSuchElementException;
 
 public abstract class Component implements IComponent {
@@ -31,6 +36,10 @@ public abstract class Component implements IComponent {
         color = hover ? HOVER_COLOR : DEFAULT_COLOR;
         toggleColor = hover ? TOGGLE_HOVER_COLOR : TOGGLE_DEFAULT_COLOR;
         onDrawScreen(x, y);
+
+        if (getSetting() != null && hover && getSetting().isVisible() && getParent().po && Gui.toolTip.isToggled() && getSetting().toolTip != null) {
+            Raven.clickGui.run(() -> RenderUtils.drawToolTip(getSetting().toolTip, x, y));
+        }
     }
 
     @Override

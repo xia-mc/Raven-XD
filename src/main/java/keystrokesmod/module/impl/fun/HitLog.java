@@ -4,14 +4,13 @@ import keystrokesmod.Raven;
 import keystrokesmod.event.ReceivePacketEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
-import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.ModeSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.script.classes.Vec3;
-import keystrokesmod.utility.RotationUtils;
 import keystrokesmod.utility.Utils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.play.server.S08PacketPlayerPosLook;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -30,7 +29,7 @@ public class HitLog extends Module {
         this.registerSetting(language, coolDown);
     }
 
-    public static void onAttack(int predTicks, EntityPlayer target, Vec3 predHitPos, Vec3 selfPos, float yaw, float pitch) {
+    public static void onAttack(int predTicks, EntityLivingBase target, Vec3 predHitPos, Vec3 selfPos, float yaw, float pitch) {
         if (!ModuleManager.hitLog.isEnabled()) return;
         if (target == null) return;
         if (System.currentTimeMillis() - lastAttack < coolDown.getInput()) return;
@@ -43,7 +42,7 @@ public class HitLog extends Module {
                     reason = Reason.PRED_FAIL;
                 } else if (Math.round(System.currentTimeMillis() - lastS08) <= predTicks) {
                     reason = Reason.WATCHDOG;
-                } else if (target.isBlocking()) {
+                } else if (target instanceof EntityPlayer && ((EntityPlayer) target).isBlocking()) {
                     reason = Reason.BLOCK;
                 } else {
                     return;

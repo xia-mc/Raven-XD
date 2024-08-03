@@ -13,6 +13,7 @@ import keystrokesmod.utility.profile.Manager;
 import keystrokesmod.utility.profile.Profile;
 import keystrokesmod.utility.render.Animation;
 import keystrokesmod.utility.render.Easing;
+import lombok.Getter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
 import org.lwjgl.opengl.GL11;
@@ -26,6 +27,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class CategoryComponent {
     public List<ModuleComponent> modules = new CopyOnWriteArrayList<>();
     public Module.category categoryName;
+    @Getter
     private boolean categoryOpened;
     private Timer smoothTimer;
     private int width;

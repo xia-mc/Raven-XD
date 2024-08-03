@@ -2,10 +2,14 @@ package keystrokesmod.module.setting.impl;
 
 import com.google.gson.JsonObject;
 import keystrokesmod.module.setting.Setting;
+import lombok.Getter;
+import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Supplier;
 
+@Setter
+@Getter
 public class DescriptionSetting extends Setting {
     private String desc;
 
@@ -14,15 +18,11 @@ public class DescriptionSetting extends Setting {
     }
 
     public DescriptionSetting(String t, @NotNull Supplier<Boolean> visibleCheck) {
-        super(t, visibleCheck);
-        this.desc = t;
+        this(t, visibleCheck, null);
     }
 
-    public String getDesc() {
-        return this.desc;
-    }
-
-    public void setDesc(String t) {
+    public DescriptionSetting(String t, @NotNull Supplier<Boolean> visibleCheck, String toolTip) {
+        super(t, visibleCheck, toolTip);
         this.desc = t;
     }
 

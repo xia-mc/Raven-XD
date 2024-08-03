@@ -25,8 +25,16 @@ public class ModeValue extends Setting implements InputSetting {
         this(settingName, parent, () -> true);
     }
 
+    public ModeValue(String settingName, Module parent, String toolTip) {
+        this(settingName, parent, () -> true, toolTip);
+    }
+
     public ModeValue(String settingName, Module parent, Supplier<Boolean> visibleCheck) {
-        super(settingName, visibleCheck);
+        this(settingName, parent, visibleCheck, null);
+    }
+
+    public ModeValue(String settingName, Module parent, Supplier<Boolean> visibleCheck, String toolTip) {
+        super(settingName, visibleCheck, toolTip);
         this.settingName = settingName;
         this.parent = parent;
     }

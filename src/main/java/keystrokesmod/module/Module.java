@@ -13,6 +13,7 @@ import lombok.Setter;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
@@ -29,6 +30,7 @@ public class Module {
     @Setter
     private boolean enabled;
     private int keycode;
+    public @Nullable String toolTip;
     protected static Minecraft mc;
     private boolean isToggled = false;
     public boolean canBeEnabled = true;
@@ -39,10 +41,15 @@ public class Module {
     public Script script = null;
 
     public Module(String moduleName, Module.category moduleCategory, int keycode) {
+        this(moduleName, moduleCategory, keycode, null);
+    }
+
+    public Module(String moduleName, Module.category moduleCategory, int keycode, @Nullable String toolTip) {
         this.moduleName = moduleName;
         this.prettyName = moduleName;
         this.moduleCategory = moduleCategory;
         this.keycode = keycode;
+        this.toolTip = toolTip;
         this.enabled = false;
         mc = Minecraft.getMinecraft();
         this.settings = new ArrayList<>();
@@ -64,24 +71,15 @@ public class Module {
     }
 
     public Module(String name, Module.category moduleCategory) {
-        this.moduleName = name;
-        this.prettyName = name;
-        this.moduleCategory = moduleCategory;
-        this.keycode = 0;
-        this.enabled = false;
-        mc = Minecraft.getMinecraft();
-        this.settings = new ArrayList<>();
+        this(name, moduleCategory, null);
+    }
+
+    public Module(String name, Module.category moduleCategory, String toolTip) {
+        this(name, moduleCategory, 0, toolTip);
     }
 
     public Module(@NotNull Script script) {
-        super();
-        this.enabled = false;
-        this.moduleName = script.name;
-        this.prettyName = script.name;
-        this.script = script;
-        this.keycode = 0;
-        this.moduleCategory = category.scripts;
-        this.settings = new ArrayList<>();
+        this(script.name, category.scripts);
     }
 
     public void keybind() {

@@ -34,7 +34,7 @@ import org.jetbrains.annotations.NotNull;
  * @author Alan34
  */
 public class HypixelBSpeed extends SubMode<Speed> {
-    private final ModeSetting mode = new ModeSetting("Mode", new String[]{"Ground Strafe", "Autism"}, 0);
+    private final ModeSetting mode = new ModeSetting("Sub mode", new String[]{"Ground Strafe", "Autism"}, 0);
     public final ButtonSetting fastFall = new ButtonSetting("Fast Fall", false, new ModeOnly(mode, 1));
     public final SliderSetting ticksToGlide = new SliderSetting("Ticks to Glide", 29, 1, 29, 1, new ModeOnly(mode, 1));
     private float wS = 0.0F;

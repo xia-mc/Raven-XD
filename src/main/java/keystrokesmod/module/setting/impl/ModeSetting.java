@@ -4,12 +4,14 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import keystrokesmod.module.setting.Setting;
 import keystrokesmod.module.setting.interfaces.InputSetting;
+import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Supplier;
 
 public class ModeSetting extends Setting implements InputSetting {
     private final String settingName;
+    @Getter
     private String[] options;
     private int value;
     private int max;
@@ -18,16 +20,20 @@ public class ModeSetting extends Setting implements InputSetting {
         this(settingName, options, defaultValue, () -> true);
     }
 
+    public ModeSetting(String settingName, String[] options, int defaultValue, String toolTip) {
+        this(settingName, options, defaultValue, () -> true, toolTip);
+    }
+
     public ModeSetting(String settingName, String @NotNull [] options, int defaultValue, Supplier<Boolean> visibleCheck) {
-        super(settingName, visibleCheck);
+        this(settingName, options, defaultValue, visibleCheck, null);
+    }
+
+    public ModeSetting(String settingName, String @NotNull [] options, int defaultValue, Supplier<Boolean> visibleCheck, String toolTip) {
+        super(settingName, visibleCheck, toolTip);
         this.settingName = settingName;
         this.options = options;
         this.value = defaultValue;
         this.max = options.length - 1;
-    }
-
-    public String[] getOptions() {
-        return options;
     }
 
     public void setOptions(String @NotNull [] options) {

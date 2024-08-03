@@ -69,8 +69,7 @@ public class Velocity extends Module {
     private final Queue<Packet<INetHandlerPlayClient>> delayedPacket = new ConcurrentLinkedQueue<>();
 
     public Velocity() {
-        super("Velocity", category.combat);
-        this.registerSetting(new DescriptionSetting("Reduce knock-back."));
+        super("Velocity", category.combat, "Reduce knock-back.");
         this.registerSetting(mode = new ModeSetting("Mode", MODES, 1));
         final ModeOnly canChangeMode = new ModeOnly(mode, 0, 1, 5);
         this.registerSetting(horizontal = new SliderSetting("Horizontal", 0.0, -100.0, 100.0, 1.0, canChangeMode));

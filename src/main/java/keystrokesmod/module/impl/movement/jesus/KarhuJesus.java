@@ -5,6 +5,7 @@ import keystrokesmod.event.MoveInputEvent;
 import keystrokesmod.event.PreMotionEvent;
 import keystrokesmod.module.impl.movement.Jesus;
 import keystrokesmod.module.setting.impl.SubMode;
+import keystrokesmod.utility.BlockUtils;
 import keystrokesmod.utility.Utils;
 import net.minecraft.block.BlockLiquid;
 import net.minecraft.util.AxisAlignedBB;
@@ -18,7 +19,7 @@ public class KarhuJesus extends SubMode<Jesus> {
 
     @SubscribeEvent
     public void onMoveInput(@NotNull MoveInputEvent event) {
-        if (Utils.inLiquid())
+        if (BlockUtils.blockRelativeToPlayer(0, -1, 0) instanceof BlockLiquid)
             event.setJump(false);
     }
 

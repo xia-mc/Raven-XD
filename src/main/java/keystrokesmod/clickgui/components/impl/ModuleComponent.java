@@ -4,6 +4,7 @@ import keystrokesmod.Raven;
 import keystrokesmod.clickgui.components.Component;
 import keystrokesmod.clickgui.components.IComponent;
 import keystrokesmod.module.Module;
+import keystrokesmod.module.impl.client.Gui;
 import keystrokesmod.module.setting.Setting;
 import keystrokesmod.utility.render.RenderUtils;
 import keystrokesmod.utility.profile.Manager;
@@ -168,7 +169,11 @@ public class ModuleComponent implements IComponent {
                 c.drawScreen(x, y);
             }
         }
-        hovering = ii(x, y);
+        hovering = isHover(x, y);
+
+        if (hovering && categoryComponent.isCategoryOpened() && Gui.toolTip.isToggled() && mod.toolTip != null) {
+            Raven.clickGui.run(() -> RenderUtils.drawToolTip(mod.toolTip, x, y));
+        }
     }
 
     public String getName() {
@@ -176,7 +181,7 @@ public class ModuleComponent implements IComponent {
     }
 
     public void onClick(int x, int y, int b) {
-        if (this.ii(x, y) && b == 0 && this.mod.canBeEnabled()) {
+        if (this.isHover(x, y) && b == 0 && this.mod.canBeEnabled()) {
             this.mod.toggle();
             if (this.mod.moduleCategory() != Module.category.profiles) {
                 if (Raven.currentProfile != null) {
@@ -185,7 +190,7 @@ public class ModuleComponent implements IComponent {
             }
         }
 
-        if (this.ii(x, y) && b == 1) {
+        if (this.isHover(x, y) && b == 1) {
             this.po = !this.po;
             this.categoryComponent.render();
         }
@@ -214,7 +219,7 @@ public class ModuleComponent implements IComponent {
         }
     }
 
-    public boolean ii(int x, int y) {
+    public boolean isHover(int x, int y) {
         return x > this.categoryComponent.getX() && x < this.categoryComponent.getX() + this.categoryComponent.gw() && y > this.categoryComponent.getY() + this.o && y < this.categoryComponent.getY() + 16 + this.o;
     }
 }

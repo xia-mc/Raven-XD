@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import keystrokesmod.module.setting.Setting;
 import keystrokesmod.module.setting.interfaces.InputSetting;
+import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
@@ -12,9 +13,12 @@ import java.util.function.Supplier;
 
 public class SliderSetting extends Setting implements InputSetting {
     private final String settingName;
+    @Getter
     private String[] options = null;
     private double defaultValue;
+    @Getter
     private double max;
+    @Getter
     private final double min;
     private final double intervals;
     public boolean isString;
@@ -35,7 +39,7 @@ public class SliderSetting extends Setting implements InputSetting {
 
     public SliderSetting(String settingName, double defaultValue, double min, double max, double intervals, String settingInfo,
                          Supplier<Boolean> visibleCheck) {
-        super(settingName, visibleCheck);
+        super(settingName, visibleCheck, null);
         this.settingName = settingName;
         this.defaultValue = defaultValue;
         this.min = min;
@@ -52,7 +56,7 @@ public class SliderSetting extends Setting implements InputSetting {
 
     @Deprecated
     public SliderSetting(String settingName, String @NotNull [] options, double defaultValue, Supplier<Boolean> visibleCheck) {
-        super(settingName, visibleCheck);
+        super(settingName, visibleCheck, null);
         this.settingName = settingName;
         this.options = options;
         this.defaultValue = defaultValue;
@@ -64,10 +68,6 @@ public class SliderSetting extends Setting implements InputSetting {
 
     public String getInfo() {
         return " " + this.settingInfo;
-    }
-
-    public String[] getOptions() {
-        return options;
     }
 
     public void setOptions(String @NotNull [] options) {
@@ -83,14 +83,6 @@ public class SliderSetting extends Setting implements InputSetting {
     @Override
     public double getInput() {
         return roundToInterval(this.defaultValue, 2);
-    }
-
-    public double getMin() {
-        return this.min;
-    }
-
-    public double getMax() {
-        return this.max;
     }
 
     @Override
