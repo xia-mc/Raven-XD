@@ -20,10 +20,12 @@ public class Tower extends Module {
         final ModeValue mode;
         this.registerSetting(mode = new ModeValue("Mode", this)
                 .add(new VanillaTower("Vanilla", this))
-                .add(new HypixelATower("Hypixel A", this))
+                .add(new HypixelATower("HypixelA", this))
                 .add(new BlocksMCTower("BlocksMC", this))
-                .add(new HypixelBTower("Hypixel B", this))
+                .add(new HypixelBTower("HypixelB", this))
                 .add(new ConstantMotionTower("ConstantMotion", this))
+                .add(new HypixelCTower("HypixelC", this))
+                .add(new HypixelDTower("HypixelD", this))
                 .setDefaultValue("Vanilla")
         );
 
