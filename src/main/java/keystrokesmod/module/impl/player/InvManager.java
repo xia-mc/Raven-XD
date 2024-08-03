@@ -40,10 +40,11 @@ public class InvManager extends Module {
     private final SliderSetting maxSortDelay = new SliderSetting("Max sort delay", 100, 0, 500, 10, "ms", sort::isToggled);
     private final SliderSetting swordSlot = new SliderSetting("Sword slot", 1, 0, 9, 1, sort::isToggled);
     private final SliderSetting blockSlot = new SliderSetting("Block slot", 2, 0, 9, 1, sort::isToggled);
-    private final SliderSetting enderPearlSlot = new SliderSetting("Ender pearl slot", 3, 0, 9, 1, sort::isToggled);
-    private final SliderSetting bowSlot = new SliderSetting("Bow slot", 4, 0, 9, 1, sort::isToggled);
-    private final SliderSetting foodSlot = new SliderSetting("Food slot", 5, 0, 9, 1, sort::isToggled);
-    private final SliderSetting throwableSlot = new SliderSetting("Throwable slot", 6, 0, 9, 1, sort::isToggled);
+    private final SliderSetting rodSlot = new SliderSetting("Rod Slot", 3, 0, 9, 1, sort::isToggled);
+    private final SliderSetting enderPearlSlot = new SliderSetting("Ender pearl slot", 4, 0, 9, 1, sort::isToggled);
+    private final SliderSetting bowSlot = new SliderSetting("Bow slot", 5, 0, 9, 1, sort::isToggled);
+    private final SliderSetting foodSlot = new SliderSetting("Food slot", 6, 0, 9, 1, sort::isToggled);
+    private final SliderSetting throwableSlot = new SliderSetting("Throwable slot", 7, 0, 9, 1, sort::isToggled);
     private final ButtonSetting shuffle = new ButtonSetting("Shuffle", false, () -> armor.isToggled() || clean.isToggled() || sort.isToggled());
 
     private State state = State.NONE;
@@ -56,7 +57,7 @@ public class InvManager extends Module {
                 mode, notWhileMoving, minStartDelay, maxStartDelay,
                 armor, minArmorDelay, maxArmorDelay,
                 clean, minCleanDelay, maxCleanDelay,
-                sort, minSortDelay, maxSortDelay, swordSlot, blockSlot, enderPearlSlot, bowSlot, foodSlot, throwableSlot,
+                sort, minSortDelay, maxSortDelay, swordSlot, blockSlot, rodSlot, enderPearlSlot, bowSlot, foodSlot, throwableSlot,
                 shuffle
         );
     }
@@ -193,6 +194,7 @@ public class InvManager extends Module {
 
         result.add(() -> sort(ContainerUtils.getBestSword(null, (int) swordSlot.getInput()), (int) swordSlot.getInput()));
         result.add(() -> sort(ContainerUtils.getMostBlocks((int) blockSlot.getInput()), (int) blockSlot.getInput()));
+        result.add(() -> sort(ContainerUtils.getBestRod(null), (int) rodSlot.getInput()));
         result.add(() -> sort(ContainerUtils.getBiggestStack(Items.ender_pearl, (int) enderPearlSlot.getInput()), (int) enderPearlSlot.getInput()));
         result.add(() -> sort(ContainerUtils.getBestBow(null), (int) bowSlot.getInput()));
         result.add(() -> sort(ContainerUtils.getBestFood((int) foodSlot.getInput()), (int) foodSlot.getInput()));
