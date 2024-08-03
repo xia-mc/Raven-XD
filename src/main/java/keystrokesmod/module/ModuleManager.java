@@ -105,6 +105,7 @@ public class ModuleManager {
     public static ViewPackets viewPackets;
     public static ArmedAura armedAura;
     public static HitLog hitLog;
+    public static LagRange lagRange;
 
     public void register() {
 
@@ -133,6 +134,7 @@ public class ModuleManager {
         this.addModule(killAura = new KillAura());
         this.addModule(killAuraV2 = new KillAuraV2());
         this.addModule(armedAura = new ArmedAura());
+        this.addModule(lagRange = new LagRange());
         this.addModule(moreKB = new MoreKB());
         this.addModule(reach = new Reach());
         this.addModule(new RodAimbot());

@@ -32,6 +32,11 @@ public class NoSlow extends Module {
         mode.disable();
     }
 
+    @Override
+    public String getInfo() {
+        return mode.getSubModeValues().get((int) mode.getInput()).getPrettyName();
+    }
+
     public static float getForwardSlowed() {
         if (!mc.thePlayer.isUsingItem()) return 1;
         if (!ModuleManager.noSlow.isEnabled()) return 0.2f;
