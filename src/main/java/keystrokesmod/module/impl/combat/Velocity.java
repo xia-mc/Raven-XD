@@ -242,7 +242,7 @@ public class Velocity extends Module {
                         if (horizontal.getInput() == 0 && vertical.getInput() > 0) {
                             mc.thePlayer.motionY = ((double) s12PacketEntityVelocity.getMotionY() / 8000) * vertical.getInput()/100;
                         }
-                        else if (horizontal.getInput() > 0 && vertical.getInput() == 0) {
+                        else if (horizontal.getInput() != 0 && vertical.getInput() == 0) {
                             mc.thePlayer.motionX = ((double) s12PacketEntityVelocity.getMotionX() / 8000) * horizontal.getInput()/100;
                             mc.thePlayer.motionZ = ((double) s12PacketEntityVelocity.getMotionZ() / 8000) * horizontal.getInput()/100;
                         }
@@ -305,7 +305,7 @@ public class Velocity extends Module {
                     if (horizontal.getInput() == 0 && vertical.getInput() > 0) {
                         mc.thePlayer.motionY += s27PacketExplosion.func_149144_d() * vertical.getInput()/100;
                     }
-                    else if (horizontal.getInput() > 0 && vertical.getInput() == 0) {
+                    else if (horizontal.getInput() != 0 && vertical.getInput() == 0) {
                         mc.thePlayer.motionX += s27PacketExplosion.func_149149_c() * horizontal.getInput()/100;
                         mc.thePlayer.motionZ += s27PacketExplosion.func_149147_e() * horizontal.getInput()/100;
                     }
