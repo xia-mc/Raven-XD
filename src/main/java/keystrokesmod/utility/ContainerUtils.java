@@ -53,7 +53,7 @@ public class ContainerUtils {
     }
 
     public static boolean isRest(Item item) {
-        return item instanceof ItemFood || item instanceof ItemPotion;
+        return item instanceof ItemFood;
     }
 
     public static int getBestSword(IInventory inventory, int desiredSlot) {

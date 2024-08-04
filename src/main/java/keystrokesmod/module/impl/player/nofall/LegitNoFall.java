@@ -1,12 +1,14 @@
-package keystrokesmod.module.impl.world;
+package keystrokesmod.module.impl.player.nofall;
 
 import keystrokesmod.event.PreUpdateEvent;
 import keystrokesmod.event.RotationEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.other.RotationHandler;
 import keystrokesmod.module.impl.other.SlotHandler;
+import keystrokesmod.module.impl.player.NoFall;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
+import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.AimSimulator;
 import keystrokesmod.utility.RotationUtils;
 import keystrokesmod.utility.Utils;
@@ -18,7 +20,7 @@ import net.minecraft.util.MovingObjectPosition;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
-public class WaterBucket extends Module {
+public class LegitNoFall extends SubMode<NoFall> {
     private final SliderSetting aimSpeed;
     private final SliderSetting minDistance;
     private final ButtonSetting silentAim;
@@ -26,8 +28,8 @@ public class WaterBucket extends Module {
 
     private float lastPitch = -1;
 
-    public WaterBucket() {
-        super("Water bucket", category.world, 0);
+    public LegitNoFall(String name, NoFall parent) {
+        super(name, parent);
         this.registerSetting(aimSpeed = new SliderSetting("Aim speed", 5, 5, 10, 0.1));
         this.registerSetting(minDistance = new SliderSetting("Min distance", 3, 0, 20, 0.5));
         this.registerSetting(silentAim = new ButtonSetting("Silent aim", true));
@@ -66,7 +68,7 @@ public class WaterBucket extends Module {
 
     private boolean inPosition() {
         return !mc.thePlayer.capabilities.isFlying && !mc.thePlayer.capabilities.isCreativeMode
-                && !mc.thePlayer.onGround && !mc.thePlayer.isInWater() && mc.thePlayer.fallDistance >= minDistance.getInput() && !Utils.overVoid();
+                && !mc.thePlayer.onGround && !mc.thePlayer.isInWater() && mc.thePlayer.fallDistance >= minDistance.getInput() && !parent.noAction();
     }
 
     private boolean holdWaterBucket(boolean setSlot) {

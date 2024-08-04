@@ -8,6 +8,7 @@ import keystrokesmod.module.impl.minigames.*;
 import keystrokesmod.module.impl.movement.*;
 import keystrokesmod.module.impl.other.*;
 import keystrokesmod.module.impl.player.*;
+import keystrokesmod.module.impl.player.nofall.LegitNoFall;
 import keystrokesmod.module.impl.render.*;
 import keystrokesmod.module.impl.world.*;
 import keystrokesmod.utility.Utils;
@@ -143,7 +144,7 @@ public class ModuleManager {
         this.addModule(new RodAimbot());
         this.addModule(timerRange = new TimerRange());
         this.addModule(velocity = new Velocity());
-        this.addModule(new ProjectileAimBot());
+        this.addModule(projectileAimBot = new ProjectileAimBot());
 
         // fun
         this.addModule(new ExtraBobbing());
@@ -265,7 +266,6 @@ public class ModuleManager {
         this.addModule(safeWalk = new SafeWalk());
         this.addModule(scaffold = new Scaffold());
         this.addModule(tower = new Tower());
-        this.addModule(new WaterBucket());
 
         // exploit
         this.addModule(clientSpoofer = new ClientSpoofer());

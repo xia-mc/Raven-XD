@@ -9,6 +9,7 @@ import keystrokesmod.utility.ContainerUtils;
 import keystrokesmod.utility.PacketUtils;
 import keystrokesmod.utility.Utils;
 import net.minecraft.item.ItemBow;
+import net.minecraft.item.ItemPotion;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
@@ -74,6 +75,9 @@ public class HypixelNoSlow extends INoSlow {
     @Override
     public float getSlowdown() {
         ItemStack item = SlotHandler.getHeldItem();
-        return item != null && item.getItem() instanceof ItemSword ? .95f : 1;
+        if (item == null) return 1;
+        if (item.getItem() instanceof ItemSword) return .95f;
+        if (item.getItem() instanceof ItemPotion) return .8f;
+        return 1;
     }
 }
