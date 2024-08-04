@@ -16,10 +16,7 @@ import keystrokesmod.module.setting.impl.ModeValue;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.utils.ModeOnly;
 import keystrokesmod.script.classes.Vec3;
-import keystrokesmod.utility.BlockUtils;
-import keystrokesmod.utility.MoveUtil;
-import keystrokesmod.utility.RotationUtils;
-import keystrokesmod.utility.Utils;
+import keystrokesmod.utility.*;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityArmorStand;
 import net.minecraft.entity.player.EntityPlayer;
@@ -31,17 +28,16 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.apache.commons.lang3.tuple.Triple;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 public class ArmedAura extends IAutoClicker {
+    private final ModeValue clickMode;
     private final ModeSetting mode;
     private final SliderSetting switchDelay;
     private final ModeSetting sortMode;
-    private final ModeValue clickMode;
+    private final ModeSetting weaponMode;
     private final SliderSetting range;
+    private final SliderSetting fov;
     private final ButtonSetting perfect;
     private final ModeSetting moveFix;
     private final ButtonSetting prediction;
@@ -69,16 +65,18 @@ public class ArmedAura extends IAutoClicker {
 
     public ArmedAura() {
         super("ArmedAura", category.combat);
-        this.registerSetting(mode = new ModeSetting("Mode", new String[]{"Single", "Switch"}, 0));
-        this.registerSetting(switchDelay = new SliderSetting("Switch delay", 200, 50, 1000, 50, "ms", new ModeOnly(mode, 1)));
-        this.registerSetting(sortMode = new ModeSetting("Sort mode", new String[]{"Distance", "Health", "Hurt time", "Yaw"}, 0));
         this.registerSetting(clickMode = new ModeValue("Click mode", this)
                 .add(new LowCPSAutoClicker("Normal", this, false, true))
                 .add(new NormalAutoClicker("NormalFast", this, false, true))
                 .add(new RecordAutoClicker("Record", this, false, true))
                 .setDefaultValue("Normal")
         );
+        this.registerSetting(mode = new ModeSetting("Mode", new String[]{"Single", "Switch"}, 0));
+        this.registerSetting(switchDelay = new SliderSetting("Switch delay", 200, 50, 1000, 50, "ms", new ModeOnly(mode, 1)));
+        this.registerSetting(sortMode = new ModeSetting("Sort mode", new String[]{"Distance", "Health", "Hurt time", "Yaw"}, 0));
+        this.registerSetting(weaponMode = new ModeSetting("Weapon mode", new String[]{"Hypixel BedWars", "Hypixel Zombie", "CubeCraft"}, 0));
         this.registerSetting(range = new SliderSetting("Range", 50, 0, 100, 5));
+        this.registerSetting(fov = new SliderSetting("FOV", 360, 40, 360, 5));
         this.registerSetting(moveFix = new ModeSetting("Move fix", RotationHandler.MoveFix.MODES, 0));
         this.registerSetting(perfect = new ButtonSetting("Perfect", false));
         this.registerSetting(prediction = new ButtonSetting("Prediction", false));
@@ -119,6 +117,7 @@ public class ArmedAura extends IAutoClicker {
                     })
                     .filter(entity -> targetInvisible.isToggled() || !entity.isInvisible())
                     .filter(p -> p.getDistanceToEntity(mc.thePlayer) < range.getInput())
+                    .filter(p -> fov.getInput() == 360 || Utils.inFov((float) fov.getInput(), p))
                     .map(p -> new Pair<>(p, doPrediction(p, new Vec3(p.motionX, p.motionY, p.motionZ))))
                     .map(pair -> new Pair<>(pair, Triple.of(pair.second().distanceTo(Utils.getEyePos()), PlayerRotation.getYaw(pair.second()), PlayerRotation.getPitch(pair.second()))))
                     .filter(pair -> RotationUtils.rayCast(pair.second().getLeft(), pair.second().getMiddle(), pair.second().getRight()) == null)
@@ -169,7 +168,7 @@ public class ArmedAura extends IAutoClicker {
 
     @SubscribeEvent
     public void onPreUpdate(PreUpdateEvent event) {
-        if (targeted && autoSwitch.isToggled()) {
+        if (targeted && autoSwitch.isToggled() && !(SlotHandler.getHeldItem() == null || !(SlotHandler.getHeldItem().getItem() instanceof ItemHoe))) {
             int bestArm = getBestArm();
             SlotHandler.setCurrentSlot(bestArm);
         }
@@ -195,40 +194,20 @@ public class ArmedAura extends IAutoClicker {
     }
 
     private int getBestArm() {
-        int arm = -1;
-        int level = -1;
-        for (int i = 0; i < 9; i++) {
-            ItemStack stack = mc.thePlayer.inventory.mainInventory[i];
-            if (stack != null && stack.getItem() instanceof ItemHoe) {
-                if (fastFire.isToggled() && firedSlots.contains(i))
-                    continue;
+        int arm;
+        Set<Integer> ignoreSlots = fastFire.isToggled() ? firedSlots : Collections.emptySet();
 
-                int curLevel;
-                String name = ((ItemHoe) stack.getItem()).getMaterialName().toLowerCase();
-                switch (name) {
-                    default:
-                    case "wood":
-                        curLevel = 1;
-                        break;
-                    case "stone":
-                        curLevel = 2;
-                        break;
-                    case "iron":
-                        curLevel = 3;
-                        break;
-                    case "gold":
-                        curLevel = 4;
-                        break;
-                    case "diamond":
-                        curLevel = 5;
-                        break;
-                }
-
-                if (curLevel > level) {
-                    level = curLevel;
-                    arm = i;
-                }
-            }
+        switch ((int) weaponMode.getInput()) {
+            default:
+            case 0:
+                arm = ArmedAuraUtils.getArmHypixelBedWars(ignoreSlots);
+                break;
+            case 1:
+                arm = ArmedAuraUtils.getArmHypixelZombie(ignoreSlots);
+                break;
+            case 2:
+                arm = ArmedAuraUtils.getArmCubeCraft(ignoreSlots);
+                break;
         }
 
         if (arm == -1 && !firedSlots.isEmpty()) {
