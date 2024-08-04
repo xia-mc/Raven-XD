@@ -44,6 +44,7 @@ public class InvManager extends Module {
     private final SliderSetting bowSlot = new SliderSetting("Bow slot", 4, 0, 9, 1, sort::isToggled);
     private final SliderSetting foodSlot = new SliderSetting("Food slot", 5, 0, 9, 1, sort::isToggled);
     private final SliderSetting throwableSlot = new SliderSetting("Throwable slot", 6, 0, 9, 1, sort::isToggled);
+    private final SliderSetting rodSlot = new SliderSetting("Rod slot", 8, 0, 9, 1, sort::isToggled);
     private final ButtonSetting shuffle = new ButtonSetting("Shuffle", false, () -> armor.isToggled() || clean.isToggled() || sort.isToggled());
 
     private State state = State.NONE;
@@ -56,7 +57,7 @@ public class InvManager extends Module {
                 mode, notWhileMoving, minStartDelay, maxStartDelay,
                 armor, minArmorDelay, maxArmorDelay,
                 clean, minCleanDelay, maxCleanDelay,
-                sort, minSortDelay, maxSortDelay, swordSlot, blockSlot, enderPearlSlot, bowSlot, foodSlot, throwableSlot,
+                sort, minSortDelay, maxSortDelay, swordSlot, blockSlot, enderPearlSlot, bowSlot, foodSlot, throwableSlot, rodSlot,
                 shuffle
         );
     }
@@ -197,6 +198,7 @@ public class InvManager extends Module {
         result.add(() -> sort(ContainerUtils.getBestBow(null), (int) bowSlot.getInput()));
         result.add(() -> sort(ContainerUtils.getBestFood((int) foodSlot.getInput()), (int) foodSlot.getInput()));
         result.add(() -> sort(ContainerUtils.getMostProjectiles((int) throwableSlot.getInput()), (int) throwableSlot.getInput()));
+        result.add(() -> sort(ContainerUtils.getBestRod(null), (int) rodSlot.getInput()));
 
         return result;
     }
