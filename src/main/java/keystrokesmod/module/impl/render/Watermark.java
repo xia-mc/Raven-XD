@@ -28,7 +28,7 @@ import java.util.HashMap;
 import java.util.Objects;
 
 public class Watermark extends Module {
-    public static final String VERSION = "1.22.0";
+    public static final String VERSION = "1.23-Dev";
     public static final HashMap<String, ResourceLocation> WATERMARK = new HashMap<>();
 
     public static String customName = "CustomClient";
@@ -53,7 +53,7 @@ public class Watermark extends Module {
         final ModeOnly textMode = new ModeOnly(mode, 0);
         final ModeOnly photoMode = new ModeOnly(mode, 1);
         this.registerSetting(watermarkText = new ModeSetting("Watermark", new String[]{"Default", "Augustus", "Custom"}, 0, textMode));
-        this.registerSetting(watermarkPhoto = new ModeSetting("Watermark", new String[]{"Enders", "Augustus"}, 0, photoMode));
+        this.registerSetting(watermarkPhoto = new ModeSetting("Watermark photo", new String[]{"Enders", "Augustus"}, 0, photoMode));
         this.registerSetting(theme = new ModeSetting("Theme", Theme.themes, 0, textMode.extend(new ModeOnly(watermarkText, 2))));
         this.registerSetting(showVersion = new ButtonSetting("Show version", true, textMode));
         this.registerSetting(lowercase = new ButtonSetting("Lowercase", false, textMode));
