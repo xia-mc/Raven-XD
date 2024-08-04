@@ -864,7 +864,7 @@ public class Scaffold extends IAutoClicker {
         }
 
         if (rayCast.isToggled()) {
-            MovingObjectPosition hitResult = RotationUtils.rayCast(4.5, RotationHandler.getRotationYaw(), RotationHandler.getRotationPitch());
+            MovingObjectPosition hitResult = RotationUtils.rayCast(4.5, placeYaw, placePitch);
             if (hitResult != null && hitResult.getBlockPos().equals(block.getBlockPos())) {
                 block.sideHit = hitResult.sideHit;
                 block.hitVec = hitResult.hitVec;

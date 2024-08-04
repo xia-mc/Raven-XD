@@ -489,7 +489,7 @@ public class ContainerUtils {
         int stackInSlot = 0;
         if (desiredSlot != -1) {
             ItemStack itemStackInSlot = getItemStack(desiredSlot + 35);
-            if (itemStackInSlot != null && (itemStackInSlot.getItem() instanceof ItemEgg || itemStackInSlot.getItem() instanceof ItemSnowball)) {
+            if (isProjectiles(itemStackInSlot)) {
                 stackInSlot = itemStackInSlot.stackSize;
             }
         }
@@ -506,5 +506,9 @@ public class ContainerUtils {
             biggestSlot = biggestSnowballSlot;
         }
         return biggestSlot;
+    }
+
+    public static boolean isProjectiles(ItemStack itemStackInSlot) {
+        return itemStackInSlot != null && (itemStackInSlot.getItem() instanceof ItemEgg || itemStackInSlot.getItem() instanceof ItemSnowball);
     }
 }

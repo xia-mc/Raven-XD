@@ -16,6 +16,7 @@ import keystrokesmod.module.setting.impl.*;
 import keystrokesmod.module.setting.utils.ModeOnly;
 import keystrokesmod.script.classes.Vec3;
 import keystrokesmod.utility.*;
+import lombok.Getter;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityArmorStand;
@@ -79,6 +80,7 @@ public class KillAura extends IAutoClicker {
     private boolean switchTargets;
     private byte entityIndex;
     private boolean swing;
+    @Getter
     private boolean attack;
     private boolean blocking;
     public boolean blinking;

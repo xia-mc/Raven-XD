@@ -3,10 +3,7 @@ package keystrokesmod.module.impl.combat;
 import akka.japi.Pair;
 import keystrokesmod.event.PreUpdateEvent;
 import keystrokesmod.event.RotationEvent;
-import keystrokesmod.module.impl.combat.autoclicker.DragClickAutoClicker;
-import keystrokesmod.module.impl.combat.autoclicker.IAutoClicker;
-import keystrokesmod.module.impl.combat.autoclicker.NormalAutoClicker;
-import keystrokesmod.module.impl.combat.autoclicker.RecordAutoClicker;
+import keystrokesmod.module.impl.combat.autoclicker.*;
 import keystrokesmod.module.impl.fun.HitLog;
 import keystrokesmod.module.impl.other.RotationHandler;
 import keystrokesmod.module.impl.other.SlotHandler;
@@ -75,8 +72,8 @@ public class ArmedAura extends IAutoClicker {
         this.registerSetting(switchDelay = new SliderSetting("Switch delay", 200, 50, 1000, 50, "ms", new ModeOnly(mode, 1)));
         this.registerSetting(sortMode = new ModeSetting("Sort mode", new String[]{"Distance", "Health", "Hurt time", "Yaw"}, 0));
         this.registerSetting(clickMode = new ModeValue("Click mode", this)
-                .add(new NormalAutoClicker("Normal", this, false, true))
-                .add(new DragClickAutoClicker("Drag Click", this, false, true))
+                .add(new LowCPSAutoClicker("Normal", this, false, true))
+                .add(new NormalAutoClicker("NormalFast", this, false, true))
                 .add(new RecordAutoClicker("Record", this, false, true))
                 .setDefaultValue("Normal")
         );

@@ -108,6 +108,7 @@ public class ModuleManager {
     public static LagRange lagRange;
     public static FakePotion fakePotion;
     public static NoWeb noWeb;
+    public static ProjectileAimBot projectileAimBot;
 
     public void register() {
 
@@ -142,6 +143,7 @@ public class ModuleManager {
         this.addModule(new RodAimbot());
         this.addModule(timerRange = new TimerRange());
         this.addModule(velocity = new Velocity());
+        this.addModule(new ProjectileAimBot());
 
         // fun
         this.addModule(new ExtraBobbing());
