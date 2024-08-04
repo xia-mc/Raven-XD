@@ -2,7 +2,6 @@ package keystrokesmod.module.impl.player.nofall;
 
 import keystrokesmod.event.PreUpdateEvent;
 import keystrokesmod.event.RotationEvent;
-import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.other.RotationHandler;
 import keystrokesmod.module.impl.other.SlotHandler;
 import keystrokesmod.module.impl.player.NoFall;
@@ -11,9 +10,11 @@ import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.AimSimulator;
 import keystrokesmod.utility.RotationUtils;
-import keystrokesmod.utility.Utils;
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
 import net.minecraft.util.MovingObjectPosition;
@@ -40,7 +41,7 @@ public class LegitNoFall extends SubMode<NoFall> {
     public void onPreUpdate(@NotNull PreUpdateEvent event) {
         if (inPosition()) {
             MovingObjectPosition rayCast = RotationUtils.rayCast(mc.playerController.getBlockReachDistance(), RotationHandler.getRotationYaw(), RotationHandler.getRotationPitch());
-            if (rayCast != null && rayCast.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK && holdWaterBucket(switchToItem.isToggled())) {
+            if (rayCast != null && rayCast.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK && holdItem(switchToItem.isToggled())) {
                 sendPlace();
             }
         }
@@ -71,12 +72,12 @@ public class LegitNoFall extends SubMode<NoFall> {
                 && !mc.thePlayer.onGround && !mc.thePlayer.isInWater() && mc.thePlayer.fallDistance >= minDistance.getInput() && !parent.noAction();
     }
 
-    private boolean holdWaterBucket(boolean setSlot) {
-        if (this.containsWater(SlotHandler.getHeldItem())) {
+    private boolean holdItem(boolean setSlot) {
+        if (this.containsItem(SlotHandler.getHeldItem())) {
             return true;
         } else {
             for (int i = 0; i < InventoryPlayer.getHotbarSize(); ++i) {
-                if (this.containsWater(mc.thePlayer.inventory.mainInventory[i]) && setSlot) {
+                if (this.containsItem(mc.thePlayer.inventory.mainInventory[i]) && setSlot) {
                     SlotHandler.setCurrentSlot(i);
                     return true;
                 }
@@ -86,8 +87,11 @@ public class LegitNoFall extends SubMode<NoFall> {
         }
     }
 
-    private boolean containsWater(ItemStack itemStack) {
-        return itemStack != null && itemStack.getItem() == Items.water_bucket;
+    private boolean containsItem(ItemStack itemStack) {
+        if (itemStack == null) return false;
+
+        Item item = itemStack.getItem();
+        return item == Items.water_bucket || ((ItemBlock) item).getBlock() == Blocks.web || ((ItemBlock) item).getBlock() == Blocks.ladder;
     }
 
     private void sendPlace() {

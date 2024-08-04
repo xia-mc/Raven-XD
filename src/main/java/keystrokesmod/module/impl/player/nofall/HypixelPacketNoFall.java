@@ -29,6 +29,7 @@ public class HypixelPacketNoFall extends SubMode<NoFall> {
         fallDistance = 0;
         if (timed)
             Utils.resetTimer();
+        timed = false;
     }
 
     @SubscribeEvent
@@ -45,6 +46,7 @@ public class HypixelPacketNoFall extends SubMode<NoFall> {
             timed = true;
         } else if (timed) {
             Utils.resetTimer();
+            timed = false;
         }
     }
 }
