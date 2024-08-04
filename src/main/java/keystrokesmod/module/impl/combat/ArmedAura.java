@@ -50,6 +50,7 @@ public class ArmedAura extends IAutoClicker {
     private final ButtonSetting drawPos;
     private final ButtonSetting autoSwitch;
     private final ButtonSetting fastFire;
+    private final ButtonSetting fastFireLegit;
     private final SliderSetting fastFireAmount;
     private final ButtonSetting targetPlayers;
     private final ButtonSetting targetEntities;
@@ -86,7 +87,8 @@ public class ArmedAura extends IAutoClicker {
         this.registerSetting(drawPos = new ButtonSetting("Draw pos", false, prediction::isToggled));
         this.registerSetting(autoSwitch = new ButtonSetting("Auto switch", true));
         this.registerSetting(fastFire = new ButtonSetting("Fast fire", false, autoSwitch::isToggled));
-        this.registerSetting(fastFireAmount = new SliderSetting("Fast fire amount", 1, 1, 4, 1, () -> autoSwitch.isToggled() && fastFire.isToggled()));
+        this.registerSetting(fastFireLegit = new ButtonSetting("Fast fire Legit", false, () -> autoSwitch.isToggled() && fastFire.isToggled()));
+        this.registerSetting(fastFireAmount = new SliderSetting("Fast fire amount", 1, 1, 4, 1, () -> autoSwitch.isToggled() && fastFire.isToggled() && !fastFireLegit.isToggled()));
         this.registerSetting(targetPlayers = new ButtonSetting("Target players", true));
         this.registerSetting(targetEntities = new ButtonSetting("Target entities", false));
         this.registerSetting(targetInvisible = new ButtonSetting("Target invisible", false));
@@ -179,7 +181,7 @@ public class ArmedAura extends IAutoClicker {
 
         if (targeted && click) {
             mc.playerController.sendUseItem(mc.thePlayer, mc.theWorld, SlotHandler.getHeldItem());
-            if (fastFire.isToggled() && autoSwitch.isToggled()) {
+            if (fastFire.isToggled() && autoSwitch.isToggled() && !fastFireLegit.isToggled()) {
                 for (int i = 0; i < (int) fastFireAmount.getInput(); i++) {
                     int bestArm = getBestArm();
                     SlotHandler.setCurrentSlot(bestArm);
