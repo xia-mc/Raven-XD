@@ -112,7 +112,6 @@ public abstract class MixinEntityPlayer extends EntityLivingBase {
                                 this.motionZ *= 0.6D;
                                 this.setSprinting(false);
                             }
-                            Velocity.slowDown = true;
                         }
 
                         if (p_attackTargetEntityWithCurrentItem_1_ instanceof EntityPlayerMP && p_attackTargetEntityWithCurrentItem_1_.velocityChanged) {
