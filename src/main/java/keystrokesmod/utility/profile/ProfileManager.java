@@ -92,6 +92,7 @@ public class ProfileManager {
         JsonObject moduleInformation = new JsonObject();
         moduleInformation.addProperty("name", (module.moduleCategory() == Module.category.scripts && !(module instanceof Manager)) ?  "sc-" + module.getName() :  module.getName());
         moduleInformation.addProperty("prettyName", module.getRawPrettyName());
+        moduleInformation.addProperty("prettyInfo", module.getRawPrettyInfo());
         if (module.canBeEnabled) {
             moduleInformation.addProperty("enabled", module.isEnabled());
             moduleInformation.addProperty("hidden", module.isHidden());

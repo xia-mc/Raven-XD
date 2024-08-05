@@ -25,6 +25,7 @@ public class Module {
     protected final ArrayList<Setting> settings;
     private final String moduleName;
     private String prettyName;
+    private String prettyInfo;
     private final Module.category moduleCategory;
     @Getter
     @Setter
@@ -145,6 +146,10 @@ public class Module {
         return "";
     }
 
+    public String getPrettyInfo() {
+        return ModuleManager.customName.isEnabled() && ModuleManager.customName.info.isToggled() ? getRawPrettyInfo() : getInfo();
+    }
+
     public String getName() {
         return this.moduleName;
     }
@@ -157,8 +162,17 @@ public class Module {
         return prettyName;
     }
 
+    public String getRawPrettyInfo() {
+        return prettyInfo;
+    }
+
     public void setPrettyName(String name) {
         this.prettyName = name;
+        ModuleManager.sort();
+    }
+
+    public void setPrettyInfo(String name) {
+        this.prettyInfo = name;
         ModuleManager.sort();
     }
 

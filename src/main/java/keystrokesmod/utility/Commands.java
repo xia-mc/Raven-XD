@@ -253,7 +253,7 @@ public class Commands {
                     return;
                 }
 
-                if (args.size() != 3) {
+                if (args.size() != 3 && args.size() != 4) {
                     print(invSyn, 1);
                     return;
                 }
@@ -261,8 +261,14 @@ public class Commands {
                 for (Module module : Raven.getModuleManager().getModules()) {
                     String name = module.getName().toLowerCase().replace(" ", "");
                     if (name.equals(args.get(1).toLowerCase())) {
-                        module.setPrettyName(args.get(2));
-                        print("&a" + module.getName() + " is now called " + module.getRawPrettyName(), 1);
+                        if (args.size() == 3) {
+                            module.setPrettyName(args.get(2));
+                            print("&a" + module.getName() + " is now called " + module.getRawPrettyName(), 1);
+                        } else {
+                            module.setPrettyName(args.get(2));
+                            module.setPrettyInfo(args.get(3));
+                            print("&a'" + module.getName() + " " + module.getInfo() + "' is now called '" + module.getRawPrettyName() + module.getRawPrettyInfo() + "'", 1);
+                        }
                     }
                 }
             } else if (firstArg.equals("resetgui")) {
@@ -462,7 +468,7 @@ public class Commands {
                 print("4 nick [name/reset]", 0);
                 print("5 ping", 0);
                 print("6 hide/show [module]", 0);
-                print("7 rename [module] [name]", 0);
+                print("7 rename [module] [name] <info>", 0);
                 print("8 say [message]", 0);
                 print("9 panic", 0);
                 print("10 resetGUI", 0);
