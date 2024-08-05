@@ -397,7 +397,8 @@ public class KillAura extends IAutoClicker {
         return rotationModes[(int) rotationMode.getInput()];
     }
 
-    private boolean noAimToEntity() {
+    public boolean noAimToEntity() {
+        if (target == null) return true;
         if (rotationMode.getInput() == 0) return false;
 
         boolean noAim = false;

@@ -40,7 +40,7 @@ public class HypixelBlinkNoFall extends SubMode<NoFall> {
                 blinked = false;
             }
 
-            this.prevOnGround = true;
+            this.prevOnGround = mc.thePlayer.onGround;
         } else if (this.prevOnGround) {
             if (shouldBlink()) {
                 blink.enable();

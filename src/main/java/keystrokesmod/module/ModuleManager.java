@@ -134,7 +134,6 @@ public class ModuleManager {
         this.addModule(criticals = new Criticals());
         this.addModule(hitBox = new HitBox());
         this.addModule(hitSelect = new HitSelect());
-        this.addModule(new JumpReset());
         this.addModule(killAura = new KillAura());
         this.addModule(killAuraV2 = new KillAuraV2());
         this.addModule(armedAura = new ArmedAura());

@@ -145,8 +145,8 @@ public class HUD extends Module {
             if (isIgnored(module)) continue;
 
             String text = module.getPrettyName();
-            if (showInfo.isToggled() && !module.getPrettyName().isEmpty()) {
-                text += " §7" + module.getPrettyName();
+            if (showInfo.isToggled() && !module.getPrettyInfo().isEmpty()) {
+                text += " §7" + module.getPrettyInfo();
             }
             if (lowercase.isToggled()) {
                 text = text.toLowerCase();

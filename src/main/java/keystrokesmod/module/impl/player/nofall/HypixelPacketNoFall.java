@@ -39,7 +39,7 @@ public class HypixelPacketNoFall extends SubMode<NoFall> {
         else
             fallDistance += (float) Math.min(mc.thePlayer.motionY, 0);
 
-        if (fallDistance >= minFallDistance.getInput() && !parent.noAction() && !(notWhileKillAura.isToggled() && KillAura.target != null)) {
+        if (fallDistance >= minFallDistance.getInput() && !parent.noAction() && !(notWhileKillAura.isToggled() && KillAura.target == null)) {
             Utils.getTimer().timerSpeed = (float) 0.5;
             mc.getNetHandler().addToSendQueue(new C03PacketPlayer(true));
             fallDistance = 0;
