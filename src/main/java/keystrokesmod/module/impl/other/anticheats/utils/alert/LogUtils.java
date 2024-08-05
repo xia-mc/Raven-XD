@@ -21,7 +21,15 @@ public class LogUtils {
             ((IChatComponent)chatComponentText).appendSibling(new ChatComponentText(Utils.formatColor(" §7[§cWDR§7]")).setChatStyle(chatStyle));
             Raven.mc.thePlayer.addChatMessage(chatComponentText);
             if (Anticheat.getShouldPing().isToggled()) {
-                Raven.mc.thePlayer.playSound("note.pling", 1.0f, 1.0f);
+                switch ((int) Anticheat.getPingSound().getInput()) {
+                    case 0:
+                        Raven.mc.thePlayer.playSound("note.pling", 1, 1);
+                        break;
+                    case 1:
+                        Raven.mc.thePlayer.playSound("keystrokesmod:alarm", 1, 1);
+                        break;
+                }
+
             }
             if (Anticheat.getAutoReport().getInput() != 0) {
                 Raven.mc.thePlayer.sendChatMessage(

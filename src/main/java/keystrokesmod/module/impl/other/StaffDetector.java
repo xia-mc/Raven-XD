@@ -2,6 +2,7 @@ package keystrokesmod.module.impl.other;
 
 import keystrokesmod.Raven;
 import keystrokesmod.module.Module;
+import keystrokesmod.module.impl.client.Settings;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.ModeSetting;
 import keystrokesmod.utility.PacketUtils;
@@ -19,10 +20,11 @@ public class StaffDetector extends Module {
 
     private final ModeSetting mode = new ModeSetting("Mode", STAFFLISTS, 0);
     private final ButtonSetting autoLobby = new ButtonSetting("Auto lobby", false);
+    private final ButtonSetting alarm = new ButtonSetting("Alarm", false);
 
     public StaffDetector() {
         super("StaffDetector", category.other);
-        this.registerSetting(mode, autoLobby);
+        this.registerSetting(mode, autoLobby, alarm);
 
         for (String s : STAFFLISTS) {
             try (BufferedReader reader = new BufferedReader(
@@ -53,6 +55,9 @@ public class StaffDetector extends Module {
                 if (autoLobby.isToggled()) {
                     PacketUtils.sendPacket(new C01PacketChatMessage("/lobby"));
                     Utils.sendMessage("Return to lobby...");
+                }
+                if (alarm.isToggled()) {
+                    mc.thePlayer.playSound("keystrokesmod:alarm", 1, 1);
                 }
             }
         }

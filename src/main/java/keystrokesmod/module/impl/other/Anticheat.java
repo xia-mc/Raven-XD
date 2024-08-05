@@ -7,6 +7,7 @@ import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.DescriptionSetting;
 import keystrokesmod.module.setting.impl.ModeSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
+import lombok.Getter;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
@@ -16,19 +17,35 @@ import org.jetbrains.annotations.NotNull;
  * @see <a href="https://github.com/Nova-Committee/CheatDetector">CheatDetector Github</a>
  */
 public class Anticheat extends Module {
+    @Getter
     private static SliderSetting latency;
+    @Getter
     private static SliderSetting threshold;
+    @Getter
     private static ButtonSetting disableInLobby;
+    @Getter
     private static ButtonSetting checkForSelf;
+    @Getter
     private static ButtonSetting checkForTeammates;
+    @Getter
     private static SliderSetting vlClearTime;
+    @Getter
     private static ButtonSetting noAlertBuffer;
+    @Getter
     private static ButtonSetting shouldPing;
+    @Getter
+    private static ModeSetting pingSound;
+    @Getter
     private static ModeSetting autoReport;
+    @Getter
     private static ButtonSetting experimentalMode;
+    @Getter
     private static ButtonSetting aimCheck;
+    @Getter
     private static ButtonSetting combatCheck;
+    @Getter
     private static ButtonSetting movementCheck;
+    @Getter
     private static ButtonSetting scaffoldingCheck;
 
     private PlayerManager manager = new PlayerManager();
@@ -43,68 +60,13 @@ public class Anticheat extends Module {
         this.registerSetting(vlClearTime = new SliderSetting("VL clear time", 6000, -1, 12000, 1, "ticks"));
         this.registerSetting(noAlertBuffer = new ButtonSetting("Remove alert buffer", false));
         this.registerSetting(shouldPing = new ButtonSetting("Should ping", true));
+        this.registerSetting(pingSound = new ModeSetting("Ping sound", new String[]{"Note", "Augustus"}, 0, shouldPing::isToggled));
         this.registerSetting(autoReport = new ModeSetting("Auto report", new String[]{"None", "/wdr", "/report"}, 0));
         this.registerSetting(experimentalMode = new ButtonSetting("Experimental mode", true));
         this.registerSetting(aimCheck = new ButtonSetting("Aim checks", true));
         this.registerSetting(combatCheck = new ButtonSetting("Combat checks", true));
         this.registerSetting(movementCheck = new ButtonSetting("Movement checks", true));
         this.registerSetting(scaffoldingCheck = new ButtonSetting("Scaffolding checks", true));
-    }
-
-    public static SliderSetting getLatency() {
-        return latency;
-    }
-
-    public static SliderSetting getThreshold() {
-        return threshold;
-    }
-
-    public static ButtonSetting getDisableInLobby() {
-        return disableInLobby;
-    }
-
-    public static ButtonSetting getCheckForSelf() {
-        return checkForSelf;
-    }
-
-    public static ButtonSetting getCheckForTeammates() {
-        return checkForTeammates;
-    }
-
-    public static SliderSetting getVlClearTime() {
-        return vlClearTime;
-    }
-
-    public static ButtonSetting getNoAlertBuffer() {
-        return noAlertBuffer;
-    }
-
-    public static ButtonSetting getShouldPing() {
-        return shouldPing;
-    }
-
-    public static ModeSetting getAutoReport() {
-        return autoReport;
-    }
-
-    public static ButtonSetting getExperimentalMode() {
-        return experimentalMode;
-    }
-
-    public static ButtonSetting getAimCheck() {
-        return aimCheck;
-    }
-
-    public static ButtonSetting getCombatCheck() {
-        return combatCheck;
-    }
-
-    public static ButtonSetting getMovementCheck() {
-        return movementCheck;
-    }
-
-    public static ButtonSetting getScaffoldingCheck() {
-        return scaffoldingCheck;
     }
 
     public void onUpdate() {

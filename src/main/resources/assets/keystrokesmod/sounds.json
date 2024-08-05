@@ -40,5 +40,11 @@
     "sounds": [
       "keystrokesmod:click/standard"
     ]
+  },
+  "alarm": {
+    "category": "player",
+    "sounds": [
+      "keystrokesmod:alarm"
+    ]
   }
 }
