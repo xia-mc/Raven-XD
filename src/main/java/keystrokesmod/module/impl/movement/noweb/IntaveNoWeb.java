@@ -21,7 +21,6 @@ public class IntaveNoWeb extends SubMode<NoWeb> {
 
     private BlockPos lastWeb = null;
     private boolean webbing = false;
-    private boolean cycle;
 
     public IntaveNoWeb(String name, @NotNull NoWeb parent) {
         super(name, parent);
@@ -48,11 +47,11 @@ public class IntaveNoWeb extends SubMode<NoWeb> {
         if (box.intersectsWith(mc.thePlayer.getEntityBoundingBox())) {
             if (mc.thePlayer.onGround) {
                 mc.thePlayer.motionY = MoveUtil.jumpMotion();
-                MoveUtil.moveFlying(0.4);
+                MoveUtil.moveFlying(0.3);
             } else if (noDown.isToggled()) {
                 if (upAndDown.isToggled())
                     if (mc.gameSettings.keyBindSneak.isKeyDown())
-                        mc.thePlayer.motionY = -0.3;
+                        mc.thePlayer.motionY = -0.2;
                     else if (mc.gameSettings.keyBindJump.isKeyDown())
                         mc.thePlayer.motionY = mc.thePlayer.ticksExisted % 2 == 0 ? 0.2 : -0.01;
                     else
@@ -61,15 +60,7 @@ public class IntaveNoWeb extends SubMode<NoWeb> {
                     mc.thePlayer.motionY = -0.01;
             }
 
-            int i = mc.thePlayer.ticksExisted % 4;
-            if (cycle ? i == 0 || i == 1 : i == 0) {
-                Utils.getTimer().timerSpeed = 0.5009f;
-            } else {
-                Utils.getTimer().timerSpeed = 2.004f;
-
-                if (i == 3)
-                    cycle = !cycle;
-            }
+            Utils.getTimer().timerSpeed = 1.004f;
             webbing = true;
         } else {
             if (webbing) {

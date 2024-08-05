@@ -82,6 +82,7 @@ public class Module {
 
     public Module(@NotNull Script script) {
         this(script.name, category.scripts);
+        this.script = script;
     }
 
     public void keybind() {
