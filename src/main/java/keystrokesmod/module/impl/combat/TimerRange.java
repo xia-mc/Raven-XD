@@ -77,6 +77,7 @@ public class TimerRange extends Module {
     }
 
     private boolean shouldStart() {
+        if (!Utils.nullCheck()) return false;
         if (onlyOnGround.isToggled() && !mc.thePlayer.onGround) return false;
         if (!Utils.isMoving()) return false;
         if (fov.getInput() == 0) return false;

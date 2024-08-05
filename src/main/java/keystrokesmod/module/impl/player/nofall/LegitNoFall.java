@@ -10,6 +10,7 @@ import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.AimSimulator;
 import keystrokesmod.utility.RotationUtils;
+import keystrokesmod.utility.Utils;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -68,6 +69,7 @@ public class LegitNoFall extends SubMode<NoFall> {
     }
 
     private boolean inPosition() {
+        if (!Utils.nullCheck()) return false;
         return !mc.thePlayer.capabilities.isFlying && !mc.thePlayer.capabilities.isCreativeMode
                 && !mc.thePlayer.onGround && !mc.thePlayer.isInWater() && mc.thePlayer.fallDistance >= minDistance.getInput() && !parent.noAction();
     }
@@ -91,7 +93,7 @@ public class LegitNoFall extends SubMode<NoFall> {
         if (itemStack == null) return false;
 
         Item item = itemStack.getItem();
-        return item == Items.water_bucket || ((ItemBlock) item).getBlock() == Blocks.web || ((ItemBlock) item).getBlock() == Blocks.ladder;
+        return item == Items.water_bucket || (item instanceof ItemBlock && (((ItemBlock) item).getBlock() == Blocks.web || ((ItemBlock) item).getBlock() == Blocks.ladder));
     }
 
     private void sendPlace() {
