@@ -48,13 +48,13 @@ public class IntaveNoWeb extends SubMode<NoWeb> {
         if (box.intersectsWith(mc.thePlayer.getEntityBoundingBox())) {
             if (mc.thePlayer.onGround) {
                 mc.thePlayer.motionY = MoveUtil.jumpMotion();
-                MoveUtil.moveFlying(0.3);
+                MoveUtil.moveFlying(0.4);
             } else if (noDown.isToggled()) {
                 if (upAndDown.isToggled())
                     if (mc.gameSettings.keyBindSneak.isKeyDown())
-                        mc.thePlayer.motionY = -0.1;
+                        mc.thePlayer.motionY = -0.3;
                     else if (mc.gameSettings.keyBindJump.isKeyDown())
-                        mc.thePlayer.motionY = mc.thePlayer.ticksExisted % 2 == 0 ? 0.1 : -0.01;
+                        mc.thePlayer.motionY = mc.thePlayer.ticksExisted % 2 == 0 ? 0.2 : -0.01;
                     else
                         mc.thePlayer.motionY = -0.01;
                 else
