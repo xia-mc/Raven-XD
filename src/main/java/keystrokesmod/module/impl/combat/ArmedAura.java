@@ -21,7 +21,6 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityArmorStand;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemHoe;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -36,6 +35,7 @@ public class ArmedAura extends IAutoClicker {
     private final SliderSetting switchDelay;
     private final ModeSetting sortMode;
     private final ModeSetting weaponMode;
+    private final ModeSetting priorityHitBox;
     private final SliderSetting range;
     private final SliderSetting fov;
     private final ButtonSetting perfect;
@@ -45,9 +45,10 @@ public class ArmedAura extends IAutoClicker {
     private final SliderSetting predictionTicks;
     private final ButtonSetting drawPos;
     private final ButtonSetting autoSwitch;
-    private final ButtonSetting fastFire;
-    private final ButtonSetting fastFireLegit;
-    private final SliderSetting fastFireAmount;
+    private final ButtonSetting lookView;
+    private final ButtonSetting rapidFire;
+    private final ButtonSetting rapidFireLegit;
+    private final SliderSetting rapidFireAmount;
     private final ButtonSetting targetPlayers;
     private final ButtonSetting targetEntities;
     private final ButtonSetting targetInvisible;
@@ -75,6 +76,7 @@ public class ArmedAura extends IAutoClicker {
         this.registerSetting(switchDelay = new SliderSetting("Switch delay", 200, 50, 1000, 50, "ms", new ModeOnly(mode, 1)));
         this.registerSetting(sortMode = new ModeSetting("Sort mode", new String[]{"Distance", "Health", "Hurt time", "Yaw"}, 0));
         this.registerSetting(weaponMode = new ModeSetting("Weapon mode", new String[]{"Hypixel BedWars", "Hypixel Zombie", "CubeCraft"}, 0));
+        this.registerSetting(priorityHitBox = new ModeSetting("Priority hit box", Arrays.stream(HitLog.HitPos.values()).map(HitLog.HitPos::getEnglish).toArray(String[]::new), 0));
         this.registerSetting(range = new SliderSetting("Range", 50, 0, 100, 5));
         this.registerSetting(fov = new SliderSetting("FOV", 360, 40, 360, 5));
         this.registerSetting(moveFix = new ModeSetting("Move fix", RotationHandler.MoveFix.MODES, 0));
@@ -84,9 +86,10 @@ public class ArmedAura extends IAutoClicker {
         this.registerSetting(predictionTicks = new SliderSetting("Prediction ticks", 2, 0, 10, 1, "ticks", () -> prediction.isToggled() && !smart.isToggled()));
         this.registerSetting(drawPos = new ButtonSetting("Draw pos", false, prediction::isToggled));
         this.registerSetting(autoSwitch = new ButtonSetting("Auto switch", true));
-        this.registerSetting(fastFire = new ButtonSetting("Fast fire", false, autoSwitch::isToggled));
-        this.registerSetting(fastFireLegit = new ButtonSetting("Fast fire Legit", false, () -> autoSwitch.isToggled() && fastFire.isToggled()));
-        this.registerSetting(fastFireAmount = new SliderSetting("Fast fire amount", 1, 1, 4, 1, () -> autoSwitch.isToggled() && fastFire.isToggled() && !fastFireLegit.isToggled()));
+        this.registerSetting(lookView = new ButtonSetting("Look view", false));
+        this.registerSetting(rapidFire = new ButtonSetting("Fast fire", false, autoSwitch::isToggled));
+        this.registerSetting(rapidFireLegit = new ButtonSetting("Fast fire Legit", false, () -> autoSwitch.isToggled() && rapidFire.isToggled()));
+        this.registerSetting(rapidFireAmount = new SliderSetting("Fast fire amount", 1, 1, 4, 1, () -> autoSwitch.isToggled() && rapidFire.isToggled() && !rapidFireLegit.isToggled()));
         this.registerSetting(targetPlayers = new ButtonSetting("Target players", true));
         this.registerSetting(targetEntities = new ButtonSetting("Target entities", false));
         this.registerSetting(targetInvisible = new ButtonSetting("Target invisible", false));
@@ -118,15 +121,20 @@ public class ArmedAura extends IAutoClicker {
                     .filter(entity -> targetInvisible.isToggled() || !entity.isInvisible())
                     .filter(p -> p.getDistanceToEntity(mc.thePlayer) < range.getInput())
                     .filter(p -> fov.getInput() == 360 || Utils.inFov((float) fov.getInput(), p))
-                    .map(p -> new Pair<>(p, doPrediction(p, new Vec3(p.motionX, p.motionY, p.motionZ))))
-                    .map(pair -> new Pair<>(pair, Triple.of(pair.second().distanceTo(Utils.getEyePos()), PlayerRotation.getYaw(pair.second()), PlayerRotation.getPitch(pair.second()))))
+                    .map(p -> new Pair<>(p, getHitPos(p, new Vec3(p.motionX, p.motionY, p.motionZ))))
+                    .map(pair -> new Pair<>(pair, Triple.of(pair.second().distanceTo(pair.second()), PlayerRotation.getYaw(pair.second()), PlayerRotation.getPitch(pair.second()))))
                     .filter(pair -> RotationUtils.rayCast(pair.second().getLeft(), pair.second().getMiddle(), pair.second().getRight()) == null)
                     .min(fromSortMode());
             if (target.isPresent()) {
                 if (SlotHandler.getHeldItem() != null && SlotHandler.getHeldItem().getItem() instanceof ItemHoe) {
-                    event.setYaw(target.get().second().getMiddle());
-                    event.setPitch(target.get().second().getRight());
-                    event.setMoveFix(RotationHandler.MoveFix.values()[(int) moveFix.getInput()]);
+                    if (lookView.isToggled()) {
+                        mc.thePlayer.rotationYaw = target.get().second().getMiddle();
+                        mc.thePlayer.rotationPitch = target.get().second().getRight();
+                    } else {
+                        event.setYaw(target.get().second().getMiddle());
+                        event.setPitch(target.get().second().getRight());
+                        event.setMoveFix(RotationHandler.MoveFix.values()[(int) moveFix.getInput()]);
+                    }
                     pos = target.get().first().second().add(0, -target.get().first().first().getEyeHeight(), 0).toVec3();
                     this.target = target.get();
                     long time = System.currentTimeMillis();
@@ -180,8 +188,8 @@ public class ArmedAura extends IAutoClicker {
 
         if (targeted && click) {
             mc.playerController.sendUseItem(mc.thePlayer, mc.theWorld, SlotHandler.getHeldItem());
-            if (fastFire.isToggled() && autoSwitch.isToggled() && !fastFireLegit.isToggled()) {
-                for (int i = 0; i < (int) fastFireAmount.getInput(); i++) {
+            if (rapidFire.isToggled() && autoSwitch.isToggled() && !rapidFireLegit.isToggled()) {
+                for (int i = 0; i < (int) rapidFireAmount.getInput(); i++) {
                     int bestArm = getBestArm();
                     SlotHandler.setCurrentSlot(bestArm);
                     mc.playerController.sendUseItem(mc.thePlayer, mc.theWorld, SlotHandler.getHeldItem());
@@ -195,7 +203,7 @@ public class ArmedAura extends IAutoClicker {
 
     private int getBestArm() {
         int arm;
-        Set<Integer> ignoreSlots = fastFire.isToggled() ? firedSlots : Collections.emptySet();
+        Set<Integer> ignoreSlots = rapidFire.isToggled() ? firedSlots : Collections.emptySet();
 
         switch ((int) weaponMode.getInput()) {
             default:
@@ -231,8 +239,22 @@ public class ArmedAura extends IAutoClicker {
         }
     }
 
-    private @NotNull Vec3 doPrediction(@NotNull EntityLivingBase entity, Vec3 motion) {
-        Vec3 result = Utils.getEyePos(entity);
+    private @NotNull Vec3 getHitPos(@NotNull EntityLivingBase entity, Vec3 motion) {
+        Vec3 result;
+
+        switch ((int) priorityHitBox.getInput()) {
+            default:
+            case 0:
+                result = Utils.getEyePos(entity);
+                break;
+            case 1:
+                result = Utils.getEyePos(entity).add(0, -1, 0);
+                break;
+            case 2:
+                result = new Vec3(entity).add(0, 0.5, 0);
+                break;
+        }
+
         for (int i = 0; i < predTicks; i++) {
             result = result.add(
                     MoveUtil.predictedMotionXZ(motion.x(), i, MoveUtil.isMoving(entity)),

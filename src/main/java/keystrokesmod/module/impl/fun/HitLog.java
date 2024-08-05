@@ -13,6 +13,7 @@ import lombok.Getter;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.play.server.S08PacketPlayerPosLook;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
@@ -36,6 +37,8 @@ public class HitLog extends Module {
         lastAttack = System.currentTimeMillis();
 
         Raven.getExecutor().schedule(() -> {
+            HitPos hitPos = HitPos.fromY(predHitPos.y(), target);
+
             if (target.hurtTime == 0) {
                 Reason reason;
                 if (!target.getEntityBoundingBox().isVecInside(predHitPos.toVec3())) {
@@ -50,19 +53,19 @@ public class HitLog extends Module {
 
                 switch ((int) language.getInput()) {
                     case 0:
-                        Utils.sendMessage("Miss "+ target.getName() + "'s head Cause " + reason.getEnglish() + " | Trying to predict " + predTicks + " ticks");
+                        Utils.sendMessage("Miss "+ target.getName() + "'s " + hitPos.getEnglish() + " Cause " + reason.getEnglish() + " | Trying to predict " + predTicks + " ticks");
                         break;
                     case 1:
-                        Utils.sendMessage("空了 " + target.getName() + "的头部 原因 " + reason.getChinese() + " | 尝试预测 " + predTicks + " ticks");
+                        Utils.sendMessage("空了 " + target.getName() + "的" + hitPos.getChinese() + " 原因 " + reason.getChinese() + " | 尝试预测 " + predTicks + " ticks");
                         break;
                 }
             } else {
                 switch ((int) language.getInput()) {
                     case 0:
-                        Utils.sendMessage("Hit "+ target.getName() + "'s head | Trying to predict " + predTicks + " ticks | Health " + target.getHealth());
+                        Utils.sendMessage("Hit "+ target.getName() + "'s " + hitPos.getEnglish() + " | Trying to predict " + predTicks + " ticks | Health " + target.getHealth());
                         break;
                     case 1:
-                        Utils.sendMessage("命中 " + target.getName() + "的头部 | 尝试预测 " + predTicks + " ticks | 血量 " + target.getHealth());
+                        Utils.sendMessage("命中 " + target.getName() + "的" + hitPos.getChinese() + " | 尝试预测 " + predTicks + " ticks | 血量 " + target.getHealth());
                         break;
                 }
             }
@@ -83,7 +86,29 @@ public class HitLog extends Module {
         WATCHDOG("Watchdog", "Watchdog"),
         BLOCK("Blocking", "格挡");
         
-        final String english;
-        final String chinese;
+        private final String english;
+        private final String chinese;
+    }
+
+    @AllArgsConstructor
+    @Getter
+    public enum HitPos {
+        HEAD("head", "头部"),
+        BODY("body", "身体"),
+        FOOT("foot", "脚");
+
+        private final String english;
+        private final String chinese;
+
+        public static HitPos fromY(double hitY, @NotNull EntityLivingBase entity) {
+            AxisAlignedBB box = entity.getEntityBoundingBox();
+            if (hitY > box.maxY - (box.maxY - Utils.getEyePos(entity).y()) * 2) {
+                return HEAD;
+            } else if (box.maxY - hitY <= 0.8125) {
+                return FOOT;
+            } else {
+                return BODY;
+            }
+        }
     }
 }
