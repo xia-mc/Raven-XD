@@ -11,6 +11,7 @@ import keystrokesmod.utility.ContainerUtils;
 import keystrokesmod.utility.Utils;
 import net.minecraft.item.ItemSkull;
 import net.minecraft.item.ItemSoup;
+import net.minecraft.item.ItemAppleGold
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
@@ -27,7 +28,7 @@ public class AutoHeal extends Module {
     public AutoHeal() {
         super("AutoHeal", category.player);
         this.registerSetting(new DescriptionSetting("help you win by auto use healing item."));
-        this.registerSetting(item = new ModeSetting("Item", new String[]{"Golden head", "Soup"}, 0));
+        this.registerSetting(item = new ModeSetting("Item", new String[]{"Golden head", "Soup", "Golden apple"}, 0));
         this.registerSetting(autoThrow = new ButtonSetting("Auto throw", false, new ModeOnly(item, 1)));
         this.registerSetting(minHealth = new SliderSetting("Min health", 10, 0, 20, 1));
         this.registerSetting(healDelay = new SliderSetting("Heal delay", 500, 0, 1500, 1));
@@ -50,6 +51,8 @@ public class AutoHeal extends Module {
                     case 1:
                         toSlot = ContainerUtils.getSlot(ItemSoup.class);
                         break;
+                    case 2:
+                        toSlot = ContainerUtils.getSlot(ItemAppleGold.class);
                 }
 
                 if (toSlot == -1) return;
