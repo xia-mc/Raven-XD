@@ -5,17 +5,15 @@ import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.DescriptionSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.utility.Utils;
+import lombok.Getter;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class LatencyAlerts extends Module {
     private final SliderSetting minLatency;
     private long lastPacket;
+    @Getter
     private static boolean freeze = false;
-
-    public static boolean isFreeze() {
-        return freeze;
-    }
 
     public LatencyAlerts() {
         super("Latency Alerts", category.other);
@@ -33,6 +31,11 @@ public class LatencyAlerts extends Module {
     }
 
     public void onUpdate() {
+        if (!Utils.nullCheck() || mc.thePlayer.ticksExisted < 20) {
+            freeze = false;
+            lastPacket = System.currentTimeMillis();
+        }
+
         if (System.currentTimeMillis() - lastPacket >= minLatency.getInput()) {
             freeze = true;
             mc.ingameGUI.setRecordPlaying(

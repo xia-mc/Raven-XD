@@ -198,6 +198,7 @@ public class ModuleManager {
         this.addModule(new BedProximityAlert());
         this.addModule(autoRegister = new AutoRegister());
         this.addModule(viewPackets = new ViewPackets());
+        this.addModule(new FlagDetector());
 
         // player
         this.addModule(new AntiAFK());
