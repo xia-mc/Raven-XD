@@ -15,5 +15,4 @@ import net.minecraftforge.fml.common.eventhandler.Event;
 public class BlockWebEvent extends Event {
     private final BlockPos blockPos;
     private final IBlockState blockState;
-    private final Entity entity;
 }

@@ -163,6 +163,8 @@ public class ArmedAura extends IAutoClicker {
                 return Comparator.comparingDouble(pair -> pair.first().first().getHealth());
             case 2:
                 return Comparator.comparingDouble(pair -> pair.first().first().hurtTime);
+            case 3:
+                return Comparator.comparingDouble(pair -> Utils.getFov(pair.first().first().posX, pair.first().first().posZ));
         }
     }
 
@@ -266,12 +268,12 @@ public class ArmedAura extends IAutoClicker {
     @Override
     public boolean click() {
         if (targeted) {
-            mc.playerController.sendUseItem(mc.thePlayer, mc.theWorld, SlotHandler.getHeldItem());
+            Utils.sendClick(1, true);
             if (rapidFire.isToggled() && autoSwitch.isToggled() && !rapidFireLegit.isToggled()) {
                 for (int i = 0; i < (int) rapidFireAmount.getInput(); i++) {
                     int bestArm = getBestArm();
                     SlotHandler.setCurrentSlot(bestArm);
-                    mc.playerController.sendUseItem(mc.thePlayer, mc.theWorld, SlotHandler.getHeldItem());
+                    Utils.sendClick(1, true);
                 }
             }
             if (target != null)

@@ -14,8 +14,6 @@ public class IgnoreNoWeb extends SubMode<NoWeb> {
 
     @SubscribeEvent
     public void onBlockWeb(@NotNull BlockWebEvent event) {
-        if (event.getBlockState().getBlock() == Blocks.web && event.getEntity() == mc.thePlayer) {
-            event.setCanceled(true);
-        }
+        event.setCanceled(true);
     }
 }

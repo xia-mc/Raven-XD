@@ -110,6 +110,7 @@ public class ModuleManager {
     public static NoWeb noWeb;
     public static ProjectileAimBot projectileAimBot;
     public static AutoWeb autoWeb;
+    public static BlockOut blockOut;
 
     public void register() {
 
@@ -152,6 +153,7 @@ public class ModuleManager {
         this.addModule(new AntiAim());
         this.addModule(hitLog = new HitLog());
         this.addModule(noteBot = new NoteBot());
+        this.addModule(blockOut = new BlockOut());
 
         // minigames
         this.addModule(new AutoWho());

@@ -1,7 +1,9 @@
 package keystrokesmod.mixins.impl.world;
 
 
+import keystrokesmod.Raven;
 import keystrokesmod.event.BlockWebEvent;
+import keystrokesmod.utility.Utils;
 import net.minecraft.block.BlockWeb;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
@@ -18,10 +20,12 @@ public class MixinBlockWeb {
 
     @Inject(method = "onEntityCollidedWithBlock", at = @At("HEAD"), cancellable = true)
     public void onEntityCollidedWithBlock(World world, BlockPos blockPos, IBlockState state, Entity entity, CallbackInfo ci) {
-        BlockWebEvent event = new BlockWebEvent(blockPos, state, entity);
-        MinecraftForge.EVENT_BUS.post(event);
+        if (Utils.nullCheck() && entity == Raven.mc.thePlayer) {
+            BlockWebEvent event = new BlockWebEvent(blockPos, state);
+            MinecraftForge.EVENT_BUS.post(event);
 
-        if (event.isCanceled())
-            ci.cancel();
+            if (event.isCanceled())
+                ci.cancel();
+        }
     }
 }

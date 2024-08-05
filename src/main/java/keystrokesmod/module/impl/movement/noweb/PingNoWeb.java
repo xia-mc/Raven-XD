@@ -31,7 +31,7 @@ public class PingNoWeb extends SubMode<NoWeb> {
 
     @SubscribeEvent
     public void onBlockWeb(@NotNull BlockWebEvent event) {
-        if (event.getEntity() == mc.thePlayer && ignoredBlock.contains(event.getBlockPos())) {
+        if (ignoredBlock.contains(event.getBlockPos())) {
             event.setCanceled(true);
         }
     }

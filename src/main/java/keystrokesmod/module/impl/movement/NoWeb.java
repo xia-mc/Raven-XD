@@ -2,6 +2,7 @@ package keystrokesmod.module.impl.movement;
 
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.movement.noweb.IgnoreNoWeb;
+import keystrokesmod.module.impl.movement.noweb.IntaveNoWeb;
 import keystrokesmod.module.impl.movement.noweb.PingNoWeb;
 import keystrokesmod.module.setting.impl.ModeValue;
 
@@ -13,6 +14,7 @@ public class NoWeb extends Module {
         this.registerSetting(mode = new ModeValue("Mode", this)
                 .add(new IgnoreNoWeb("Ignore", this))
                 .add(new PingNoWeb("Ping", this))
+                .add(new IntaveNoWeb("Intave", this))
         );
     }
 
