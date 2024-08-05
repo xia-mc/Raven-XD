@@ -26,7 +26,7 @@ public class Module {
     protected final ArrayList<Setting> settings;
     private final String moduleName;
     private String prettyName;
-    private String prettyInfo;
+    private String prettyInfo = "";
     private final Module.category moduleCategory;
     @Getter
     @Setter
