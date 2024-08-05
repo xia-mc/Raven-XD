@@ -267,7 +267,7 @@ public class Commands {
                         } else {
                             module.setPrettyName(args.get(2));
                             module.setPrettyInfo(args.get(3));
-                            print("&a'" + module.getName() + " " + module.getInfo() + "' is now called '" + module.getRawPrettyName() + module.getRawPrettyInfo() + "'", 1);
+                            print("&a'" + module.getName() + " " + module.getInfo() + "' is now called '" + module.getRawPrettyName() + " " + module.getRawPrettyInfo() + "'", 1);
                         }
                     }
                 }
