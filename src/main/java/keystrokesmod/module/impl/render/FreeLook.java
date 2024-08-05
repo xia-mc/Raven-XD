@@ -44,9 +44,12 @@ public class FreeLook extends Module {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onPreMotion(RotationEvent event) {
-        if (onlyIfPressed.isToggled() && !Keyboard.isKeyDown(this.getKeycode())) {
-            disable();
-            return;
+        try {
+            if (onlyIfPressed.isToggled() && !Keyboard.isKeyDown(this.getKeycode())) {
+                disable();
+                return;
+            }
+        } catch (IndexOutOfBoundsException ignored) {
         }
 
         if (viewData != null){
