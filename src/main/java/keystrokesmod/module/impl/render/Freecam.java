@@ -1,4 +1,4 @@
-package keystrokesmod.module.impl.player;
+package keystrokesmod.module.impl.render;
 
 import keystrokesmod.event.SendPacketEvent;
 import keystrokesmod.module.Module;
@@ -30,7 +30,7 @@ public class Freecam extends Module {
     private float[] sAng = new float[]{0.0F, 0.0F};
 
     public Freecam() {
-        super("Freecam", category.player, 0);
+        super("Freecam", category.render, 0);
         this.registerSetting(speed = new SliderSetting("Speed", 2.5D, 0.5D, 10.0D, 0.5D));
         this.registerSetting(disableOnDamage = new ButtonSetting("Disable on damage", true));
         this.registerSetting(allowDigging = new ButtonSetting("Allow digging", false));

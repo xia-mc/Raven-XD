@@ -944,6 +944,12 @@ public class Utils {
                 .anyMatch(target -> new keystrokesmod.script.classes.Vec3(target).distanceTo(mc.thePlayer) < 6);
     }
 
+    public static boolean isTargetNearby(double dist) {
+        return mc.theWorld.playerEntities.stream()
+                .filter(target -> target != mc.thePlayer)
+                .anyMatch(target -> new keystrokesmod.script.classes.Vec3(target).distanceTo(mc.thePlayer) < dist);
+    }
+
     /**
      * Checks if the player is in a liquid
      *

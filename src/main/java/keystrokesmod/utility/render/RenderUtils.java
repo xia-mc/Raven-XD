@@ -1,7 +1,7 @@
 package keystrokesmod.utility.render;
 
 import keystrokesmod.mixins.impl.render.RenderManagerAccessor;
-import keystrokesmod.module.impl.player.Freecam;
+import keystrokesmod.module.impl.render.Freecam;
 import keystrokesmod.module.impl.render.HUD;
 import keystrokesmod.script.classes.Vec3;
 import keystrokesmod.utility.Theme;

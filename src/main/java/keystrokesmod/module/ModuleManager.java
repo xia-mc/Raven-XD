@@ -8,7 +8,6 @@ import keystrokesmod.module.impl.minigames.*;
 import keystrokesmod.module.impl.movement.*;
 import keystrokesmod.module.impl.other.*;
 import keystrokesmod.module.impl.player.*;
-import keystrokesmod.module.impl.player.nofall.LegitNoFall;
 import keystrokesmod.module.impl.render.*;
 import keystrokesmod.module.impl.world.*;
 import keystrokesmod.utility.Utils;
@@ -110,6 +109,7 @@ public class ModuleManager {
     public static FakePotion fakePotion;
     public static NoWeb noWeb;
     public static ProjectileAimBot projectileAimBot;
+    public static AutoWeb autoWeb;
 
     public void register() {
 
@@ -216,6 +216,7 @@ public class ModuleManager {
         this.addModule(noFall = new NoFall());
         this.addModule(new NoRotate());
         this.addModule(fakePotion = new FakePotion());
+        this.addModule(autoWeb = new AutoWeb());
 
         // render
         this.addModule(ambience = new Ambience());
