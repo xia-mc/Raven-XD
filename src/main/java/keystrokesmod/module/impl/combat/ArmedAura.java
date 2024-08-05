@@ -57,7 +57,6 @@ public class ArmedAura extends IAutoClicker {
 
     private boolean targeted = false;
     private Pair<Pair<EntityLivingBase, Vec3>, Triple<Double, Float, Float>> target = null;
-    private boolean click = false;
     private int predTicks = 0;
     private net.minecraft.util.Vec3 pos = null;
     private final Set<Integer> firedSlots = new HashSet<>();
@@ -183,21 +182,6 @@ public class ArmedAura extends IAutoClicker {
 
         if (SlotHandler.getHeldItem() == null || !(SlotHandler.getHeldItem().getItem() instanceof ItemHoe)) {
             targeted = false;
-            return;
-        }
-
-        if (targeted && click) {
-            mc.playerController.sendUseItem(mc.thePlayer, mc.theWorld, SlotHandler.getHeldItem());
-            if (rapidFire.isToggled() && autoSwitch.isToggled() && !rapidFireLegit.isToggled()) {
-                for (int i = 0; i < (int) rapidFireAmount.getInput(); i++) {
-                    int bestArm = getBestArm();
-                    SlotHandler.setCurrentSlot(bestArm);
-                    mc.playerController.sendUseItem(mc.thePlayer, mc.theWorld, SlotHandler.getHeldItem());
-                }
-            }
-            if (target != null)
-                HitLog.onAttack(predTicks, target.first().first(), Utils.getEyePos(target.first().first()), new Vec3(mc.thePlayer), RotationHandler.getRotationYaw(), RotationHandler.getRotationPitch());
-            targeted = false;
         }
     }
 
@@ -269,7 +253,6 @@ public class ArmedAura extends IAutoClicker {
     public void onEnable() {
         clickMode.enable();
         targeted = false;
-        click = false;
         predTicks = 0;
         firedSlots.clear();
         pos = null;
@@ -282,7 +265,20 @@ public class ArmedAura extends IAutoClicker {
 
     @Override
     public boolean click() {
-        click = true;
-        return targeted;
+        if (targeted) {
+            mc.playerController.sendUseItem(mc.thePlayer, mc.theWorld, SlotHandler.getHeldItem());
+            if (rapidFire.isToggled() && autoSwitch.isToggled() && !rapidFireLegit.isToggled()) {
+                for (int i = 0; i < (int) rapidFireAmount.getInput(); i++) {
+                    int bestArm = getBestArm();
+                    SlotHandler.setCurrentSlot(bestArm);
+                    mc.playerController.sendUseItem(mc.thePlayer, mc.theWorld, SlotHandler.getHeldItem());
+                }
+            }
+            if (target != null)
+                HitLog.onAttack(predTicks, target.first().first(), Utils.getEyePos(target.first().first()), new Vec3(mc.thePlayer), RotationHandler.getRotationYaw(), RotationHandler.getRotationPitch());
+            targeted = false;
+            return true;
+        }
+        return false;
     }
 }
