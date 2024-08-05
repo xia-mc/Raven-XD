@@ -36,7 +36,7 @@ public class AutoHeal extends Module {
 
     @SubscribeEvent
     public void onRender(TickEvent.RenderTickEvent event) {
-        if (!Utils.nullCheck() || mc.thePlayer.isDead) return;
+        if (!Utils.nullCheck() || mc.thePlayer.isDead || mc.playerController == null) return;
         if (System.currentTimeMillis() - lastHeal < healDelay.getInput()) return;
 
         if (mc.thePlayer.getHealth() <= minHealth.getInput()) {
