@@ -4,6 +4,8 @@ import keystrokesmod.event.PreMotionEvent;
 import keystrokesmod.module.impl.player.NoFall;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.impl.SubMode;
+import keystrokesmod.utility.PacketUtils;
+import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
@@ -18,7 +20,7 @@ public class OnGround1NoFall extends SubMode<NoFall> {
     @SubscribeEvent
     public void onPreMotion(PreMotionEvent event) {
         if (mc.thePlayer.fallDistance > minFallDist.getInput() && !parent.noAction()) {
-            event.setOnGround(true);
+            PacketUtils.sendPacket(new C03PacketPlayer(true));
         }
     }
 }

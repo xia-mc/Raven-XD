@@ -14,7 +14,7 @@ public class OnGround2NoFall extends SubMode<NoFall> {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void onPreMotion(@NotNull PreMotionEvent event) {
-        if (!parent.noAction())
+        if (!parent.noAction() && mc.thePlayer.fallDistance > 3)
             event.setOnGround(true);
     }
 }
