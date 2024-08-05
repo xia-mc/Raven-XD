@@ -18,6 +18,7 @@ public class ProjectileAimBot extends IAutoClicker {
     private final SliderSetting maxTargetLookFovDiff;
 
     private int fromSlot = -1;
+    private boolean targeted = false;
 
     public ProjectileAimBot() {
         super("ProjectileAimBot", category.combat);
@@ -45,22 +46,26 @@ public class ProjectileAimBot extends IAutoClicker {
         if (KillAura.target != null && !ModuleManager.killAura.isAttack() && Utils.inFov((float) maxTargetLookFovDiff.getInput(), KillAura.target)) {
             int slot = ContainerUtils.getMostProjectiles(-1);
             if (slot == -1) return;
+            if (slot >= 9)
+                slot -= 36;
             fromSlot = SlotHandler.getCurrentSlot();
             SlotHandler.setCurrentSlot(slot);
-
-
-        } else if (fromSlot != -1) {
-            SlotHandler.setCurrentSlot(fromSlot);
-            fromSlot = -1;
+            targeted = true;
         }
     }
 
     @Override
     public boolean click() {
-        if (ContainerUtils.isProjectiles(SlotHandler.getHeldItem())) {
+        if (ContainerUtils.isProjectiles(SlotHandler.getHeldItem()) && targeted) {
             Utils.sendClick(1, true);
+            targeted = false;
+            Utils.sendClick(1, false);
             return true;
         } else {
+            if (fromSlot != -1) {
+                SlotHandler.setCurrentSlot(fromSlot);
+                fromSlot = -1;
+            }
             return false;
         }
     }

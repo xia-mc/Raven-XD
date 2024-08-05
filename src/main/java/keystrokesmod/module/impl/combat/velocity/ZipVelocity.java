@@ -57,6 +57,8 @@ public class ZipVelocity extends SubMode<Velocity> {
     @SubscribeEvent
     public void onReceivePacket(@NotNull ReceivePacketEvent event) {
         if (event.getPacket() instanceof S12PacketEntityVelocity) {
+            if (((S12PacketEntityVelocity) event.getPacket()).getEntityID() != mc.thePlayer.getEntityId()) return;
+
             event.setCanceled(true);
             delayedPackets.add(((S12PacketEntityVelocity) event.getPacket()));
             if (lastVelocityTime == -1) {

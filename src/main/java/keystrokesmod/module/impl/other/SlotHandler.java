@@ -45,6 +45,7 @@ public final class SlotHandler extends Module {
 
     public static void setCurrentSlot(int slot) {
         if (slot != -1) {
+
             currentSlot = slot;
             lastSetCurrentSlotTime = System.currentTimeMillis();
         }

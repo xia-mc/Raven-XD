@@ -16,6 +16,7 @@ public class Velocity extends Module {
                 .add(new LegitVelocity("Legit", this))
                 .add(new KarhuVelocity("Karhu", this))
                 .add(new MatrixVelocity("Matrix", this))
+                .add(new GrimACVelocity("GrimAC", this))
                 .add(new TickVelocity("Tick", this))
                 .add(new ZipVelocity("7-Zip", this))
         );
