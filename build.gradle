@@ -1,6 +1,7 @@
+import net.minecraftforge.gradle.user.IReobfuscator
+
 buildscript {
     repositories {
-        jcenter()
         maven {
             name = "forge"
             url = "https://files.minecraftforge.net/maven"
@@ -124,6 +125,6 @@ jar {
 
 reobf {
     jar {
-        mappingType = "searge"
+        mappingType = "SEARGE"
     }
 }

@@ -1,14 +1,14 @@
 package keystrokesmod.module.impl.movement.noweb;
 
 import keystrokesmod.event.BlockWebEvent;
-import keystrokesmod.event.PrePlayerInputEvent;
 import keystrokesmod.event.PreUpdateEvent;
-import keystrokesmod.event.RotationEvent;
 import keystrokesmod.module.impl.movement.NoWeb;
-import keystrokesmod.module.impl.other.RotationHandler;
+import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.BlockUtils;
+import keystrokesmod.utility.MoveUtil;
 import keystrokesmod.utility.Utils;
+import net.minecraft.init.Blocks;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
@@ -16,11 +16,17 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
 public class IntaveNoWeb extends SubMode<NoWeb> {
+    private final ButtonSetting noDown;
+    private final ButtonSetting upAndDown;
+
     private BlockPos lastWeb = null;
     private boolean webbing = false;
+    private boolean cycle;
 
     public IntaveNoWeb(String name, @NotNull NoWeb parent) {
         super(name, parent);
+        this.registerSetting(noDown = new ButtonSetting("No down", false));
+        this.registerSetting(upAndDown = new ButtonSetting("UpAndDown", false, noDown::isToggled));
     }
 
     @SubscribeEvent
@@ -30,17 +36,40 @@ public class IntaveNoWeb extends SubMode<NoWeb> {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void onPreUpdate(PreUpdateEvent event) {
-        if (lastWeb == null || !Utils.nullCheck()) {
+        if (lastWeb == null || !Utils.nullCheck() || BlockUtils.getBlock(lastWeb) != Blocks.web) {
             if (webbing)
                 Utils.resetTimer();
             webbing = false;
+            lastWeb = null;
+            return;
         }
 
-        AxisAlignedBB box = BlockUtils.getCollisionBoundingBox(lastWeb);
-        if (box != null && box.intersectsWith(mc.thePlayer.getEntityBoundingBox())) {
-            if (mc.thePlayer.onGround)
-                mc.thePlayer.jump();
-            Utils.getTimer().timerSpeed = 1.004f;
+        AxisAlignedBB box = new AxisAlignedBB(lastWeb, lastWeb.add(1, 1, 1));
+        if (box.intersectsWith(mc.thePlayer.getEntityBoundingBox())) {
+            if (mc.thePlayer.onGround) {
+                mc.thePlayer.motionY = MoveUtil.jumpMotion();
+                MoveUtil.moveFlying(0.3);
+            } else if (noDown.isToggled()) {
+                if (upAndDown.isToggled())
+                    if (mc.gameSettings.keyBindSneak.isKeyDown())
+                        mc.thePlayer.motionY = -0.1;
+                    else if (mc.gameSettings.keyBindJump.isKeyDown())
+                        mc.thePlayer.motionY = mc.thePlayer.ticksExisted % 2 == 0 ? 0.1 : -0.01;
+                    else
+                        mc.thePlayer.motionY = -0.01;
+                else
+                    mc.thePlayer.motionY = -0.01;
+            }
+
+            int i = mc.thePlayer.ticksExisted % 4;
+            if (cycle ? i == 0 || i == 1 : i == 0) {
+                Utils.getTimer().timerSpeed = 0.5009f;
+            } else {
+                Utils.getTimer().timerSpeed = 2.004f;
+
+                if (i == 3)
+                    cycle = !cycle;
+            }
             webbing = true;
         } else {
             if (webbing) {
@@ -48,22 +77,6 @@ public class IntaveNoWeb extends SubMode<NoWeb> {
                 webbing = false;
             }
             lastWeb = null;
-        }
-    }
-
-    @SubscribeEvent(priority = EventPriority.HIGH)
-    public void onRotation(RotationEvent event) {
-        if (!mc.thePlayer.onGround && webbing) {
-            event.setYaw(mc.thePlayer.rotationYaw - 45);
-            event.setMoveFix(RotationHandler.MoveFix.SILENT);
-        }
-    }
-
-    @SubscribeEvent
-    public void onPrePlayerInput(PrePlayerInputEvent event) {
-        if (webbing) {
-            event.setStrafe(0);
-            event.setForward(event.getForward() != 0 ? 1 : 0);
         }
     }
 

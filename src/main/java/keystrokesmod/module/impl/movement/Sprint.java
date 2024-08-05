@@ -16,6 +16,7 @@ public class Sprint extends Module {
     private final ModeSetting mode = new ModeSetting("Mode", new String[]{"Legit", "Omni"}, 0);
     private final ModeSetting omniMode = new ModeSetting("Bypass mode", new String[]{"None", "Hypixel", "Legit"}, 1, new ModeOnly(mode, 1));
     public static boolean omni = false;
+    public static boolean stopSprint = false;
 
     public Sprint() {
         super("Sprint", Module.category.movement, 0);
@@ -24,6 +25,10 @@ public class Sprint extends Module {
 
     public static boolean omni() {
         return omni || ModuleManager.sprint != null && ModuleManager.sprint.isEnabled() && ModuleManager.sprint.mode.getInput() == 1 && MoveUtil.isMoving();
+    }
+
+    public static boolean stopSprint() {
+        return stopSprint;
     }
 
     @SubscribeEvent
