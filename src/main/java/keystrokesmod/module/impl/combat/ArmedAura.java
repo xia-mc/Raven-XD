@@ -19,6 +19,8 @@ import keystrokesmod.script.classes.Vec3;
 import keystrokesmod.utility.*;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityArmorStand;
+import net.minecraft.entity.monster.EntityGiantZombie;
+import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemHoe;
 import net.minecraft.util.BlockPos;
@@ -73,7 +75,7 @@ public class ArmedAura extends IAutoClicker {
         );
         this.registerSetting(mode = new ModeSetting("Mode", new String[]{"Single", "Switch"}, 0));
         this.registerSetting(switchDelay = new SliderSetting("Switch delay", 200, 50, 1000, 50, "ms", new ModeOnly(mode, 1)));
-        this.registerSetting(sortMode = new ModeSetting("Sort mode", new String[]{"Distance", "Health", "Hurt time", "Yaw"}, 0));
+        this.registerSetting(sortMode = new ModeSetting("Sort mode", new String[]{"Distance", "Health", "Hurt time", "Yaw", "Hypixel Zombie"}, 0));
         this.registerSetting(weaponMode = new ModeSetting("Weapon mode", new String[]{"Hypixel BedWars", "Hypixel Zombie", "CubeCraft"}, 0));
         this.registerSetting(priorityHitBox = new ModeSetting("Priority hit box", Arrays.stream(HitLog.HitPos.values()).map(HitLog.HitPos::getEnglish).toArray(String[]::new), 0));
         this.registerSetting(range = new SliderSetting("Range", 50, 0, 100, 5));
@@ -165,6 +167,26 @@ public class ArmedAura extends IAutoClicker {
                 return Comparator.comparingDouble(pair -> pair.first().first().hurtTime);
             case 3:
                 return Comparator.comparingDouble(pair -> Utils.getFov(pair.first().first().posX, pair.first().first().posZ));
+            case 4:
+                return (o1, o2) -> {
+                    final EntityLivingBase first = o1.first().first();
+                    final EntityLivingBase second = o2.first().first();
+
+                    if (first == second) return 0;
+                    if (second instanceof EntityZombie) {
+                        if (second.isChild()) return 1;
+                    }
+                    if (first instanceof EntityZombie) {
+                        if (first.isChild()) return -1;
+                    }
+                    if (second instanceof EntityGiantZombie) {
+                        if (second.isChild()) return 1;
+                    }
+                    if (first instanceof EntityGiantZombie) {
+                        if (first.isChild()) return -1;
+                    }
+                    return Double.compare(first.getHealth(), second.getHealth());
+                };
         }
     }
 
