@@ -141,12 +141,16 @@ public class Utils {
         return Math.random() * (max - min) + min;
     }
 
-    public static boolean inFov(float fov, BlockPos blockPos) {
+    public static boolean inFov(float fov, @NotNull BlockPos blockPos) {
         return inFov(fov, blockPos.getX(), blockPos.getZ());
     }
 
-    public static boolean inFov(float fov, Entity entity) {
+    public static boolean inFov(float fov, @NotNull Entity entity) {
         return inFov(fov, entity.posX, entity.posZ);
+    }
+
+    public static boolean inFov(float fov, @NotNull Entity self, @NotNull Entity target) {
+        return inFov(self.rotationYaw, fov, target.posX, target.posZ);
     }
 
     public static boolean inFov(float fov, final double n2, final double n3) {
@@ -157,8 +161,20 @@ public class Utils {
         } else return fovToPoint > -fov;
     }
 
+    public static boolean inFov(float yaw, float fov, final double n2, final double n3) {
+        fov *= 0.5F;
+        final double fovToPoint = getFov(yaw, n2, n3);
+        if (fovToPoint > 0.0) {
+            return fovToPoint < fov;
+        } else return fovToPoint > -fov;
+    }
+
     public static @Range(from = -180, to = 180) double getFov(final double posX, final double posZ) {
-        return MathHelper.wrapAngleTo180_double((mc.thePlayer.rotationYaw - RotationUtils.angle(posX, posZ)) % 360.0f);
+        return getFov(mc.thePlayer.rotationYaw, posX, posZ);
+    }
+
+    public static @Range(from = -180, to = 180) double getFov(final float yaw, final double posX, final double posZ) {
+        return MathHelper.wrapAngleTo180_double((yaw - RotationUtils.angle(posX, posZ)) % 360.0f);
     }
 
     public static void sendMessage(String txt) {

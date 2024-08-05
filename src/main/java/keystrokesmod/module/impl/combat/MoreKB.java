@@ -26,6 +26,7 @@ public class MoreKB extends Module {
     private final SliderSetting rePressDelay;
     private long lastFinish = -1;
     private final ButtonSetting playersOnly;
+    private final ButtonSetting notWhileRunner;
     private final ButtonSetting sprintReset;
     private final ButtonSetting sneak;
 
@@ -39,6 +40,7 @@ public class MoreKB extends Module {
         this.registerSetting(delay = new SliderSetting("Delay", 500, 200, 750, 1, "ms"));
         this.registerSetting(rePressDelay = new SliderSetting("Re-press delay", 100, 1, 500, 1, "ms"));
         this.registerSetting(playersOnly = new ButtonSetting("Players only", true));
+        this.registerSetting(notWhileRunner = new ButtonSetting("Not while runner", false));
         this.registerSetting(sprintReset = new ButtonSetting("Sprint reset", true));
         this.registerSetting(sneak = new ButtonSetting("Sneak", false));
     }
@@ -60,6 +62,7 @@ public class MoreKB extends Module {
         final long currentTimeMillis = System.currentTimeMillis();
         if (!Utils.nullCheck() || event.entityPlayer != mc.thePlayer || currentTimeMillis - lastFinish < delay.getInput()) return;
         if (playersOnly.isToggled() && !(event.target instanceof EntityPlayer)) return;
+        if (notWhileRunner.isToggled() && !Utils.inFov(180, event.target, mc.thePlayer)) return;
         else if (!(event.target instanceof EntityLivingBase)) return;
         if (((EntityLivingBase) event.target).deathTime != 0) return;
         if (AntiBot.isBot(event.target)) return;
