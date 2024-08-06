@@ -8,6 +8,7 @@ import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.ModeValue;
 import keystrokesmod.utility.Utils;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.util.MovingObjectPosition;
 import net.minecraftforge.event.entity.player.AttackEntityEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -24,6 +25,7 @@ public class TargetHUD extends Module {
     public static int current$minY;
     public static int current$maxY;
     private static @Nullable EntityLivingBase target = null;
+    private long lastKillAuraTime = -1;
 
     public TargetHUD() {
         super("TargetHUD", category.render);
@@ -42,6 +44,7 @@ public class TargetHUD extends Module {
         mode.disable();
 
         target = null;
+        lastKillAuraTime = -1;
     }
 
     @Override
@@ -51,8 +54,16 @@ public class TargetHUD extends Module {
             return;
         }
 
-        if (KillAura.target != null)
+        if (KillAura.target != null) {
             target = KillAura.target;
+            lastKillAuraTime = System.currentTimeMillis();
+        }
+
+        if (lastKillAuraTime != -1 && System.currentTimeMillis() - lastKillAuraTime > 1000) {
+            target = null;
+            lastKillAuraTime = -1;
+        }
+
 
         if (onlyKillAura.isToggled()) return;
 
@@ -60,6 +71,13 @@ public class TargetHUD extends Module {
         if (target != null) {
             if (!Utils.inFov(180, target) || target.getDistanceSqToEntity(mc.thePlayer) > 36) {
                 target = null;
+            }
+        } else {
+            if (mc.objectMouseOver != null
+                    && mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY
+                    && mc.objectMouseOver.entityHit instanceof EntityLivingBase) {
+                target = (EntityLivingBase) mc.objectMouseOver.entityHit;
+                lastKillAuraTime = System.currentTimeMillis();
             }
         }
     }
