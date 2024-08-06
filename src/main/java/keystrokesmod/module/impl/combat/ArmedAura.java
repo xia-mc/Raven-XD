@@ -88,9 +88,9 @@ public class ArmedAura extends IAutoClicker {
         this.registerSetting(drawPos = new ButtonSetting("Draw pos", false, prediction::isToggled));
         this.registerSetting(autoSwitch = new ButtonSetting("Auto switch", true));
         this.registerSetting(lookView = new ButtonSetting("Look view", false));
-        this.registerSetting(rapidFire = new ButtonSetting("Fast fire", false, autoSwitch::isToggled));
-        this.registerSetting(rapidFireLegit = new ButtonSetting("Fast fire Legit", false, () -> autoSwitch.isToggled() && rapidFire.isToggled()));
-        this.registerSetting(rapidFireAmount = new SliderSetting("Fast fire amount", 1, 1, 4, 1, () -> autoSwitch.isToggled() && rapidFire.isToggled() && !rapidFireLegit.isToggled()));
+        this.registerSetting(rapidFire = new ButtonSetting("Rapid fire", false, autoSwitch::isToggled));
+        this.registerSetting(rapidFireLegit = new ButtonSetting("Rapid fire Legit", false, () -> autoSwitch.isToggled() && rapidFire.isToggled()));
+        this.registerSetting(rapidFireAmount = new SliderSetting("Rapid fire amount", 1, 1, 4, 1, () -> autoSwitch.isToggled() && rapidFire.isToggled() && !rapidFireLegit.isToggled()));
         this.registerSetting(targetPlayers = new ButtonSetting("Target players", true));
         this.registerSetting(targetEntities = new ButtonSetting("Target entities", false));
         this.registerSetting(targetInvisible = new ButtonSetting("Target invisible", false));
@@ -123,7 +123,7 @@ public class ArmedAura extends IAutoClicker {
                     .filter(p -> p.getDistanceToEntity(mc.thePlayer) < range.getInput())
                     .filter(p -> fov.getInput() == 360 || Utils.inFov((float) fov.getInput(), p))
                     .map(p -> new Pair<>(p, getHitPos(p, new Vec3(p.motionX, p.motionY, p.motionZ))))
-                    .map(pair -> new Pair<>(pair, Triple.of(pair.second().distanceTo(pair.second()), PlayerRotation.getYaw(pair.second()), PlayerRotation.getPitch(pair.second()))))
+                    .map(pair -> new Pair<>(pair, Triple.of(pair.second().distanceTo(Utils.getEyePos()), PlayerRotation.getYaw(pair.second()), PlayerRotation.getPitch(pair.second()))))
                     .filter(pair -> RotationUtils.rayCast(pair.second().getLeft(), pair.second().getMiddle(), pair.second().getRight()) == null)
                     .min(fromSortMode());
             if (target.isPresent()) {

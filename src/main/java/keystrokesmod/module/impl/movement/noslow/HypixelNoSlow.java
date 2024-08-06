@@ -33,7 +33,9 @@ public class HypixelNoSlow extends INoSlow {
         if (!mc.thePlayer.isUsingItem() || SlotHandler.getHeldItem() == null) return;
 
         if (SlotHandler.getHeldItem().getItem() instanceof ItemSword) {
-            PacketUtils.sendPacket(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.UP));
+            if (mc.thePlayer.ticksExisted % 3 == 0) {
+                PacketUtils.sendPacket(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.UP));
+            }
         } else {
             if (mc.thePlayer.ticksExisted % 3 == 0 && !Raven.badPacketsHandler.C07) {
                 PacketUtils.sendPacket(new C08PacketPlayerBlockPlacement(new BlockPos(-1, -1, -1), 1, null, 0, 0, 0));
