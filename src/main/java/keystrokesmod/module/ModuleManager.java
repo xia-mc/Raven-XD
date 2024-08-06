@@ -111,6 +111,7 @@ public class ModuleManager {
     public static ProjectileAimBot projectileAimBot;
     public static AutoWeb autoWeb;
     public static BlockOut blockOut;
+    public static GhostBlock ghostBlock;
 
     public void register() {
 
@@ -277,6 +278,7 @@ public class ModuleManager {
         this.addModule(modSpoofer = new ModSpoofer());
         this.addModule(pingSpoof = new PingSpoof());
         this.addModule(exploitFixer = new ExploitFixer());
+        this.addModule(ghostBlock = new GhostBlock());
 
         // enable
         antiBot.enable();
