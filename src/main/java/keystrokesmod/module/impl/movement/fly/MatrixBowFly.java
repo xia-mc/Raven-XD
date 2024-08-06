@@ -1,6 +1,7 @@
 package keystrokesmod.module.impl.movement.fly;
 
 import keystrokesmod.event.MoveEvent;
+import keystrokesmod.event.PreVelocityEvent;
 import keystrokesmod.event.ReceivePacketEvent;
 import keystrokesmod.event.RotationEvent;
 import keystrokesmod.module.impl.movement.Fly;
@@ -17,14 +18,15 @@ import org.jetbrains.annotations.NotNull;
 public class MatrixBowFly extends SubMode<Fly> {
     private float yaw;
 
+
     public MatrixBowFly(String name, @NotNull Fly parent) {
         super(name, parent);
     }
 
     @SubscribeEvent
     public void onRotation(@NotNull RotationEvent event) {
-        event.setPitch(-90);
-        event.setYaw(yaw);
+        event.setPitch(-85);
+        event.setYaw(yaw + 180);
     }
 
     @Override
@@ -33,22 +35,18 @@ public class MatrixBowFly extends SubMode<Fly> {
     }
 
     @SubscribeEvent
-    public void onReceivePacket(@NotNull ReceivePacketEvent event) {
-        if (event.getPacket() instanceof S12PacketEntityVelocity) {
-            final S12PacketEntityVelocity packet = (S12PacketEntityVelocity) event.getPacket();
-            if (packet.getEntityID() == mc.thePlayer.getEntityId()) {
-                event.setCanceled(true);
-                yaw = mc.thePlayer.rotationYaw;  // because we have set the rotation yaw on RotationEvent.
-                MoveUtil.strafe(Math.hypot(packet.getMotionX(), packet.getMotionZ()));
-                mc.thePlayer.motionY = Math.abs(packet.getMotionY());
-            }
-        }
+    public void onPreVelocity(@NotNull PreVelocityEvent event) {
+        event.setCanceled(true);
+        yaw = mc.thePlayer.rotationYaw;  // because we have set the rotation yaw on RotationEvent.
+        mc.thePlayer.motionY = Math.abs(event.getMotionY() / 8000);
+        MoveUtil.strafe(Math.hypot(event.getMotionX() / 8000.0, event.getMotionZ() / 8000.0));
     }
 
     @SubscribeEvent
     public void onMove(@NotNull MoveEvent event) {
-        if (mc.thePlayer.hurtTime < 3) {
+        if (mc.thePlayer.hurtTime == 0) {
             event.setCanceled(true);
+            mc.thePlayer.motionY = 0;
         }
     }
 

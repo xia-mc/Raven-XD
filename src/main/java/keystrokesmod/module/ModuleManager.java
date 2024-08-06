@@ -112,6 +112,7 @@ public class ModuleManager {
     public static AutoWeb autoWeb;
     public static BlockOut blockOut;
     public static GhostBlock ghostBlock;
+    public static AirStuck airStuck;
 
     public void register() {
 
@@ -146,6 +147,7 @@ public class ModuleManager {
         this.addModule(timerRange = new TimerRange());
         this.addModule(velocity = new Velocity());
         this.addModule(projectileAimBot = new ProjectileAimBot());
+        this.addModule(airStuck = new AirStuck());
 
         // fun
         this.addModule(new ExtraBobbing());

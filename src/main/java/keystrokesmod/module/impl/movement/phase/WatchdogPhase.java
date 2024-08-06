@@ -81,7 +81,7 @@ public class WatchdogPhase extends SubMode<Phase> {
     @SubscribeEvent
     public void onBlockAABB(BlockAABBEvent event) {
         if (this.phase) {
-            if (exceptGround.isToggled() && event.getBlockPos().equals(new BlockPos(mc.thePlayer).down()))
+            if (exceptGround.isToggled() && event.getBlockPos().getY() < mc.thePlayer.posY)
                 return;
             event.setBoundingBox(null);
         }
