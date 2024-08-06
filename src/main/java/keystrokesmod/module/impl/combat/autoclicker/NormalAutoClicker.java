@@ -1,6 +1,5 @@
 package keystrokesmod.module.impl.combat.autoclicker;
 
-import keystrokesmod.module.impl.combat.HitSelect;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.impl.SubMode;
