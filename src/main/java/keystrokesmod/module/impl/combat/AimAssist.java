@@ -11,7 +11,7 @@ public class AimAssist extends Module {
     public AimAssist() {
         super("AimAssist", category.combat, "Smoothly aims to closet valid target");
         this.registerSetting(mode = new ModeValue("Mode", this)
-                .add(new OriginalAimAssist("Normal", this))
+                .add(new NormalAimAssist("Normal", this))
                 .add(new TejasAssist("Tejas", this))
                 .setDefaultValue("Original"));
     }

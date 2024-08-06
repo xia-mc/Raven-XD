@@ -23,29 +23,51 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class OriginalAimAssist extends SubMode<AimAssist> {
-   private final ButtonSetting clickAim, aimWhileOnTarget, strafeIncrease, checkBlockBreak, aimVertically, weaponOnly, ignoreTeammates, throughBlock;
-private final SliderSetting verticalSpeed, horizontalSpeed, maxAngle, distance;
-private Double yawNoise = null;
-private Double pitchNoise = null;
-private long nextNoiseRefreshTime = -1;
-private long nextNoiseEmptyTime = 200;
+public class NormalAimAssist extends SubMode<AimAssist> {
+    private final ButtonSetting clickAim, aimWhileOnTarget, strafeIncrease, checkBlockBreak, aimVertically, weaponOnly, ignoreTeammates, throughBlock;
+    private final SliderSetting verticalSpeed, horizontalSpeed, maxAngle, distance;
+    private Double yawNoise = null;
+    private Double pitchNoise = null;
+    private long nextNoiseRefreshTime = -1;
+    private long nextNoiseEmptyTime = 200;
 
-public OriginalAimAssist(String name, AimAssist parent) {
-    super(name, parent);
-    this.registerSetting(clickAim = new ButtonSetting("Click aim", true));
-    this.registerSetting(aimWhileOnTarget = new ButtonSetting("Aim while on target", true));
-    this.registerSetting(strafeIncrease = new ButtonSetting("Strafe increase", false));
-    this.registerSetting(checkBlockBreak = new ButtonSetting("Check block break", true));
-    this.registerSetting(aimVertically = new ButtonSetting("Aim vertically", false));
-    this.registerSetting(verticalSpeed = new SliderSetting("Vertical speed", 5, 1, 10, 0.1, aimVertically::isToggled));
-    this.registerSetting(horizontalSpeed = new SliderSetting("Horizontal speed", 5, 1, 10, 0.1));
-    this.registerSetting(maxAngle = new SliderSetting("Max angle", 180, 1, 360, 5));
-    this.registerSetting(distance = new SliderSetting("Distance", 5, 1, 8, 0.1));
-    this.registerSetting(weaponOnly = new ButtonSetting("Weapon only", false));
-    this.registerSetting(ignoreTeammates = new ButtonSetting("Ignore teammates", false));
-    this.registerSetting(throughBlock = new ButtonSetting("Through block", true));
-}
+    public NormalAimAssist(String name, AimAssist parent) {
+        super(name, parent);
+        this.registerSetting(clickAim = new ButtonSetting("Click aim", true));
+        this.registerSetting(aimWhileOnTarget = new ButtonSetting("Aim while on target", true));
+        this.registerSetting(strafeIncrease = new ButtonSetting("Strafe increase", false));
+        this.registerSetting(checkBlockBreak = new ButtonSetting("Check block break", true));
+        this.registerSetting(aimVertically = new ButtonSetting("Aim vertically", false));
+        this.registerSetting(verticalSpeed = new SliderSetting("Vertical speed", 5, 1, 20, 0.1, aimVertically::isToggled));
+        this.registerSetting(horizontalSpeed = new SliderSetting("Horizontal speed", 5, 1, 20, 0.1));
+        this.registerSetting(maxAngle = new SliderSetting("Max angle", 180, 1, 360, 5));
+        this.registerSetting(distance = new SliderSetting("Distance", 5, 1, 8, 0.1));
+        this.registerSetting(weaponOnly = new ButtonSetting("Weapon only", false));
+        this.registerSetting(ignoreTeammates = new ButtonSetting("Ignore teammates", false));
+        this.registerSetting(throughBlock = new ButtonSetting("Through block", true));
+    }
+
+    @Contract("_, _ -> new")
+    private static @NotNull Pair<Float, Float> sortYaw(final float yaw1, final float yaw2) {
+        final float fixedYaw1 = fixYaw(yaw1);
+        final float fixedYaw2 = fixYaw(yaw2);
+
+        if (fixedYaw1 < fixedYaw2) {
+            return new Pair<>(yaw1, yaw2);
+        } else {
+            return new Pair<>(yaw2, yaw1);
+        }
+    }
+
+    private static float fixYaw(float yaw) {
+        while (yaw < 0) {
+            yaw += 360;
+        }
+        while (yaw > 360) {
+            yaw -= 360;
+        }
+        return yaw;
+    }
 
     @Override
     public void onDisable() {
@@ -148,28 +170,6 @@ public OriginalAimAssist(String name, AimAssist parent) {
                 sortYaw(yaw1, yaw2),
                 new Pair<>(Math.min(pitch1, pitch2), Math.max(pitch1, pitch2))
         );
-    }
-
-    @Contract("_, _ -> new")
-    private static @NotNull Pair<Float, Float> sortYaw(final float yaw1, final float yaw2) {
-        final float fixedYaw1 = fixYaw(yaw1);
-        final float fixedYaw2 = fixYaw(yaw2);
-
-        if (fixedYaw1 < fixedYaw2) {
-            return new Pair<>(yaw1, yaw2);
-        } else {
-            return new Pair<>(yaw2, yaw1);
-        }
-    }
-
-    private static float fixYaw(float yaw) {
-        while (yaw < 0) {
-            yaw += 360;
-        }
-        while (yaw > 360) {
-            yaw -= 360;
-        }
-        return yaw;
     }
 
     private boolean noAction() {
