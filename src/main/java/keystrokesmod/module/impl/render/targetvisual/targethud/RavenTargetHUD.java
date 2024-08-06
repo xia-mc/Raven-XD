@@ -7,10 +7,6 @@ import keystrokesmod.module.setting.impl.ModeSetting;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.Theme;
 import keystrokesmod.utility.Utils;
-import keystrokesmod.utility.font.FontManager;
-import keystrokesmod.utility.font.IFont;
-import keystrokesmod.utility.render.Animation;
-import keystrokesmod.utility.render.Easing;
 import keystrokesmod.utility.render.RenderUtils;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
@@ -23,47 +19,30 @@ import static keystrokesmod.module.impl.render.TargetHUD.*;
 
 public class RavenTargetHUD extends SubMode<TargetHUD> implements ITargetVisual {
     private final ModeSetting theme;
-    private final ModeSetting font;
     private final ButtonSetting showStatus;
     private final ButtonSetting healthColor;
-    private final Animation healthBarAnimation = new Animation(Easing.EASE_OUT_CIRC, 150);
 
     public RavenTargetHUD(String name, @NotNull TargetHUD parent) {
         super(name, parent);
         this.registerSetting(theme = new ModeSetting("Theme", Theme.themes, 0));
-        this.registerSetting(font = new ModeSetting("Font", new String[]{"Minecraft", "ProductSans", "Regular"}, 0));
         this.registerSetting(showStatus = new ButtonSetting("Show win or loss", true));
         this.registerSetting(healthColor = new ButtonSetting("Traditional health color", false));
     }
 
-    private IFont getFont() {
-        switch ((int) font.getInput()) {
-            default:
-            case 0:
-                return FontManager.getMinecraft();
-            case 1:
-                return FontManager.productSansMedium;
-            case 2:
-                return FontManager.regular22;
-        }
-    }
-
     @Override
     public void render(@NotNull EntityLivingBase target) {
-        String name = target.getDisplayName().getFormattedText();
-        String healthText = " " + (int) target.getHealth();
-        float health = Utils.limit(target.getHealth() / target.getMaxHealth(), 0, 1);
+        String string = target.getDisplayName().getFormattedText();
+        float health = target.getHealth() / target.getMaxHealth();
         if (Float.isInfinite(health) || Float.isNaN(health)) {
             health = 0;
         }
 
         if (showStatus.isToggled()) {
-            healthText = healthText + " " + ((health <= Utils.getCompleteHealth(mc.thePlayer) / mc.thePlayer.getMaxHealth()) ? "§aW" : "§cL");
+            string = string + " " + ((health <= Utils.getCompleteHealth(mc.thePlayer) / mc.thePlayer.getMaxHealth()) ? "§aW" : "§cL");
         }
-
         final ScaledResolution scaledResolution = new ScaledResolution(mc);
         final int n2 = 8;
-        final int n3 = mc.fontRendererObj.getStringWidth(name + healthText) + n2;
+        final int n3 = mc.fontRendererObj.getStringWidth(string) + n2;
         final int n4 = scaledResolution.getScaledWidth() / 2 - n3 / 2 + posX;
         final int n5 = scaledResolution.getScaledHeight() / 2 + 15 + posY;
         current$minX = n4 - n2;
@@ -81,13 +60,10 @@ public class RavenTargetHUD extends SubMode<TargetHUD> implements ITargetVisual 
         int k = Utils.merge(array[0], n12);
         int n16 = Utils.merge(array[1], n12);
         float healthBar = (float) (int) (n14 + (n13 - n14) * (1.0 - ((health < 0.05) ? 0.05 : health)));
-
         if (healthBar - n13 < 3) { // if goes below, the rounded health bar glitches out
             healthBar = n13 + 3;
         }
-
-        healthBarAnimation.run(healthBar);
-        float lastHealthBar = (float) healthBarAnimation.getValue();
+        float lastHealthBar = healthBar;
         if (healthColor.isToggled()) {
             k = n16 = Utils.merge(Utils.getColorForHealth(health), n12);
         }
@@ -95,11 +71,7 @@ public class RavenTargetHUD extends SubMode<TargetHUD> implements ITargetVisual 
         GlStateManager.pushMatrix();
         GlStateManager.enableBlend();
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
-        getFont().drawString(name, (float) n4, (float) n5, (new Color(220, 220, 220, 255).getRGB() & 0xFFFFFF) | Utils.clamp(n10 + 15) << 24, true);
-
-        int healthTextColor = Utils.getColorForHealth(health);
-
-        getFont().drawString(healthText, (float) (n4 + mc.fontRendererObj.getStringWidth(name)), (float) n5, (healthTextColor & 0xFFFFFF) | Utils.clamp(n10 + 15) << 24, true);
+        mc.fontRendererObj.drawString(string, (float) n4, (float) n5, (new Color(220, 220, 220, 255).getRGB() & 0xFFFFFF) | Utils.clamp(n10 + 15) << 24, true);
         GlStateManager.disableBlend();
         GlStateManager.popMatrix();
     }
