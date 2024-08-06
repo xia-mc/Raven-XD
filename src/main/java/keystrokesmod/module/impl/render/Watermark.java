@@ -53,13 +53,13 @@ public class Watermark extends Module {
         final ModeOnly textMode = new ModeOnly(mode, 0);
         final ModeOnly photoMode = new ModeOnly(mode, 1);
         this.registerSetting(watermarkText = new ModeSetting("Watermark text", new String[]{"Default", "Augustus", "Custom", "Sense"}, 0, textMode));
-        this.registerSetting(watermarkPhoto = new ModeSetting("Watermark photo", new String[]{"Enders", "Augustus"}, 0, photoMode));
+        this.registerSetting(watermarkPhoto = new ModeSetting("Watermark photo", new String[]{"Default", "Enders", "Augustus"}, 0, photoMode));
         this.registerSetting(theme = new ModeSetting("Theme", Theme.themes, 0, textMode.extend(new ModeOnly(watermarkText, 2))));
         this.registerSetting(showVersion = new ButtonSetting("Show version", true, textMode));
         this.registerSetting(lowercase = new ButtonSetting("Lowercase", false, textMode));
         this.registerSetting(shadow = new ButtonSetting("Shadow", true, textMode));
 
-        for (String s : Arrays.asList("enders", "augustus")) {
+        for (String s : Arrays.asList("default", "enders", "augustus")) {
             try (InputStream stream = Objects.requireNonNull(Raven.class.getResourceAsStream("/assets/keystrokesmod/textures/watermarks/" + s + ".png"))) {
                 BufferedImage image = ImageIO.read(stream);
                 WATERMARK.put(s, Minecraft.getMinecraft().renderEngine.getDynamicTextureLocation(s, new DynamicTexture(image)));
@@ -112,10 +112,13 @@ public class Watermark extends Module {
             case 1:
                 switch ((int) watermarkPhoto.getInput()) {
                     case 0:
-                        RenderUtils.drawImage(WATERMARK.get("enders"), posX, posY, 150, 45, new Color(255, 255, 255));
+                        RenderUtils.drawImage(WATERMARK.get("default"), posX, posY, 50, 50, new Color(255, 255, 255));
                         break;
                     case 1:
-                        RenderUtils.drawImage(WATERMARK.get("augustus"), posX, posY, 50, 50, new Color(255, 255, 255));
+                        RenderUtils.drawImage(WATERMARK.get("enders"), posX, posY, 150, 45, new Color(255, 255, 255));
+                        break;
+                    case 2:
+                        RenderUtils.drawImage(WATERMARK.get("augustus"), posX, posY, 60, 60, new Color(255, 255, 255));
                         break;
                 }
             break;

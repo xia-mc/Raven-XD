@@ -53,5 +53,8 @@ public class Sprint extends Module {
                 event.setYaw(event.getYaw() + Move.fromMovement(mc.thePlayer.moveForward, mc.thePlayer.moveStrafing).getDeltaYaw());
                 break;
         }
+
+        if (MoveUtil.isMoving())
+            mc.thePlayer.setSprinting(true);
     }
 }
