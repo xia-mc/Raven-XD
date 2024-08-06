@@ -145,8 +145,8 @@ public class ArmedAura extends IAutoClicker {
                         switchedTarget.add(target.get().first().first());
                         lastSwitched = time;
                     }
+                    targeted = true;
                 }
-                targeted = true;
             } else {
                 if (!switchedTarget.isEmpty()) {
                     switchedTarget.clear();
