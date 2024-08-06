@@ -51,8 +51,7 @@ public class HypixelNoSlow extends INoSlow {
                     0, 0, 0
             ));
 
-        } else if (item != null && mc.thePlayer.isUsingItem()
-                && (ContainerUtils.isRest(item.getItem()) || item.getItem() instanceof ItemBow)) {
+        } else if (item != null && mc.thePlayer.isUsingItem()) {
             event.setPosY(event.getPosY() + 1E-14);
         }
     }
