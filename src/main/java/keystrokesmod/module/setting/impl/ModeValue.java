@@ -125,4 +125,8 @@ public class ModeValue extends Setting implements InputSetting {
     public void disable() {
         this.subModes.get(selected).disable();
     }
+
+    public SubMode<?> getSelected() {
+        return getSubModeValues().get((int) getInput());
+    }
 }
