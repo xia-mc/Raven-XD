@@ -3,32 +3,30 @@ package keystrokesmod.module.impl.render;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.combat.KillAura;
 import keystrokesmod.module.impl.render.targetvisual.ITargetVisual;
-import keystrokesmod.module.impl.render.targetvisual.targethud.RavenTargetHUD;
+import keystrokesmod.module.impl.render.targetvisual.targetesp.JelloTargetESP;
+import keystrokesmod.module.impl.render.targetvisual.targetesp.RavenTargetESP;
+import keystrokesmod.module.impl.render.targetvisual.targetesp.VapeTargetESP;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.ModeValue;
 import keystrokesmod.utility.Utils;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.event.entity.player.AttackEntityEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.jetbrains.annotations.Nullable;
 
-public class TargetHUD extends Module {
-    public static int posX = 70;
-    public static int posY = 30;
-    private static ModeValue mode;
+public class TargetESP extends Module {
+    private final ModeValue mode;
     private final ButtonSetting onlyKillAura;
 
-    public static int current$minX;
-    public static int current$maxX;
-    public static int current$minY;
-    public static int current$maxY;
     private static @Nullable EntityLivingBase target = null;
 
-    public TargetHUD() {
-        super("TargetHUD", category.render);
+    public TargetESP() {
+        super("TargetESP", category.render);
         this.registerSetting(mode = new ModeValue("Mode", this)
-                .add(new RavenTargetHUD("Raven", this))
+                .add(new RavenTargetESP("Raven", this))
+                .add(new JelloTargetESP("Jello", this))
+                .add(new VapeTargetESP("Vape", this))
         );
         this.registerSetting(onlyKillAura = new ButtonSetting("Only killAura", true));
     }
@@ -38,6 +36,7 @@ public class TargetHUD extends Module {
         mode.enable();
     }
 
+    @Override
     public void onDisable() {
         mode.disable();
 
@@ -74,12 +73,8 @@ public class TargetHUD extends Module {
     }
 
     @SubscribeEvent
-    public void onRender(TickEvent.RenderTickEvent event) {
+    public void onRender(RenderWorldLastEvent event) {
         if (target != null)
             ((ITargetVisual) mode.getSubModeValues().get((int) mode.getInput())).render(target);
-    }
-
-    public static void renderExample() {
-        ((ITargetVisual) mode.getSubModeValues().get((int) mode.getInput())).render(mc.thePlayer);
     }
 }

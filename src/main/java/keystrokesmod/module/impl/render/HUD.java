@@ -242,7 +242,7 @@ public class HUD extends Module {
 
         @SubscribeEvent
         public void onRenderTick(RenderTickEvent event) {
-            TargetHUD.drawTargetHUD(null, mc.thePlayer.getName(), 1);
+            TargetHUD.renderExample();
             ModuleManager.watermark.render();
         }
 
