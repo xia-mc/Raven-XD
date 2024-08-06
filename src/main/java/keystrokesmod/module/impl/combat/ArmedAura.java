@@ -173,16 +173,16 @@ public class ArmedAura extends IAutoClicker {
                     final EntityLivingBase second = o2.first().first();
 
                     if (first == second) return 0;
+                    if (second instanceof EntityGiantZombie) {
+                        return 1;
+                    }
+                    if (first instanceof EntityGiantZombie) {
+                        return -1;
+                    }
                     if (second instanceof EntityZombie) {
                         if (second.isChild()) return 1;
                     }
                     if (first instanceof EntityZombie) {
-                        if (first.isChild()) return -1;
-                    }
-                    if (second instanceof EntityGiantZombie) {
-                        if (second.isChild()) return 1;
-                    }
-                    if (first instanceof EntityGiantZombie) {
                         if (first.isChild()) return -1;
                     }
                     return Double.compare(first.getHealth(), second.getHealth());

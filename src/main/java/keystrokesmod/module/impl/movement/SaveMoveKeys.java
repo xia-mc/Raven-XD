@@ -2,13 +2,10 @@ package keystrokesmod.module.impl.movement;
 
 import keystrokesmod.Raven;
 import keystrokesmod.module.Module;
-import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.setting.impl.DescriptionSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.utility.Utils;
 import net.minecraft.client.settings.KeyBinding;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.lwjgl.input.Keyboard;
 
 import java.util.concurrent.TimeUnit;
@@ -29,8 +26,6 @@ public class SaveMoveKeys extends Module {
         } else {
             if (lastInGUI) {
                 Raven.getExecutor().schedule(() -> {
-                    if (!ModuleManager.autoPlay.isEnabled()) return;
-
                     KeyBinding.setKeyBindState(mc.gameSettings.keyBindForward.getKeyCode(), Keyboard.isKeyDown(mc.gameSettings.keyBindForward.getKeyCode()));
                     KeyBinding.setKeyBindState(mc.gameSettings.keyBindBack.getKeyCode(), Keyboard.isKeyDown(mc.gameSettings.keyBindBack.getKeyCode()));
                     KeyBinding.setKeyBindState(mc.gameSettings.keyBindLeft.getKeyCode(), Keyboard.isKeyDown(mc.gameSettings.keyBindLeft.getKeyCode()));
@@ -38,6 +33,13 @@ public class SaveMoveKeys extends Module {
                     KeyBinding.setKeyBindState(mc.gameSettings.keyBindSprint.getKeyCode(), Keyboard.isKeyDown(mc.gameSettings.keyBindSprint.getKeyCode()));
                     KeyBinding.setKeyBindState(mc.gameSettings.keyBindSneak.getKeyCode(), Keyboard.isKeyDown(mc.gameSettings.keyBindSneak.getKeyCode()));
                     KeyBinding.setKeyBindState(mc.gameSettings.keyBindJump.getKeyCode(), Utils.jumpDown());
+                    KeyBinding.onTick(mc.gameSettings.keyBindForward.getKeyCode());
+                    KeyBinding.onTick(mc.gameSettings.keyBindBack.getKeyCode());
+                    KeyBinding.onTick(mc.gameSettings.keyBindLeft.getKeyCode());
+                    KeyBinding.onTick(mc.gameSettings.keyBindRight.getKeyCode());
+                    KeyBinding.onTick(mc.gameSettings.keyBindSprint.getKeyCode());
+                    KeyBinding.onTick(mc.gameSettings.keyBindSneak.getKeyCode());
+                    KeyBinding.onTick(mc.gameSettings.keyBindJump.getKeyCode());
                 }, (long) delay.getInput(), TimeUnit.MILLISECONDS);
             }
 

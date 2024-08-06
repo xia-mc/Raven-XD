@@ -181,6 +181,7 @@ public class ModuleManager {
         this.addModule(wallClimb = new WallClimb());
         this.addModule(jesus = new Jesus());
         this.addModule(noWeb = new NoWeb());
+        this.addModule(new SaveMoveKeys());
 
         // other
         this.addModule(new Anticheat());
