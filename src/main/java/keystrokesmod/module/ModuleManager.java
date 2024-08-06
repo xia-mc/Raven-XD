@@ -113,6 +113,7 @@ public class ModuleManager {
     public static BlockOut blockOut;
     public static GhostBlock ghostBlock;
     public static AirStuck airStuck;
+    public static TargetHUD targetHUD;
     public static TargetESP targetESP;
 
     public void register() {
@@ -250,7 +251,7 @@ public class ModuleManager {
         this.addModule(potions = new Potions());
         this.addModule(new Radar());
         this.addModule(new Shaders());
-        this.addModule(new TargetHUD());
+        this.addModule(targetHUD = new TargetHUD());
         this.addModule(targetESP = new TargetESP());
         this.addModule(new Tracers());
         this.addModule(new Trajectories());

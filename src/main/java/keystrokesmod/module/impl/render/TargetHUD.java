@@ -3,10 +3,13 @@ package keystrokesmod.module.impl.render;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.combat.KillAura;
 import keystrokesmod.module.impl.render.targetvisual.ITargetVisual;
+import keystrokesmod.module.impl.render.targetvisual.targethud.ExhibitionTargetHUD;
 import keystrokesmod.module.impl.render.targetvisual.targethud.RavenTargetHUD;
+import keystrokesmod.module.impl.render.targetvisual.targethud.WurstTargetHUD;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.ModeValue;
 import keystrokesmod.utility.Utils;
+import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraftforge.event.entity.player.AttackEntityEvent;
@@ -31,6 +34,8 @@ public class TargetHUD extends Module {
         super("TargetHUD", category.render);
         this.registerSetting(mode = new ModeValue("Mode", this)
                 .add(new RavenTargetHUD("Raven", this))
+                .add(new ExhibitionTargetHUD("Exhibition", this))
+                .add(new WurstTargetHUD("Wurst", this))
         );
         this.registerSetting(onlyKillAura = new ButtonSetting("Only killAura", true));
     }
@@ -93,11 +98,26 @@ public class TargetHUD extends Module {
 
     @SubscribeEvent
     public void onRender(TickEvent.RenderTickEvent event) {
-        if (target != null)
+        render(target);
+    }
+
+    private static void render(EntityLivingBase target) {
+        if (target != null) {
+            final ScaledResolution scaledResolution = new ScaledResolution(mc);
+            final int n2 = 8;
+            final int n3 = mc.fontRendererObj.getStringWidth(target.getDisplayName().getFormattedText()) + n2;
+            final int n4 = scaledResolution.getScaledWidth() / 2 - n3 / 2 + posX;
+            final int n5 = scaledResolution.getScaledHeight() / 2 + 15 + posY;
+            current$minX = n4 - n2;
+            current$minY = n5 - n2;
+            current$maxX = n4 + n3;
+            current$maxY = n5 + (mc.fontRendererObj.FONT_HEIGHT + 5) - 6 + n2;
+
             ((ITargetVisual) mode.getSubModeValues().get((int) mode.getInput())).render(target);
+        }
     }
 
     public static void renderExample() {
-        ((ITargetVisual) mode.getSubModeValues().get((int) mode.getInput())).render(mc.thePlayer);
+        render(mc.thePlayer);
     }
 }

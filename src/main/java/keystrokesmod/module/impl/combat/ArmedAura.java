@@ -124,7 +124,7 @@ public class ArmedAura extends IAutoClicker {
                     .filter(p -> fov.getInput() == 360 || Utils.inFov((float) fov.getInput(), p))
                     .map(p -> new Pair<>(p, getHitPos(p, new Vec3(p.motionX, p.motionY, p.motionZ))))
                     .map(pair -> new Pair<>(pair, Triple.of(pair.second().distanceTo(Utils.getEyePos()), PlayerRotation.getYaw(pair.second()), PlayerRotation.getPitch(pair.second()))))
-                    .filter(pair -> RotationUtils.rayCast(pair.second().getLeft(), pair.second().getMiddle(), pair.second().getRight()) == null)
+                    .filter(pair -> RotationUtils.isMouseOver(pair.second().getMiddle(), pair.second().getRight(), pair.first().first(), pair.second().getLeft().floatValue()))
                     .min(fromSortMode());
             if (target.isPresent()) {
                 if (SlotHandler.getHeldItem() != null && SlotHandler.getHeldItem().getItem() instanceof ItemHoe) {

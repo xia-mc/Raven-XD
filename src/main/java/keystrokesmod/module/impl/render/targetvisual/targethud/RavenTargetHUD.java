@@ -7,8 +7,9 @@ import keystrokesmod.module.setting.impl.ModeSetting;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.Theme;
 import keystrokesmod.utility.Utils;
+import keystrokesmod.utility.font.FontManager;
+import keystrokesmod.utility.font.IFont;
 import keystrokesmod.utility.render.RenderUtils;
-import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.EntityLivingBase;
 import org.jetbrains.annotations.NotNull;
@@ -19,14 +20,28 @@ import static keystrokesmod.module.impl.render.TargetHUD.*;
 
 public class RavenTargetHUD extends SubMode<TargetHUD> implements ITargetVisual {
     private final ModeSetting theme;
+    private final ModeSetting font;
     private final ButtonSetting showStatus;
     private final ButtonSetting healthColor;
 
     public RavenTargetHUD(String name, @NotNull TargetHUD parent) {
         super(name, parent);
         this.registerSetting(theme = new ModeSetting("Theme", Theme.themes, 0));
+        this.registerSetting(font = new ModeSetting("Font", new String[]{"Minecraft", "ProductSans", "Regular"}, 0));
         this.registerSetting(showStatus = new ButtonSetting("Show win or loss", true));
         this.registerSetting(healthColor = new ButtonSetting("Traditional health color", false));
+    }
+
+    private IFont getFont() {
+        switch ((int) font.getInput()) {
+            default:
+            case 0:
+                return FontManager.getMinecraft();
+            case 1:
+                return FontManager.productSansMedium;
+            case 2:
+                return FontManager.regular22;
+        }
     }
 
     @Override
@@ -40,15 +55,6 @@ public class RavenTargetHUD extends SubMode<TargetHUD> implements ITargetVisual 
         if (showStatus.isToggled()) {
             string = string + " " + ((health <= Utils.getCompleteHealth(mc.thePlayer) / mc.thePlayer.getMaxHealth()) ? "§aW" : "§cL");
         }
-        final ScaledResolution scaledResolution = new ScaledResolution(mc);
-        final int n2 = 8;
-        final int n3 = mc.fontRendererObj.getStringWidth(string) + n2;
-        final int n4 = scaledResolution.getScaledWidth() / 2 - n3 / 2 + posX;
-        final int n5 = scaledResolution.getScaledHeight() / 2 + 15 + posY;
-        current$minX = n4 - n2;
-        current$minY = n5 - n2;
-        current$maxX = n4 + n3;
-        current$maxY = n5 + (mc.fontRendererObj.FONT_HEIGHT + 5) - 6 + n2;
         final int n10 = 255;
         final int n11 = Math.min(n10, 110);
         final int n12 = Math.min(n10, 210);
@@ -71,7 +77,7 @@ public class RavenTargetHUD extends SubMode<TargetHUD> implements ITargetVisual 
         GlStateManager.pushMatrix();
         GlStateManager.enableBlend();
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
-        mc.fontRendererObj.drawString(string, (float) n4, (float) n5, (new Color(220, 220, 220, 255).getRGB() & 0xFFFFFF) | Utils.clamp(n10 + 15) << 24, true);
+        getFont().drawString(string, (float) current$minX + 8, (float) current$minY + 8, (new Color(220, 220, 220, 255).getRGB() & 0xFFFFFF) | Utils.clamp(n10 + 15) << 24, true);
         GlStateManager.disableBlend();
         GlStateManager.popMatrix();
     }

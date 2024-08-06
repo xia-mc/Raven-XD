@@ -17,6 +17,7 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.ResourceLocation;
@@ -947,6 +948,23 @@ public class RenderUtils {
         for (String s : split) {
             font.drawString(s, x + 6, y + height - 1, FontRenderer.CenterMode.NONE, false, TOOLTIP_TEXT);
             y += (int) Math.round(height);
+        }
+    }
+
+    public static void renderItemIcon(final double x, final double y, final ItemStack itemStack) {
+        if (itemStack != null) {
+            GlStateManager.pushMatrix();
+            GlStateManager.enableRescaleNormal();
+            GlStateManager.enableBlend();
+            GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
+            RenderHelper.enableGUIStandardItemLighting();
+
+            mc.getRenderItem().renderItemAndEffectIntoGUI(itemStack, (int) x, (int) y);
+
+            GlStateManager.disableRescaleNormal();
+            GlStateManager.disableBlend();
+            RenderHelper.disableStandardItemLighting();
+            GlStateManager.popMatrix();
         }
     }
 }
