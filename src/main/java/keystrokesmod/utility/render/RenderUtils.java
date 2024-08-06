@@ -233,7 +233,7 @@ public class RenderUtils {
                 int i;
                 if (type == 4) {
                     EntityLivingBase en = (EntityLivingBase) e;
-                    double r = en.getHealth() / en.getMaxHealth();
+                    double r = Utils.limit(en.getHealth() / en.getMaxHealth(), 0, 1);
                     int b = (int) (74.0D * r);
                     int hc = r < 0.3D ? Color.red.getRGB() : (r < 0.5D ? Color.orange.getRGB() : (r < 0.7D ? Color.yellow.getRGB() : Color.green.getRGB()));
                     GL11.glTranslated(x, y - 0.2D, z);

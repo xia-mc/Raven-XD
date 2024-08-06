@@ -219,10 +219,6 @@ public class Utils {
         return getColorForHealth(entity.getHealth() / entity.getMaxHealth(), completeHealth);
     }
 
-    public static int limit(int current, int min, int max) {
-        return Math.min(Math.max(current, min), max);
-    }
-
     public static int getTool(Block block) {
         float n = 1.0f;
         int n2 = -1;
@@ -1026,5 +1022,21 @@ public class Utils {
             return;
 
         ((GuiScreenAccessor) s).mouseClicked(x, y, 0);
+    }
+
+    public static int limit(int value, int min, int max) {
+        return Math.max(Math.min(value, max), min);
+    }
+
+    public static long limit(long value, long min, long max) {
+        return Math.max(Math.min(value, max), min);
+    }
+
+    public static float limit(float value, float min, float max) {
+        return Math.max(Math.min(value, max), min);
+    }
+
+    public static double limit(double value, double min, double max) {
+        return Math.max(Math.min(value, max), min);
     }
 }

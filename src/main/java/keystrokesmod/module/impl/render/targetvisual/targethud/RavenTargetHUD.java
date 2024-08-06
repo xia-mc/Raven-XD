@@ -32,7 +32,7 @@ public class RavenTargetHUD extends SubMode<TargetHUD> implements ITargetVisual 
     @Override
     public void render(@NotNull EntityLivingBase target) {
         String string = target.getDisplayName().getFormattedText();
-        float health = target.getHealth() / target.getMaxHealth();
+        float health = Utils.limit(target.getHealth() / target.getMaxHealth(), 0, 1);
         if (Float.isInfinite(health) || Float.isNaN(health)) {
             health = 0;
         }
