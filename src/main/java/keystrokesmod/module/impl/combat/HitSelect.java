@@ -5,7 +5,6 @@ import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.ModeSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.utility.MoveUtil;
-import net.minecraft.entity.Entity;
 import net.minecraftforge.event.entity.player.AttackEntityEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -71,7 +70,7 @@ public class HitSelect extends Module {
         }
     }
 
-    public static boolean canAttack(Entity target) {
+    public static boolean canAttack() {
         return canSwing();
     }
 

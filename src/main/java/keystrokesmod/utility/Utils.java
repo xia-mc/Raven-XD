@@ -191,7 +191,7 @@ public class Utils {
     }
 
     public static void attackEntity(Entity e, boolean clientSwing) {
-        boolean attack = HitSelect.canAttack(e);
+        boolean attack = HitSelect.canAttack();
         if (clientSwing) {
             if (attack || HitSelect.canSwing()) mc.thePlayer.swingItem();
         } else {
@@ -201,7 +201,7 @@ public class Utils {
     }
 
     public static void attackEntityNoSwing(Entity e) {
-        if (HitSelect.canAttack(e)) mc.playerController.attackEntity(mc.thePlayer, e);
+        if (HitSelect.canAttack()) mc.playerController.attackEntity(mc.thePlayer, e);
     }
 
     public static void sendRawMessage(String txt) {

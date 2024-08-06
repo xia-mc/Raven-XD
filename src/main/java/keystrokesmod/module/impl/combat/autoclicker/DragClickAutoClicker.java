@@ -4,6 +4,7 @@ import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.Utils;
 import org.jetbrains.annotations.NotNull;
+import org.lwjgl.input.Mouse;
 
 public class DragClickAutoClicker extends SubMode<IAutoClicker> {
     private final SliderSetting minLength = new SliderSetting("Min Length", 17, 1, 50, 1);
@@ -32,7 +33,7 @@ public class DragClickAutoClicker extends SubMode<IAutoClicker> {
 
     @Override
     public void onUpdate() {
-        if (!always && left ? !mc.gameSettings.keyBindAttack.isKeyDown() : !mc.gameSettings.keyBindUseItem.isKeyDown())
+        if (!always && left ? !Mouse.isButtonDown(0) : !Mouse.isButtonDown(1))
             return;
 
         if (nextLength < 0) {

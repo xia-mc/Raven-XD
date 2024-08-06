@@ -6,6 +6,7 @@ import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.CoolDown;
 import keystrokesmod.utility.Utils;
 import org.jetbrains.annotations.NotNull;
+import org.lwjgl.input.Mouse;
 
 public class LowCPSAutoClicker extends SubMode<IAutoClicker> {
     private final SliderSetting minDelay = new SliderSetting("Min Delay", 500, 100, 3000, 100, "ms");
@@ -35,10 +36,10 @@ public class LowCPSAutoClicker extends SubMode<IAutoClicker> {
     @Override
     public void onUpdate() {
         clickStopWatch.setCooldown(nextSwing);
-        if (clickStopWatch.hasFinished() && HitSelect.canAttack(mc.objectMouseOver.entityHit) && mc.currentScreen == null) {
+        if (clickStopWatch.hasFinished()) {
             final long delay = (long) (Utils.randomizeDouble(minDelay.getInput(), maxDelay.getInput()));
 
-            if (mc.gameSettings.keyBindAttack.isKeyDown() || always) {
+            if (Mouse.isButtonDown(0) || always) {
                 ticksDown++;
             } else {
                 ticksDown = 0;
@@ -46,11 +47,11 @@ public class LowCPSAutoClicker extends SubMode<IAutoClicker> {
 
             this.nextSwing = delay;
 
-            if (rightClick && ((mc.gameSettings.keyBindUseItem.isKeyDown() && !mc.gameSettings.keyBindAttack.isKeyDown()) || always)) {
+            if (rightClick && ((Mouse.isButtonDown(1) && !Mouse.isButtonDown(0)) || always)) {
                 parent.click();
             }
 
-            if (leftClick && ticksDown > 1 && (!mc.gameSettings.keyBindUseItem.isKeyDown() || always)) {
+            if (leftClick && ticksDown > 1 && (!Mouse.isButtonDown(1) || always)) {
                 parent.click();
             }
 

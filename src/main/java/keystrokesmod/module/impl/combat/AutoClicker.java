@@ -1,6 +1,7 @@
 package keystrokesmod.module.impl.combat;
 
 import keystrokesmod.event.ClickEvent;
+import keystrokesmod.event.PreMotionEvent;
 import keystrokesmod.mixins.impl.client.MinecraftAccessor;
 import keystrokesmod.mixins.impl.client.PlayerControllerMPAccessor;
 import keystrokesmod.module.impl.combat.autoclicker.DragClickAutoClicker;
@@ -17,6 +18,8 @@ import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
+import java.util.List;
+
 public class AutoClicker extends IAutoClicker {
     private final ModeValue mode;
     private final ButtonSetting breakBlocks;
@@ -26,6 +29,8 @@ public class AutoClicker extends IAutoClicker {
 
     private final CoolDown coolDown = new CoolDown(100);
     private double directionX, directionY;
+
+    private int inventoryClick = 0;
 
     public AutoClicker() {
         super("AutoClicker", category.combat);
@@ -78,21 +83,31 @@ public class AutoClicker extends IAutoClicker {
 
     @Override
     public boolean click() {
-        if (mc.objectMouseOver != null && mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
-            if (breakBlocks.isToggled()) {
-                return false;
-            } else {
-                ((PlayerControllerMPAccessor) mc.playerController).setCurBlockDamageMP(0);
+        if (mc.currentScreen == null && HitSelect.canAttack()) {
+            if (mc.objectMouseOver != null && mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
+                if (breakBlocks.isToggled()) {
+                    return false;
+                } else {
+                    ((PlayerControllerMPAccessor) mc.playerController).setCurBlockDamageMP(0);
+                }
             }
-        }
 
-        if (mc.currentScreen == null) {
             Utils.sendClick(0, true);
             return true;
         } else if (inventoryFill.isToggled() && mc.currentScreen instanceof GuiContainer) {
-            Utils.inventoryClick(mc.currentScreen);
+            inventoryClick++;
             return true;
         }
         return false;
+    }
+
+    @SubscribeEvent
+    public void onPreMotion(PreMotionEvent event) {
+        if (mc.currentScreen instanceof GuiContainer) {
+            for (int i = 0; i < inventoryClick; i++) {
+                Utils.inventoryClick(mc.currentScreen);
+            }
+        }
+        inventoryClick = 0;
     }
 }
