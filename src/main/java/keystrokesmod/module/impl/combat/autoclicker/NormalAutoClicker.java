@@ -1,12 +1,12 @@
 package keystrokesmod.module.impl.combat.autoclicker;
 
-import keystrokesmod.module.impl.combat.HitSelect;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.CoolDown;
 import keystrokesmod.utility.Utils;
 import org.jetbrains.annotations.NotNull;
+import org.lwjgl.input.Mouse;
 
 public class NormalAutoClicker extends SubMode<IAutoClicker> {
     private final SliderSetting minCPS = new SliderSetting("Min CPS", 8, 1, 40, 0.1);
@@ -37,10 +37,10 @@ public class NormalAutoClicker extends SubMode<IAutoClicker> {
     @Override
     public void onUpdate() {
         clickStopWatch.setCooldown(nextSwing);
-        if (clickStopWatch.hasFinished() && HitSelect.canAttack(mc.objectMouseOver.entityHit) && mc.currentScreen == null) {
+        if (clickStopWatch.hasFinished()) {
             final long clicks = (long) (Utils.randomizeDouble(minCPS.getInput(), maxCPS.getInput()));
 
-            if (mc.gameSettings.keyBindAttack.isKeyDown() || always) {
+            if (Mouse.isButtonDown(0) || always) {
                 ticksDown++;
             } else {
                 ticksDown = 0;
@@ -52,7 +52,7 @@ public class NormalAutoClicker extends SubMode<IAutoClicker> {
                 this.nextSwing = 1000 / clicks;
             }
 
-            if (rightClick && ((mc.gameSettings.keyBindUseItem.isKeyDown() && !mc.gameSettings.keyBindAttack.isKeyDown()) || always)) {
+            if (rightClick && ((Mouse.isButtonDown(1) && !Mouse.isButtonDown(0)) || always)) {
                 parent.click();
 
                 if (Math.random() > 0.9) {
@@ -60,7 +60,7 @@ public class NormalAutoClicker extends SubMode<IAutoClicker> {
                 }
             }
 
-            if (leftClick && ticksDown > 1 && (!mc.gameSettings.keyBindUseItem.isKeyDown() || always)) {
+            if (leftClick && ticksDown > 1 && (!Mouse.isButtonDown(1) || always)) {
                 parent.click();
             }
 

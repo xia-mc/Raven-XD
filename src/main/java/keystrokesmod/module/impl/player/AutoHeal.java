@@ -11,6 +11,7 @@ import keystrokesmod.utility.ContainerUtils;
 import keystrokesmod.utility.Utils;
 import net.minecraft.item.ItemSkull;
 import net.minecraft.item.ItemSoup;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
@@ -61,13 +62,16 @@ public class AutoHeal extends Module {
         }
 
         if (lastSwitchTo != -1) {
+            ItemStack stack = SlotHandler.getHeldItem();
+            if (stack == null) return;
+
             if (lastDoneUse == -1) {
                 if (System.currentTimeMillis() - lastSwitchTo < startDelay.getInput()) return;
-                mc.playerController.sendUseItem(mc.thePlayer, mc.theWorld, SlotHandler.getHeldItem());
+                mc.playerController.sendUseItem(mc.thePlayer, mc.theWorld, stack);
                 lastDoneUse = System.currentTimeMillis();
             } else {
                 if (item.getInput() == 1 && autoThrow.isToggled()) {
-                    mc.playerController.sendPacketDropItem(SlotHandler.getHeldItem());
+                    mc.playerController.sendPacketDropItem(stack);
                 }
 
                 if (originalSlot != -1) {

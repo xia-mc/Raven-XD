@@ -1,6 +1,7 @@
 package keystrokesmod.module.impl.movement;
 
 import keystrokesmod.module.Module;
+import keystrokesmod.module.impl.movement.wallclimb.TestWallClimb;
 import keystrokesmod.module.impl.movement.wallclimb.IntaveWallClimb;
 import keystrokesmod.module.impl.movement.wallclimb.VulcanWallClimb;
 import keystrokesmod.module.setting.impl.ModeValue;
@@ -13,7 +14,7 @@ public class WallClimb extends Module {
         this.registerSetting(mode = new ModeValue("Mode", this)
                 .add(new IntaveWallClimb("Intave", this))
                 .add(new VulcanWallClimb("Vulcan", this))
-                .setDefaultValue("Intave")
+                .add(new TestWallClimb("Test", this))
         );
     }
 

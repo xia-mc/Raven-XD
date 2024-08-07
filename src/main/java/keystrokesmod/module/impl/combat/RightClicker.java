@@ -5,14 +5,21 @@ import keystrokesmod.module.impl.combat.autoclicker.DragClickAutoClicker;
 import keystrokesmod.module.impl.combat.autoclicker.IAutoClicker;
 import keystrokesmod.module.impl.combat.autoclicker.NormalAutoClicker;
 import keystrokesmod.module.impl.combat.autoclicker.RecordAutoClicker;
+import keystrokesmod.module.impl.other.SlotHandler;
+import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.ModeSetting;
 import keystrokesmod.module.setting.impl.ModeValue;
+import keystrokesmod.utility.BlockUtils;
+import keystrokesmod.utility.ContainerUtils;
 import keystrokesmod.utility.CoolDown;
 import keystrokesmod.utility.Utils;
+import net.minecraft.item.ItemBlock;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class RightClicker extends IAutoClicker {
     private final ModeValue mode;
+    private final ButtonSetting onlyBlocks;
     private final ModeSetting clickSound;
 
     private final CoolDown coolDown = new CoolDown(100);
@@ -25,6 +32,7 @@ public class RightClicker extends IAutoClicker {
                 .add(new RecordAutoClicker("Record", this, false, false))
                 .setDefaultValue("Normal")
         );
+        this.registerSetting(onlyBlocks = new ButtonSetting("Only blocks", false));
         this.registerSetting(clickSound = new ModeSetting("Click sound", new String[]{"None", "Standard", "Double", "Alan"}, 0));
     }
 
@@ -52,6 +60,13 @@ public class RightClicker extends IAutoClicker {
 
     @Override
     public boolean click() {
+        ItemStack item = SlotHandler.getHeldItem();
+        if (onlyBlocks.isToggled() && (item == null
+                || !(item.getItem() instanceof ItemBlock)
+                || !ContainerUtils.canBePlaced(((ItemBlock) item.getItem())))) {
+            return false;
+        }
+
         Utils.sendClick(1, true);
         return true;
     }

@@ -25,7 +25,7 @@ public abstract class Check {
         violations++;
         if (!Anticheat.getNoAlertBuffer().isToggled())
             if (violations % getAlertBuffer() != 0) return;
-        LogUtils.alert(player.fabricPlayer.getName(), checkName, String.format("(VL:%s)", violations));
+        LogUtils.alert(player.fabricPlayer.getDisplayName().getFormattedText(), checkName, String.format("(VL:%s)", violations));
     }
 
     protected void flag(String extraMsg) {
@@ -35,7 +35,7 @@ public abstract class Check {
         violations++;
         if (!Anticheat.getNoAlertBuffer().isToggled())
             if (violations % getAlertBuffer() != 0) return;
-        LogUtils.alert(player.fabricPlayer.getName(), checkName, String.format("(VL:%s) %s%s", violations, ChatFormatting.GRAY, extraMsg));
+        LogUtils.alert(player.fabricPlayer.getDisplayName().getFormattedText(), checkName, String.format("(VL:%s) %s%s", violations, ChatFormatting.GRAY, extraMsg));
     }
 
     protected void moduleMsg(String msg) {

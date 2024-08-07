@@ -22,7 +22,8 @@ import net.minecraft.entity.item.EntityArmorStand;
 import net.minecraft.entity.monster.EntityGiantZombie;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemHoe;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -58,6 +59,7 @@ public class ArmedAura extends IAutoClicker {
     private final ButtonSetting notWhileKillAura;
 
     private boolean targeted = false;
+    private boolean armed = false;
     private Pair<Pair<EntityLivingBase, Vec3>, Triple<Double, Float, Float>> target = null;
     private int predTicks = 0;
     private net.minecraft.util.Vec3 pos = null;
@@ -66,7 +68,7 @@ public class ArmedAura extends IAutoClicker {
     private long lastSwitched = -1;
 
     public ArmedAura() {
-        super("ArmedAura", category.combat);
+        super("ArmedAura", category.combat, "Auto-aim and fire like CS2 cheats");
         this.registerSetting(clickMode = new ModeValue("Click mode", this)
                 .add(new LowCPSAutoClicker("Normal", this, false, true))
                 .add(new NormalAutoClicker("NormalFast", this, false, true))
@@ -88,9 +90,9 @@ public class ArmedAura extends IAutoClicker {
         this.registerSetting(drawPos = new ButtonSetting("Draw pos", false, prediction::isToggled));
         this.registerSetting(autoSwitch = new ButtonSetting("Auto switch", true));
         this.registerSetting(lookView = new ButtonSetting("Look view", false));
-        this.registerSetting(rapidFire = new ButtonSetting("Fast fire", false, autoSwitch::isToggled));
-        this.registerSetting(rapidFireLegit = new ButtonSetting("Fast fire Legit", false, () -> autoSwitch.isToggled() && rapidFire.isToggled()));
-        this.registerSetting(rapidFireAmount = new SliderSetting("Fast fire amount", 1, 1, 4, 1, () -> autoSwitch.isToggled() && rapidFire.isToggled() && !rapidFireLegit.isToggled()));
+        this.registerSetting(rapidFire = new ButtonSetting("Rapid fire", false, autoSwitch::isToggled));
+        this.registerSetting(rapidFireLegit = new ButtonSetting("Rapid fire Legit", false, () -> autoSwitch.isToggled() && rapidFire.isToggled()));
+        this.registerSetting(rapidFireAmount = new SliderSetting("Rapid fire amount", 1, 1, 4, 1, () -> autoSwitch.isToggled() && rapidFire.isToggled() && !rapidFireLegit.isToggled()));
         this.registerSetting(targetPlayers = new ButtonSetting("Target players", true));
         this.registerSetting(targetEntities = new ButtonSetting("Target entities", false));
         this.registerSetting(targetInvisible = new ButtonSetting("Target invisible", false));
@@ -123,11 +125,11 @@ public class ArmedAura extends IAutoClicker {
                     .filter(p -> p.getDistanceToEntity(mc.thePlayer) < range.getInput())
                     .filter(p -> fov.getInput() == 360 || Utils.inFov((float) fov.getInput(), p))
                     .map(p -> new Pair<>(p, getHitPos(p, new Vec3(p.motionX, p.motionY, p.motionZ))))
-                    .map(pair -> new Pair<>(pair, Triple.of(pair.second().distanceTo(pair.second()), PlayerRotation.getYaw(pair.second()), PlayerRotation.getPitch(pair.second()))))
-                    .filter(pair -> RotationUtils.rayCast(pair.second().getLeft(), pair.second().getMiddle(), pair.second().getRight()) == null)
+                    .map(pair -> new Pair<>(pair, Triple.of(pair.second().distanceTo(Utils.getEyePos()), PlayerRotation.getYaw(pair.second()), PlayerRotation.getPitch(pair.second()))))
+                    .filter(pair -> RotationUtils.isMouseOver(pair.second().getMiddle(), pair.second().getRight(), pair.first().first(), pair.second().getLeft().floatValue()))
                     .min(fromSortMode());
             if (target.isPresent()) {
-                if (SlotHandler.getHeldItem() != null && SlotHandler.getHeldItem().getItem() instanceof ItemHoe) {
+                if (armed) {
                     if (lookView.isToggled()) {
                         mc.thePlayer.rotationYaw = target.get().second().getMiddle();
                         mc.thePlayer.rotationPitch = target.get().second().getRight();
@@ -173,16 +175,16 @@ public class ArmedAura extends IAutoClicker {
                     final EntityLivingBase second = o2.first().first();
 
                     if (first == second) return 0;
+                    if (second instanceof EntityGiantZombie) {
+                        return 1;
+                    }
+                    if (first instanceof EntityGiantZombie) {
+                        return -1;
+                    }
                     if (second instanceof EntityZombie) {
                         if (second.isChild()) return 1;
                     }
                     if (first instanceof EntityZombie) {
-                        if (first.isChild()) return -1;
-                    }
-                    if (second instanceof EntityGiantZombie) {
-                        if (second.isChild()) return 1;
-                    }
-                    if (first instanceof EntityGiantZombie) {
                         if (first.isChild()) return -1;
                     }
                     return Double.compare(first.getHealth(), second.getHealth());
@@ -199,13 +201,14 @@ public class ArmedAura extends IAutoClicker {
 
     @SubscribeEvent
     public void onPreUpdate(PreUpdateEvent event) {
-        if (targeted && autoSwitch.isToggled() && !(SlotHandler.getHeldItem() == null || !(SlotHandler.getHeldItem().getItem() instanceof ItemHoe))) {
+        if (targeted && autoSwitch.isToggled()) {
             int bestArm = getBestArm();
             SlotHandler.setCurrentSlot(bestArm);
         }
 
-        if (SlotHandler.getHeldItem() == null || !(SlotHandler.getHeldItem().getItem() instanceof ItemHoe)) {
+        if (!isArmed()) {
             targeted = false;
+            armed = false;
         }
     }
 
@@ -232,6 +235,23 @@ public class ArmedAura extends IAutoClicker {
         }
         firedSlots.add(arm);
         return arm;
+    }
+
+    private boolean isArmed() {
+        ItemStack stack = SlotHandler.getHeldItem();
+        if (stack == null) return false;
+
+        Item item = stack.getItem();
+
+        switch ((int) weaponMode.getInput()) {
+            default:
+            case 0:
+                return ArmedAuraUtils.isArmHypixelBedWars(item);
+            case 1:
+                return ArmedAuraUtils.isArmHypixelZombie(item);
+            case 2:
+                return ArmedAuraUtils.isArmCubeCraft(item);
+        }
     }
 
     @Override
@@ -289,7 +309,7 @@ public class ArmedAura extends IAutoClicker {
 
     @Override
     public boolean click() {
-        if (targeted) {
+        if (targeted && armed) {
             Utils.sendClick(1, true);
             if (rapidFire.isToggled() && autoSwitch.isToggled() && !rapidFireLegit.isToggled()) {
                 for (int i = 0; i < (int) rapidFireAmount.getInput(); i++) {

@@ -13,7 +13,7 @@ public class ArmedAuraUtils {
         int level = -1;
         for (int i = 0; i < 9; i++) {
             ItemStack stack = mc.thePlayer.inventory.mainInventory[i];
-            if (stack != null && stack.getItem() instanceof ItemHoe) {
+            if (stack != null && isArmHypixelBedWars(stack.getItem())) {
                 if (ignoreSlots.contains(i))
                     continue;
 
@@ -47,6 +47,10 @@ public class ArmedAuraUtils {
         return arm;
     }
 
+    public static boolean isArmHypixelBedWars(Item item) {
+        return item instanceof ItemHoe;
+    }
+
     public static int getArmHypixelZombie(Set<Integer> ignoreSlots) {
         int arm = getArmHypixelBedWars(ignoreSlots);
         if (arm != -1)
@@ -54,9 +58,7 @@ public class ArmedAuraUtils {
 
         for (int i = 0; i < 9; i++) {
             ItemStack stack = mc.thePlayer.inventory.mainInventory[i];
-            if (stack != null && (stack.getItem() instanceof ItemPickaxe
-                            || stack.getItem() instanceof ItemFlintAndSteel
-                            || stack.getItem() == Items.golden_shovel)) {
+            if (stack != null && isArmHypixelZombie(stack.getItem())) {
                 if (ignoreSlots.contains(i))
                     continue;
 
@@ -66,10 +68,14 @@ public class ArmedAuraUtils {
         return -1;
     }
 
+    public static boolean isArmHypixelZombie(Item item) {
+        return item instanceof ItemHoe || item instanceof ItemPickaxe || item instanceof ItemFlintAndSteel || item == Items.golden_shovel;
+    }
+
     public static int getArmCubeCraft(Set<Integer> ignoreSlots) {
         for (int i = 0; i < 9; i++) {
             ItemStack stack = mc.thePlayer.inventory.mainInventory[i];
-            if (stack != null && stack.getItem() instanceof ItemFirework) {
+            if (stack != null && isArmCubeCraft(stack.getItem())) {
                 if (ignoreSlots.contains(i))
                     continue;
 
@@ -77,5 +83,9 @@ public class ArmedAuraUtils {
             }
         }
         return -1;
+    }
+
+    public static boolean isArmCubeCraft(Item item) {
+        return item instanceof ItemFirework;
     }
 }

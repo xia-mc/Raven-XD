@@ -1,7 +1,9 @@
 package keystrokesmod.clickgui.components;
 
+import keystrokesmod.clickgui.ClickGui;
 import keystrokesmod.clickgui.components.impl.ModuleComponent;
 import keystrokesmod.module.setting.Setting;
+import keystrokesmod.utility.font.IFont;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -17,6 +19,11 @@ public interface IComponent {
 
     @NotNull
     ModuleComponent getParent();
+
+    @NotNull
+    default IFont getFont() {
+        return ClickGui.getFont();
+    }
 
     default void onDrawScreen(int x, int y) {
     }

@@ -27,4 +27,9 @@ public class NoWeb extends Module {
     public void onDisable() {
         mode.disable();
     }
+
+    @Override
+    public String getInfo() {
+        return mode.getSubModeValues().get((int) mode.getInput()).getPrettyName();
+    }
 }

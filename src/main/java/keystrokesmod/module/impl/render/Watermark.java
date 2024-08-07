@@ -8,7 +8,7 @@ import keystrokesmod.module.setting.impl.ModeSetting;
 import keystrokesmod.module.setting.utils.ModeOnly;
 import keystrokesmod.utility.Theme;
 import keystrokesmod.utility.font.FontManager;
-import keystrokesmod.utility.font.impl.MinecraftFontRenderer;
+import keystrokesmod.utility.font.IFont;
 import keystrokesmod.utility.render.RenderUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiChat;
@@ -28,7 +28,7 @@ import java.util.HashMap;
 import java.util.Objects;
 
 public class Watermark extends Module {
-    public static final String VERSION = "1.23.1";
+    public static final String VERSION = "1.24-Dev";
     public static final HashMap<String, ResourceLocation> WATERMARK = new HashMap<>();
 
     public static String customName = "CustomClient";
@@ -42,6 +42,7 @@ public class Watermark extends Module {
     private final ModeSetting mode;
     private final ModeSetting watermarkText;
     private final ModeSetting watermarkPhoto;
+    private final ModeSetting font;
     private final ModeSetting theme;
     private final ButtonSetting showVersion;
     private final ButtonSetting lowercase;
@@ -53,13 +54,14 @@ public class Watermark extends Module {
         final ModeOnly textMode = new ModeOnly(mode, 0);
         final ModeOnly photoMode = new ModeOnly(mode, 1);
         this.registerSetting(watermarkText = new ModeSetting("Watermark text", new String[]{"Default", "Augustus", "Custom", "Sense"}, 0, textMode));
-        this.registerSetting(watermarkPhoto = new ModeSetting("Watermark photo", new String[]{"Enders", "Augustus"}, 0, photoMode));
+        this.registerSetting(watermarkPhoto = new ModeSetting("Watermark photo", new String[]{"Default", "Enders", "Augustus"}, 0, photoMode));
+        this.registerSetting(font = new ModeSetting("Font", new String[]{"Minecraft", "Product Sans"}, 0, textMode));
         this.registerSetting(theme = new ModeSetting("Theme", Theme.themes, 0, textMode.extend(new ModeOnly(watermarkText, 2))));
         this.registerSetting(showVersion = new ButtonSetting("Show version", true, textMode));
         this.registerSetting(lowercase = new ButtonSetting("Lowercase", false, textMode));
         this.registerSetting(shadow = new ButtonSetting("Shadow", true, textMode));
 
-        for (String s : Arrays.asList("enders", "augustus")) {
+        for (String s : Arrays.asList("default", "enders", "augustus")) {
             try (InputStream stream = Objects.requireNonNull(Raven.class.getResourceAsStream("/assets/keystrokesmod/textures/watermarks/" + s + ".png"))) {
                 BufferedImage image = ImageIO.read(stream);
                 WATERMARK.put(s, Minecraft.getMinecraft().renderEngine.getDynamicTextureLocation(s, new DynamicTexture(image)));
@@ -100,7 +102,16 @@ public class Watermark extends Module {
                     if (lowercase.isToggled())
                         text = text.toLowerCase();
 
-                    MinecraftFontRenderer font = FontManager.getMinecraft();
+                    IFont font;
+                    switch ((int) this.font.getInput()) {
+                        default:
+                        case 0:
+                            font = FontManager.getMinecraft();
+                            break;
+                        case 1:
+                            font = FontManager.productSans20;
+                    }
+
                     font.drawString(text, posX, posY, Theme.getGradient((int) theme.getInput(), 0), shadow.isToggled());
 
                     current$minX = posX;
@@ -112,10 +123,13 @@ public class Watermark extends Module {
             case 1:
                 switch ((int) watermarkPhoto.getInput()) {
                     case 0:
-                        RenderUtils.drawImage(WATERMARK.get("enders"), posX, posY, 150, 45, new Color(255, 255, 255));
+                        RenderUtils.drawImage(WATERMARK.get("default"), posX, posY, 50, 50, new Color(255, 255, 255));
                         break;
                     case 1:
-                        RenderUtils.drawImage(WATERMARK.get("augustus"), posX, posY, 50, 50, new Color(255, 255, 255));
+                        RenderUtils.drawImage(WATERMARK.get("enders"), posX, posY, 150, 45, new Color(255, 255, 255));
+                        break;
+                    case 2:
+                        RenderUtils.drawImage(WATERMARK.get("augustus"), posX, posY, 60, 60, new Color(255, 255, 255));
                         break;
                 }
             break;

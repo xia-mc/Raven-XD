@@ -81,15 +81,23 @@ public final class RotationHandler extends Module {
     }
 
     public static float getRotationYaw() {
+        return getRotationYaw(mc.thePlayer.rotationYaw);
+    }
+
+    public static float getRotationYaw(float yaw) {
         if (rotationYaw != null)
             return RotationUtils.normalize(rotationYaw);
-        return RotationUtils.normalize(mc.thePlayer.rotationYaw);
+        return yaw;
     }
 
     public static float getRotationPitch() {
+        return getRotationPitch(mc.thePlayer.rotationPitch);
+    }
+
+    public static float getRotationPitch(float pitch) {
         if (rotationPitch != null)
             return rotationPitch;
-        return mc.thePlayer.rotationPitch;
+        return pitch;
     }
 
     /**

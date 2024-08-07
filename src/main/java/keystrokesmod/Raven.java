@@ -13,6 +13,7 @@ import keystrokesmod.script.ScriptManager;
 import keystrokesmod.utility.*;
 import keystrokesmod.utility.clicks.CPSCalculator;
 import keystrokesmod.utility.font.FontManager;
+import keystrokesmod.utility.i18n.I18nManager;
 import keystrokesmod.utility.profile.Profile;
 import keystrokesmod.utility.profile.ProfileManager;
 import net.minecraft.client.Minecraft;
@@ -77,6 +78,8 @@ public class Raven {
         FMLCommonHandler.instance().bus().register(ModuleManager.rotationHandler);
         FMLCommonHandler.instance().bus().register(ModuleManager.slotHandler);
         FMLCommonHandler.instance().bus().register(ModuleManager.dynamicManager);
+
+        I18nManager.init();
     }
 
     @SubscribeEvent

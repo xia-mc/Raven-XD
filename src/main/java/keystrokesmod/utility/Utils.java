@@ -191,7 +191,7 @@ public class Utils {
     }
 
     public static void attackEntity(Entity e, boolean clientSwing) {
-        boolean attack = HitSelect.canAttack(e);
+        boolean attack = HitSelect.canAttack();
         if (clientSwing) {
             if (attack || HitSelect.canSwing()) mc.thePlayer.swingItem();
         } else {
@@ -201,7 +201,7 @@ public class Utils {
     }
 
     public static void attackEntityNoSwing(Entity e) {
-        if (HitSelect.canAttack(e)) mc.playerController.attackEntity(mc.thePlayer, e);
+        if (HitSelect.canAttack()) mc.playerController.attackEntity(mc.thePlayer, e);
     }
 
     public static void sendRawMessage(String txt) {
@@ -217,10 +217,6 @@ public class Utils {
     public static String getHealthStr(EntityLivingBase entity) {
         float completeHealth = getCompleteHealth(entity);
         return getColorForHealth(entity.getHealth() / entity.getMaxHealth(), completeHealth);
-    }
-
-    public static int limit(int current, int min, int max) {
-        return Math.min(Math.max(current, min), max);
     }
 
     public static int getTool(Block block) {
@@ -1027,23 +1023,20 @@ public class Utils {
 
         ((GuiScreenAccessor) s).mouseClicked(x, y, 0);
     }
-    public static boolean isPlayerInGame() {
-        return mc.thePlayer != null && mc.theWorld != null;
+
+    public static int limit(int value, int min, int max) {
+        return Math.max(Math.min(value, max), min);
     }
 
-    public static class Player {
-        public static void hotkeyToSlot(int slot) {
-            if (!isPlayerInGame()) {
-                return;
-            }
-        }
+    public static long limit(long value, long min, long max) {
+        return Math.max(Math.min(value, max), min);
+    }
 
-        public static boolean playerOverAir() {
-            double x = mc.thePlayer.posX;
-            double y = mc.thePlayer.posY - 1.0D;
-            double z = mc.thePlayer.posZ;
-            BlockPos p = new BlockPos(MathHelper.floor_double(x), MathHelper.floor_double(y), MathHelper.floor_double(z));
-            return mc.theWorld.isAirBlock(p);
-        }
+    public static float limit(float value, float min, float max) {
+        return Math.max(Math.min(value, max), min);
+    }
+
+    public static double limit(double value, double min, double max) {
+        return Math.max(Math.min(value, max), min);
     }
 }

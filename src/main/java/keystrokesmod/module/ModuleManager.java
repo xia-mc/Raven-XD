@@ -111,6 +111,11 @@ public class ModuleManager {
     public static ProjectileAimBot projectileAimBot;
     public static AutoWeb autoWeb;
     public static BlockOut blockOut;
+    public static GhostBlock ghostBlock;
+    public static AirStuck airStuck;
+    public static TargetHUD targetHUD;
+    public static TargetESP targetESP;
+    public static Language language;
 
     public void register() {
 
@@ -124,6 +129,7 @@ public class ModuleManager {
         this.addModule(new MiddleClick());
         this.addModule(notifications = new Notifications());
         this.addModule(new DiscordRpc());
+        this.addModule(language = new Language());
 
         // combat
         this.addModule(new AimAssist());
@@ -145,6 +151,7 @@ public class ModuleManager {
         this.addModule(timerRange = new TimerRange());
         this.addModule(velocity = new Velocity());
         this.addModule(projectileAimBot = new ProjectileAimBot());
+        this.addModule(airStuck = new AirStuck());
 
         // fun
         this.addModule(new ExtraBobbing());
@@ -180,6 +187,7 @@ public class ModuleManager {
         this.addModule(wallClimb = new WallClimb());
         this.addModule(jesus = new Jesus());
         this.addModule(noWeb = new NoWeb());
+        this.addModule(new SaveMoveKeys());
 
         // other
         this.addModule(new Anticheat());
@@ -245,7 +253,8 @@ public class ModuleManager {
         this.addModule(potions = new Potions());
         this.addModule(new Radar());
         this.addModule(new Shaders());
-        this.addModule(new TargetHUD());
+        this.addModule(targetHUD = new TargetHUD());
+        this.addModule(targetESP = new TargetESP());
         this.addModule(new Tracers());
         this.addModule(new Trajectories());
         this.addModule(new Xray());
@@ -277,6 +286,7 @@ public class ModuleManager {
         this.addModule(modSpoofer = new ModSpoofer());
         this.addModule(pingSpoof = new PingSpoof());
         this.addModule(exploitFixer = new ExploitFixer());
+        this.addModule(ghostBlock = new GhostBlock());
 
         // enable
         antiBot.enable();

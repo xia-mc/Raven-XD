@@ -1,6 +1,7 @@
 package keystrokesmod.module.impl.movement;
 
 import keystrokesmod.module.Module;
+import keystrokesmod.module.impl.movement.jesus.HypixelJesus;
 import keystrokesmod.module.impl.movement.jesus.KarhuJesus;
 import keystrokesmod.module.impl.movement.jesus.OldNCPJesus;
 import keystrokesmod.module.impl.movement.jesus.VulcanJesus;
@@ -15,7 +16,7 @@ public class Jesus extends Module {
                 .add(new KarhuJesus("Karhu", this))
                 .add(new OldNCPJesus("Old NCP", this))
                 .add(new VulcanJesus("Vulcan", this))
-                .setDefaultValue("Karhu")
+                .add(new HypixelJesus("Hypixel", this))
         );
     }
 
