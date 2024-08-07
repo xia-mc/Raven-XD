@@ -202,6 +202,7 @@ public class Module {
                 this.settings.add(setting);
             }
         }
+        Raven.settingCounter++;
     }
 
     public void registerSetting(Setting @NotNull ... setting) {
@@ -212,7 +213,8 @@ public class Module {
 
     public void unregisterSetting(Setting setting) {
         synchronized (settings) {
-            this.settings.remove(setting);
+            if (this.settings.remove(setting))
+                Raven.settingCounter--;
         }
     }
 

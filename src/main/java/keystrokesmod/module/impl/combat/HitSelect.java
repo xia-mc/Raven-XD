@@ -48,12 +48,15 @@ public class HitSelect extends Module {
             return;
         }
 
-        attackTime = System.currentTimeMillis();
+        if (canAttack())
+            attackTime = System.currentTimeMillis();
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onPreUpdate(PreUpdateEvent event) {
-        if (Math.random() > hitSelect.chance.getInput()) {
+        currentShouldAttack = false;
+
+        if (Math.random() * 100 > hitSelect.chance.getInput()) {
             currentShouldAttack = true;
         } else {
             switch ((int) preference.getInput()) {

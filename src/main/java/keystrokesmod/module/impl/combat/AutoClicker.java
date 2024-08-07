@@ -30,7 +30,7 @@ public class AutoClicker extends IAutoClicker {
     private final CoolDown coolDown = new CoolDown(100);
     private double directionX, directionY;
 
-    private int inventoryClick = 0;
+    private boolean inventoryClick = false;
 
     public AutoClicker() {
         super("AutoClicker", category.combat);
@@ -95,7 +95,7 @@ public class AutoClicker extends IAutoClicker {
             Utils.sendClick(0, true);
             return true;
         } else if (inventoryFill.isToggled() && mc.currentScreen instanceof GuiContainer) {
-            inventoryClick++;
+            inventoryClick = true;
             return true;
         }
         return false;
@@ -104,10 +104,10 @@ public class AutoClicker extends IAutoClicker {
     @SubscribeEvent
     public void onPreMotion(PreMotionEvent event) {
         if (mc.currentScreen instanceof GuiContainer) {
-            for (int i = 0; i < inventoryClick; i++) {
+            if (inventoryClick) {
                 Utils.inventoryClick(mc.currentScreen);
             }
         }
-        inventoryClick = 0;
+        inventoryClick = false;
     }
 }

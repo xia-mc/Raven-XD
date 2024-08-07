@@ -335,7 +335,7 @@ public class RotationUtils {
         );
 
         for (BlockPos pos : possible) {
-            if (BlockUtils.getBlockState(pos).getBlock().isFullBlock()) {
+            if (!BlockUtils.replaceable(pos)) {
                 EnumFacing facing;
                 keystrokesmod.script.classes.Vec3 hitPos;
                 if (pos.getY() < blockPos.getY()) {

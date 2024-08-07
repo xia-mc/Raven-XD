@@ -39,6 +39,7 @@ public class BlockOut extends Module {
         if (!Utils.nullCheck()) return;
 
         mc.theWorld.playerEntities.parallelStream()
+                .filter(p -> p != mc.thePlayer)
                 .filter(p -> p instanceof AbstractClientPlayer)
                 .map(p -> (AbstractClientPlayer) p)
                 .filter(p -> p.getDistanceSqToEntity(mc.thePlayer) <= range.getInput() * range.getInput())

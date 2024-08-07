@@ -47,6 +47,9 @@ public class Raven {
     public static BadPacketsHandler badPacketsHandler;
     private boolean loaded = false;
 
+    public static int moduleCounter;
+    public static int settingCounter;
+
     public Raven() {
         moduleManager = new ModuleManager();
     }

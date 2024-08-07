@@ -26,7 +26,7 @@ public class LagCriticals extends SubMode<Criticals> {
 
     public LagCriticals(String name, @NotNull Criticals parent) {
         super(name, parent);
-        this.registerSetting(maxLagTime = new SliderSetting("Max lag time", 1000, 100, 2000, 100));
+        this.registerSetting(maxLagTime = new SliderSetting("Max lag time", 100, 50, 500, 50));
         this.registerSetting(chance = new SliderSetting("Chance", 90, 0, 100, 1, "%"));
         this.registerSetting(stopOnHurt = new ButtonSetting("Stop on hurt", true));
     }

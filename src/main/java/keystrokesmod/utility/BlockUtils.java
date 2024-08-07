@@ -206,18 +206,20 @@ public class BlockUtils {
 
 
     public static @NotNull Set<BlockPos> getSurroundBlocks(@NotNull AbstractClientPlayer target) {
-        AxisAlignedBB playerBox = target.getEntityBoundingBox();
+        return getSurroundBlocks(target.getEntityBoundingBox());
+    }
 
-        int minX = MathHelper.floor_double(playerBox.minX) - 1;
-        int minY = MathHelper.floor_double(playerBox.minY) - 1;
-        int minZ = MathHelper.floor_double(playerBox.minZ) - 1;
-        int maxX = MathHelper.floor_double(playerBox.maxX) + 1;
-        int maxY = MathHelper.floor_double(playerBox.maxY) + 1;
-        int maxZ = MathHelper.floor_double(playerBox.maxZ) + 1;
+    public static @NotNull Set<BlockPos> getSurroundBlocks(@NotNull AxisAlignedBB box) {
+        int minX = MathHelper.floor_double(box.minX) - 1;
+        int minY = MathHelper.floor_double(box.minY) - 1;
+        int minZ = MathHelper.floor_double(box.minZ) - 1;
+        int maxX = MathHelper.floor_double(box.maxX) + 1;
+        int maxY = MathHelper.floor_double(box.maxY) + 1;
+        int maxZ = MathHelper.floor_double(box.maxZ) + 1;
 
         return getAllInBox(new BlockPos(minX, minY, minZ), new BlockPos(maxX, maxY, maxZ))
                 .stream()
-                .filter(blockPos -> !playerBox.intersectsWith(new AxisAlignedBB(
+                .filter(blockPos -> !box.intersectsWith(new AxisAlignedBB(
                         blockPos.getX(), blockPos.getY(), blockPos.getZ(),
                         blockPos.getX() + 1, blockPos.getY() + 1, blockPos.getZ() + 1
                 )))

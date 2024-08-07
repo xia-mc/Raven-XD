@@ -42,6 +42,7 @@
     "render.MixinEntityRenderer",
     "render.MixinGuiConnecting",
     "render.MixinGuiContainer",
+    "render.MixinGuiMainMenu",
     "render.MixinGuiScreen",
     "render.MixinItemRenderer",
     "render.RenderManagerAccessor"

@@ -1,5 +1,6 @@
 package keystrokesmod.utility.render;
 
+import keystrokesmod.clickgui.ClickGui;
 import keystrokesmod.mixins.impl.render.RenderManagerAccessor;
 import keystrokesmod.module.impl.render.Freecam;
 import keystrokesmod.module.impl.render.HUD;
@@ -939,14 +940,14 @@ public class RenderUtils {
 
     public static void drawToolTip(@NotNull String toolTip, int x, int y) {
         if (toolTip.isEmpty()) return;
-        final FontRenderer font = FontManager.productSans16;
+        final IFont font = ClickGui.getFont();
         final String[] split = toolTip.split("\n");
-        final double width = font.getStringWidth(split[0]);
-        final double height = font.getHeight();
+        final double width = font.width(split[0]);
+        final double height = font.height();
 
         drawRect(x + 5, y + height - 3, x + 6 + width + 1, y + (height + 1) * split.length, TOOLTIP_BACKGROUND);
         for (String s : split) {
-            font.drawString(s, x + 6, y + height - 1, FontRenderer.CenterMode.NONE, false, TOOLTIP_TEXT);
+            font.drawString(s, x + 6, y + height - 1, TOOLTIP_TEXT);
             y += (int) Math.round(height);
         }
     }

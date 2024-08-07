@@ -1,5 +1,6 @@
 package keystrokesmod.module;
 
+import keystrokesmod.Raven;
 import keystrokesmod.module.impl.client.*;
 import keystrokesmod.module.impl.combat.*;
 import keystrokesmod.module.impl.exploit.*;
@@ -116,6 +117,7 @@ public class ModuleManager {
     public static TargetHUD targetHUD;
     public static TargetESP targetESP;
     public static Language language;
+    public static BedDefender bedDefender;
 
     public void register() {
 
@@ -278,6 +280,7 @@ public class ModuleManager {
         this.addModule(safeWalk = new SafeWalk());
         this.addModule(scaffold = new Scaffold());
         this.addModule(tower = new Tower());
+        this.addModule(bedDefender = new BedDefender());
 
         // exploit
         this.addModule(clientSpoofer = new ClientSpoofer());
@@ -297,6 +300,7 @@ public class ModuleManager {
 
     public void addModule(Module m) {
         modules.add(m);
+        Raven.moduleCounter++;
     }
 
     public List<Module> getModules() {
