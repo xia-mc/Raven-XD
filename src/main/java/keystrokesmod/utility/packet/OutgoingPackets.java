@@ -1,5 +1,6 @@
 package keystrokesmod.utility.packet;
 
+import lombok.Getter;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.INetHandlerPlayServer;
 import net.minecraft.network.play.client.*;
@@ -36,20 +37,15 @@ public enum OutgoingPackets {
     C18PacketSpectate(net.minecraft.network.play.client.C18PacketSpectate.class),
     C19PacketResourcePacketStatus(C19PacketResourcePackStatus.class);
 
+    @Getter
     private final Class<? extends Packet<INetHandlerPlayServer>> packetClass;
 
     OutgoingPackets(Class<? extends Packet<INetHandlerPlayServer>> packetClass) {
         this.packetClass = packetClass;
     }
 
-    public Class<? extends Packet<INetHandlerPlayServer>> getPacketClass() {
-        return this.packetClass;
-    }
-
+    @Getter
     private static final List<Class<? extends Packet<INetHandlerPlayServer>>> outgoingPackets =
             Arrays.stream(values()).map(OutgoingPackets::getPacketClass).collect(Collectors.toList());
 
-    public static List<Class<? extends Packet<INetHandlerPlayServer>>> getOutgoingPackets() {
-        return outgoingPackets;
-    }
 }

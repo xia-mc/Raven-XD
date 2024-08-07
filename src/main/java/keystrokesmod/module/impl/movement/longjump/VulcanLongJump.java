@@ -2,15 +2,19 @@ package keystrokesmod.module.impl.movement.longjump;
 
 import keystrokesmod.event.PreMotionEvent;
 import keystrokesmod.module.impl.movement.LongJump;
+import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SubMode;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
 public class VulcanLongJump extends SubMode<LongJump> {
+    private final ButtonSetting autoDisable;
+
     private int ticks;
 
     public VulcanLongJump(String name, @NotNull LongJump parent) {
         super(name, parent);
+        this.registerSetting(autoDisable = new ButtonSetting("Auto disable", true));
     }
 
     @Override
@@ -31,6 +35,10 @@ public class VulcanLongJump extends SubMode<LongJump> {
             mc.thePlayer.motionY = 0;
             mc.thePlayer.onGround = true;
 
+        }
+
+        if (ticks > 3 && mc.thePlayer.onGround && autoDisable.isToggled()) {
+            parent.disable();
         }
 
         if (ticks > 3 && ticks % 2 == 0 & !mc.thePlayer.onGround) {
