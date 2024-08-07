@@ -4,6 +4,7 @@ import keystrokesmod.event.JumpEvent;
 import keystrokesmod.event.PrePlayerInputEvent;
 import keystrokesmod.event.PreUpdateEvent;
 import keystrokesmod.module.Module;
+import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.combat.KillAura;
 import keystrokesmod.module.impl.other.anticheats.utils.world.PlayerRotation;
 import keystrokesmod.module.setting.impl.ButtonSetting;
@@ -20,8 +21,10 @@ import static keystrokesmod.module.ModuleManager.*;
 
 public class TargetStrafe extends Module {
     private final SliderSetting range = new SliderSetting("Range", 1, 0.2, 6, 0.1);
-    private final ButtonSetting onlySpeed = new ButtonSetting("Only speed", true);
-    private final ButtonSetting strafe = new ButtonSetting("Strafe", true);
+    private final ButtonSetting speed = new ButtonSetting("Allow speed", true);
+    private final ButtonSetting fly = new ButtonSetting("Allow fly", false);
+    private final ButtonSetting manual = new ButtonSetting("Allow manual", false);
+    private final ButtonSetting strafe = new ButtonSetting("Strafe around", true);
 
     private static float yaw;
     private static EntityLivingBase target = null;
@@ -30,7 +33,7 @@ public class TargetStrafe extends Module {
 
     public TargetStrafe() {
         super("TargetStrafe", category.movement);
-        this.registerSetting(range, onlySpeed, strafe);
+        this.registerSetting(range, speed, fly, manual, strafe);
     }
 
     public static float getMovementYaw() {
@@ -65,9 +68,9 @@ public class TargetStrafe extends Module {
         /*
          * Getting targets and selecting the nearest one
          */
-
-        if (onlySpeed.isToggled() && !speed.isEnabled() || !(mc.gameSettings.keyBindForward.isKeyDown() &&
-                ((fly != null && fly.isEnabled()) || ((speed != null && speed.isEnabled()))))) {
+        if ((!speed.isToggled() && ModuleManager.speed.isEnabled())
+                || (!fly.isToggled() && ModuleManager.fly.isEnabled())
+                || (!manual.isToggled() && !ModuleManager.speed.isEnabled() && !ModuleManager.fly.isEnabled())) {
             target = null;
             return;
         }

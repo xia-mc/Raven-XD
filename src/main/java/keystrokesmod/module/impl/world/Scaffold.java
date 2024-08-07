@@ -20,6 +20,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockAir;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.client.C0APacketAnimation;
@@ -49,7 +50,8 @@ public class Scaffold extends IAutoClicker {
     private final SliderSetting tellyStartTick;
     private final SliderSetting tellyStopTick;
     private final SliderSetting strafe;
-    private final ModeSetting fastScaffold;
+    private final ModeSetting sprint;
+    private final ButtonSetting fast;
     private final ButtonSetting cancelSprint;
     private final ButtonSetting rayCast;
     private final ButtonSetting recycleRotation;
@@ -76,7 +78,6 @@ public class Scaffold extends IAutoClicker {
     private final ButtonSetting delayOnJump;
     private final ButtonSetting silentSwing;
     public final ButtonSetting tower;
-    public final ButtonSetting fast;
     public final ButtonSetting sameY;
     public final ButtonSetting autoJump;
     private final ButtonSetting expand;
@@ -86,7 +87,7 @@ public class Scaffold extends IAutoClicker {
     public MovingObjectPosition placeBlock;
     private int lastSlot;
     private static final String[] rotationModes = new String[]{"None", "Backwards", "Strict", "Precise", "Telly", "Constant", "Snap"};
-    private static final String[] fastScaffoldModes = new String[]{"Disabled", "Sprint", "Edge", "Jump A", "Jump B", "Jump C", "Float", "Side", "Legit", "GrimAC", "Sneak", "Star"};
+    private static final String[] sprintModes = new String[]{"Disabled", "Vanilla", "Edge", "HypixelJump A", "HypixelJump B", "HypixelJump C", "Float", "Side", "Legit", "GrimAC", "Sneak"};
     private static final String[] precisionModes = new String[]{"Very low", "Low", "Moderate", "High", "Very high"};
     public float placeYaw;
     public float placePitch = 85;
@@ -123,9 +124,10 @@ public class Scaffold extends IAutoClicker {
         this.registerSetting(moveFix = new ButtonSetting("MoveFix", false, new ModeOnly(rotation, 0).reserve()));
         this.registerSetting(motion = new SliderSetting("Motion", 1.0, 0.5, 1.2, 0.01, () -> !moveFix.isToggled()));
         this.registerSetting(strafe = new SliderSetting("Strafe", 0, -45, 45, 5));
-        this.registerSetting(fastScaffold = new ModeSetting("Fast scaffold", fastScaffoldModes, 0));
+        this.registerSetting(sprint = new ModeSetting("Sprint", sprintModes, 0));
+        this.registerSetting(fast = new ButtonSetting("Fast", false, new ModeOnly(sprint, 3, 4, 5)));
         this.registerSetting(precision = new ModeSetting("Precision", precisionModes, 4));
-        this.registerSetting(cancelSprint = new ButtonSetting("Cancel sprint", false, new ModeOnly(fastScaffold, 0).reserve()));
+        this.registerSetting(cancelSprint = new ButtonSetting("Cancel sprint", false, new ModeOnly(sprint, 0).reserve()));
         this.registerSetting(rayCast = new ButtonSetting("Ray cast", false));
         this.registerSetting(recycleRotation = new ButtonSetting("Recycle rotation", false));
         this.registerSetting(sneak = new ButtonSetting("Sneak", false));
@@ -150,7 +152,6 @@ public class Scaffold extends IAutoClicker {
         this.registerSetting(showBlockCount = new ButtonSetting("Show block count", true));
         this.registerSetting(silentSwing = new ButtonSetting("Silent swing", false));
         this.registerSetting(tower = new ButtonSetting("Tower", false));
-        this.registerSetting(fast = new ButtonSetting("Fast", false));
         this.registerSetting(sameY = new ButtonSetting("SameY", false));
         this.registerSetting(autoJump = new ButtonSetting("Auto jump", false));
         this.registerSetting(expand = new ButtonSetting("Expand", false));
@@ -301,7 +302,7 @@ public class Scaffold extends IAutoClicker {
             event.setSprinting(false);
         }
 
-        if (fastScaffold.getInput() == 10) {
+        if (sprint.getInput() == 10) {
             if (Math.abs(MathHelper.wrapAngleTo180_float(mc.thePlayer.rotationYaw) -
                     MathHelper.wrapAngleTo180_float(RotationHandler.getRotationYaw())) > 100) {
                 ((KeyBindingAccessor) mc.gameSettings.keyBindSprint).setPressed(false);
@@ -329,7 +330,7 @@ public class Scaffold extends IAutoClicker {
 
     @SubscribeEvent
     public void onMoveInput(@NotNull MoveInputEvent event) {
-        if (fastScaffold.getInput() == 10) {
+        if (sprint.getInput() == 10) {
             event.setSneak(true);
             event.setSneakSlowDownMultiplier(1);
         }
@@ -370,17 +371,7 @@ public class Scaffold extends IAutoClicker {
             mc.thePlayer.jump();
         }
 
-        if (fast.isToggled() && mc.gameSettings.keyBindJump.isKeyDown()) {
-            if (mc.gameSettings.keyBindForward.isKeyDown() && mc.thePlayer.onGround) {
-                if (!isDiagonal() && !(mc.gameSettings.keyBindRight.isKeyDown() || mc.gameSettings.keyBindLeft.isKeyDown())) {
-                    MoveUtil.strafe(0.5);
-                    mc.thePlayer.setSprinting(false);
-                    mc.thePlayer.jump();
-                }
-            }
-        }
-
-        if (fastScaffold.getInput() == 7 && !Utils.jumpDown() && sameY$bridged != 0 && sameY$bridged % 2 == 0 && placeBlock != null && !Utils.jumpDown()) {
+        if (sprint.getInput() == 7 && !Utils.jumpDown() && sameY$bridged != 0 && sameY$bridged % 2 == 0 && placeBlock != null && !Utils.jumpDown()) {
             List<BlockPos> possible = new ArrayList<>(Arrays.asList(
                     placeBlock.getBlockPos().west(),
                     placeBlock.getBlockPos().east(),
@@ -422,22 +413,34 @@ public class Scaffold extends IAutoClicker {
             down = false;
             placedUp = false;
         }
-        if (keepYPosition() && (fastScaffold.getInput() == 3 || fastScaffold.getInput() == 4 || fastScaffold.getInput() == 5) && mc.thePlayer.onGround) {
-            mc.thePlayer.jump();
-            add = 0;
-            if (Math.floor(mc.thePlayer.posY) == Math.floor(startPos) && fastScaffold.getInput() == 5) {
-                placedUp = false;
+        if (keepYPosition() && (sprint.getInput() == 3 || sprint.getInput() == 4 || sprint.getInput() == 5)) {
+            if (mc.thePlayer.onGround) {
+                if (fast.isToggled())
+                    MoveUtil.strafe(MoveUtil.getAllowedHorizontalDistance());
+                mc.thePlayer.jump();
+                add = 0;
+                if (Math.floor(mc.thePlayer.posY) == Math.floor(startPos) && sprint.getInput() == 5) {
+                    placedUp = false;
+                }
+            } else if (fast.isToggled()) {
+                if (offGroundTicks == 4) {
+                    mc.thePlayer.motionY -= 0.19;
+                } else if (offGroundTicks == 1) {
+                    MoveUtil.strafe();
+                } else if (BlockUtils.blockRelativeToPlayer(0, mc.thePlayer.motionY, 0) != Blocks.air && offGroundTicks > 2) {
+                    MoveUtil.strafe();
+                }
             }
         }
         double original = startPos;
-        if (fastScaffold.getInput() == 3) {
+        if (sprint.getInput() == 3) {
             if (groundDistance() >= 2 && add == 0) {
                 original++;
                 add++;
             }
         }
-        else if (fastScaffold.getInput() == 4 || fastScaffold.getInput() == 5) {
-            if (groundDistance() > 0 && mc.thePlayer.posY >= Math.floor(mc.thePlayer.posY) && mc.thePlayer.fallDistance > 0 && ((!placedUp || isDiagonal()) || fastScaffold.getInput() == 4)) {
+        else if (sprint.getInput() == 4 || sprint.getInput() == 5) {
+            if (groundDistance() > 0 && mc.thePlayer.posY >= Math.floor(mc.thePlayer.posY) && mc.thePlayer.fallDistance > 0 && ((!placedUp || isDiagonal()) || sprint.getInput() == 4)) {
                 original++;
             }
         }
@@ -482,11 +485,6 @@ public class Scaffold extends IAutoClicker {
             case 4:
                 searchYaw = 5;
                 break;
-        }
-
-        if (fastScaffold.getInput() == 11) {
-            starScaffold();
-            return;
         }
 
         EnumFacingOffset enumFacing = getEnumFacing(targetVec3);
@@ -722,10 +720,10 @@ public class Scaffold extends IAutoClicker {
 
     public static boolean sprint() {
         if (ModuleManager.scaffold.isEnabled()
-                && ModuleManager.scaffold.fastScaffold.getInput() > 0
+                && ModuleManager.scaffold.sprint.getInput() > 0
                 && ModuleManager.scaffold.placeBlock != null
                 && (!ModuleManager.scaffold.fastOnRMB.isToggled() || Mouse.isButtonDown(1))) {
-            switch ((int) ModuleManager.scaffold.fastScaffold.getInput()) {
+            switch ((int) ModuleManager.scaffold.sprint.getInput()) {
                 case 1:
                 case 7:
                 case 9:
@@ -737,7 +735,6 @@ public class Scaffold extends IAutoClicker {
                 case 4:
                 case 5:
                 case 6:
-                case 11:
                     return ModuleManager.scaffold.keepYPosition();
                 case 8:
                     return Math.abs(MathHelper.wrapAngleTo180_float(mc.thePlayer.rotationYaw) - MathHelper.wrapAngleTo180_float(RotationHandler.getRotationYaw())) <= 45;
@@ -751,12 +748,12 @@ public class Scaffold extends IAutoClicker {
     }
 
     private boolean keepYPosition() {
-        boolean sameYSca = fastScaffold.getInput() == 4 || fastScaffold.getInput() == 3 || fastScaffold.getInput() == 5 || fastScaffold.getInput() == 6 || fastScaffold.getInput() == 11;
-        return this.isEnabled() && Utils.keysDown() && (sameYSca || (sameY.isToggled() && !Utils.jumpDown())) && (!Utils.jumpDown() || fastScaffold.getInput() == 6) && (!fastOnRMB.isToggled() || Mouse.isButtonDown(1));
+        boolean sameYSca = sprint.getInput() == 4 || sprint.getInput() == 3 || sprint.getInput() == 5 || sprint.getInput() == 6;
+        return this.isEnabled() && Utils.keysDown() && (sameYSca || (sameY.isToggled() && !Utils.jumpDown())) && (!Utils.jumpDown() || sprint.getInput() == 6) && (!fastOnRMB.isToggled() || Mouse.isButtonDown(1));
     }
 
     public boolean safewalk() {
-        return this.isEnabled() && safeWalk.isToggled() && (!keepYPosition() || fastScaffold.getInput() == 3);
+        return this.isEnabled() && safeWalk.isToggled() && (!keepYPosition() || sprint.getInput() == 3);
     }
 
     public boolean stopRotation() {
@@ -942,92 +939,6 @@ public class Scaffold extends IAutoClicker {
 
     @Override
     public String getInfo() {
-        return fastScaffoldModes[(int) fastScaffold.getInput()];
-    }
-
-    private void starScaffold() {
-        ItemStack heldItem = mc.thePlayer.getHeldItem();
-        if (getSlot() != -1 || heldItem != null && heldItem.getItem() instanceof ItemBlock) {
-
-            if (this.keepYPosition() && !this.down) {
-                this.startPos = Math.floor(mc.thePlayer.posY);
-                this.down = true;
-            } else if (!this.keepYPosition()) {
-                this.down = false;
-                this.placedUp = false;
-            }
-
-            if (mc.thePlayer.onGround && MoveUtil.isMoving()) {
-                mc.thePlayer.jump();
-                this.add = 0;
-            }
-
-            double original = this.startPos;
-            if (this.groundDistance() > 0.0 && mc.thePlayer.posY >= Math.floor(mc.thePlayer.posY) && mc.thePlayer.fallDistance > 0.0F) {
-                ++original;
-            }
-
-            Vec3 targetVec3 = this.getPlacePossibility(0.0, original);
-            if (targetVec3 != null) {
-                BlockPos targetPos = new BlockPos(targetVec3.xCoord, targetVec3.yCoord, targetVec3.zCoord);
-                    if (heldItem != null && heldItem.getItem() instanceof ItemBlock) {
-                        MovingObjectPosition rayCasted = null;
-                        float searchYaw = 25.0F;
-                        EnumFacingOffset enumFacing = this.getEnumFacing(targetVec3);
-                        if (enumFacing != null) {
-                            targetPos = targetPos.add(enumFacing.getOffset().xCoord, enumFacing.getOffset().yCoord, enumFacing.getOffset().zCoord);
-                            float[] targetRotation = new float[]{PlayerRotation.getYaw(targetPos), PlayerRotation.getPitch(targetPos)};
-                            float[] searchPitch = new float[]{78.0F, 59.0F};
-
-                            for(int i = 0; i < 2; ++i) {
-                                if (i == 1 && Utils.overPlaceable(-1.0)) {
-                                    searchYaw = 180.0F;
-                                    searchPitch = new float[]{65.0F, 25.0F};
-                                } else if (i == 1) {
-                                    break;
-                                }
-
-                                float[] var13 = this.generateSearchSequence(searchYaw);
-
-                                for (float checkYaw : var13) {
-                                    float playerYaw = this.isDiagonal() ? getYaw() : targetRotation[0];
-                                    float fixedYaw = (float) ((double) (playerYaw - checkYaw) + this.getRandom());
-                                    double deltaYaw = Math.abs(playerYaw - fixedYaw);
-                                    if ((i != 1 || !this.inBetween(75.0F, 95.0F, (float) deltaYaw)) && !(deltaYaw > 500.0)) {
-                                        float[] var21 = this.generateSearchSequence(searchPitch[1]);
-
-                                        for (float checkPitch : var21) {
-                                            float fixedPitch = RotationUtils.clampTo90((float) ((double) (targetRotation[1] + checkPitch) + this.getRandom()));
-                                            MovingObjectPosition raycast = RotationUtils.rayTraceCustom(mc.playerController.getBlockReachDistance(), fixedYaw, fixedPitch);
-                                            if (raycast != null && raycast.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK && raycast.getBlockPos().equals(targetPos) && raycast.sideHit == enumFacing.getEnumFacing() && (rayCasted == null || !BlockUtils.isSamePos(raycast.getBlockPos(), rayCasted.getBlockPos())) && ((ItemBlock) heldItem.getItem()).canPlaceBlockOnSide(mc.theWorld, raycast.getBlockPos(), raycast.sideHit, mc.thePlayer, heldItem) && rayCasted == null) {
-                                                this.forceStrict = this.forceStrict(checkYaw) && i == 1;
-
-                                                rayCasted = raycast;
-                                                this.placeYaw = fixedYaw;
-                                                this.placePitch = fixedPitch;
-                                                break;
-                                            }
-                                        }
-                                    }
-                                }
-
-                                if (rayCasted != null) {
-                                    break;
-                                }
-                            }
-
-                            if (rayCasted != null) {
-                                KeyBinding.setKeyBindState(mc.gameSettings.keyBindUseItem.getKeyCode(), false);
-                                this.placeBlock = rayCasted;
-                                this.place(this.placeBlock, false);
-                                this.place = false;
-                                if (this.placeBlock.sideHit == EnumFacing.UP && this.keepYPosition()) {
-                                    this.placedUp = true;
-                                }
-                            }
-                    }
-                }
-            }
-        }
+        return sprintModes[(int) sprint.getInput()];
     }
 }

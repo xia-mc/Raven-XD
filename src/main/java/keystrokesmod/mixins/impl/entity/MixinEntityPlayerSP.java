@@ -140,8 +140,8 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
                 this.posX,
                 this.getEntityBoundingBox().minY,
                 this.posZ,
-                RotationHandler.getRotationYaw(),
-                RotationHandler.getRotationPitch(),
+                RotationHandler.getRotationYaw(rotationYaw),
+                RotationHandler.getRotationPitch(rotationPitch),
                 this.onGround,
                 this.isSprinting(),
                 this.isSneaking()
