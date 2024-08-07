@@ -6,7 +6,6 @@ import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.ModeSetting;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.Theme;
-import keystrokesmod.utility.Timer;
 import keystrokesmod.utility.Utils;
 import keystrokesmod.utility.font.FontManager;
 import keystrokesmod.utility.font.IFont;
@@ -31,7 +30,6 @@ public class TestTargetHUD extends SubMode<TargetHUD> implements ITargetVisual {
     private final ModeSetting font;
     private final ButtonSetting showStatus;
     private final ButtonSetting healthColor;
-    private static final Timer healthBarTimer = null;
 
     private final Animation healthBarAnimation = new Animation(Easing.EASE_OUT_CIRC, 150);
 
