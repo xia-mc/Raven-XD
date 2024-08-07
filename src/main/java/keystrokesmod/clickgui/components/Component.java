@@ -6,12 +6,10 @@ import keystrokesmod.module.impl.client.Gui;
 import keystrokesmod.module.setting.Setting;
 import keystrokesmod.module.setting.impl.*;
 import keystrokesmod.utility.render.RenderUtils;
-import net.minecraftforge.fml.client.config.GuiUtils;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
-import java.util.Collections;
 import java.util.NoSuchElementException;
 
 public abstract class Component implements IComponent {

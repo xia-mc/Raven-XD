@@ -79,7 +79,7 @@ public class Raven {
         FMLCommonHandler.instance().bus().register(ModuleManager.slotHandler);
         FMLCommonHandler.instance().bus().register(ModuleManager.dynamicManager);
 
-//        I18nManager.init();
+        I18nManager.init();
     }
 
     @SubscribeEvent

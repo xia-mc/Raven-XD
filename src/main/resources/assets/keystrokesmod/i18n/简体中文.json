@@ -11,6 +11,24 @@
     },
     "BlockHit": {
       "name": "格挡"
+    },
+    "Criticals": {
+      "name": "刀爆"
+    },
+    "HitBox": {
+      "name": "命中框"
+    },
+    "HitSelect": {
+      "name": "点击选择"
+    },
+    "KillAura": {
+      "name": "杀戮光环"
+    },
+    "Velocity": {
+      "name": "反击退"
+    },
+    "Fly": {
+      "name": "飞行"
     }
   }
 }

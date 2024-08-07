@@ -96,7 +96,7 @@ public class BindComponent extends Component {
     }
 
     private void drawString(String s) {
-        Minecraft.getMinecraft().fontRendererObj.drawStringWithShadow(s, (float) ((this.parent.categoryComponent.getX() + 4) * 2), (float) ((this.parent.categoryComponent.getY() + this.bind + 3) * 2), !this.parent.mod.hidden ? Theme.getGradient(10, 0) : Theme.getGradient(11, 0));
+        getFont().drawStringWithShadow(s, (float) ((this.parent.categoryComponent.getX() + 4) * 2), (float) ((this.parent.categoryComponent.getY() + this.bind + 3) * 2), !this.parent.mod.hidden ? Theme.getGradient(10, 0) : Theme.getGradient(11, 0));
     }
 
     public void onGuiClosed() {

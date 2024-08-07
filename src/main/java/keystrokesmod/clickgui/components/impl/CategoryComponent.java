@@ -6,7 +6,7 @@ import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.client.Gui;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.Timer;
-import keystrokesmod.utility.font.impl.MinecraftFontRenderer;
+import keystrokesmod.utility.font.IFont;
 import keystrokesmod.utility.render.RenderUtils;
 import keystrokesmod.utility.Utils;
 import keystrokesmod.utility.profile.Manager;
@@ -25,13 +25,16 @@ import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class CategoryComponent {
+    @Getter
     public List<ModuleComponent> modules = new CopyOnWriteArrayList<>();
     public Module.category categoryName;
     @Getter
     private boolean categoryOpened;
     private Timer smoothTimer;
     private int width;
+    @Getter
     private int y;
+    @Getter
     private int x;
     private int buttonHeight;
     public boolean dragging;
@@ -75,10 +78,6 @@ public class CategoryComponent {
             this.modules.add(b);
             tY += 16;
         }
-    }
-
-    public List<ModuleComponent> getModules() {
-        return this.modules;
     }
 
     public void reloadModules(boolean isProfile) {
@@ -150,7 +149,7 @@ public class CategoryComponent {
         this.openCloseAnimation.setDestinationValue(on ? 1 : 0);
     }
 
-    public void rf(MinecraftFontRenderer renderer) {
+    public void rf(IFont renderer) {
         this.width = 92;
         int h = 0;
         if (!this.modules.isEmpty() && this.categoryOpened) {
@@ -210,14 +209,6 @@ public class CategoryComponent {
             c.so(o);
         }
 
-    }
-
-    public int getX() {
-        return this.x;
-    }
-
-    public int getY() {
-        return this.y;
     }
 
     public int gw() {

@@ -8,7 +8,7 @@ import keystrokesmod.module.setting.impl.ModeSetting;
 import keystrokesmod.module.setting.utils.ModeOnly;
 import keystrokesmod.utility.Theme;
 import keystrokesmod.utility.font.FontManager;
-import keystrokesmod.utility.font.impl.MinecraftFontRenderer;
+import keystrokesmod.utility.font.IFont;
 import keystrokesmod.utility.render.RenderUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiChat;
@@ -42,6 +42,7 @@ public class Watermark extends Module {
     private final ModeSetting mode;
     private final ModeSetting watermarkText;
     private final ModeSetting watermarkPhoto;
+    private final ModeSetting font;
     private final ModeSetting theme;
     private final ButtonSetting showVersion;
     private final ButtonSetting lowercase;
@@ -54,6 +55,7 @@ public class Watermark extends Module {
         final ModeOnly photoMode = new ModeOnly(mode, 1);
         this.registerSetting(watermarkText = new ModeSetting("Watermark text", new String[]{"Default", "Augustus", "Custom", "Sense"}, 0, textMode));
         this.registerSetting(watermarkPhoto = new ModeSetting("Watermark photo", new String[]{"Default", "Enders", "Augustus"}, 0, photoMode));
+        this.registerSetting(font = new ModeSetting("Font", new String[]{"Minecraft", "Product Sans"}, 0, textMode));
         this.registerSetting(theme = new ModeSetting("Theme", Theme.themes, 0, textMode.extend(new ModeOnly(watermarkText, 2))));
         this.registerSetting(showVersion = new ButtonSetting("Show version", true, textMode));
         this.registerSetting(lowercase = new ButtonSetting("Lowercase", false, textMode));
@@ -100,7 +102,16 @@ public class Watermark extends Module {
                     if (lowercase.isToggled())
                         text = text.toLowerCase();
 
-                    MinecraftFontRenderer font = FontManager.getMinecraft();
+                    IFont font;
+                    switch ((int) this.font.getInput()) {
+                        default:
+                        case 0:
+                            font = FontManager.getMinecraft();
+                            break;
+                        case 1:
+                            font = FontManager.productSans20;
+                    }
+
                     font.drawString(text, posX, posY, Theme.getGradient((int) theme.getInput(), 0), shadow.isToggled());
 
                     current$minX = posX;

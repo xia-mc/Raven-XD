@@ -2,7 +2,6 @@ package keystrokesmod.module.impl.client;
 
 import keystrokesmod.Raven;
 import keystrokesmod.module.Module;
-import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.ModeValue;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.i18n.I18nManager;
@@ -15,7 +14,6 @@ public class Language extends Module {
 
     public Language() {
         super("Language", category.client);
-        this.registerSetting(new ButtonSetting("Load", I18nManager::init));
         mode = new ModeValue("Language", this);
 
         String[] languageList = I18nManager.LANGUAGE_LIST;
