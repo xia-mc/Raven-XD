@@ -10,7 +10,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class FontManager {
-    public static FontRenderer regular16, regular22, icon20, productSans16, productSans20, productSansLight, productSansMedium;
+    public static FontRenderer
+            regular16, regular22,
+            icon20,
+            productSans16, productSans20, productSansLight, productSansMedium;
+
     private static int prevScale;
 
     public static void init() {

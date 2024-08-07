@@ -13,7 +13,7 @@ import keystrokesmod.utility.Commands;
 import keystrokesmod.utility.Timer;
 import keystrokesmod.utility.Utils;
 import keystrokesmod.utility.font.FontManager;
-import keystrokesmod.utility.font.impl.MinecraftFontRenderer;
+import keystrokesmod.utility.font.IFont;
 import net.minecraft.client.gui.*;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraftforge.fml.client.config.GuiButtonExt;
@@ -37,7 +37,6 @@ public class ClickGui extends GuiScreen {
     private ScaledResolution sr;
     private GuiButtonExt s;
     private GuiTextField c;
-    private final MinecraftFontRenderer fontRendererObj = FontManager.getMinecraft();
     public static Map<Module.category, CategoryComponent> categories;
     public static List<Module.category> clickHistory;
     private Runnable delayedAction = null;
@@ -59,8 +58,14 @@ public class ClickGui extends GuiScreen {
         }
     }
 
-    public FontRenderer getFont() {
-        return super.fontRendererObj;
+    public static IFont getFont() {
+        switch ((int) Gui.font.getInput()) {
+            default:
+            case 0:
+                return FontManager.getMinecraft();
+            case 1:
+                return FontManager.productSans20;
+        }
     }
 
     public void run(Runnable task) {
@@ -88,12 +93,12 @@ public class ClickGui extends GuiScreen {
             int h = this.height / 4;
             int wd = this.width / 2;
             int w_c = 30 - this.aT.getValueInt(0, 30, 3);
-            this.fontRendererObj.drawCenteredString("r", wd + 1 - w_c, h - 25, Utils.getChroma(2L, 1500L));
-            this.fontRendererObj.drawCenteredString("a", wd - w_c, h - 15, Utils.getChroma(2L, 1200L));
-            this.fontRendererObj.drawCenteredString("v", wd - w_c, h - 5, Utils.getChroma(2L, 900L));
-            this.fontRendererObj.drawCenteredString("e", wd - w_c, h + 5, Utils.getChroma(2L, 600L));
-            this.fontRendererObj.drawCenteredString("n", wd - w_c, h + 15, Utils.getChroma(2L, 300L));
-            this.fontRendererObj.drawCenteredString("XD", wd + 1 + w_c, h + 30, Utils.getChroma(2L, 0L));
+            getFont().drawCenteredString("r", wd + 1 - w_c, h - 25, Utils.getChroma(2L, 1500L));
+            getFont().drawCenteredString("a", wd - w_c, h - 15, Utils.getChroma(2L, 1200L));
+            getFont().drawCenteredString("v", wd - w_c, h - 5, Utils.getChroma(2L, 900L));
+            getFont().drawCenteredString("e", wd - w_c, h + 5, Utils.getChroma(2L, 600L));
+            getFont().drawCenteredString("n", wd - w_c, h + 15, Utils.getChroma(2L, 300L));
+            getFont().drawCenteredString("XD", wd + 1 + w_c, h + 30, Utils.getChroma(2L, 0L));
             this.drawVerticalLine(wd - 10 - w_c, h - 30, h + 43, Color.white.getRGB());
             this.drawVerticalLine(wd + 10 + w_c, h - 30, h + 43, Color.white.getRGB());
             if (this.aL != null) {
@@ -105,7 +110,7 @@ public class ClickGui extends GuiScreen {
 
         for (Module.category category : clickHistory) {
             CategoryComponent c = categories.get(category);
-            c.rf(this.fontRendererObj);
+            c.rf(getFont());
             c.up(x, y);
 
             for (IComponent m : c.getModules()) {
@@ -138,7 +143,7 @@ public class ClickGui extends GuiScreen {
             this.drawHorizontalLine(0, r - 1, this.height - 345, -1);
             this.drawHorizontalLine(0, r - 1, this.height - 115, -1);
             drawRect(r - 1, 0, r, this.height, -1);
-            Commands.rc(this.fontRendererObj, this.height, r, this.sr.getScaleFactor());
+            Commands.rc(getFont(), this.height, r, this.sr.getScaleFactor());
             int x2 = r - 178;
             this.c.xPosition = x2;
             this.s.xPosition = x2;

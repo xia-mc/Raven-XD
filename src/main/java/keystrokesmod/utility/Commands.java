@@ -6,14 +6,13 @@ import keystrokesmod.clickgui.ClickGui;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.client.Settings;
-import keystrokesmod.module.impl.combat.Velocity;
 import keystrokesmod.module.impl.fun.NoteBot;
 import keystrokesmod.module.impl.minigames.DuelsStats;
 import keystrokesmod.module.impl.other.FakeChat;
 import keystrokesmod.module.impl.other.KillMessage;
 import keystrokesmod.module.impl.other.NameHider;
 import keystrokesmod.module.impl.render.Watermark;
-import keystrokesmod.utility.font.impl.MinecraftFontRenderer;
+import keystrokesmod.utility.font.IFont;
 import keystrokesmod.utility.profile.Profile;
 import keystrokesmod.utility.render.RenderUtils;
 import net.minecraft.client.Minecraft;
@@ -468,7 +467,7 @@ public class Commands {
         }
     }
 
-    public static void rc(MinecraftFontRenderer fr, int h, int w, int s) {
+    public static void rc(IFont fr, int h, int w, int s) {
         int x = w - 195;
         int y = h - 130;
         int sY = h - 345;
@@ -481,7 +480,7 @@ public class Commands {
         GL11.glDisable(3089);
     }
 
-    private static void rss(MinecraftFontRenderer fr, List<String> rs, int x, int y) {
+    private static void rss(IFont fr, List<String> rs, int x, int y) {
         if (f) {
             f = false;
             print("Welcome,", 0);
@@ -504,7 +503,7 @@ public class Commands {
                 }
 
                 fr.drawString(s, x, y, c);
-                y -= Math.round(fr.height() + 5);
+                y -= (int) Math.round(fr.height() + 5);
             }
 
         }

@@ -115,6 +115,7 @@ public class ModuleManager {
     public static AirStuck airStuck;
     public static TargetHUD targetHUD;
     public static TargetESP targetESP;
+    public static Language language;
 
     public void register() {
 
@@ -128,6 +129,7 @@ public class ModuleManager {
         this.addModule(new MiddleClick());
         this.addModule(notifications = new Notifications());
         this.addModule(new DiscordRpc());
+        this.addModule(language = new Language());
 
         // combat
         this.addModule(new AimAssist());

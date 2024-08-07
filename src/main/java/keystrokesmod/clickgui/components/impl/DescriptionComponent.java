@@ -28,7 +28,7 @@ public class DescriptionComponent extends Component {
     public void render() {
         GL11.glPushMatrix();
         GL11.glScaled(0.5D, 0.5D, 0.5D);
-        Minecraft.getMinecraft().fontRendererObj.drawString(this.desc.getDesc(), (float) ((this.parent.categoryComponent.getX() + 4) * 2), (float) ((this.parent.categoryComponent.getY() + this.o + 4) * 2), Theme.getGradient(10, 0), true);
+        getFont().drawString(this.desc.getDesc(), (float) ((this.parent.categoryComponent.getX() + 4) * 2), (float) ((this.parent.categoryComponent.getY() + this.o + 4) * 2), Theme.getGradient(10, 0), true);
         GL11.glPopMatrix();
     }
 

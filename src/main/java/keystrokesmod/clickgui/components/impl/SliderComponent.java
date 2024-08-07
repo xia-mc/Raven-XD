@@ -7,7 +7,6 @@ import keystrokesmod.module.setting.Setting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.utility.Utils;
 import keystrokesmod.utility.profile.ProfileModule;
-import net.minecraft.client.Minecraft;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
@@ -57,7 +56,7 @@ public class SliderComponent extends Component {
         } else {
             value = Utils.isWholeNumber(input) ? (int) input + "" : String.valueOf(input);
         }
-        Minecraft.getMinecraft().fontRendererObj.drawString(
+        getFont().drawString(
                 this.sliderSetting.getName() + ": " + value + info,
                 (float) ((int) ((float) (this.parent.categoryComponent.getX() + 4) * 2.0F)),
                 (float) ((int) ((float) (this.parent.categoryComponent.getY() + this.o + 3) * 2.0F)),

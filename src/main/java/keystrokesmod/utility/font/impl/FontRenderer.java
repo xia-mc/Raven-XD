@@ -68,10 +68,10 @@ public class FontRenderer extends CharRenderer implements IFont {
         }
 
         if (shadow) {
-            color = (color & 0xFCFCFC) >> 2 | color & 0xFF000000;
+            drawString(text, x + 1, y + 1, (color & 0xFCFCFC) >> 2 | color & 0xFF000000, false);
         }
 
-        FontManager.init();
+//        FontManager.init();
 
         CharData[] currentData = this.charData;
         double alpha = (color >> 24 & 255) / 255f;

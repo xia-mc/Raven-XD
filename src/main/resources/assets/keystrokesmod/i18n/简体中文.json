@@ -1,0 +1,111 @@
+{
+  "modules": {
+    "AimAssist": {
+      "name": "自瞄",
+      "toolTip": "平滑地瞄准最接近的目标"
+    },
+    "ArmedAura": {
+      "name": "枪械光环",
+      "toolTip": "像CS2外挂一样自动瞄准并开火"
+    },
+    "AutoClicker": {
+      "name": "连点"
+    },
+    "BlockHit": {
+      "name": "格挡",
+      "toolTip": "自动格挡"
+    },
+    "Criticals": {
+      "name": "刀爆",
+      "toolTip": "使你刀刀暴击"
+    },
+    "HitBox": {
+      "name": "命中框"
+    },
+    "HitSelect": {
+      "name": "点击选择",
+      "toolTip": "选择最好的时间以攻击"
+    },
+    "KillAura": {
+      "name": "杀戮光环"
+    },
+    "Reach": {
+      "name": "距离"
+    },
+    "Velocity": {
+      "name": "反击退"
+    },
+    "AirStuck": {
+      "name": "卡空"
+    },
+    "Fly": {
+      "name": "飞行"
+    },
+    "InvMove": {
+      "name": "背包行走"
+    },
+    "Jesus": {
+      "name": "水上行走"
+    },
+    "KeepSprint": {
+      "name": "保持疾跑"
+    },
+    "Phase": {
+      "name": "穿墙"
+    },
+    "Speed": {
+      "name": "速度"
+    },
+    "Sprint": {
+      "name": "自动疾跑"
+    },
+    "WallClimb": {
+      "name": "爬墙"
+    },
+    "Anticheat": {
+      "name": "反作弊"
+    },
+    "AntiVoid": {
+      "name": "反虚空"
+    },
+    "AutoHeal": {
+      "name": "自动治疗"
+    },
+    "Backtrack": {
+      "name": "回溯"
+    },
+    "ChestStealer": {
+      "name": "箱子小偷"
+    },
+    "FakeLag": {
+      "name": "假延迟"
+    },
+    "InvManager": {
+      "name": "背包整理"
+    },
+    "NoFall": {
+      "name": "无摔落伤害"
+    },
+    "AntiBot": {
+      "name": "反假人"
+    },
+    "AutoTool": {
+      "name": "自动工具"
+    },
+    "BedAura": {
+      "name": "自动挖床"
+    },
+    "FastPlace": {
+      "name": "快速放置"
+    },
+    "Legit Scaffold": {
+      "name": "搭路辅助"
+    },
+    "SafeWalk": {
+      "name": "安全行走"
+    },
+    "Scaffold": {
+      "name": "自动搭路"
+    }
+  }
+}

@@ -9,6 +9,7 @@ import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.ModeValue;
 import keystrokesmod.script.Script;
 import keystrokesmod.utility.Utils;
+import keystrokesmod.utility.i18n.I18nModule;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.client.Minecraft;
@@ -22,6 +23,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 public class Module {
+    @Setter
+    private @Nullable I18nModule i18nObject = null;
+
     @Getter
     protected final ArrayList<Setting> settings;
     private final String moduleName;
@@ -32,7 +36,7 @@ public class Module {
     @Setter
     private boolean enabled;
     private int keycode;
-    public @Nullable String toolTip;
+    private @Nullable String toolTip;
     protected static Minecraft mc;
     private boolean isToggled = false;
     public boolean canBeEnabled = true;
@@ -149,7 +153,9 @@ public class Module {
     }
 
     public String getPrettyInfo() {
-        return ModuleManager.customName.isEnabled() && ModuleManager.customName.info.isToggled() ? getRawPrettyInfo() : getInfo();
+        return ModuleManager.customName.isEnabled() && ModuleManager.customName.info.isToggled()
+                ? getRawPrettyInfo()
+                : getInfo();
     }
 
     public String getName() {
@@ -157,7 +163,17 @@ public class Module {
     }
 
     public String getPrettyName() {
-        return ModuleManager.customName.isEnabled() ? getRawPrettyName() : getName();
+        return ModuleManager.customName.isEnabled()
+                ? getRawPrettyName()
+                : i18nObject != null ? i18nObject.getName() : getName();
+    }
+
+    public @Nullable String getToolTip() {
+        return toolTip;
+    }
+
+    public @Nullable String getPrettyToolTip() {
+        return i18nObject != null ? i18nObject.getToolTip() : getToolTip();
     }
 
     public String getRawPrettyName() {

@@ -9,7 +9,6 @@ import keystrokesmod.module.setting.Setting;
 import keystrokesmod.utility.render.RenderUtils;
 import keystrokesmod.utility.profile.Manager;
 import keystrokesmod.utility.profile.ProfileModule;
-import net.minecraft.client.Minecraft;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.opengl.GL11;
 
@@ -125,7 +124,7 @@ public class ModuleComponent implements IComponent {
         if (this.mod.moduleCategory() == Module.category.profiles && !(this.mod instanceof Manager) && !((ProfileModule) this.mod).saved && Raven.currentProfile.getModule() == this.mod) {
             button_rgb = unsavedColor;
         }
-        Minecraft.getMinecraft().fontRendererObj.drawStringWithShadow(this.mod.getPrettyName(), (float) (this.categoryComponent.getX() + this.categoryComponent.gw() / 2 - Minecraft.getMinecraft().fontRendererObj.getStringWidth(this.mod.getPrettyName()) / 2), (float) (this.categoryComponent.getY() + this.o + 4), button_rgb);
+        getFont().drawStringWithShadow(this.mod.getPrettyName(), (float) (this.categoryComponent.getX() + (double) this.categoryComponent.gw() / 2 - getFont().width(this.mod.getPrettyName()) / 2), (float) (this.categoryComponent.getY() + this.o + 4), button_rgb);
         GL11.glPopMatrix();
         if (this.po && !this.settings.isEmpty()) {
             for (Component c : this.settings) {
@@ -171,8 +170,8 @@ public class ModuleComponent implements IComponent {
         }
         hovering = isHover(x, y);
 
-        if (hovering && categoryComponent.isCategoryOpened() && Gui.toolTip.isToggled() && mod.toolTip != null) {
-            Raven.clickGui.run(() -> RenderUtils.drawToolTip(mod.toolTip, x, y));
+        if (hovering && categoryComponent.isCategoryOpened() && Gui.toolTip.isToggled() && mod.getPrettyToolTip() != null) {
+            Raven.clickGui.run(() -> RenderUtils.drawToolTip(mod.getPrettyToolTip(), x, y));
         }
     }
 

@@ -5,28 +5,30 @@ import keystrokesmod.event.PreMotionEvent;
 import keystrokesmod.event.SendPacketEvent;
 import keystrokesmod.module.impl.movement.NoSlow;
 import keystrokesmod.module.impl.other.SlotHandler;
+import keystrokesmod.module.setting.impl.ModeSetting;
 import keystrokesmod.utility.ContainerUtils;
 import keystrokesmod.utility.PacketUtils;
 import keystrokesmod.utility.Utils;
-import net.minecraft.item.ItemBow;
 import net.minecraft.item.ItemPotion;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
-import net.minecraft.network.play.client.C07PacketPlayerDigging;
+import net.minecraft.network.play.client.C02PacketUseEntity;
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
 import net.minecraft.network.play.client.C09PacketHeldItemChange;
 import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumFacing;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class HypixelNoSlow extends INoSlow {
+    private final ModeSetting swordMode;
+
     private int offGroundTicks = 0;
     private boolean send = false;
 
     public HypixelNoSlow(String name, @NotNull NoSlow parent) {
         super(name, parent);
+        this.registerSetting(swordMode = new ModeSetting("Sword mode", new String[]{"Switch", "Test1", "Test2"}, 0));
     }
 
     @Override
@@ -34,8 +36,18 @@ public class HypixelNoSlow extends INoSlow {
         if (!mc.thePlayer.isUsingItem() || SlotHandler.getHeldItem() == null) return;
 
         if (SlotHandler.getHeldItem().getItem() instanceof ItemSword) {
-            if (mc.thePlayer.ticksExisted % 3 == 0 && !Raven.badPacketsHandler.C07) {
-                PacketUtils.sendPacket(new C08PacketPlayerBlockPlacement(null));
+            switch ((int) swordMode.getInput()) {
+                case 0:
+                    PacketUtils.sendPacket(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem % 8 + 1));
+                    PacketUtils.sendPacket(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
+                    break;
+                case 1:
+                    if (mc.thePlayer.ticksExisted % 2 == 0 && !Raven.badPacketsHandler.C07)
+                        PacketUtils.sendPacket(new C08PacketPlayerBlockPlacement(null));
+                    break;
+                case 2:
+                    PacketUtils.sendPacket(new C02PacketUseEntity());
+                    break;
             }
         } else {
             if (mc.thePlayer.ticksExisted % 3 == 0 && !Raven.badPacketsHandler.C07) {
@@ -85,7 +97,6 @@ public class HypixelNoSlow extends INoSlow {
     public float getSlowdown() {
         ItemStack item = SlotHandler.getHeldItem();
         if (item == null) return 1;
-        if (item.getItem() instanceof ItemSword) return .8f;
         if (item.getItem() instanceof ItemPotion) return .8f;
         return 1;
     }
