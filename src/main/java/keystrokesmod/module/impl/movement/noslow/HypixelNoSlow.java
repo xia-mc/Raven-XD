@@ -98,7 +98,6 @@ public class HypixelNoSlow extends INoSlow {
     public float getSlowdown() {
         ItemStack item = SlotHandler.getHeldItem();
         if (item == null) return 1;
-        if (item.getItem() instanceof ItemSword) return .8f;
         if (item.getItem() instanceof ItemPotion) return .8f;
         return 1;
     }
