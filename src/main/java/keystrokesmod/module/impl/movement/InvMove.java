@@ -1,5 +1,6 @@
 package keystrokesmod.module.impl.movement;
 
+import keystrokesmod.clickgui.ClickGui;
 import keystrokesmod.event.PreUpdateEvent;
 import keystrokesmod.event.SendPacketEvent;
 import keystrokesmod.module.Module;
@@ -21,13 +22,14 @@ import org.lwjgl.input.Keyboard;
 import static keystrokesmod.module.ModuleManager.*;
 
 public class InvMove extends Module {
-    public static final String[] MODES = {"Normal", "Blink", "LegitInv", "Hypixel"};
+    public static final String[] MODES = {"Normal", "Blink", "LegitInv", "Hypixel", "None"};
     private final ModeSetting mode;
     private final ButtonSetting noOpenPacket;
     private final ButtonSetting allowSprint;
     private final ButtonSetting allowSneak;
     private final ButtonSetting chestNameCheck;
     private final ButtonSetting targetNearbyCheck;
+    private final ButtonSetting clickGui;
 
     private boolean blinking = false;
 
@@ -42,11 +44,13 @@ public class InvMove extends Module {
         this.registerSetting(allowSneak = new ButtonSetting("Allow sneak", false));
         this.registerSetting(chestNameCheck = new ButtonSetting("Chest name check", true));
         this.registerSetting(targetNearbyCheck = new ButtonSetting("Target nearby check", true));
+        this.registerSetting(clickGui = new ButtonSetting("Click gui", true));
     }
 
     @SubscribeEvent
     public void onPreUpdate(PreUpdateEvent event) {
-        if (mc.currentScreen instanceof GuiContainer && nameCheck() && targetNearbyCheck() && !scaffold.isEnabled()) {
+        if ((mc.currentScreen instanceof GuiContainer || (clickGui.isToggled() && mc.currentScreen instanceof ClickGui))
+                && nameCheck() && targetNearbyCheck() && !scaffold.isEnabled()) {
             switch ((int) mode.getInput()) {
                 case 1:
                     if (!blinking) {
@@ -62,6 +66,11 @@ public class InvMove extends Module {
                     break;
                 case 3:
                     MoveUtil.stop();
+                    break;
+                case 4:
+                    if (!(mc.currentScreen instanceof ClickGui) || !clickGui.isToggled()) {
+                        return;
+                    }
                     break;
             }
 

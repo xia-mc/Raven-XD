@@ -33,7 +33,7 @@ import static keystrokesmod.module.ModuleManager.tower;
  * @see hackclient.rise.rh
  * @author Alan34
  */
-public class HypixelBTower extends SubMode<Tower> {
+public class HypixelFastTower extends SubMode<Tower> {
     public static final HashSet<EnumFacing> LIMIT_FACING = new HashSet<>(Collections.singleton(EnumFacing.SOUTH));
     private int vr;
     private int er;
@@ -49,7 +49,7 @@ public class HypixelBTower extends SubMode<Tower> {
 
     private final ButtonSetting onlyWhileMoving;
 
-    public HypixelBTower(String name, @NotNull Tower parent) {
+    public HypixelFastTower(String name, @NotNull Tower parent) {
         super(name, parent);
         this.registerSetting(onlyWhileMoving = new ButtonSetting("Only while moving", true));
     }

@@ -11,11 +11,11 @@ import net.minecraft.util.BlockPos;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
-public class HypixelDTower extends SubMode<Tower> {
+public class HypixelFastVerticalTower extends SubMode<Tower> {
     private boolean towering;
     private int towerTicks;
 
-    public HypixelDTower(String name, @NotNull Tower parent) {
+    public HypixelFastVerticalTower(String name, @NotNull Tower parent) {
         super(name, parent);
     }
 

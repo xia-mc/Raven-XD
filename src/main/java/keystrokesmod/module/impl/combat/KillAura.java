@@ -45,7 +45,7 @@ public class KillAura extends IAutoClicker {
     private final ModeValue clickMode;
     public ModeSetting autoBlockMode;
     private final SliderSetting fov;
-    private final SliderSetting attackRange;
+    public final SliderSetting attackRange;
     private final SliderSetting swingRange;
     private final SliderSetting blockRange;
     private final SliderSetting preAimRange;
