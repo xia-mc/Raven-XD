@@ -36,7 +36,7 @@ public class Module {
     @Setter
     private boolean enabled;
     private int keycode;
-    public @Nullable String toolTip;
+    private @Nullable String toolTip;
     protected static Minecraft mc;
     private boolean isToggled = false;
     public boolean canBeEnabled = true;
@@ -153,7 +153,9 @@ public class Module {
     }
 
     public String getPrettyInfo() {
-        return ModuleManager.customName.isEnabled() && ModuleManager.customName.info.isToggled() ? getRawPrettyInfo() : getInfo();
+        return ModuleManager.customName.isEnabled() && ModuleManager.customName.info.isToggled()
+                ? getRawPrettyInfo()
+                : getInfo();
     }
 
     public String getName() {
@@ -161,7 +163,17 @@ public class Module {
     }
 
     public String getPrettyName() {
-        return ModuleManager.customName.isEnabled() ? getRawPrettyName() : i18nObject != null ? i18nObject.getName() : getName();
+        return ModuleManager.customName.isEnabled()
+                ? getRawPrettyName()
+                : i18nObject != null ? i18nObject.getName() : getName();
+    }
+
+    public @Nullable String getToolTip() {
+        return toolTip;
+    }
+
+    public @Nullable String getPrettyToolTip() {
+        return i18nObject != null ? i18nObject.getToolTip() : getToolTip();
     }
 
     public String getRawPrettyName() {

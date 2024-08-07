@@ -1,6 +1,7 @@
 package keystrokesmod.utility.font.impl;
 
 import net.minecraft.client.renderer.texture.DynamicTexture;
+import org.jetbrains.annotations.NotNull;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
@@ -28,7 +29,7 @@ public class CharRenderer {
         return new DynamicTexture(img);
     }
 
-    protected BufferedImage generateFontImage(Font font, boolean antiAlias, boolean fractionalMetrics, CharData[] chars) {
+    protected BufferedImage generateFontImage(Font font, boolean antiAlias, boolean fractionalMetrics, CharData @NotNull [] chars) {
         int imgSize = (int) this.imgSize;
         BufferedImage bufferedImage = new BufferedImage(imgSize, imgSize, 2);
         Graphics2D graphics = (Graphics2D) bufferedImage.getGraphics();

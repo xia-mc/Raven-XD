@@ -170,8 +170,8 @@ public class ModuleComponent implements IComponent {
         }
         hovering = isHover(x, y);
 
-        if (hovering && categoryComponent.isCategoryOpened() && Gui.toolTip.isToggled() && mod.toolTip != null) {
-            Raven.clickGui.run(() -> RenderUtils.drawToolTip(mod.toolTip, x, y));
+        if (hovering && categoryComponent.isCategoryOpened() && Gui.toolTip.isToggled() && mod.getPrettyToolTip() != null) {
+            Raven.clickGui.run(() -> RenderUtils.drawToolTip(mod.getPrettyToolTip(), x, y));
         }
     }
 

@@ -68,7 +68,7 @@ public class ArmedAura extends IAutoClicker {
     private long lastSwitched = -1;
 
     public ArmedAura() {
-        super("ArmedAura", category.combat);
+        super("ArmedAura", category.combat, "Auto-aim and fire like CS2 cheats");
         this.registerSetting(clickMode = new ModeValue("Click mode", this)
                 .add(new LowCPSAutoClicker("Normal", this, false, true))
                 .add(new NormalAutoClicker("NormalFast", this, false, true))

@@ -13,7 +13,6 @@ import net.minecraft.item.ItemPotion;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
 import net.minecraft.network.play.client.C02PacketUseEntity;
-import net.minecraft.network.play.client.C07PacketPlayerDigging;
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
 import net.minecraft.network.play.client.C09PacketHeldItemChange;
 import net.minecraft.util.BlockPos;
@@ -46,7 +45,7 @@ public class HypixelNoSlow extends INoSlow {
                     if (mc.thePlayer.ticksExisted % 2 == 0 && !Raven.badPacketsHandler.C07)
                         PacketUtils.sendPacket(new C08PacketPlayerBlockPlacement(null));
                     break;
-                case 3:
+                case 2:
                     PacketUtils.sendPacket(new C02PacketUseEntity());
                     break;
             }

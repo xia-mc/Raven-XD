@@ -39,7 +39,15 @@ public class I18nManager {
                             Utils.sendMessage("found module: " + module.getName());
                             JsonObject moduleObject = modulesObject.getAsJsonObject(module.getName());
 
-                            I18nModule i18nModule = new I18nModule(moduleObject.get("name").getAsString());
+                            String name = module.getName();
+                            String toolTip = module.getToolTip();
+
+                            if (moduleObject.has("name"))
+                                name = moduleObject.get("name").getAsString();
+                            if (moduleObject.has("toolTip"))
+                                toolTip = moduleObject.get("toolTip").getAsString();
+
+                            I18nModule i18nModule = new I18nModule(name, toolTip);
                             Utils.sendMessage("load i18n module: " + i18nModule.getName());
                             moduleMap.put(module, i18nModule);
                         }
