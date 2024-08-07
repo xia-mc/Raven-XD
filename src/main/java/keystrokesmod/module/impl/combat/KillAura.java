@@ -179,7 +179,7 @@ public class KillAura extends IAutoClicker {
                 break;
         }
 
-        Pair<Float, Float> result = AimSimulator.getLegitAim(target, mc.thePlayer, nearest, lazy, noise, new Pair<>(0.5F, 0.75F), (long) (80 + Math.random() * 100));
+        Pair<Float, Float> result = AimSimulator.getLegitAim(target, mc.thePlayer, nearest, lazy, noise, new Pair<>(0.35F, 0.5F), (long) (50 + Math.random() * 50));
         if (rotationSpeed.getInput() == 5) return new float[]{result.first(), result.second()};
 
         return new float[]{
