@@ -122,7 +122,7 @@ public class HypixelFireball extends SubMode<Fly> {
     public void onEnable() {
         if (getFireball() == -1) {
             Notifications.sendNotification(Notifications.NotificationTypes.INFO, "Could not find Fireball");
-            this.toggle();
+            parent.disable();
             return;
         }
         initTicks = 0;
