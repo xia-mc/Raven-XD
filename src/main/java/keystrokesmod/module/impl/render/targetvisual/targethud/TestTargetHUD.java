@@ -57,7 +57,7 @@ public class TestTargetHUD extends SubMode<TargetHUD> implements ITargetVisual {
         String string = target.getDisplayName().getFormattedText();
         float health = Utils.limit(target.getHealth() / target.getMaxHealth(), 0, 1);
         string = string + " §a" + Math.round(target.getHealth()) + " §c❤ ";
-        if (showStatus.isToggled()) {
+        if (showStatus.isToggled() && mc.thePlayer != null && mc.currentScreen != null) {
             String status = (health <= Utils.getCompleteHealth(mc.thePlayer) / mc.thePlayer.getMaxHealth()) ? "§aW" : "§cL";
             string = string + status;
         }

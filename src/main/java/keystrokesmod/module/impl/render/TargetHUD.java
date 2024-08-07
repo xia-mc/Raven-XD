@@ -100,6 +100,9 @@ public class TargetHUD extends Module {
 
     @SubscribeEvent
     public void onRender(TickEvent.RenderTickEvent event) {
+        if (mc.currentScreen != null) {
+            return;
+        }
         render(target);
     }
 

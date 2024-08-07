@@ -57,7 +57,7 @@ public class RavenTargetHUD extends SubMode<TargetHUD> implements ITargetVisual 
             health = 0;
         }
 
-        if (showStatus.isToggled()) {
+        if (showStatus.isToggled() && mc.thePlayer != null) {
             healthText = healthText + " " + ((health <= Utils.getCompleteHealth(mc.thePlayer) / mc.thePlayer.getMaxHealth()) ? "§aW" : "§cL");
         }
 
