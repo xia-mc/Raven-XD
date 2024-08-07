@@ -1,6 +1,7 @@
 package keystrokesmod.module.impl.movement.noweb;
 
 import keystrokesmod.event.BlockWebEvent;
+import keystrokesmod.event.MoveInputEvent;
 import keystrokesmod.event.PreUpdateEvent;
 import keystrokesmod.module.impl.movement.NoWeb;
 import keystrokesmod.module.setting.impl.ButtonSetting;
@@ -77,5 +78,11 @@ public class IntaveNoWeb extends SubMode<NoWeb> {
             Utils.resetTimer();
         webbing = false;
         lastWeb = null;
+    }
+
+    @SubscribeEvent
+    public void onMove(MoveInputEvent event) {
+        if (webbing)
+            event.setJump(false);
     }
 }

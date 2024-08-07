@@ -1,0 +1,16 @@
+{
+  "modules": {
+    "AimAssist": {
+      "name": "自瞄"
+    },
+    "ArmedAura": {
+      "name": "枪械光环"
+    },
+    "AutoClicker": {
+      "name": "连点"
+    },
+    "BlockHit": {
+      "name": "格挡"
+    }
+  }
+}

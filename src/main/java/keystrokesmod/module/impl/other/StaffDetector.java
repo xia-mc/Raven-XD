@@ -27,9 +27,8 @@ public class StaffDetector extends Module {
         this.registerSetting(mode, autoLobby, alarm);
 
         for (String s : STAFFLISTS) {
-            try (BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(
-                            Objects.requireNonNull(Raven.class.getResourceAsStream("/assets/keystrokesmod/stafflists/" + s + ".txt"))))) {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(
+                    Objects.requireNonNull(Raven.class.getResourceAsStream("/assets/keystrokesmod/stafflists/" + s + ".txt"))))) {
                 Set<String> lines = new HashSet<>();
                 String line;
                 while ((line = reader.readLine()) != null) {

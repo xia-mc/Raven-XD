@@ -9,6 +9,7 @@ import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.ModeValue;
 import keystrokesmod.script.Script;
 import keystrokesmod.utility.Utils;
+import keystrokesmod.utility.i18n.I18nModule;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.client.Minecraft;
@@ -22,6 +23,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 public class Module {
+    @Setter
+    private @Nullable I18nModule i18nObject = null;
+
     @Getter
     protected final ArrayList<Setting> settings;
     private final String moduleName;
@@ -157,7 +161,7 @@ public class Module {
     }
 
     public String getPrettyName() {
-        return ModuleManager.customName.isEnabled() ? getRawPrettyName() : getName();
+        return ModuleManager.customName.isEnabled() ? getRawPrettyName() : i18nObject != null ? i18nObject.getName() : getName();
     }
 
     public String getRawPrettyName() {
