@@ -4,9 +4,14 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import keystrokesmod.module.setting.Setting;
 import keystrokesmod.module.setting.interfaces.InputSetting;
+import keystrokesmod.utility.i18n.I18nModule;
+import keystrokesmod.utility.i18n.settings.I18nModeSetting;
+import keystrokesmod.utility.i18n.settings.I18nSetting;
+import keystrokesmod.utility.i18n.settings.I18nSliderSetting;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Map;
 import java.util.function.Supplier;
 
 public class ModeSetting extends Setting implements InputSetting {
@@ -44,6 +49,32 @@ public class ModeSetting extends Setting implements InputSetting {
     @Override
     public String getName() {
         return this.settingName;
+    }
+
+    public String getPrettyName() {
+        if (parent != null) {
+            I18nModule i18nObject = parent.getI18nObject();
+            if (i18nObject != null) {
+                Map<Setting, I18nSetting> settings = i18nObject.getSettings();
+                if (settings.containsKey(this)) {
+                    return ((I18nModeSetting) settings.get(this)).getSettingName();
+                }
+            }
+        }
+        return getName();
+    }
+
+    public String[] getPrettyOptions() {
+        if (parent != null) {
+            I18nModule i18nObject = parent.getI18nObject();
+            if (i18nObject != null) {
+                Map<Setting, I18nSetting> settings = i18nObject.getSettings();
+                if (settings.containsKey(this)) {
+                    return ((I18nModeSetting) settings.get(this)).getOptions();
+                }
+            }
+        }
+        return getOptions();
     }
 
     @Override

@@ -32,7 +32,7 @@ public class VulcanFly extends SubMode<Fly> {
 
     @SubscribeEvent
     public void onBlockAABB(@NotNull BlockAABBEvent event) {
-        if (BlockUtils.replaceable(event.getBlockPos())) {
+        if (BlockUtils.replaceable(event.getBlockPos()) && !mc.thePlayer.isSneaking()) {
             final double x = event.getBlockPos().getX(), y = event.getBlockPos().getY(), z = event.getBlockPos().getZ();
 
             if (y < mc.thePlayer.posY) {

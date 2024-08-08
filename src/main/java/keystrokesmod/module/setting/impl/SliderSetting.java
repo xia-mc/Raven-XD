@@ -4,11 +4,15 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import keystrokesmod.module.setting.Setting;
 import keystrokesmod.module.setting.interfaces.InputSetting;
+import keystrokesmod.utility.i18n.I18nModule;
+import keystrokesmod.utility.i18n.settings.I18nSetting;
+import keystrokesmod.utility.i18n.settings.I18nSliderSetting;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Map;
 import java.util.function.Supplier;
 
 public class SliderSetting extends Setting implements InputSetting {
@@ -66,8 +70,21 @@ public class SliderSetting extends Setting implements InputSetting {
         this.isString = true;
     }
 
+    public String getPrettyInfo() {
+        if (parent != null) {
+            I18nModule i18nObject = parent.getI18nObject();
+            if (i18nObject != null) {
+                Map<Setting, I18nSetting> settings = i18nObject.getSettings();
+                if (settings.containsKey(this)) {
+                    return ((I18nSliderSetting) settings.get(this)).getSettingInfo();
+                }
+            }
+        }
+        return getInfo();
+    }
+
     public String getInfo() {
-        return " " + this.settingInfo;
+        return this.settingInfo;
     }
 
     public void setOptions(String @NotNull [] options) {

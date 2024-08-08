@@ -13,8 +13,8 @@ public class I18nModeSetting extends I18nSetting {
     private final String settingName;
     private final String[] options;
 
-    public I18nModeSetting(String n, String toolTip, String settingName, String[] options) {
-        super(n, toolTip);
+    public I18nModeSetting(String toolTip, String settingName, String[] options) {
+        super(toolTip);
         this.settingName = settingName;
         this.options = options;
     }

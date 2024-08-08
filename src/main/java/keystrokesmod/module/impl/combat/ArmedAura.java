@@ -206,7 +206,9 @@ public class ArmedAura extends IAutoClicker {
             SlotHandler.setCurrentSlot(bestArm);
         }
 
-        if (!isArmed()) {
+        if (isArmed()) {
+            armed = true;
+        } else {
             targeted = false;
             armed = false;
         }

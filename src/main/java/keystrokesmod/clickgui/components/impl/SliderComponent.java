@@ -47,17 +47,14 @@ public class SliderComponent extends Component {
         GL11.glScaled(0.5D, 0.5D, 0.5D);
         String value;
         double input = this.sliderSetting.getInput();
-        String info = this.sliderSetting.getInfo();
-        if (input != 1 && info.equals(" second")) {
-            info += "s";
-        }
+        String info = this.sliderSetting.getPrettyInfo();
         if (this.sliderSetting.isString) {
             value = this.sliderSetting.getOptions()[(int) this.sliderSetting.getInput()];
         } else {
             value = Utils.isWholeNumber(input) ? (int) input + "" : String.valueOf(input);
         }
         getFont().drawString(
-                this.sliderSetting.getName() + ": " + value + info,
+                this.sliderSetting.getName() + ": " + value + " " + info,
                 (float) ((int) ((float) (this.parent.categoryComponent.getX() + 4) * 2.0F)),
                 (float) ((int) ((float) (this.parent.categoryComponent.getY() + this.o + 3) * 2.0F)),
                 color, true

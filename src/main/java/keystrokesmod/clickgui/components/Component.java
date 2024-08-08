@@ -35,8 +35,8 @@ public abstract class Component implements IComponent {
         toggleColor = hover ? TOGGLE_HOVER_COLOR : TOGGLE_DEFAULT_COLOR;
         onDrawScreen(x, y);
 
-        if (getSetting() != null && hover && getSetting().isVisible() && getParent().po && Gui.toolTip.isToggled() && getSetting().toolTip != null) {
-            Raven.clickGui.run(() -> RenderUtils.drawToolTip(getSetting().toolTip, x, y));
+        if (getSetting() != null && hover && getSetting().isVisible() && getParent().po && Gui.toolTip.isToggled() && getSetting().getPrettyToolTip() != null) {
+            Raven.clickGui.run(() -> RenderUtils.drawToolTip(getSetting().getPrettyToolTip(), x, y));
         }
     }
 

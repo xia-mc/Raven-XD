@@ -40,7 +40,7 @@ public class HitBox extends Module {
 
     @Override
     public String getInfo() {
-        return ((int) multiplier.getInput() == multiplier.getInput() ? (int) multiplier.getInput() + "" : multiplier.getInput()) + multiplier.getInfo();
+        return ((int) multiplier.getInput() == multiplier.getInput() ? (int) multiplier.getInput() + "" : multiplier.getInput()) + " " + multiplier.getPrettyInfo();
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)

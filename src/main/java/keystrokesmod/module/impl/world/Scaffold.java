@@ -43,6 +43,7 @@ import java.util.concurrent.TimeUnit;
 
 public class Scaffold extends IAutoClicker {
     private final ModeValue clickMode;
+    private final ButtonSetting alwaysPlaceIfPossible;
     private final SliderSetting aimSpeed;
     private final SliderSetting motion;
     private final ModeSetting rotation;
@@ -87,7 +88,7 @@ public class Scaffold extends IAutoClicker {
     public MovingObjectPosition placeBlock;
     private int lastSlot;
     private static final String[] rotationModes = new String[]{"None", "Backwards", "Strict", "Precise", "Telly", "Constant", "Snap"};
-    private static final String[] sprintModes = new String[]{"Disabled", "Vanilla", "Edge", "HypixelJump A", "HypixelJump B", "HypixelJump C", "Float", "Side", "Legit", "GrimAC", "Sneak"};
+    private static final String[] sprintModes = new String[]{"Disabled", "Vanilla", "Edge", "HypixelJump A", "HypixelJump B", "HypixelJump C", "Float", "Side", "Legit", "GrimAC", "Sneak", "Star"};
     private static final String[] precisionModes = new String[]{"Very low", "Low", "Moderate", "High", "Very high"};
     public float placeYaw;
     public float placePitch = 85;
@@ -117,6 +118,7 @@ public class Scaffold extends IAutoClicker {
                 .add(new NormalAutoClicker("Normal", this, false, true))
                 .setDefaultValue("Basic")
         );
+        this.registerSetting(alwaysPlaceIfPossible = new ButtonSetting("Always place if possible", false));
         this.registerSetting(rotation = new ModeSetting("Rotation", rotationModes, 1));
         this.registerSetting(aimSpeed = new SliderSetting("Aim speed", 20, 5, 20, 0.1, new ModeOnly(rotation, 0).reserve()));
         this.registerSetting(tellyStartTick = new SliderSetting("Telly start", 3, 0, 11, 1, "tick", new ModeOnly(rotation, 4)));
@@ -487,6 +489,11 @@ public class Scaffold extends IAutoClicker {
                 break;
         }
 
+        if (sprint.getInput() == 11) {
+            starScaffold();
+            return;
+        }
+
         EnumFacingOffset enumFacing = getEnumFacing(targetVec3);
         if (enumFacing == null) {
             return;
@@ -574,9 +581,17 @@ public class Scaffold extends IAutoClicker {
                 break;
             }
         }
-        if (rayCasted != null && place) {
+        if (place) {
             KeyBinding.setKeyBindState(mc.gameSettings.keyBindUseItem.getKeyCode(), false);
-            placeBlock = rayCasted;
+
+            if (rayCasted == null && alwaysPlaceIfPossible.isToggled()) {
+                MovingObjectPosition hitResult = RotationUtils.rayCast(4.5, RotationHandler.getRotationYaw(), RotationHandler.getRotationPitch());
+                if (hitResult == null) return;
+                placeBlock = hitResult;
+            } else {
+                if (rayCasted == null) return;
+                placeBlock = rayCasted;
+            }
             if (multiPlace.isToggled()) {
                 place(placeBlock, true);
             }
@@ -735,6 +750,7 @@ public class Scaffold extends IAutoClicker {
                 case 4:
                 case 5:
                 case 6:
+                case 11:
                     return ModuleManager.scaffold.keepYPosition();
                 case 8:
                     return Math.abs(MathHelper.wrapAngleTo180_float(mc.thePlayer.rotationYaw) - MathHelper.wrapAngleTo180_float(RotationHandler.getRotationYaw())) <= 45;
@@ -748,7 +764,7 @@ public class Scaffold extends IAutoClicker {
     }
 
     private boolean keepYPosition() {
-        boolean sameYSca = sprint.getInput() == 4 || sprint.getInput() == 3 || sprint.getInput() == 5 || sprint.getInput() == 6;
+        boolean sameYSca = sprint.getInput() == 4 || sprint.getInput() == 3 || sprint.getInput() == 5 || sprint.getInput() == 6 || sprint.getInput() == 11;
         return this.isEnabled() && Utils.keysDown() && (sameYSca || (sameY.isToggled() && !Utils.jumpDown())) && (!Utils.jumpDown() || sprint.getInput() == 6) && (!fastOnRMB.isToggled() || Mouse.isButtonDown(1));
     }
 
@@ -934,6 +950,92 @@ public class Scaffold extends IAutoClicker {
 
         Vec3 getOffset() {
             return offset;
+        }
+    }
+
+    private void starScaffold() {
+        ItemStack heldItem = mc.thePlayer.getHeldItem();
+        if (getSlot() != -1 || heldItem != null && heldItem.getItem() instanceof ItemBlock) {
+
+            if (this.keepYPosition() && !this.down) {
+                this.startPos = Math.floor(mc.thePlayer.posY);
+                this.down = true;
+            } else if (!this.keepYPosition()) {
+                this.down = false;
+                this.placedUp = false;
+            }
+
+            if (mc.thePlayer.onGround && MoveUtil.isMoving()) {
+                mc.thePlayer.jump();
+                this.add = 0;
+            }
+
+            double original = this.startPos;
+            if (this.groundDistance() > 0.0 && mc.thePlayer.posY >= Math.floor(mc.thePlayer.posY) && mc.thePlayer.fallDistance > 0.0F) {
+                ++original;
+            }
+
+            Vec3 targetVec3 = this.getPlacePossibility(0.0, original);
+            if (targetVec3 != null) {
+                BlockPos targetPos = new BlockPos(targetVec3.xCoord, targetVec3.yCoord, targetVec3.zCoord);
+                if (heldItem != null && heldItem.getItem() instanceof ItemBlock) {
+                    MovingObjectPosition rayCasted = null;
+                    float searchYaw = 25.0F;
+                    EnumFacingOffset enumFacing = this.getEnumFacing(targetVec3);
+                    if (enumFacing != null) {
+                        targetPos = targetPos.add(enumFacing.getOffset().xCoord, enumFacing.getOffset().yCoord, enumFacing.getOffset().zCoord);
+                        float[] targetRotation = new float[]{PlayerRotation.getYaw(targetPos), PlayerRotation.getPitch(targetPos)};
+                        float[] searchPitch = new float[]{78.0F, 59.0F};
+
+                        for (int i = 0; i < 2; ++i) {
+                            if (i == 1 && Utils.overPlaceable(-1.0)) {
+                                searchYaw = 180.0F;
+                                searchPitch = new float[]{65.0F, 25.0F};
+                            } else if (i == 1) {
+                                break;
+                            }
+
+                            float[] var13 = this.generateSearchSequence(searchYaw);
+
+                            for (float checkYaw : var13) {
+                                float playerYaw = this.isDiagonal() ? getYaw() : targetRotation[0];
+                                float fixedYaw = (float) ((double) (playerYaw - checkYaw) + this.getRandom());
+                                double deltaYaw = Math.abs(playerYaw - fixedYaw);
+                                if ((i != 1 || !this.inBetween(75.0F, 95.0F, (float) deltaYaw)) && !(deltaYaw > 500.0)) {
+                                    float[] var21 = this.generateSearchSequence(searchPitch[1]);
+
+                                    for (float checkPitch : var21) {
+                                        float fixedPitch = RotationUtils.clampTo90((float) ((double) (targetRotation[1] + checkPitch) + this.getRandom()));
+                                        MovingObjectPosition raycast = RotationUtils.rayTraceCustom(mc.playerController.getBlockReachDistance(), fixedYaw, fixedPitch);
+                                        if (raycast != null && raycast.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK && raycast.getBlockPos().equals(targetPos) && raycast.sideHit == enumFacing.getEnumFacing() && (rayCasted == null || !BlockUtils.isSamePos(raycast.getBlockPos(), rayCasted.getBlockPos())) && ((ItemBlock) heldItem.getItem()).canPlaceBlockOnSide(mc.theWorld, raycast.getBlockPos(), raycast.sideHit, mc.thePlayer, heldItem) && rayCasted == null) {
+                                            this.forceStrict = this.forceStrict(checkYaw) && i == 1;
+
+                                            rayCasted = raycast;
+                                            this.placeYaw = fixedYaw;
+                                            this.placePitch = fixedPitch;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+
+                            if (rayCasted != null) {
+                                break;
+                            }
+                        }
+
+                        if (rayCasted != null) {
+                            KeyBinding.setKeyBindState(mc.gameSettings.keyBindUseItem.getKeyCode(), false);
+                            this.placeBlock = rayCasted;
+                            this.place(this.placeBlock, false);
+                            this.place = false;
+                            if (this.placeBlock.sideHit == EnumFacing.UP && this.keepYPosition()) {
+                                this.placedUp = true;
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 

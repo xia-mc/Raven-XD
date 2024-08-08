@@ -2,6 +2,7 @@ package keystrokesmod.module.impl.client;
 
 import keystrokesmod.Raven;
 import keystrokesmod.module.Module;
+import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.setting.impl.ModeValue;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.i18n.I18nManager;
@@ -10,7 +11,7 @@ import keystrokesmod.utility.i18n.I18nModule;
 import java.util.Map;
 
 public class Language extends Module {
-    private final ModeValue mode;
+    public final ModeValue mode;
 
     public Language() {
         super("Language", category.client);
@@ -27,6 +28,7 @@ public class Language extends Module {
                     for (Module module : Raven.getModuleManager().getModules()) {
                         module.setI18nObject(map.getOrDefault(module, null));
                     }
+                    ModuleManager.sort();
                 }
             });
         }
@@ -46,5 +48,6 @@ public class Language extends Module {
         for (Module module : Raven.getModuleManager().getModules()) {
             module.setI18nObject(null);
         }
+        ModuleManager.sort();
     }
 }
