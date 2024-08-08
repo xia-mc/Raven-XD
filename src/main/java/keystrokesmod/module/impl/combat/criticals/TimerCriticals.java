@@ -36,6 +36,8 @@ public class TimerCriticals extends SubMode<Criticals> {
 
     @SubscribeEvent
     public void onRender(TickEvent.RenderTickEvent event) {
+        if (mc.thePlayer == null) return;
+
         if (startTimer != -1) {
             if (mc.thePlayer.onGround || delayed
                     || (mc.thePlayer.hurtTime > 0 && stopOnHurt.isToggled())

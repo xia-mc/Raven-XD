@@ -56,10 +56,12 @@ public class ExhibitionTargetHUD extends SubMode<TargetHUD> implements ITargetVi
 
         ///////////////////////////////////////////////////
 
-        GlStateManager.pushMatrix(); // gay shit
-        GlStateManager.scale(0.7, 0.7, 0.7); //scaling text
-        getFont().drawString("HP: " + Math.round(target.getHealth()) + " | Dist: " + Math.round(mc.thePlayer.getDistanceToEntity(target)), (int) ((x + 40) * (1 / 0.7)), (int) ((y + 17) * (1 / 0.7)), Color.WHITE.getRGB()); //drawing said scaled text
-        GlStateManager.popMatrix(); // more gay shit
+        if (mc.thePlayer != null) {
+            GlStateManager.pushMatrix(); // gay shit
+            GlStateManager.scale(0.7, 0.7, 0.7); //scaling text
+            getFont().drawString("HP: " + Math.round(target.getHealth()) + " | Dist: " + Math.round(mc.thePlayer.getDistanceToEntity(target)), (int) ((x + 40) * (1 / 0.7)), (int) ((y + 17) * (1 / 0.7)), Color.WHITE.getRGB()); //drawing said scaled text
+            GlStateManager.popMatrix(); // more gay shit
+        }
 
         ///////////////////////////////////////////////////
 
@@ -93,11 +95,13 @@ public class ExhibitionTargetHUD extends SubMode<TargetHUD> implements ITargetVi
 
         ///////////////////////////////////////////////////
 
-        GlStateManager.pushMatrix(); //gay shit
-        GlStateManager.scale(0.4, 0.4, 0.4); //scaling the gay shit
-        GlStateManager.translate((x + 20) * (1 / 0.4), (y + 44) * (1 / 0.4), 40f * (1 / 0.4)); //translating
-        drawModel(target.rotationYaw, target.rotationPitch, target); //drawing model
-        GlStateManager.popMatrix(); //more gay shit
+        if (mc.thePlayer != null) {
+            GlStateManager.pushMatrix(); //gay shit
+            GlStateManager.scale(0.4, 0.4, 0.4); //scaling the gay shit
+            GlStateManager.translate((x + 20) * (1 / 0.4), (y + 44) * (1 / 0.4), 40f * (1 / 0.4)); //translating
+            drawModel(target.rotationYaw, target.rotationPitch, target); //drawing model
+            GlStateManager.popMatrix(); //more gay shit
+        }
     }
 
     private static Color getColor(@NotNull EntityLivingBase target) { // a VERY retarded way to do health colors :smile:
