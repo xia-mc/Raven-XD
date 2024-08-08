@@ -1,127 +1,127 @@
 {
   "modules": {
     "AimAssist": {
-      "name": "×ÔÃé",
-      "toolTip": "Æ½»¬µØÃé×¼×î½Ó½üµÄÄ¿±ê"
+      "name": "è‡ªç„",
+      "toolTip": "å¹³æ»‘åœ°ç„å‡†æœ€æ¥è¿‘çš„ç›®æ ‡"
     },
     "ArmedAura": {
-      "name": "Ç¹Ğµ¹â»·",
-      "toolTip": "ÏñCS2Íâ¹ÒÒ»Ñù×Ô¶¯Ãé×¼²¢¿ª»ğ"
+      "name": "æªæ¢°å…‰ç¯",
+      "toolTip": "åƒCS2å¤–æŒ‚ä¸€æ ·è‡ªåŠ¨ç„å‡†å¹¶å¼€ç«"
     },
     "AutoClicker": {
-      "name": "Á¬µã"
+      "name": "è¿ç‚¹"
     },
     "BlockHit": {
-      "name": "¸ñµ²",
-      "toolTip": "×Ô¶¯¸ñµ²"
+      "name": "æ ¼æŒ¡",
+      "toolTip": "è‡ªåŠ¨æ ¼æŒ¡"
     },
     "Criticals": {
-      "name": "µ¶±¬",
-      "toolTip": "Ê¹Äãµ¶µ¶±©»÷"
+      "name": "åˆ€çˆ†",
+      "toolTip": "ä½¿ä½ åˆ€åˆ€æš´å‡»"
     },
     "HitBox": {
-      "name": "ÃüÖĞ¿ò"
+      "name": "å‘½ä¸­æ¡†"
     },
     "HitSelect": {
-      "name": "µã»÷Ñ¡Ôñ",
-      "toolTip": "Ñ¡Ôñ×îºÃµÄÊ±¼äÒÔ¹¥»÷",
+      "name": "ç‚¹å‡»é€‰æ‹©",
+      "toolTip": "é€‰æ‹©æœ€å¥½çš„æ—¶é—´ä»¥æ”»å‡»",
       "settings": {
         "Mode": {
-          "settingName": "Ä£Ê½",
-          "toolTip": "ÔİÍ£: ºÏ·¨µØÔİÍ£µã»÷\n»î¶¯: È¡Ïû¹¥»÷µ«ÔÊĞíµã»÷",
-          "options": ["ÔİÍ£", "»î¶¯"]
+          "settingName": "æ¨¡å¼",
+          "toolTip": "æš‚åœ: åˆæ³•åœ°æš‚åœç‚¹å‡»\næ´»åŠ¨: å–æ¶ˆæ”»å‡»ä½†å…è®¸ç‚¹å‡»",
+          "options": ["æš‚åœ", "æ´»åŠ¨"]
         }
       }
     },
     "KillAura": {
-      "name": "É±Â¾¹â»·"
+      "name": "æ€æˆ®å…‰ç¯"
     },
     "Reach": {
-      "name": "¾àÀë"
+      "name": "è·ç¦»"
     },
     "Velocity": {
-      "name": "·´»÷ÍË"
+      "name": "åå‡»é€€"
     },
     "AirStuck": {
-      "name": "¿¨¿Õ"
+      "name": "å¡ç©º"
     },
     "Fly": {
-      "name": "·ÉĞĞ"
+      "name": "é£è¡Œ"
     },
     "InvMove": {
-      "name": "±³°üĞĞ×ß"
+      "name": "èƒŒåŒ…è¡Œèµ°"
     },
     "Jesus": {
-      "name": "Ë®ÉÏĞĞ×ß"
+      "name": "æ°´ä¸Šè¡Œèµ°"
     },
     "KeepSprint": {
-      "name": "±£³Ö¼²ÅÜ"
+      "name": "ä¿æŒç–¾è·‘"
     },
     "Phase": {
-      "name": "´©Ç½"
+      "name": "ç©¿å¢™"
     },
     "Speed": {
-      "name": "ËÙ¶È"
+      "name": "é€Ÿåº¦"
     },
     "Sprint": {
-      "name": "×Ô¶¯¼²ÅÜ"
+      "name": "è‡ªåŠ¨ç–¾è·‘"
     },
     "WallClimb": {
-      "name": "ÅÀÇ½"
+      "name": "çˆ¬å¢™"
     },
     "Anticheat": {
-      "name": "·´×÷±×"
+      "name": "åä½œå¼Š"
     },
     "AntiVoid": {
-      "name": "·´Ğé¿Õ"
+      "name": "åè™šç©º"
     },
     "AutoHeal": {
-      "name": "×Ô¶¯ÖÎÁÆ"
+      "name": "è‡ªåŠ¨æ²»ç–—"
     },
     "Backtrack": {
-      "name": "»ØËİ"
+      "name": "å›æº¯"
     },
     "ChestStealer": {
-      "name": "Ïä×ÓĞ¡Íµ"
+      "name": "ç®±å­å°å·"
     },
     "FakeLag": {
-      "name": "¼ÙÑÓ³Ù"
+      "name": "å‡å»¶è¿Ÿ"
     },
     "InvManager": {
-      "name": "±³°üÕûÀí"
+      "name": "èƒŒåŒ…æ•´ç†"
     },
     "NoFall": {
-      "name": "ÎŞË¤ÂäÉËº¦"
+      "name": "æ— æ‘”è½ä¼¤å®³"
     },
     "AntiBot": {
-      "name": "·´¼ÙÈË"
+      "name": "åå‡äºº"
     },
     "AutoTool": {
-      "name": "×Ô¶¯¹¤¾ß"
+      "name": "è‡ªåŠ¨å·¥å…·"
     },
     "BedAura": {
-      "name": "×Ô¶¯ÍÚ´²"
+      "name": "è‡ªåŠ¨æŒ–åºŠ"
     },
     "FastPlace": {
-      "name": "¿ìËÙ·ÅÖÃ"
+      "name": "å¿«é€Ÿæ”¾ç½®"
     },
     "Legit Scaffold": {
-      "name": "´îÂ·¸¨Öú"
+      "name": "æ­è·¯è¾…åŠ©"
     },
     "SafeWalk": {
-      "name": "°²È«ĞĞ×ß"
+      "name": "å®‰å…¨è¡Œèµ°"
     },
     "Scaffold": {
-      "name": "×Ô¶¯´îÂ·"
+      "name": "è‡ªåŠ¨æ­è·¯"
     }
   },
   "replace": {
-    "Fail to check latest version.": "¼ì²é×îĞÂ°æ±¾Ê§°Ü¡£",
-    "You are not at latest version.": "ÄãµÄ°æ±¾²»ÊÇ×îĞÂ¡£",
-    "Run command 'update' to download latest version.": "Ö´ĞĞÖ¸Áî 'update' ÒÔÏÂÔØ×îĞÂ°æ±¾¡£",
-    "Fetching download link...": "»ñÈ¡ÏÂÔØÁ´½Ó...",
-    "Downloading...": "ÕıÔÚÏÂÔØ...",
-    "Download success! Restart client to finish update.": "ÏÂÔØ³É¹¦£¡ÖØÆô¿Í»§¶ËÒÔÍê³É¸üĞÂ¡£",
-    "Fail to download latest version.": "ÏÂÔØ×îĞÂ°æ±¾Ê§°Ü¡£"
+    "Fail to check latest version.": "æ£€æŸ¥æœ€æ–°ç‰ˆæœ¬å¤±è´¥ã€‚",
+    "You are not at latest version.": "ä½ çš„ç‰ˆæœ¬ä¸æ˜¯æœ€æ–°ã€‚",
+    "Run command 'update' to download latest version.": "æ‰§è¡ŒæŒ‡ä»¤ 'update' ä»¥ä¸‹è½½æœ€æ–°ç‰ˆæœ¬ã€‚",
+    "Fetching download link...": "è·å–ä¸‹è½½é“¾æ¥...",
+    "Downloading...": "æ­£åœ¨ä¸‹è½½...",
+    "Download success! Restart client to finish update.": "ä¸‹è½½æˆåŠŸï¼é‡å¯å®¢æˆ·ç«¯ä»¥å®Œæˆæ›´æ–°ã€‚",
+    "Fail to download latest version.": "ä¸‹è½½æœ€æ–°ç‰ˆæœ¬å¤±è´¥ã€‚"
   }
 }
