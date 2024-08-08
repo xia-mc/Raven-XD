@@ -313,12 +313,12 @@ public class ArmedAura extends IAutoClicker {
     @Override
     public boolean click() {
         if (targeted && armed) {
-            Utils.sendClick(1, true);
+            mc.playerController.sendUseItem(mc.thePlayer, mc.theWorld, SlotHandler.getHeldItem());
             if (rapidFire.isToggled() && autoSwitch.isToggled() && !rapidFireLegit.isToggled()) {
                 for (int i = 0; i < (int) rapidFireAmount.getInput(); i++) {
                     int bestArm = getBestArm();
                     SlotHandler.setCurrentSlot(bestArm);
-                    Utils.sendClick(1, true);
+                    mc.playerController.sendUseItem(mc.thePlayer, mc.theWorld, SlotHandler.getHeldItem());
                 }
             }
             if (target != null)
