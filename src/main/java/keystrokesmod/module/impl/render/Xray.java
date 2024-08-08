@@ -21,6 +21,7 @@ import java.util.List;
 public class Xray extends Module {
     private SliderSetting range;
     private SliderSetting rate;
+    private ButtonSetting caveOnly;
     private ButtonSetting iron;
     private ButtonSetting gold;
     private ButtonSetting diamond;
@@ -37,6 +38,7 @@ public class Xray extends Module {
         super("Xray", category.render);
         this.registerSetting(range = new SliderSetting("Range", 20, 5, 50, 1));
         this.registerSetting(rate = new SliderSetting("Rate", 0.5, 0.1, 3.0, 0.1, " second"));
+        this.registerSetting(caveOnly = new ButtonSetting("Cave Only (bypass Anti-Xray)", false));
         this.registerSetting(coal = new ButtonSetting("Coal", true));
         this.registerSetting(diamond = new ButtonSetting("Diamond", true));
         this.registerSetting(emerald = new ButtonSetting("Emerald", true));
@@ -67,11 +69,30 @@ public class Xray extends Module {
                     }
                     Block blockState = BlockUtils.getBlock(blockPos);
                     if (blockState != null && canBreak(blockState)) {
+                        if (caveOnly.isToggled() && !isNextToAir(blockPos)) continue;
                         blocks.add(blockPos);
                     }
                 }
             }
         }
+    }
+
+    private boolean isNextToAir(BlockPos blockPos) {
+        BlockPos[] neighbors = new BlockPos[] {
+                blockPos.up(),
+                blockPos.down(),
+                blockPos.north(),
+                blockPos.south(),
+                blockPos.east(),
+                blockPos.west()
+        };
+        for (BlockPos neighbor : neighbors) {
+            Block neighborBlock = BlockUtils.getBlock(neighbor);
+            if (neighborBlock == null || neighborBlock.equals(Blocks.air)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @SubscribeEvent
