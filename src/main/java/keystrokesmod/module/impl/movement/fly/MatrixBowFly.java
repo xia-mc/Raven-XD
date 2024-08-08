@@ -18,7 +18,6 @@ import org.jetbrains.annotations.NotNull;
 public class MatrixBowFly extends SubMode<Fly> {
     private float yaw;
 
-
     public MatrixBowFly(String name, @NotNull Fly parent) {
         super(name, parent);
     }

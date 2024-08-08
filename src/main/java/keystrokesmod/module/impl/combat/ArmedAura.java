@@ -102,7 +102,8 @@ public class ArmedAura extends IAutoClicker {
 
     @SubscribeEvent
     public void onRotation(RotationEvent event) {
-        if (!targeted && !(perfect.isToggled() && mc.thePlayer.experience % 1 != 0) && !(notWhileKillAura.isToggled() && KillAura.target != null)) {
+        if (!(perfect.isToggled() && mc.thePlayer.experience % 1 != 0) && !(notWhileKillAura.isToggled() && KillAura.target != null)) {
+            final Vec3 eyePos = Utils.getEyePos();
             final Optional<Pair<Pair<EntityLivingBase, Vec3>, Triple<Double, Float, Float>>> target = mc.theWorld.loadedEntityList.parallelStream()
                     .filter(entity -> entity instanceof EntityLivingBase)
                     .map(entity -> (EntityLivingBase) entity)
@@ -125,8 +126,8 @@ public class ArmedAura extends IAutoClicker {
                     .filter(p -> p.getDistanceToEntity(mc.thePlayer) < range.getInput())
                     .filter(p -> fov.getInput() == 360 || Utils.inFov((float) fov.getInput(), p))
                     .map(p -> new Pair<>(p, getHitPos(p, new Vec3(p.motionX, p.motionY, p.motionZ))))
-                    .map(pair -> new Pair<>(pair, Triple.of(pair.second().distanceTo(Utils.getEyePos()), PlayerRotation.getYaw(pair.second()), PlayerRotation.getPitch(pair.second()))))
-                    .filter(pair -> RotationUtils.isMouseOver(pair.second().getMiddle(), pair.second().getRight(), pair.first().first(), pair.second().getLeft().floatValue()))
+                    .map(pair -> new Pair<>(pair, Triple.of(pair.second().distanceTo(eyePos), PlayerRotation.getYaw(pair.second()), PlayerRotation.getPitch(pair.second()))))
+                    .filter(pair -> RotationUtils.rayCast(eyePos.toVec3(), pair.second().getLeft(), pair.second().getMiddle(), pair.second().getRight()) == null)
                     .min(fromSortMode());
             if (target.isPresent()) {
                 if (armed) {

@@ -17,6 +17,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -143,7 +144,7 @@ public class I18nManager {
 
     private static JsonObject getJsonObject(InputStream inputStream) {
         StringBuilder sb = new StringBuilder();
-        List<String> file = new BufferedReader(new InputStreamReader(inputStream)).lines()
+        List<String> file = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8)).lines()
                 .collect(Collectors.toList());
 
         for (int i = 0; i < file.size() - 1; i++) {
