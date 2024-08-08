@@ -1,6 +1,7 @@
 package keystrokesmod.utility.i18n;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import keystrokesmod.Raven;
 import keystrokesmod.module.Module;
@@ -14,7 +15,7 @@ public class I18nManager {
 
     private static boolean loaded = false;
     public static final List<Map<Module, I18nModule>> MODULE_MAP = new ArrayList<>(LANGUAGE_LIST.length);
-
+    public static final List<Map<String, String>> REPLACE_MAP = new ArrayList<>(LANGUAGE_LIST.length);
 
     /**
      * call after load all modules
@@ -25,6 +26,7 @@ public class I18nManager {
 
         for (String s : LANGUAGE_LIST) {
             Map<Module, I18nModule> moduleMap = new HashMap<>();
+            Map<String, String> replaceMap = new HashMap<>();
 
             try (InputStream stream = Objects.requireNonNull(Raven.class.getResourceAsStream("/assets/keystrokesmod/i18n/" + s + ".json"))) {
                 JsonObject jsonObject = getJsonObject(stream);
@@ -50,10 +52,19 @@ public class I18nManager {
                     }
                 }
 
+                if (jsonObject.has("replace")) {
+                    JsonObject replaceObject = jsonObject.getAsJsonObject("replace");
+
+                    for (Map.Entry<String, JsonElement> entry : replaceObject.entrySet()) {
+                        replaceMap.put(entry.getKey(), entry.getValue().getAsString());
+                    }
+                }
+
             } catch (IOException ignored) {
             }
 
             MODULE_MAP.add(moduleMap);
+            REPLACE_MAP.add(replaceMap);
         }
     }
 

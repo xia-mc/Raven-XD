@@ -11,7 +11,7 @@ import keystrokesmod.utility.i18n.I18nModule;
 import java.util.Map;
 
 public class Language extends Module {
-    private final ModeValue mode;
+    public final ModeValue mode;
 
     public Language() {
         super("Language", category.client);

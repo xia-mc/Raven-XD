@@ -107,5 +107,14 @@
     "Scaffold": {
       "name": "自动搭路"
     }
+  },
+  "replace": {
+    "Fail to check latest version.": "检查最新版本失败。",
+    "You are not at latest version.": "你的版本不是最新。",
+    "Run command 'update' to download latest version.": "执行指令 'update' 以下载最新版本。",
+    "Fetching download link...": "获取下载链接...",
+    "Downloading...": "正在下载...",
+    "Download success! Restart client to finish update.": "下载成功！重启客户端以完成更新。",
+    "Fail to download latest version.": "下载最新版本失败。"
   }
 }

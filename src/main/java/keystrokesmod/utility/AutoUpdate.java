@@ -28,19 +28,19 @@ public class AutoUpdate {
             @NotNull Result result = checkVersion();
             switch (result.getType()) {
                 case FAIL:
-                    Utils.sendMessage(ChatFormatting.RED + "Fail to check latest version.");
+                    Utils.sendMessageAnyWay(ChatFormatting.RED + "Fail to check latest version.");
                     break;
                 case OLD:
-                    Utils.sendMessage(ChatFormatting.RED + "You are not at latest version." +
-                            ChatFormatting.RESET + " current:" + Watermark.VERSION + " latest:" + result.getLatestVersion());
-                    Utils.sendMessage("Run command 'update' to download latest version.");
+                    Utils.sendMessageAnyWay(ChatFormatting.RED + "You are not at latest version." +
+                            ChatFormatting.RESET + " current: " + Watermark.VERSION + "  latest: " + result.getLatestVersion());
+                    Utils.sendMessageAnyWay("Run command 'update' to download latest version.");
                     break;
             }
         });
     }
 
     public static void update() {
-        Utils.sendMessage("Getting download link..");
+        Utils.sendMessage("Fetching download link...");
         Result result = checkVersion();
 
         switch (result.getType()) {
@@ -52,7 +52,7 @@ public class AutoUpdate {
                 return;
         }
 
-        Utils.sendMessage("Downloading..");
+        Utils.sendMessage("Downloading...");
         try (CloseableHttpClient httpClient = HttpClientBuilder.create()
                 .setDefaultRequestConfig(RequestConfig.custom()
                         .setCookieSpec(CookieSpecs.STANDARD)
