@@ -1,6 +1,7 @@
 package keystrokesmod.module.impl.combat.velocity;
 
 import keystrokesmod.event.PreVelocityEvent;
+import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.combat.Velocity;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;

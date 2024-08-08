@@ -6,8 +6,8 @@ import lombok.Getter;
 public class I18nDescriptionSetting extends I18nSetting {
     private final String desc;
 
-    public I18nDescriptionSetting(String n, String toolTip, String desc) {
-        super(n, toolTip);
+    public I18nDescriptionSetting(String toolTip, String desc) {
+        super(toolTip);
         this.desc = desc;
     }
 }

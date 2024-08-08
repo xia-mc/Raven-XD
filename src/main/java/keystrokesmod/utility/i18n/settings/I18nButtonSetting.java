@@ -6,8 +6,8 @@ import lombok.Getter;
 public class I18nButtonSetting extends I18nSetting {
     private final String name;
 
-    public I18nButtonSetting(String n, String toolTip, String name) {
-        super(n, toolTip);
+    public I18nButtonSetting(String toolTip, String name) {
+        super(toolTip);
         this.name = name;
     }
 }

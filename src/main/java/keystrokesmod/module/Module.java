@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 public class Module {
+    @Getter
     @Setter
     private @Nullable I18nModule i18nObject = null;
 
@@ -36,7 +37,7 @@ public class Module {
     @Setter
     private boolean enabled;
     private int keycode;
-    private @Nullable String toolTip;
+    private final @Nullable String toolTip;
     protected static Minecraft mc;
     private boolean isToggled = false;
     public boolean canBeEnabled = true;
@@ -196,6 +197,10 @@ public class Module {
 
     public void registerSetting(Setting setting) {
         synchronized (settings) {
+            if (settings.contains(setting))
+                throw new RuntimeException("Setting '" + setting.getName() + "' is already registered in module '" + this.getName() + "'!");
+
+            setting.setParent(this);
             if (setting instanceof ModeValue) {
                 this.settings.add(0, setting);
             } else {

@@ -74,7 +74,7 @@ public class ButtonComponent extends Component {
         GL11.glPushMatrix();
         GL11.glScaled(0.5D, 0.5D, 0.5D);
         getFont().drawString(
-                (this.buttonSetting.isMethodButton ? "[=]  " : (this.buttonSetting.isToggled() ? "[+]  " : "[-]  ")) + this.buttonSetting.getName(),
+                (this.buttonSetting.isMethodButton ? "[=]  " : (this.buttonSetting.isToggled() ? "[+]  " : "[-]  ")) + this.buttonSetting.getPrettyName(),
                 (float) ((this.parent.categoryComponent.getX() + 4) * 2),
                 (float) ((this.parent.categoryComponent.getY() + this.o + 4) * 2),
                 this.buttonSetting.isToggled() ? toggleColor : color,

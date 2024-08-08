@@ -24,7 +24,14 @@
     },
     "HitSelect": {
       "name": "点击选择",
-      "toolTip": "选择最好的时间以攻击"
+      "toolTip": "选择最好的时间以攻击",
+      "settings": {
+        "Mode": {
+          "settingName": "模式",
+          "toolTip": "暂停: 合法地暂停点击\n活动: 取消攻击但允许点击",
+          "options": ["暂停", "活动"]
+        }
+      }
     },
     "KillAura": {
       "name": "杀戮光环"

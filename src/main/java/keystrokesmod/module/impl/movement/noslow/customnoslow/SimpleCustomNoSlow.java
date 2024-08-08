@@ -15,7 +15,6 @@ import net.minecraft.network.play.client.C09PacketHeldItemChange;
 import net.minecraft.network.play.client.C0CPacketInput;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
 public class SimpleCustomNoSlow extends SubMode<CustomNoSlow> {
@@ -40,6 +39,8 @@ public class SimpleCustomNoSlow extends SubMode<CustomNoSlow> {
     private final SliderSetting timerValue;
     private final ButtonSetting blink;
 
+    private boolean lastUsed = false;
+
     public SimpleCustomNoSlow(String name, @NotNull CustomNoSlow parent) {
         super(name, parent);
         this.registerSetting(slowDown = new ButtonSetting("Slowdown", false));
@@ -62,6 +63,17 @@ public class SimpleCustomNoSlow extends SubMode<CustomNoSlow> {
         this.registerSetting(timer = new ButtonSetting("Timer", false));
         this.registerSetting(timerValue = new SliderSetting("Timer", 0.2, 0.1, 2, 0.01, timer::isToggled));
         this.registerSetting(blink = new ButtonSetting("Blink", false));
+    }
+
+    @Override
+    public void onUpdate() {
+        if (lastUsed && !mc.thePlayer.isUsingItem()) {
+            if (timer.isToggled())
+                Utils.resetTimer();
+            if (blink.isToggled())
+                blink.disable();
+        }
+        lastUsed = mc.thePlayer.isUsingItem();
     }
 
     public void onPreUpdate(PreUpdateEvent event) {
@@ -107,18 +119,10 @@ public class SimpleCustomNoSlow extends SubMode<CustomNoSlow> {
             ));
         }
         if (timer.isToggled()) {
-            if (mc.thePlayer.isUsingItem()) {
-                Utils.getTimer().timerSpeed = (float) timerValue.getInput();
-            } else {
-                Utils.resetTimer();
-            }
+            Utils.getTimer().timerSpeed = (float) timerValue.getInput();
         }
         if (blink.isToggled()) {
-            if (mc.thePlayer.isUsingItem()) {
-                ModuleManager.blink.enable();
-            } else {
-                ModuleManager.blink.disable();
-            }
+            ModuleManager.blink.enable();
         }
     }
 

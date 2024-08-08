@@ -3,10 +3,15 @@ package keystrokesmod.module.setting.impl;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import keystrokesmod.module.setting.Setting;
+import keystrokesmod.utility.i18n.I18nModule;
+import keystrokesmod.utility.i18n.settings.I18nButtonSetting;
+import keystrokesmod.utility.i18n.settings.I18nSetting;
+import keystrokesmod.utility.i18n.settings.I18nSliderSetting;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -80,6 +85,19 @@ public class ButtonSetting extends Setting {
         }
     }
 
+    public String getPrettyName() {
+        if (parent != null) {
+            I18nModule i18nObject = parent.getI18nObject();
+            if (i18nObject != null) {
+                Map<Setting, I18nSetting> settings = i18nObject.getSettings();
+                if (settings.containsKey(this)) {
+                    return ((I18nButtonSetting) settings.get(this)).getName();
+                }
+            }
+        }
+        return getName();
+    }
+
     public boolean isToggled() {
         return this.isEnabled;
     }
@@ -102,7 +120,7 @@ public class ButtonSetting extends Setting {
     }
 
     @Override
-    public void loadProfile(JsonObject data) {
+    public void loadProfile(@NotNull JsonObject data) {
         if (data.has(getName()) && data.get(getName()).isJsonPrimitive() && !this.isMethodButton) {
             JsonPrimitive jsonPrimitive = data.getAsJsonPrimitive(getName());
             if (jsonPrimitive.isBoolean()) {

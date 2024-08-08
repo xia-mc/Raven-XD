@@ -13,6 +13,5 @@ import java.util.Map;
 public class I18nModule {
     private final String name;
     private final @Nullable String toolTip;
-    // TODO doesn't implement now
-//    private final Map<Setting, ? extends I18nSetting> settings;
+    private final Map<Setting, I18nSetting> settings;
 }

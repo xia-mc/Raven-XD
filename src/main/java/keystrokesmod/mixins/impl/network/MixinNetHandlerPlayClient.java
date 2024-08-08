@@ -4,6 +4,7 @@ package keystrokesmod.mixins.impl.network;
 import keystrokesmod.Raven;
 import keystrokesmod.event.PostVelocityEvent;
 import keystrokesmod.event.PreVelocityEvent;
+import keystrokesmod.module.ModuleManager;
 import keystrokesmod.utility.Utils;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.network.play.server.S12PacketEntityVelocity;
@@ -21,6 +22,8 @@ public abstract class MixinNetHandlerPlayClient {
         if (!Utils.nullCheck()) return;
 
         if (packet.getEntityID() == Raven.mc.thePlayer.getEntityId()) {
+            if (ModuleManager.fly.isEnabled() || ModuleManager.longJump.isEnabled()) return;
+
             PreVelocityEvent event = new PreVelocityEvent(packet.getMotionX(), packet.getMotionY(), packet.getMotionZ());
             MinecraftForge.EVENT_BUS.post(event);
             if (event.isCanceled()) ci.cancel();
