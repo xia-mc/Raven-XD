@@ -1,10 +1,13 @@
-package keystrokesmod.module.impl.movement.fly;
+package keystrokesmod.module.impl.movement.longjump;
 
 import keystrokesmod.event.PreMotionEvent;
 import keystrokesmod.event.ReceivePacketEvent;
 import keystrokesmod.event.SendPacketEvent;
 import keystrokesmod.module.impl.client.Notifications;
-import keystrokesmod.module.impl.movement.Fly;
+import keystrokesmod.module.impl.movement.LongJump;
+import keystrokesmod.module.impl.other.SlotHandler;
+import keystrokesmod.module.setting.impl.ButtonSetting;
+import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.MoveUtil;
 import keystrokesmod.utility.PacketUtils;
@@ -18,16 +21,26 @@ import net.minecraft.network.play.server.S12PacketEntityVelocity;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
-public class HypixelFireball extends SubMode<Fly> {
+public class HypixelFireball extends SubMode<LongJump> {
+    private final ButtonSetting autoDisable;
+    private final ButtonSetting longer;
+    private final ButtonSetting fakeGround;
+    private final SliderSetting longerTick;
+
     private int lastSlot = -1;
     private int ticks = -1;
+    private int offGroundTicks = 0;
     private boolean setSpeed;
     private boolean sentPlace;
     private int initTicks;
     private boolean thrown;
 
-    public HypixelFireball(String name, @NotNull Fly parent) {
+    public HypixelFireball(String name, @NotNull LongJump parent) {
         super(name, parent);
+        this.registerSetting(autoDisable = new ButtonSetting("Auto disable", true));
+        this.registerSetting(longer = new ButtonSetting("Longer", false));
+        this.registerSetting(fakeGround = new ButtonSetting("Fake ground", false, longer::isToggled));
+        this.registerSetting(longerTick = new SliderSetting("Longer tick", 40, 20, 50, 1, longer::isToggled));
     }
 
     @SubscribeEvent
@@ -67,13 +80,19 @@ public class HypixelFireball extends SubMode<Fly> {
         if (!Utils.nullCheck()) {
             return;
         }
+
+        if (mc.thePlayer.onGround)
+            offGroundTicks = 0;
+        else
+            offGroundTicks++;
+
         if (initTicks == 0) {
             event.setYaw(mc.thePlayer.rotationYaw - 180);
             event.setPitch(89);
             int fireballSlot = getFireball();
-            if (fireballSlot != -1 && fireballSlot != mc.thePlayer.inventory.currentItem) {
-                lastSlot = mc.thePlayer.inventory.currentItem;
-                mc.thePlayer.inventory.currentItem = fireballSlot;
+            if (fireballSlot != -1 && fireballSlot != SlotHandler.getCurrentSlot()) {
+                lastSlot = SlotHandler.getCurrentSlot();
+                SlotHandler.setCurrentSlot(fireballSlot);
             }
         }
         if (initTicks == 1) {
@@ -83,14 +102,24 @@ public class HypixelFireball extends SubMode<Fly> {
             }
         } else if (initTicks == 2) {
             if (lastSlot != -1) {
-                mc.thePlayer.inventory.currentItem = lastSlot;
+                SlotHandler.setCurrentSlot(lastSlot);
                 lastSlot = -1;
             }
         }
-        if (ticks > 1) {
-            this.toggle();
-            return;
+
+        if (longer.isToggled()) {
+            if (offGroundTicks == (int) longerTick.getInput()) {
+                if (fakeGround.isToggled())
+                    event.setOnGround(true);
+                mc.thePlayer.motionY = 0;
+                if (autoDisable.isToggled())
+                    parent.disable();
+            }
+        } else if (ticks > 1) {
+            if (autoDisable.isToggled())
+                parent.disable();
         }
+
         if (setSpeed) {
             this.setSpeed();
             ticks++;
@@ -112,7 +141,7 @@ public class HypixelFireball extends SubMode<Fly> {
 
     public void onDisable() {
         if (lastSlot != -1) {
-            mc.thePlayer.inventory.currentItem = lastSlot;
+            SlotHandler.setCurrentSlot(lastSlot);
         }
         ticks = lastSlot = -1;
         setSpeed = sentPlace = false;
