@@ -46,7 +46,7 @@ public final class DynamicManager extends Module {
                 Desktop.getDesktop().open(directory);
             }
             catch (IOException ex) {
-                Raven.profileManager.directory.mkdirs();
+                directory.mkdirs();
                 Utils.sendMessage("&cError locating folder, recreated.");
             }
         }));

@@ -23,6 +23,8 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -232,6 +234,15 @@ public class Commands {
             } else if (firstArg.equals("resetgui")) {
                 ClickGui.resetPosition();
                 print(ChatFormatting.GREEN + "Reset ClickGUI position!", 1);
+            } else if (firstArg.equals("folder")) {
+                File folder = new File(Raven.mc.mcDataDir, "keystrokes");
+                try {
+                    Desktop.getDesktop().open(folder);
+                }
+                catch (IOException ex) {
+                    folder.mkdirs();
+                    Utils.sendMessage("&cError locating folder, recreated.");
+                }
             } else if (firstArg.equals("say")) {
                 if (!hasArgs) {
                     print(invSyn, 1);
@@ -430,6 +441,7 @@ public class Commands {
                 print("8 say [message]", 0);
                 print("9 panic", 0);
                 print("10 resetGUI", 0);
+                print("11 folder", 0);
                 print("&eProfiles:", 0);
                 print("1 profiles", 0);
                 print("2 profiles save [profile]", 0);
