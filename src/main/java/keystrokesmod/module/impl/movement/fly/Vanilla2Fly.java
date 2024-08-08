@@ -38,7 +38,8 @@ public class Vanilla2Fly extends SubMode<Fly> {
         else {
             mc.thePlayer.motionY = 0.0;
         }
-        MoveUtil.strafe(0.85 * horizontalSpeed.getInput());
+        if (MoveUtil.isMoving())
+            MoveUtil.strafe(0.85 * horizontalSpeed.getInput());
     }
 
     @SubscribeEvent

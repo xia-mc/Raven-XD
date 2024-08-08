@@ -181,7 +181,7 @@ public class Module {
     }
 
     public String getRawPrettyInfo() {
-        return prettyInfo;
+        return prettyInfo.isEmpty() ? getInfo() : prettyInfo;
     }
 
     public void setPrettyName(String name) {

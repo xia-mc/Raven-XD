@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import keystrokesmod.Raven;
 import keystrokesmod.module.Module;
-import keystrokesmod.utility.Utils;
 
 import java.io.*;
 import java.util.*;
@@ -29,14 +28,12 @@ public class I18nManager {
 
             try (InputStream stream = Objects.requireNonNull(Raven.class.getResourceAsStream("/assets/keystrokesmod/i18n/" + s + ".json"))) {
                 JsonObject jsonObject = getJsonObject(stream);
-                Utils.sendMessage("found jsonObject: " + s);
 
                 if (jsonObject.has("modules")) {
                     JsonObject modulesObject = jsonObject.getAsJsonObject("modules");
 
                     for (Module module : Raven.getModuleManager().getModules()) {
                         if (modulesObject.has(module.getName())) {
-                            Utils.sendMessage("found module: " + module.getName());
                             JsonObject moduleObject = modulesObject.getAsJsonObject(module.getName());
 
                             String name = module.getName();
@@ -48,7 +45,6 @@ public class I18nManager {
                                 toolTip = moduleObject.get("toolTip").getAsString();
 
                             I18nModule i18nModule = new I18nModule(name, toolTip);
-                            Utils.sendMessage("load i18n module: " + i18nModule.getName());
                             moduleMap.put(module, i18nModule);
                         }
                     }
@@ -57,7 +53,6 @@ public class I18nManager {
             } catch (IOException ignored) {
             }
 
-            Utils.sendMessage("load moduleMap: " + s);
             MODULE_MAP.add(moduleMap);
         }
     }

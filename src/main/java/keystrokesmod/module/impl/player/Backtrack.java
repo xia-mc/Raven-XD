@@ -32,8 +32,8 @@ import org.jetbrains.annotations.Nullable;
 public class Backtrack extends Module {
     public static final Color color = new Color(72, 125, 227);
 
-    private final SliderSetting minLatency = new SliderSetting("Min latency", 50, 5, 1000, 5);
-    private final SliderSetting maxLatency = new SliderSetting("Max latency", 100, 5, 1000, 5);
+    private final SliderSetting minLatency = new SliderSetting("Min latency", 50, 10, 1000, 10);
+    private final SliderSetting maxLatency = new SliderSetting("Max latency", 100, 10, 1000, 10);
     private final SliderSetting minDistance = new SliderSetting("Min distance", 0.0, 0.0, 3.0, 0.1);
     private final SliderSetting maxDistance = new SliderSetting("Max distance", 6.0, 0.0, 10.0, 0.1);
     private final SliderSetting stopOnTargetHurtTime = new SliderSetting("Stop on target HurtTime", -1, -1, 10, 1);

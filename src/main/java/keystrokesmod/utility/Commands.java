@@ -231,6 +231,7 @@ public class Commands {
                         }
                     }
                 }
+                ModuleManager.sort();
             } else if (firstArg.equals("resetgui")) {
                 ClickGui.resetPosition();
                 print(ChatFormatting.GREEN + "Reset ClickGUI position!", 1);
@@ -238,11 +239,12 @@ public class Commands {
                 File folder = new File(Raven.mc.mcDataDir, "keystrokes");
                 try {
                     Desktop.getDesktop().open(folder);
-                }
-                catch (IOException ex) {
+                } catch (IOException ex) {
                     folder.mkdirs();
                     Utils.sendMessage("&cError locating folder, recreated.");
                 }
+            } else if (firstArg.equals("update")) {
+                Raven.getExecutor().execute(AutoUpdate::update);
             } else if (firstArg.equals("say")) {
                 if (!hasArgs) {
                     print(invSyn, 1);
