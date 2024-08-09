@@ -1,5 +1,6 @@
 package keystrokesmod.module.impl.world;
 
+import keystrokesmod.event.RightClickEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.other.SlotHandler;
@@ -12,6 +13,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import net.minecraftforge.fml.common.gameevent.TickEvent.PlayerTickEvent;
+import org.jetbrains.annotations.NotNull;
 
 public class FastPlace extends Module {
     public SliderSetting tickDelay;
@@ -19,13 +21,13 @@ public class FastPlace extends Module {
 
     public FastPlace() {
         super("FastPlace", Module.category.world, 0);
-        this.registerSetting(tickDelay = new SliderSetting("Tick delay", 1.0, 1.0, 3.0, 1.0));
+        this.registerSetting(tickDelay = new SliderSetting("Tick delay", 1, 0, 3, 1));
         this.registerSetting(blocksOnly = new ButtonSetting("Blocks only", true));
         this.registerSetting(pitchCheck = new ButtonSetting("Pitch check", false));
     }
 
     @SubscribeEvent
-    public void a(PlayerTickEvent e) {
+    public void a(@NotNull PlayerTickEvent e) {
         if (e.phase == Phase.END) {
             if (ModuleManager.scaffold.stopFastPlace()) {
                 return;
@@ -52,10 +54,20 @@ public class FastPlace extends Module {
                             Reflection.rightClickDelayTimerField.set(mc, c);
                         }
                     }
-                } catch (IllegalAccessException var4) {
-                } catch (IndexOutOfBoundsException var5) {
+                } catch (IllegalAccessException | IndexOutOfBoundsException ignored) {
                 }
             }
+        }
+    }
+
+    @SubscribeEvent
+    public void onRightClick(RightClickEvent event) {
+        try {
+            int c = (int) tickDelay.getInput();
+            if (c == 0) {
+                Reflection.rightClickDelayTimerField.set(mc, 0);
+            }
+        } catch (IllegalAccessException | IndexOutOfBoundsException ignored) {
         }
     }
 }
