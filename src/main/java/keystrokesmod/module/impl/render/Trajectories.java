@@ -17,10 +17,10 @@ import org.lwjgl.opengl.GL11;
 import java.awt.*;
 
 public class Trajectories extends Module {
-    private ButtonSetting autoScale;
-    private ButtonSetting disableUncharged;
-    private ButtonSetting highlightOnEntity;
-    private int highlightColor = new Color(234, 38, 38).getRGB();
+    private final ButtonSetting autoScale;
+    private final ButtonSetting disableUncharged;
+    private final ButtonSetting highlightOnEntity;
+    private static final int HIGHLIGHT_COLOR = new Color(234, 38, 38).getRGB();
     public Trajectories() {
         super("Trajectories", category.render);
         this.registerSetting(autoScale = new ButtonSetting("Auto-scale", true));
@@ -40,10 +40,7 @@ public class Trajectories extends Module {
         if (heldItem.getItem() instanceof ItemBow && !mc.thePlayer.isUsingItem() && disableUncharged.isToggled()) {
             return;
         }
-        boolean bow = false;
-        if (heldItem.getItem() instanceof ItemBow) {
-            bow = true;
-        }
+        boolean bow = heldItem.getItem() instanceof ItemBow;
 
         float playerYaw = mc.thePlayer.rotationYaw;
         float playerPitch = mc.thePlayer.rotationPitch;
@@ -96,7 +93,7 @@ public class Trajectories extends Module {
         MovingObjectPosition target = null;
         boolean highlight = false;
         double[] transform = new double[]{posX, posY, posZ, motionX, motionY, motionZ};
-        for (int k = 0; k <= 100 && !ground; ++k) {
+        for (int k = 0; k <= 100; ++k) {
             Vec3 start = new Vec3(transform[0], transform[1], transform[2]);
             Vec3 predicted = new Vec3(transform[0] + transform[3], transform[1] + transform[4], transform[2] + transform[5]);
             MovingObjectPosition rayTraced = mc.theWorld.rayTraceBlocks(start, predicted, false, true, false);
@@ -130,7 +127,7 @@ public class Trajectories extends Module {
                 }
             }
             if (highlight && highlightOnEntity.isToggled()) {
-                RenderUtils.glColor(highlightColor);
+                RenderUtils.glColor(HIGHLIGHT_COLOR);
             }
             float f14 = 0.99f;
             motionY *= f14;
@@ -141,7 +138,7 @@ public class Trajectories extends Module {
         GL11.glDisable(3042);
         GL11.glTranslated(posX - mc.getRenderManager().viewerPosX, posY - mc.getRenderManager().viewerPosY, posZ - mc.getRenderManager().viewerPosZ);
         if (target != null && target.sideHit != null) {
-            switch (target.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK ? target.sideHit.getIndex() : target.sideHit.getIndex()) {
+            switch (target.sideHit.getIndex()) {
                 case 2:
                 case 3: {
                     GL11.glRotatef(90.0f, 1.0f, 0.0f, 0.0f);

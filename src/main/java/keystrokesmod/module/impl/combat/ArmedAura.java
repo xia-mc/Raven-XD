@@ -24,7 +24,6 @@ import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.BlockPos;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.apache.commons.lang3.tuple.Triple;
@@ -139,7 +138,7 @@ public class ArmedAura extends IAutoClicker {
                         event.setPitch(target.get().second().getRight());
                         event.setMoveFix(RotationHandler.MoveFix.values()[(int) moveFix.getInput()]);
                     }
-                    pos = target.get().first().second().add(0, -target.get().first().first().getEyeHeight(), 0).toVec3();
+                    pos = target.get().first().second().add(0, -getYOffSetForHitPos(target.get().first().first()), 0).toVec3();
                     this.target = target.get();
                     long time = System.currentTimeMillis();
                     if (time - lastSwitched > switchDelay.getInput()) {
@@ -271,29 +270,21 @@ public class ArmedAura extends IAutoClicker {
     }
 
     private @NotNull Vec3 getHitPos(@NotNull EntityLivingBase entity, Vec3 motion) {
-        Vec3 result;
+        Vec3 result = new Vec3(entity).add(0, getYOffSetForHitPos(entity), 0);
 
+        return MoveUtil.predictedPos(entity, motion, result, predTicks);
+    }
+
+    private double getYOffSetForHitPos(EntityLivingBase entity) {
         switch ((int) priorityHitBox.getInput()) {
             default:
             case 0:
-                result = Utils.getEyePos(entity);
-                break;
+                return entity.getEyeHeight();
             case 1:
-                result = Utils.getEyePos(entity).add(0, -1, 0);
-                break;
+                return entity.getEyeHeight() - 1;
             case 2:
-                result = new Vec3(entity).add(0, 0.5, 0);
-                break;
+                return 0.5;
         }
-
-        for (int i = 0; i < predTicks; i++) {
-            result = result.add(
-                    MoveUtil.predictedMotionXZ(motion.x(), i, MoveUtil.isMoving(entity)),
-                    entity.onGround || !BlockUtils.replaceable(new BlockPos(result.toVec3())) ? 0 : MoveUtil.predictedMotion(motion.y(), i),
-                    MoveUtil.predictedMotionXZ(motion.z(), i, MoveUtil.isMoving(entity))
-            );
-        }
-        return result;
     }
 
     @Override

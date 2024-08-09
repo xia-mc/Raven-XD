@@ -108,10 +108,10 @@ public class AimSimulator {
     }
 
     public static boolean yawEquals(float yaw1, float yaw2) {
-        return Math.abs(RotationUtils.normalize(yaw1) - RotationUtils.normalize(yaw2)) < 0.05;
+        return Math.abs(RotationUtils.normalize(yaw1) - RotationUtils.normalize(yaw2)) < 0.1;
     }
 
     public static boolean equals(@NotNull Vec2 rot1, @NotNull Vec2 rot2) {
-        return yawEquals(rot1.x, rot2.x) && rot1.y == rot2.y;
+        return yawEquals(rot1.x, rot2.x) && Math.abs(rot1.y - rot2.y) < 0.1;
     }
 }

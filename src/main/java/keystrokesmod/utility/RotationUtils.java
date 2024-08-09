@@ -226,6 +226,23 @@ public class RotationUtils {
         return new keystrokesmod.script.classes.Vec3(pointX, pointY, pointZ);
     }
 
+    public static EnumFacing getEnumFacing(keystrokesmod.script.classes.@NotNull Vec3 hitPos, @NotNull AxisAlignedBB box) {
+        if (hitPos.y() == box.maxY) {
+            return EnumFacing.UP;
+        } else if (hitPos.y() == box.minY) {
+            return EnumFacing.DOWN;
+        } else if (hitPos.x() == box.minX) {
+            return EnumFacing.WEST;
+        } else if (hitPos.x() == box.maxX) {
+            return EnumFacing.EAST;
+        } else if (hitPos.z() == box.minZ) {
+            return EnumFacing.NORTH;
+        } else if (hitPos.z() == box.maxZ) {
+            return EnumFacing.SOUTH;
+        }
+        return mc.thePlayer.getHorizontalFacing();
+    }
+
     @Contract("_, _ -> new")
     public static @NotNull keystrokesmod.script.classes.Vec3 getFarthestPoint(@NotNull AxisAlignedBB from, @NotNull keystrokesmod.script.classes.Vec3 to) {
         double pointX, pointY, pointZ;

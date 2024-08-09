@@ -1,6 +1,7 @@
 package keystrokesmod.module.impl.movement;
 
 import keystrokesmod.module.Module;
+import keystrokesmod.module.impl.movement.noweb.VulcanNoWeb;
 import keystrokesmod.module.impl.movement.noweb.IgnoreNoWeb;
 import keystrokesmod.module.impl.movement.noweb.IntaveNoWeb;
 import keystrokesmod.module.impl.movement.noweb.PingNoWeb;
@@ -15,6 +16,7 @@ public class NoWeb extends Module {
                 .add(new IgnoreNoWeb("Ignore", this))
                 .add(new PingNoWeb("Ping", this))
                 .add(new IntaveNoWeb("Intave", this))
+                .add(new VulcanNoWeb("Vulcan", this))
         );
     }
 

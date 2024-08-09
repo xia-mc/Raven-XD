@@ -3,9 +3,11 @@ package keystrokesmod.utility;
 import keystrokesmod.mixins.impl.entity.EntityAccessor;
 import keystrokesmod.module.impl.movement.TargetStrafe;
 import keystrokesmod.module.impl.other.anticheats.utils.world.PlayerMove;
+import keystrokesmod.script.classes.Vec3;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.potion.Potion;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.MathHelper;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -280,5 +282,16 @@ public class MoveUtil {
                 return 0;
         }
         return motion;
+    }
+
+    public static @NotNull Vec3 predictedPos(@NotNull EntityLivingBase entity, Vec3 motion, Vec3 result, int predTicks) {
+        for (int i = 0; i < predTicks; i++) {
+            result = result.add(
+                    MoveUtil.predictedMotionXZ(motion.x(), i, MoveUtil.isMoving(entity)),
+                    entity.onGround || !BlockUtils.replaceable(new BlockPos(result.toVec3())) ? 0 : MoveUtil.predictedMotion(motion.y(), i),
+                    MoveUtil.predictedMotionXZ(motion.z(), i, MoveUtil.isMoving(entity))
+            );
+        }
+        return result;
     }
 }

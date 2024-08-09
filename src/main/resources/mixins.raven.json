@@ -30,6 +30,7 @@
     "client.GuiScreenAccessor",
     "client.KeyBindingAccessor",
     "client.MinecraftAccessor",
+    "client.MixinEntityRenderer",
     "client.MixinMinecraft",
     "client.MixinMovementInputFromOptions",
     "client.MixinPlayerControllerMP",

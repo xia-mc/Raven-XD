@@ -4,6 +4,7 @@ import keystrokesmod.event.MoveEvent;
 import keystrokesmod.event.PrePlayerInputEvent;
 import keystrokesmod.event.StepEvent;
 import keystrokesmod.module.ModuleManager;
+import keystrokesmod.utility.RotationUtils;
 import keystrokesmod.utility.rise.RiseSecret;
 import keystrokesmod.module.impl.other.RotationHandler;
 import keystrokesmod.module.impl.world.SafeWalk;
@@ -25,6 +26,8 @@ import net.minecraftforge.common.MinecraftForge;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Redirect;
 
 import java.util.List;
 import java.util.Random;
@@ -474,6 +477,17 @@ public abstract class MixinEntity {
             float f2 = MathHelper.cos(yaw * 3.1415927F / 180.0F);
             this.motionX += p_moveFlying_1_ * f2 - p_moveFlying_2_ * f1;
             this.motionZ += p_moveFlying_2_ * f2 + p_moveFlying_1_ * f1;
+        }
+    }
+
+    @Redirect(method = "rayTrace", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;getLook(F)Lnet/minecraft/util/Vec3;"))
+    public Vec3 onGetLook(Entity instance, float partialTicks) {
+        if (partialTicks == 1.0F) {
+            return RotationUtils.getVectorForRotation(RotationHandler.getRotationPitch(), RotationHandler.getRotationYaw());
+        } else {
+            float f = RotationHandler.getPrevRotationPitch() + (RotationHandler.getRotationPitch() - RotationHandler.getPrevRotationPitch()) * partialTicks;
+            float f1 = RotationHandler.getPrevRotationYaw() + (RotationHandler.getRotationYaw() - RotationHandler.getPrevRotationYaw()) * partialTicks;
+            return RotationUtils.getVectorForRotation(f, f1);
         }
     }
 }

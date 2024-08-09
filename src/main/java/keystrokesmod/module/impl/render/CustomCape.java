@@ -25,7 +25,7 @@ public final class CustomCape extends Module {
     public static String[] CAPES_NAME = new String[]{
             "RavenAnime", "RavenAqua", "RavenGreen", "RavenPurple", "RavenRed", "RavenWhite", "RavenYellow",
             "Cherry", "Die",
-            "Astolfo", "AugustusCandy", "Esound"
+            "Astolfo"
     };
     public static final List<ResourceLocation> LOADED_CAPES = new ArrayList<>();
     public static final ModeSetting cape = new ModeSetting("Cape", CAPES_NAME, 0);
@@ -68,7 +68,7 @@ public final class CustomCape extends Module {
         final String[] builtinCapes = new String[]{
                 "RavenAnime", "RavenAqua", "RavenGreen", "RavenPurple", "RavenRed", "RavenWhite", "RavenYellow",
                 "Cherry", "Die",
-                "Astolfo", "AugustusCandy", "Esound"
+                "Astolfo"
         };
         CAPES_NAME = new String[files.length + builtinCapes.length];
         LOADED_CAPES.clear();

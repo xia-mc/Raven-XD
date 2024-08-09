@@ -48,7 +48,8 @@ public class ProjectileAimBot extends IAutoClicker {
             if (slot == -1) return;
             if (slot >= 9)
                 slot -= 36;
-            fromSlot = SlotHandler.getCurrentSlot();
+            if (fromSlot == -1)
+                fromSlot = SlotHandler.getCurrentSlot();
             SlotHandler.setCurrentSlot(slot);
             targeted = true;
         }

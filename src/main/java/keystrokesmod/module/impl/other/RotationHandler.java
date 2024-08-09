@@ -12,6 +12,7 @@ import keystrokesmod.module.setting.utils.ModeOnly;
 import keystrokesmod.utility.AimSimulator;
 import keystrokesmod.utility.MoveUtil;
 import keystrokesmod.utility.RotationUtils;
+import lombok.Getter;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.MathHelper;
@@ -25,7 +26,11 @@ import java.util.Arrays;
 public final class RotationHandler extends Module {
     private static @Nullable Float movementYaw = null;
     private static @Nullable Float rotationYaw = null;
+    @Getter
+    private static float prevRotationYaw;
     private static @Nullable Float rotationPitch = null;
+    @Getter
+    private static float prevRotationPitch;
     private boolean isSet = false;
     private static MoveFix moveFix = MoveFix.NONE;
 
@@ -106,6 +111,8 @@ public final class RotationHandler extends Module {
      */
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onPreMotion(MoveInputEvent event) {
+        prevRotationYaw = getRotationYaw();
+        prevRotationPitch = getRotationPitch();
         if (isSet && mc.currentScreen == null) {
             float viewYaw = RotationUtils.normalize(mc.thePlayer.rotationYaw);
             float viewPitch = RotationUtils.normalize(mc.thePlayer.rotationPitch);

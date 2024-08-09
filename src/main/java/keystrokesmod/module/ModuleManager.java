@@ -118,6 +118,8 @@ public class ModuleManager {
     public static TargetESP targetESP;
     public static Language language;
     public static BedDefender bedDefender;
+    public static ChestAura chestAura;
+    public static AutoRod autoRod;
 
     public void register() {
 
@@ -154,6 +156,7 @@ public class ModuleManager {
         this.addModule(velocity = new Velocity());
         this.addModule(projectileAimBot = new ProjectileAimBot());
         this.addModule(airStuck = new AirStuck());
+        this.addModule(autoRod = new AutoRod());
 
         // fun
         this.addModule(new ExtraBobbing());
@@ -229,6 +232,7 @@ public class ModuleManager {
         this.addModule(new NoRotate());
         this.addModule(fakePotion = new FakePotion());
         this.addModule(autoWeb = new AutoWeb());
+        this.addModule(chestAura = new ChestAura());
 
         // render
         this.addModule(ambience = new Ambience());
