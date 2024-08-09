@@ -670,6 +670,7 @@ public class KillAura extends IAutoClicker {
     public void onReach(ReachEvent event) {
         if (attackMode.getInput() == 0) {
             event.setDistance(((float) attackRange.getInput()));
+            event.setHitThroughBlock(hitThroughBlocks.isToggled());
         }
     }
 
