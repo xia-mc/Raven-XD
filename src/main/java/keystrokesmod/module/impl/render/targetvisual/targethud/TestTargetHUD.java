@@ -13,31 +13,27 @@ import keystrokesmod.utility.render.Animation;
 import keystrokesmod.utility.render.Easing;
 import keystrokesmod.utility.render.RenderUtils;
 import net.minecraft.client.entity.AbstractClientPlayer;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.EntityLivingBase;
 import org.jetbrains.annotations.NotNull;
 import java.awt.*;
-
 import static keystrokesmod.module.impl.render.TargetHUD.*;
-import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
 
 public class TestTargetHUD extends SubMode<TargetHUD> implements ITargetVisual {
     private final ModeSetting theme;
     private final ModeSetting font;
     private final ButtonSetting showStatus;
     private final ButtonSetting healthColor;
-    private final Animation healthBarAnimation = new Animation(Easing.EASE_OUT_CIRC, 150);
-    private final Animation backgroundWidthAnimation = new Animation(Easing.EASE_OUT_CIRC, 75);
+    private final Animation healthBarAnimation = new Animation(Easing.EASE_IN_OUT_CUBIC, 240);
+    private final Animation backgroundWidthAnimation = new Animation(Easing.EASE_IN_QUAD, 80);
 
     public TestTargetHUD(String name, @NotNull TargetHUD parent) {
         super(name, parent);
         this.registerSetting(theme = new ModeSetting("Theme", Theme.themes, 0));
         this.registerSetting(font = new ModeSetting("Font", new String[]{"Minecraft", "ProductSans", "Regular"}, 0));
         this.registerSetting(showStatus = new ButtonSetting("Show win or loss", true));
-        this.registerSetting(healthColor = new ButtonSetting("Traditional health color", false));
+        this.registerSetting(healthColor = new ButtonSetting("Traditional health color", true));
     }
 
     private IFont getFont() {
@@ -57,7 +53,7 @@ public class TestTargetHUD extends SubMode<TargetHUD> implements ITargetVisual {
         String string = target.getDisplayName().getFormattedText();
         float health = Utils.limit(target.getHealth() / target.getMaxHealth(), 0, 1);
         string = string + " §a" + Math.round(target.getHealth()) + " §c❤ ";
-        if (showStatus.isToggled() && mc.thePlayer != null && mc.currentScreen != null) {
+        if (showStatus.isToggled() && mc.thePlayer != null) {
             String status = (health <= Utils.getCompleteHealth(mc.thePlayer) / mc.thePlayer.getMaxHealth()) ? "§aW" : "§cL";
             string = string + status;
         }
@@ -81,7 +77,6 @@ public class TestTargetHUD extends SubMode<TargetHUD> implements ITargetVisual {
         backgroundWidthAnimation.run(current$maxX - current$minX);
         float animatedWidth = (float) backgroundWidthAnimation.getValue();
         float halfAnimatedWidth = animatedWidth / 2;
-
         float animatedMinX = (float) (current$minX + current$maxX) / 2 - halfAnimatedWidth;
         float animatedMaxX = (float) (current$minX + current$maxX) / 2 + halfAnimatedWidth;
 
@@ -107,7 +102,6 @@ public class TestTargetHUD extends SubMode<TargetHUD> implements ITargetVisual {
         if (healthColor.isToggled()) {
             k = n16 = Utils.merge(Utils.getColorForHealth(health), n12);
         }
-
         RenderUtils.drawRoundedGradientRect((float) n13, (float) n15, lastHealthBar, (float) (n15 + 5), 4.0f, k, k, k, n16);
 
         GlStateManager.pushMatrix();
@@ -118,18 +112,12 @@ public class TestTargetHUD extends SubMode<TargetHUD> implements ITargetVisual {
         GlStateManager.popMatrix();
 
         if (target instanceof AbstractClientPlayer) {
-            renderPlayer2D(current$minX + 5, current$minY + 4, 25, 25, (AbstractClientPlayer) target);
-            GlStateManager.disableBlend();
+            AbstractClientPlayer player = (AbstractClientPlayer) target;
+            double offset = -(player.hurtTime * 10);
+            Color dynamicColor = new Color(255, (int) (255 + offset), (int) (255 + offset));
+            GlStateManager.color(dynamicColor.getRed() / 255F, dynamicColor.getGreen() / 255F, dynamicColor.getBlue() / 255F, dynamicColor.getAlpha() / 255F);
+            RenderUtils.renderPlayer2D(current$minX + 5, current$minY + 4, 25, 25, (AbstractClientPlayer) target);
+            GlStateManager.color(1, 1, 1, 1);
         }
-    }
-    public static void renderPlayer2D(float x, float y, float width, float height, AbstractClientPlayer player) {
-        GlStateManager.pushAttrib();
-        GlStateManager.enableBlend();
-        GlStateManager.blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        mc.getTextureManager().bindTexture(player.getLocationSkin());
-        Gui.drawScaledCustomSizeModalRect((int) x, (int) y, 8.0F, 8.0F, 8, 8, (int) width, (int) height, 64.0F, 64.0F);
-        GlStateManager.disableBlend();
-        GlStateManager.popAttrib();
     }
 }
