@@ -482,12 +482,6 @@ public abstract class MixinEntity {
 
     @Redirect(method = "rayTrace", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;getLook(F)Lnet/minecraft/util/Vec3;"))
     public Vec3 onGetLook(Entity instance, float partialTicks) {
-        if (partialTicks == 1.0F) {
-            return RotationUtils.getVectorForRotation(RotationHandler.getRotationPitch(), RotationHandler.getRotationYaw());
-        } else {
-            float f = RotationHandler.getPrevRotationPitch() + (RotationHandler.getRotationPitch() - RotationHandler.getPrevRotationPitch()) * partialTicks;
-            float f1 = RotationHandler.getPrevRotationYaw() + (RotationHandler.getRotationYaw() - RotationHandler.getPrevRotationYaw()) * partialTicks;
-            return RotationUtils.getVectorForRotation(f, f1);
-        }
+        return RotationHandler.getLook(partialTicks);
     }
 }

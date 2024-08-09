@@ -45,6 +45,7 @@ public class KillAura extends IAutoClicker {
     private final ModeValue clickMode;
     public ModeSetting autoBlockMode;
     private final SliderSetting fov;
+    private final ModeSetting attackMode;
     public final SliderSetting attackRange;
     private final SliderSetting swingRange;
     private final SliderSetting blockRange;
@@ -104,8 +105,9 @@ public class KillAura extends IAutoClicker {
         String[] autoBlockModes = new String[]{"Manual", "Vanilla", "Post", "Swap", "Interact A", "Interact B", "Fake", "Partial"};
         this.registerSetting(autoBlockMode = new ModeSetting("Autoblock", autoBlockModes, 0));
         this.registerSetting(fov = new SliderSetting("FOV", 360.0, 30.0, 360.0, 4.0));
-        this.registerSetting(attackRange = new SliderSetting("Attack range", 3.2, 3.0, 6.0, 0.1));
-        this.registerSetting(swingRange = new SliderSetting("Swing range", 3.2, 3.0, 8.0, 0.1));
+        this.registerSetting(attackMode = new ModeSetting("Attack mode", new String[]{"Legit", "Packet"}, 1));
+        this.registerSetting(attackRange = new SliderSetting("Attack range", 3.0, 3.0, 6.0, 0.1));
+        this.registerSetting(swingRange = new SliderSetting("Swing range", 3.0, 3.0, 8.0, 0.1));
         this.registerSetting(blockRange = new SliderSetting("Block range", 6.0, 3.0, 12.0, 0.1));
         this.registerSetting(preAimRange = new SliderSetting("PreAim range", 6.0, 3.0, 12.0, 0.1));
         this.registerSetting(rotationMode = new ModeSetting("Rotation", rotationModes, 1));
@@ -119,7 +121,7 @@ public class KillAura extends IAutoClicker {
         this.registerSetting(rotationSpeed = new SliderSetting("Rotation speed", 5, 0, 5, 0.05, doRotation));
         String[] sortModes = new String[]{"Health", "HurtTime", "Distance", "Yaw"};
         this.registerSetting(sortMode = new ModeSetting("Sort mode", sortModes, 0));
-        this.registerSetting(targets = new SliderSetting("Targets", 3.0, 1.0, 10.0, 1.0));
+        this.registerSetting(targets = new SliderSetting("Targets", 1.0, 1.0, 10.0, 1.0));
         this.registerSetting(switchDelay = new SliderSetting("Switch delay", 200.0, 50.0, 1000.0, 25.0, "ms", () -> targets.getInput() > 1));
         this.registerSetting(targetInvisible = new ButtonSetting("Target invisible", true));
         this.registerSetting(targetPlayer = new ButtonSetting("Target player", true));
@@ -128,7 +130,7 @@ public class KillAura extends IAutoClicker {
         this.registerSetting(disableWhileBlocking = new ButtonSetting("Disable while blocking", false));
         this.registerSetting(disableWhileMining = new ButtonSetting("Disable while mining", false));
         this.registerSetting(fixSlotReset = new ButtonSetting("Fix slot reset", false));
-        this.registerSetting(fixNoSlowFlag = new ButtonSetting("Fix NoSlow flag", true));
+        this.registerSetting(fixNoSlowFlag = new ButtonSetting("Fix NoSlow flag", false));
         this.registerSetting(postDelay = new SliderSetting("Post delay", 10, 1, 20, 1, fixNoSlowFlag::isToggled));
         this.registerSetting(hitThroughBlocks = new ButtonSetting("Hit through blocks", true));
         this.registerSetting(ignoreTeammates = new ButtonSetting("Ignore teammates", true));
@@ -664,9 +666,26 @@ public class KillAura extends IAutoClicker {
         return false;
     }
 
+    @SubscribeEvent
+    public void onReach(ReachEvent event) {
+        if (attackMode.getInput() == 0) {
+            event.setDistance(((float) attackRange.getInput()));
+        }
+    }
+
     @Override
     public boolean click() {
-        attack = true;
-        return swing;
+        switch ((int) attackMode.getInput()) {
+            case 0:
+                if (target != null && mc.thePlayer.getDistanceToEntity(target) <= swingRange.getInput()) {
+                    Utils.sendClick(0, true);
+                    return true;
+                }
+                return false;
+            default:
+            case 1:
+                attack = true;
+                return swing;
+        }
     }
 }

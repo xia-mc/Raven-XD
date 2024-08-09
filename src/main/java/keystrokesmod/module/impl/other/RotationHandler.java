@@ -16,9 +16,11 @@ import lombok.Getter;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.MathHelper;
+import net.minecraft.util.Vec3;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
@@ -103,6 +105,17 @@ public final class RotationHandler extends Module {
         if (rotationPitch != null)
             return rotationPitch;
         return pitch;
+    }
+
+    @NotNull
+    public static Vec3 getLook(float partialTicks) {
+        if (partialTicks == 1.0F) {
+            return RotationUtils.getVectorForRotation(RotationHandler.getRotationPitch(), RotationHandler.getRotationYaw());
+        } else {
+            float f = RotationHandler.getPrevRotationPitch() + (RotationHandler.getRotationPitch() - RotationHandler.getPrevRotationPitch()) * partialTicks;
+            float f1 = RotationHandler.getPrevRotationYaw() + (RotationHandler.getRotationYaw() - RotationHandler.getPrevRotationYaw()) * partialTicks;
+            return RotationUtils.getVectorForRotation(f, f1);
+        }
     }
 
     /**
