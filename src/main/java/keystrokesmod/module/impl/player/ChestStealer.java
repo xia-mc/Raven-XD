@@ -32,6 +32,7 @@ public class ChestStealer extends Module {
     private final ButtonSetting ignoreTrash = new ButtonSetting("Ignore trash", false);
     private static final ButtonSetting silent = new ButtonSetting("Silent", false);
     private static final ButtonSetting notMoving = new ButtonSetting("Not Moving", false);
+    public static ButtonSetting allowMouseControl = new ButtonSetting("Allow mouse control", false);
 
     private static State state = State.NONE;
     private long nextStealTime;
@@ -47,7 +48,7 @@ public class ChestStealer extends Module {
         super("ChestStealer", category.player);
         this.registerSetting(minStartDelay, maxStartDelay, minStealDelay, maxStealDelay, shuffle,
                 autoClose, autoCloseIfInvFull, minCloseDelay, maxCloseDelay,
-                customChest, ignoreTrash, silent, notMoving);
+                customChest, ignoreTrash, silent, notMoving, allowMouseControl);
     }
 
     @Override
@@ -86,6 +87,11 @@ public class ChestStealer extends Module {
         if (notMoving.isToggled() && ContainerUtils.isChest(customChest.isToggled())) {
             mc.thePlayer.motionX = 0;
             mc.thePlayer.motionZ = 0;
+        }
+
+        if (allowMouseControl.isToggled() && ContainerUtils.isChest(customChest.isToggled())) {
+            Utils.mc.inGameHasFocus = true;
+            Utils.mc.mouseHelper.grabMouseCursor();
         }
 
         switch (state) {
