@@ -7,8 +7,10 @@ import keystrokesmod.module.impl.client.Notifications;
 import keystrokesmod.module.impl.movement.LongJump;
 import keystrokesmod.module.impl.other.SlotHandler;
 import keystrokesmod.module.setting.impl.ButtonSetting;
+import keystrokesmod.module.setting.impl.ModeSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.impl.SubMode;
+import keystrokesmod.module.setting.utils.ModeOnly;
 import keystrokesmod.utility.MoveUtil;
 import keystrokesmod.utility.PacketUtils;
 import keystrokesmod.utility.Utils;
@@ -24,7 +26,7 @@ import org.jetbrains.annotations.NotNull;
 public class HypixelFireballLongJump extends SubMode<LongJump> {
     private final SliderSetting speed;
     private final ButtonSetting autoDisable;
-    private final ButtonSetting longer;
+    private final ModeSetting longer;
     private final ButtonSetting fakeGround;
     private final SliderSetting longerTick;
 
@@ -38,11 +40,11 @@ public class HypixelFireballLongJump extends SubMode<LongJump> {
 
     public HypixelFireballLongJump(String name, @NotNull LongJump parent) {
         super(name, parent);
-        this.registerSetting(speed = new SliderSetting("Speed", 1.5, 1, 2, 0.02));
+        this.registerSetting(speed = new SliderSetting("Speed", 1.5, 1, 2, 0.01));
         this.registerSetting(autoDisable = new ButtonSetting("Auto disable", true));
-        this.registerSetting(longer = new ButtonSetting("Longer", false));
-        this.registerSetting(fakeGround = new ButtonSetting("Fake ground", false, longer::isToggled));
-        this.registerSetting(longerTick = new SliderSetting("Longer tick", 20, 10, 30, 1, longer::isToggled));
+        this.registerSetting(longer = new ModeSetting("Longer", new String[]{"Disable", "Stop motion", "Air jump"}, 1));
+        this.registerSetting(fakeGround = new ButtonSetting("Fake ground", false, new ModeOnly(longer, 1, 2)));
+        this.registerSetting(longerTick = new SliderSetting("Longer tick", 20, 10, 30, 1, new ModeOnly(longer, 1, 2)));
     }
 
     @SubscribeEvent
@@ -52,7 +54,7 @@ public class HypixelFireballLongJump extends SubMode<LongJump> {
                 && ((C08PacketPlayerBlockPlacement) event.getPacket()).getStack() != null
                 && ((C08PacketPlayerBlockPlacement) event.getPacket()).getStack().getItem() instanceof ItemFireball) {
             thrown = true;
-            if (mc.thePlayer.onGround) {
+            if (mc.thePlayer.onGround && !Utils.jumpDown()) {
                 mc.thePlayer.jump();
             }
         }
@@ -113,14 +115,16 @@ public class HypixelFireballLongJump extends SubMode<LongJump> {
                 break;
         }
 
-        if (longer.isToggled()) {
+        if (longer.getInput() != 0) {
             if (offGroundTicks == (int) longerTick.getInput()) {
                 if (fakeGround.isToggled())
                     event.setOnGround(true);
-                mc.thePlayer.motionY = 0;
+                if (longer.getInput() == 1)
+                    mc.thePlayer.motionY = 0;
+                else if (longer.getInput() == 2)
+                    mc.thePlayer.jump();
                 if (autoDisable.isToggled())
                     parent.disable();
-                Utils.sendMessage("longer.");
             }
         } else if (ticks > 1) {
             if (autoDisable.isToggled())
