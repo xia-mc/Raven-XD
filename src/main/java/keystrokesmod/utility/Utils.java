@@ -260,6 +260,7 @@ public class Utils {
     }
 
     public static float getCompleteHealth(EntityLivingBase entity) {
+        if (entity == null) return 0;
         return entity.getHealth() + entity.getAbsorptionAmount();
     }
 
