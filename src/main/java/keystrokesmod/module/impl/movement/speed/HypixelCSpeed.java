@@ -16,14 +16,14 @@ public class HypixelCSpeed extends SubMode<Speed> {
 
     public HypixelCSpeed(String name, @NotNull Speed parent) {
         super(name, parent);
-        this.registerSetting(fast = new ButtonSetting("Fast", true));
+        this.registerSetting(fast = new ButtonSetting("Fast", false));
     }
 
     @SubscribeEvent
     public void onPrePlayerInput(PrePlayerInputEvent event) {
         if (!Utils.nullCheck()) return;
         if (mc.thePlayer.onGround && MoveUtil.isMoving()) {
-            if (fast.isToggled()) {
+            if (!fast.isToggled()) {
                 Utils.getTimer().timerSpeed = (float) ((mc.thePlayer.ticksExisted % 2 == 0 ? 0.9095f : 1.11f) + (Math.random() - 0.5) / 1000.0);
                 timed = true;
             }
@@ -31,6 +31,7 @@ public class HypixelCSpeed extends SubMode<Speed> {
             event.setSpeed(MoveUtil.getAllowedHorizontalDistance() - (fast.isToggled() ? 0 : Math.random() / 100.0));
         } else if (timed) {
             Utils.resetTimer();
+            timed = false;
         }
     }
 
@@ -38,5 +39,6 @@ public class HypixelCSpeed extends SubMode<Speed> {
     public void onDisable() {
         if (timed)
             Utils.resetTimer();
+        timed = false;
     }
 }
