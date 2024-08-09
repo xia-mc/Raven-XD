@@ -22,7 +22,7 @@ public class HypixelCSpeed extends SubMode<Speed> {
     @SubscribeEvent
     public void onPrePlayerInput(PrePlayerInputEvent event) {
         if (!Utils.nullCheck()) return;
-        if (mc.thePlayer.onGround && MoveUtil.isMoving()) {
+        if (mc.thePlayer.onGround && MoveUtil.isMoving() && mc.currentScreen == null) {
             if (!fast.isToggled()) {
                 Utils.getTimer().timerSpeed = (float) ((mc.thePlayer.ticksExisted % 2 == 0 ? 0.9095f : 1.11f) + (Math.random() - 0.5) / 1000.0);
                 timed = true;
