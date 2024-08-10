@@ -25,6 +25,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class HypixelFireballLongJump extends SubMode<LongJump> {
     private final SliderSetting speed;
+    private final SliderSetting verticalSpeed;
     private final ButtonSetting autoDisable;
     private final ModeSetting longer;
     private final ButtonSetting fakeGround;
@@ -37,10 +38,12 @@ public class HypixelFireballLongJump extends SubMode<LongJump> {
     private boolean sentPlace;
     private int initTicks;
     private boolean thrown;
+    private double receiveVerticalSpeed = 0;
 
     public HypixelFireballLongJump(String name, @NotNull LongJump parent) {
         super(name, parent);
         this.registerSetting(speed = new SliderSetting("Speed", 1.5, 1, 2, 0.01));
+        this.registerSetting(verticalSpeed = new SliderSetting("Vertical speed", 1, 1, 2, 0.01));
         this.registerSetting(autoDisable = new ButtonSetting("Auto disable", true));
         this.registerSetting(longer = new ModeSetting("Longer", new String[]{"Disable", "Stop motion", "Air jump"}, 1));
         this.registerSetting(fakeGround = new ButtonSetting("Fake ground", false, new ModeOnly(longer, 1, 2)));
@@ -75,6 +78,7 @@ public class HypixelFireballLongJump extends SubMode<LongJump> {
                 ticks = 0;
                 setSpeed = true;
                 thrown = false;
+                receiveVerticalSpeed = ((S12PacketEntityVelocity) packet).getMotionY() / 8000.0;
             }
         }
     }
@@ -167,9 +171,11 @@ public class HypixelFireballLongJump extends SubMode<LongJump> {
         }
         initTicks = 0;
         offGroundTicks = 0;
+        receiveVerticalSpeed = 0;
     }
 
     private void setSpeed() {
+        mc.thePlayer.motionY = receiveVerticalSpeed * verticalSpeed.getInput();
         MoveUtil.strafe((float) speed.getInput());
     }
 

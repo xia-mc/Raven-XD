@@ -17,6 +17,7 @@ import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.script.classes.Vec3;
 import keystrokesmod.utility.*;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.init.Items;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemFishingRod;
 import net.minecraft.item.ItemStack;
@@ -91,14 +92,24 @@ public class AutoRod extends IAutoClicker {
         }
 
         if (target != null) {
-            int slot = ContainerUtils.getBestRod(null);
+            int slot = getRod();
             if (slot == -1) return;
-            if (slot >= 9)
-                slot -= 36;
             if (fromSlot == -1)
                 fromSlot = SlotHandler.getCurrentSlot();
             SlotHandler.setCurrentSlot(slot);
         }
+    }
+
+    private int getRod() {
+        int a = -1;
+        for (int i = 0; i < 9; ++i) {
+            final ItemStack getStackInSlot = mc.thePlayer.inventory.getStackInSlot(i);
+            if (getStackInSlot != null && getStackInSlot.getItem() == Items.fishing_rod) {
+                a = i;
+                break;
+            }
+        }
+        return a;
     }
 
     @SubscribeEvent

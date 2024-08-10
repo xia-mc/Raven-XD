@@ -1,14 +1,17 @@
 package keystrokesmod.module.impl.movement.speed;
 
-import keystrokesmod.event.PrePlayerInputEvent;
 import keystrokesmod.module.impl.movement.Speed;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.MoveUtil;
 import keystrokesmod.utility.Utils;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * @see net.ccbluex.liquidbounce.features.module.modules.movement.speedmodes.other.MineblazeHop
+ * <p>
+ * credit: @thatonecoder & @larryngton / Intave14
+ */
 public class IntaveSpeed extends SubMode<Speed> {
     private final ButtonSetting airSpeed;
 
@@ -17,14 +20,18 @@ public class IntaveSpeed extends SubMode<Speed> {
         this.registerSetting(airSpeed = new ButtonSetting("Air speed", true));
     }
 
-    @SubscribeEvent
-    public void onPrePlayerInput(PrePlayerInputEvent event) {
+    @Override
+    public void onUpdate() {
+        if (!MoveUtil.isMoving() || Utils.inLiquid() || mc.thePlayer.isOnLadder()) return;
+
         if (mc.thePlayer.onGround && !Utils.jumpDown()) {
-            mc.thePlayer.motionY = 0.42;
-            MoveUtil.moveFlying(0.29);
+            mc.thePlayer.jump();
+
+            if (mc.thePlayer.isSprinting())
+                MoveUtil.strafe(0.29);
         }
 
-        if (mc.thePlayer.motionY > 0.003 && airSpeed.isToggled()) {
+        if (mc.thePlayer.motionY > 0.003 && mc.thePlayer.isSprinting() && airSpeed.isToggled()) {
             mc.thePlayer.motionX *= 1.0015;
             mc.thePlayer.motionZ *= 1.0015;
         }
