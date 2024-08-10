@@ -20,8 +20,6 @@ Raven B4, but not only for Hypixel.
 
 ![2024-07-10_14 13 51](https://github.com/xia-mc/Raven-XD/assets/108219418/15470b4f-b29d-49a5-8396-1c1d4bd315a1)
 
-### ***More functionality while staying in sync with upstream branches.***
-
 <a href="https://discord.gg/zSgDKArSH4"><img src="https://invidget.switchblade.xyz/zSgDKArSH4" alt="https://discord.gg/zSgDKArSH4"/></a><br>
 </div>
 
