@@ -27,6 +27,8 @@ public class TestTargetHUD extends SubMode<TargetHUD> implements ITargetVisual {
     private final ButtonSetting healthColor;
     private final Animation healthBarAnimation = new Animation(Easing.EASE_IN_OUT_CUBIC, 240);
     private final Animation backgroundWidthAnimation = new Animation(Easing.EASE_IN_QUAD, 80);
+    private final Animation playerXAnimation = new Animation(Easing.EASE_IN_OUT_CUBIC, 80);
+    private final Animation playerYAnimation = new Animation(Easing.EASE_IN_OUT_CUBIC, 80);
 
     public TestTargetHUD(String name, @NotNull TargetHUD parent) {
         super(name, parent);
@@ -113,10 +115,18 @@ public class TestTargetHUD extends SubMode<TargetHUD> implements ITargetVisual {
 
         if (target instanceof AbstractClientPlayer) {
             AbstractClientPlayer player = (AbstractClientPlayer) target;
+
+            double targetX = current$minX + 5;
+            double targetY = current$minY + 4;
+            playerXAnimation.run(targetX);
+            playerYAnimation.run(targetY);
+            double animatedX = playerXAnimation.getValue();
+            double animatedY = playerYAnimation.getValue();
+
             double offset = -(player.hurtTime * 10);
             Color dynamicColor = new Color(255, (int) (255 + offset), (int) (255 + offset));
             GlStateManager.color(dynamicColor.getRed() / 255F, dynamicColor.getGreen() / 255F, dynamicColor.getBlue() / 255F, dynamicColor.getAlpha() / 255F);
-            RenderUtils.renderPlayer2D(current$minX + 5, current$minY + 4, 25, 25, (AbstractClientPlayer) target);
+            RenderUtils.renderPlayer2D((float) animatedX, (float) animatedY, 25, 25, player);
             GlStateManager.color(1, 1, 1, 1);
         }
     }
