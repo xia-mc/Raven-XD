@@ -22,9 +22,9 @@ public class IntaveSpeed extends SubMode<Speed> {
 
     @Override
     public void onUpdate() {
-        if (!MoveUtil.isMoving() || Utils.inLiquid() || mc.thePlayer.isOnLadder()) return;
+        if (!MoveUtil.isMoving() || Utils.inLiquid() || mc.thePlayer.isOnLadder() || !Utils.jumpDown()) return;
 
-        if (mc.thePlayer.onGround && !Utils.jumpDown()) {
+        if (mc.thePlayer.onGround) {
             mc.thePlayer.jump();
 
             if (mc.thePlayer.isSprinting())
