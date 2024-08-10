@@ -11,6 +11,7 @@ import keystrokesmod.utility.font.FontManager;
 import keystrokesmod.utility.font.IFont;
 import keystrokesmod.utility.font.impl.FontRenderer;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.*;
@@ -967,5 +968,12 @@ public class RenderUtils {
             RenderHelper.disableStandardItemLighting();
             GlStateManager.popMatrix();
         }
+    }
+    public static void renderPlayer2D(float x, float y, float width, float height, AbstractClientPlayer player) {
+        GlStateManager.enableBlend();
+        GlStateManager.blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        mc.getTextureManager().bindTexture(player.getLocationSkin());
+        Gui.drawScaledCustomSizeModalRect((int) x, (int) y, 8.0F, 8.0F, 8, 8, (int) width, (int) height, 64.0F, 64.0F);
+        GlStateManager.disableBlend();
     }
 }
