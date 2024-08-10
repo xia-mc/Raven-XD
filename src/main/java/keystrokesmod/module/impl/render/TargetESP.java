@@ -59,7 +59,7 @@ public class TargetESP extends Module {
             lastTargetTime = System.currentTimeMillis();
         }
 
-        if (lastTargetTime != -1 && System.currentTimeMillis() - lastTargetTime > 1000) {
+        if (target != null && lastTargetTime != -1 && (System.currentTimeMillis() - lastTargetTime > 1000 || target.getDistanceSqToEntity(mc.thePlayer) > 10)) {
             target = null;
             lastTargetTime = -1;
         }

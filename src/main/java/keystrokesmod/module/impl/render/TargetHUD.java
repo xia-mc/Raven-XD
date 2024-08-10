@@ -29,7 +29,7 @@ public class TargetHUD extends Module {
     public static int current$minY;
     public static int current$maxY;
     private static @Nullable EntityLivingBase target = null;
-    private long lastKillAuraTime = -1;
+    private long lastTargetTime = -1;
 
     public TargetHUD() {
         super("TargetHUD", category.render);
@@ -51,7 +51,7 @@ public class TargetHUD extends Module {
         mode.disable();
 
         target = null;
-        lastKillAuraTime = -1;
+        lastTargetTime = -1;
     }
 
     @Override
@@ -63,12 +63,12 @@ public class TargetHUD extends Module {
 
         if (KillAura.target != null) {
             target = KillAura.target;
-            lastKillAuraTime = System.currentTimeMillis();
+            lastTargetTime = System.currentTimeMillis();
         }
 
-        if (lastKillAuraTime != -1 && System.currentTimeMillis() - lastKillAuraTime > 1000) {
+        if (target != null && lastTargetTime != -1 && (System.currentTimeMillis() - lastTargetTime > 1000 || target.getDistanceSqToEntity(mc.thePlayer) > 10)) {
             target = null;
-            lastKillAuraTime = -1;
+            lastTargetTime = -1;
         }
 
 
@@ -84,7 +84,7 @@ public class TargetHUD extends Module {
                     && mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY
                     && mc.objectMouseOver.entityHit instanceof EntityLivingBase) {
                 target = (EntityLivingBase) mc.objectMouseOver.entityHit;
-                lastKillAuraTime = System.currentTimeMillis();
+                lastTargetTime = System.currentTimeMillis();
             }
         }
     }
