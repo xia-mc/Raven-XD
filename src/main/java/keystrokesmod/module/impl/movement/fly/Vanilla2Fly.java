@@ -27,11 +27,9 @@ public class Vanilla2Fly extends SubMode<Fly> {
         if (mc.currentScreen == null) {
             if (Utils.jumpDown()) {
                 mc.thePlayer.motionY = 0.3 * verticalSpeed.getInput();
-            }
-            else if (Utils.jumpDown()) {
+            } else if (mc.gameSettings.keyBindSneak.isKeyDown()) {
                 mc.thePlayer.motionY = -0.3 * verticalSpeed.getInput();
-            }
-            else {
+            } else {
                 mc.thePlayer.motionY = 0.0;
             }
         }
@@ -40,6 +38,8 @@ public class Vanilla2Fly extends SubMode<Fly> {
         }
         if (MoveUtil.isMoving())
             MoveUtil.strafe(0.85 * horizontalSpeed.getInput());
+        else
+            MoveUtil.stop();
     }
 
     @SubscribeEvent
