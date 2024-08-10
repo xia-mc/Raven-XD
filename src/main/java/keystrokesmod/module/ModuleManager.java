@@ -120,6 +120,7 @@ public class ModuleManager {
     public static BedDefender bedDefender;
     public static ChestAura chestAura;
     public static AutoRod autoRod;
+//    public static AbilitiesBedWars abilitiesBedWars;
 
     public void register() {
 
@@ -166,6 +167,7 @@ public class ModuleManager {
         this.addModule(hitLog = new HitLog());
         this.addModule(noteBot = new NoteBot());
         this.addModule(blockOut = new BlockOut());
+//        this.addModule(abilitiesBedWars = new AbilitiesBedWars());
 
         // minigames
         this.addModule(new AutoWho());

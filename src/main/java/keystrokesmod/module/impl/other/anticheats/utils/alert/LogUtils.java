@@ -15,7 +15,7 @@ public class LogUtils {
 
     public static void alert(String player, String module, String extraMsg) {
         if (check()) {
-            final ChatComponentText chatComponentText = new ChatComponentText(String.format("%s§r §r%s§r %s§r %s§r | %s§r", "§b§lTR§r§l>", player, "failed", module, extraMsg));
+            final ChatComponentText chatComponentText = new ChatComponentText(String.format("%s§r §r%s§r %s§r §b%s§r | %s§r", "§b§lTR§r§l>", player, "failed", module, extraMsg));
             final ChatStyle chatStyle = new ChatStyle();
             chatStyle.setChatClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/wdr " + player));
             ((IChatComponent)chatComponentText).appendSibling(new ChatComponentText(Utils.formatColor(" §7[§cWDR§7]")).setChatStyle(chatStyle));

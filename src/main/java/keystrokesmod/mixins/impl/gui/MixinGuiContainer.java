@@ -1,6 +1,5 @@
-package keystrokesmod.mixins.impl.render;
+package keystrokesmod.mixins.impl.gui;
 
-import keystrokesmod.module.impl.player.InvManager;
 import keystrokesmod.module.impl.player.ChestStealer;
 import keystrokesmod.utility.Utils;
 import net.minecraft.client.gui.inventory.GuiContainer;

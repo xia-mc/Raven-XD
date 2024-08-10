@@ -1,4 +1,4 @@
-package keystrokesmod.mixins.impl.render;
+package keystrokesmod.mixins.impl.gui;
 
 import keystrokesmod.event.PreConnectEvent;
 import net.minecraft.client.gui.GuiScreen;
