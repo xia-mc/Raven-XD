@@ -286,7 +286,7 @@ public class Scaffold extends IAutoClicker {
 
         event.setYaw(lastYaw = instant ? yaw : AimSimulator.rotMove(yaw, lastYaw, (float) aimSpeed.getInput()));
         event.setPitch(lastPitch = instant ? pitch : AimSimulator.rotMove(pitch, lastPitch, (float) aimSpeed.getInput()));
-        event.setMoveFix(moveFix.isToggled() ? RotationHandler.MoveFix.SILENT : RotationHandler.MoveFix.NONE);
+        event.setMoveFix(moveFix.isToggled() ? RotationHandler.MoveFix.Silent : RotationHandler.MoveFix.None);
 
         if (clickMode.getInput() == 0)
             place = true;

@@ -39,7 +39,7 @@ public class AntiAim extends Module {
 
     @SubscribeEvent
     public void onRotation(@NotNull RotationEvent event) {
-        event.setMoveFix(moveFix.isToggled() ? RotationHandler.MoveFix.SILENT : RotationHandler.MoveFix.NONE);
+        event.setMoveFix(moveFix.isToggled() ? RotationHandler.MoveFix.Silent : RotationHandler.MoveFix.None);
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)

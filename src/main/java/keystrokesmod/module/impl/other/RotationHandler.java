@@ -3,7 +3,6 @@ package keystrokesmod.module.impl.other;
 import keystrokesmod.event.MoveInputEvent;
 import keystrokesmod.event.RotationEvent;
 import keystrokesmod.module.Module;
-import keystrokesmod.module.impl.world.Scaffold;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.DescriptionSetting;
 import keystrokesmod.module.setting.impl.ModeSetting;
@@ -34,7 +33,7 @@ public final class RotationHandler extends Module {
     @Getter
     private static float prevRotationPitch;
     private boolean isSet = false;
-    private static MoveFix moveFix = MoveFix.NONE;
+    private static MoveFix moveFix = MoveFix.None;
 
     private static final ModeSetting defaultMoveFix = new ModeSetting("Default MoveFix", new String[]{"None", "Silent", "Strict"}, 0);
     private final ModeSetting smoothBack = new ModeSetting("Smooth back", new String[]{"None", "Default"}, 0);
@@ -153,10 +152,10 @@ public final class RotationHandler extends Module {
             moveFix = rotationEvent.getMoveFix();
 
             switch (moveFix) {
-                case NONE:
+                case None:
                     movementYaw = null;
                     break;
-                case SILENT:
+                case Silent:
                     movementYaw = getRotationYaw();
 
                     final float forward = event.getForward();
@@ -188,7 +187,7 @@ public final class RotationHandler extends Module {
                     event.setForward(closestForward);
                     event.setStrafe(closestStrafe);
                     break;
-                case STRICT:
+                case Strict:
                     movementYaw = getRotationYaw();
                     break;
             }
@@ -199,9 +198,9 @@ public final class RotationHandler extends Module {
     }
 
     public enum MoveFix {
-        NONE,
-        SILENT,
-        STRICT;
+        None,
+        Silent,
+        Strict;
 
         public static final String[] MODES = Arrays.stream(values()).map(Enum::name).toArray(String[]::new);
     }
