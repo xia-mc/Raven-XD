@@ -1,6 +1,7 @@
 package keystrokesmod.module.impl.movement;
 
 import keystrokesmod.event.MoveEvent;
+import keystrokesmod.event.MoveInputEvent;
 import keystrokesmod.event.RotationEvent;
 import keystrokesmod.event.SendPacketEvent;
 import keystrokesmod.module.Module;
@@ -20,7 +21,7 @@ public class AirStuck extends Module {
 
     public AirStuck() {
         super("AirStuck", category.movement);
-        this.registerSetting(mode = new ModeSetting("Mode", new String[]{"CanRotate", "NoRotate", "NoPacket", "FakeMove"}, 0));
+        this.registerSetting(mode = new ModeSetting("Mode", new String[]{"CanRotate", "NoRotate", "NoPacket", "FakeMove"}, 1));
         this.registerSetting(clearMotion = new ButtonSetting("Clear motion", true));
     }
 

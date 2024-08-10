@@ -9,9 +9,9 @@ import org.jetbrains.annotations.NotNull;
 import org.lwjgl.input.Mouse;
 
 public class NormalAutoClicker extends SubMode<IAutoClicker> {
-    private final SliderSetting minCPS = new SliderSetting("Min CPS", 8, 1, 40, 0.1);
-    private final SliderSetting maxCPS = new SliderSetting("Max CPS", 14, 1, 40, 0.1);
-    private final ButtonSetting butterFly = new ButtonSetting("Butterfly", true);
+    private final SliderSetting minCPS;
+    private final SliderSetting maxCPS;
+    private final ButtonSetting butterFly;
     private final boolean leftClick;
     private final boolean rightClick;
     private final boolean always;
@@ -26,6 +26,9 @@ public class NormalAutoClicker extends SubMode<IAutoClicker> {
         this.rightClick = !left;
         this.always = always;
 
+        minCPS = new SliderSetting("Min CPS", 8, 1, left ? 20 : 40, 0.1);
+        maxCPS = new SliderSetting("Max CPS", 14, 1, left ? 20 : 40, 0.1);
+        butterFly = new ButtonSetting("Butterfly", true);
         this.registerSetting(minCPS, maxCPS, butterFly);
     }
 
