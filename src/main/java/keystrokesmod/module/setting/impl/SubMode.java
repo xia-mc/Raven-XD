@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public abstract class SubMode<T extends Module> extends Module {
     protected final String name;
-    protected final T parent;
+    public final T parent;
 
     public SubMode(String name, @NotNull T parent) {
         super(parent.getName() + "$" + name, parent.moduleCategory());

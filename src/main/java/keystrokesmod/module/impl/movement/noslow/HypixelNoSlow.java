@@ -21,14 +21,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class HypixelNoSlow extends INoSlow {
-    private final ModeSetting swordMode;
-
     private int offGroundTicks = 0;
     private boolean send = false;
 
     public HypixelNoSlow(String name, @NotNull NoSlow parent) {
         super(name, parent);
-        this.registerSetting(swordMode = new ModeSetting("Sword mode", new String[]{"Switch", "Test1", "Test2"}, 0));
     }
 
     @Override
@@ -36,23 +33,8 @@ public class HypixelNoSlow extends INoSlow {
         if (!mc.thePlayer.isUsingItem() || SlotHandler.getHeldItem() == null) return;
 
         if (SlotHandler.getHeldItem().getItem() instanceof ItemSword) {
-            switch ((int) swordMode.getInput()) {
-                case 0:
-                    PacketUtils.sendPacket(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem % 8 + 1));
-                    PacketUtils.sendPacket(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
-                    break;
-                case 1:
-                    if (mc.thePlayer.ticksExisted % 2 == 0 && !Raven.badPacketsHandler.C07)
-                        PacketUtils.sendPacket(new C08PacketPlayerBlockPlacement(null));
-                    break;
-                case 2:
-                    PacketUtils.sendPacket(new C02PacketUseEntity());
-                    break;
-            }
-        } else {
-            if (mc.thePlayer.ticksExisted % 3 == 0 && !Raven.badPacketsHandler.C07) {
-                PacketUtils.sendPacket(new C08PacketPlayerBlockPlacement(new BlockPos(-1, -1, -1), 1, null, 0, 0, 0));
-            }
+            PacketUtils.sendPacket(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem % 7 + (int) (Math.random() * 2.0) + 1));
+            PacketUtils.sendPacket(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
         }
     }
 

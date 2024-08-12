@@ -1,8 +1,8 @@
-package keystrokesmod.module.impl.movement.speed;
+package keystrokesmod.module.impl.movement.speed.hypixel;
 
 import keystrokesmod.event.PrePlayerInputEvent;
 import keystrokesmod.event.ReceivePacketEvent;
-import keystrokesmod.module.impl.movement.Speed;
+import keystrokesmod.module.impl.movement.speed.HypixelSpeed;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.MoveUtil;
 import keystrokesmod.utility.Utils;
@@ -11,11 +11,11 @@ import net.minecraft.potion.Potion;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
-public class HypixelASpeed extends SubMode<Speed> {
+public class GroundStrafeSpeed extends SubMode<HypixelSpeed> {
     private double lastAngle = 999;
-    public static int ticksSinceVelocity = 0;
+    private int ticksSinceVelocity = 0;
 
-    public HypixelASpeed(String name, @NotNull Speed parent) {
+    public GroundStrafeSpeed(String name, @NotNull HypixelSpeed parent) {
         super(name, parent);
     }
 
@@ -26,7 +26,7 @@ public class HypixelASpeed extends SubMode<Speed> {
 
     @SubscribeEvent
     public void onPrePlayerInput(PrePlayerInputEvent event) {
-        if (parent.noAction()) return;
+        if (parent.parent.noAction()) return;
 
         if (!Utils.jumpDown() && Utils.isMoving() && mc.currentScreen == null) {
             mc.thePlayer.setSprinting(true);

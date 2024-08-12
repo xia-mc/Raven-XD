@@ -6,7 +6,6 @@ import keystrokesmod.module.impl.movement.noslow.*;
 import keystrokesmod.module.impl.other.SlotHandler;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.ModeValue;
-import keystrokesmod.module.setting.utils.ModeOnly;
 import keystrokesmod.utility.ContainerUtils;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBow;
@@ -22,8 +21,6 @@ public class NoSlow extends Module {
     private static final ButtonSetting sword = new ButtonSetting("Sword", true, nonCustomMode);
     private static final ButtonSetting bow = new ButtonSetting("Bow", true, nonCustomMode);
     private static final ButtonSetting rest = new ButtonSetting("Rest", true, nonCustomMode);
-
-
 
     public NoSlow() {
         super("NoSlow", category.movement);

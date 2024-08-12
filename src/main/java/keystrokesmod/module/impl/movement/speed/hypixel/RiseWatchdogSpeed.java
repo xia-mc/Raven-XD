@@ -3,14 +3,14 @@
 // (powered by FernFlower decompiler)
 //
 
-package keystrokesmod.module.impl.movement.speed;
+package keystrokesmod.module.impl.movement.speed.hypixel;
 
 import keystrokesmod.event.MoveInputEvent;
 import keystrokesmod.event.PreMotionEvent;
 import keystrokesmod.event.PrePlayerInputEvent;
 import keystrokesmod.event.PreUpdateEvent;
-import keystrokesmod.module.impl.movement.Speed;
 import keystrokesmod.module.impl.movement.Sprint;
+import keystrokesmod.module.impl.movement.speed.HypixelSpeed;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.module.setting.utils.ModeOnly;
 import keystrokesmod.utility.MoveUtil;
@@ -33,7 +33,7 @@ import org.jetbrains.annotations.NotNull;
  * @see hackclient.rise.nb
  * @author Alan34
  */
-public class HypixelBSpeed extends SubMode<Speed> {
+public class RiseWatchdogSpeed extends SubMode<HypixelSpeed> {
     private final ModeSetting mode = new ModeSetting("Sub mode", new String[]{"Ground Strafe", "Autism"}, 0);
     public final ButtonSetting fastFall = new ButtonSetting("Fast Fall", false, new ModeOnly(mode, 1));
     public final SliderSetting ticksToGlide = new SliderSetting("Ticks to Glide", 29, 1, 29, 1, new ModeOnly(mode, 1));
@@ -45,7 +45,7 @@ public class HypixelBSpeed extends SubMode<Speed> {
     
     private int offGroundTicks = 0;
 
-    public HypixelBSpeed(String name, Speed parent) {
+    public RiseWatchdogSpeed(String name, HypixelSpeed parent) {
         super(name, parent);
         this.registerSetting(mode, fastFall, ticksToGlide);
     }
@@ -65,7 +65,7 @@ public class HypixelBSpeed extends SubMode<Speed> {
 
     @SubscribeEvent
     public void onPreMotion(PreMotionEvent event) {
-        if (parent.noAction()) return;
+        if (parent.parent.noAction()) return;
 
         if (BlockUtils.getBlock(mc.thePlayer.posX, mc.thePlayer.posY + mc.thePlayer.motionY, 0.0) != Blocks.air) {
             this.wT = false;
@@ -88,7 +88,7 @@ public class HypixelBSpeed extends SubMode<Speed> {
 
     @SubscribeEvent
     public void onStrafe(PrePlayerInputEvent event) {
-        if (parent.noAction()) return;
+        if (parent.parent.noAction()) return;
 
         switch (mode.getOptions()[(int) mode.getInput()]) {
             case "Ground Strafe":

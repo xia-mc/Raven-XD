@@ -11,6 +11,7 @@ import keystrokesmod.module.impl.other.*;
 import keystrokesmod.module.impl.player.*;
 import keystrokesmod.module.impl.render.*;
 import keystrokesmod.module.impl.world.*;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -338,16 +339,18 @@ public class ModuleManager {
         return null;
     }
 
+    private static double getWidth(@NotNull Module module) {
+        return HUD.getFontRenderer().width(
+                module.getPrettyName()
+                        + ((HUD.showInfo.isToggled() && !module.getPrettyInfo().isEmpty()) ? " " + module.getPrettyInfo() : "")
+        );
+    }
+
     public static void sort() {
         if (HUD.alphabeticalSort.isToggled()) {
             organizedModules.sort(Comparator.comparing(Module::getPrettyName));
         } else {
-            organizedModules.sort(Comparator.comparingDouble(module ->
-                    HUD.getFontRenderer().width(
-                            module.getPrettyName()
-                                    + ((HUD.showInfo.isToggled() && !module.getPrettyInfo().isEmpty()) ? " " + module.getPrettyInfo() : "")
-                    )
-            ));
+            organizedModules.sort((c1, c2) -> Double.compare(getWidth(c2), getWidth(c1)));
         }
     }
 }
