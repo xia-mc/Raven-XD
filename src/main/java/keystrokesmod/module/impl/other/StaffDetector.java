@@ -14,7 +14,7 @@ import java.io.*;
 import java.util.*;
 
 public class StaffDetector extends Module {
-    public static final String[] STAFFLISTS = new String[]{"HypixelDefault", "BlocksMCDefault", "GamsterDefault", "GommeHDDefault", "PikaDefault", "SyuuDefault", "StardixDefault", "MinemenClubDefault", "MushMCDefault"};
+    public static final String[] STAFFLISTS = new String[]{"Hypixel", "BlocksMC", "Gamster", "GommeHD", "Pika", "Syuu", "Stardix", "MinemenClub", "MushMC"};
     public static final List<Set<String>> STAFFS = new ArrayList<>();
     public static final Set<String> hasFlagged = new HashSet<>();
 
