@@ -13,11 +13,12 @@ public class FontManager {
     public static FontRenderer
             regular16, regular22,
             icon20,
-            productSans16, productSans20, productSansLight, productSansMedium;
+            productSans16, productSans20, productSansLight, productSansMedium,
+            tenacity20, tenacity80;
 
     private static int prevScale;
 
-    public static void init() {
+    static {
         Map<String, java.awt.Font> locationMap = new HashMap<>();
 
         ScaledResolution sr = new ScaledResolution(mc);
@@ -34,6 +35,8 @@ public class FontManager {
             productSans20 = new FontRenderer(FontUtil.getResource(locationMap, "product_sans_regular.ttf", 20));
             productSansLight = new FontRenderer(FontUtil.getResource(locationMap, "product_sans_light.ttf", 22));
             productSansMedium = new FontRenderer(FontUtil.getResource(locationMap, "product_sans_medium.ttf", 22));
+            tenacity20 = new FontRenderer(FontUtil.getResource(locationMap, "tenacity.ttf", 20));
+            tenacity80 = new FontRenderer(FontUtil.getResource(locationMap, "tenacity.ttf", 80));
         }
     }
     public static MinecraftFontRenderer getMinecraft() {

@@ -12,10 +12,10 @@ import keystrokesmod.module.ModuleManager;
 import keystrokesmod.script.ScriptManager;
 import keystrokesmod.utility.*;
 import keystrokesmod.utility.clicks.CPSCalculator;
-import keystrokesmod.utility.font.FontManager;
 import keystrokesmod.utility.i18n.I18nManager;
 import keystrokesmod.utility.profile.Profile;
 import keystrokesmod.utility.profile.ProfileManager;
+import lombok.Getter;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.fml.common.FMLCommonHandler;
@@ -39,6 +39,7 @@ public class Raven {
     private static KeySrokeRenderer keySrokeRenderer;
     private static boolean isKeyStrokeConfigGuiToggled;
     private static final ScheduledExecutorService ex = Executors.newScheduledThreadPool(4);
+    @Getter
     public static ModuleManager moduleManager;
     public static ClickGui clickGui;
     public static ProfileManager profileManager;
@@ -66,7 +67,6 @@ public class Raven {
         FMLCommonHandler.instance().bus().register(badPacketsHandler = new BadPacketsHandler());
         Reflection.getFields();
         Reflection.getMethods();
-        FontManager.init();
         moduleManager.register();
         scriptManager = new ScriptManager();
         keySrokeRenderer = new KeySrokeRenderer();
@@ -127,10 +127,6 @@ public class Raven {
             } catch (Exception ignored) {
             }
         }
-    }
-
-    public static ModuleManager getModuleManager() {
-        return moduleManager;
     }
 
     public static ScheduledExecutorService getExecutor() {

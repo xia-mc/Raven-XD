@@ -4,6 +4,7 @@ import keystrokesmod.event.ReceivePacketEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.ModeSetting;
 import keystrokesmod.utility.PacketUtils;
+import keystrokesmod.utility.Utils;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.play.client.C01PacketChatMessage;
 import net.minecraft.network.play.server.S13PacketDestroyEntities;
@@ -11,10 +12,41 @@ import net.minecraftforge.event.entity.player.AttackEntityEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Locale;
-import java.util.Random;
-
 public class KillMessage extends Module {
+    public static final String[] BIPAS_MESSAGE = new String[]{
+            "Mit Icarus wäre das nicht passiert",
+            "POV: Icarus",
+            "Nova is 'THE BEST CLIENT 2024', trust, no auto ban",
+            "Vesper ist kein Exitscam, vertrau",
+            "Spielst du Fortnite?",
+            "Welcome to Meist... Meist Hacks?... Was ist den Meist Hacks?",
+            "POV Icarus... Und jetzt einmal kurz... POV Augustus...",
+            "Ah... Doof gelaufen für Augustus... Vielleicht nächstes Mal...",
+            "IQ Zellen",
+            "Bro paid for a cheat to lose against me",
+            "It's only cheating when you get caught!",
+            "I'm on Immaculate rn, btw",
+            "I'm on AstroWare rn, btw",
+            "I'm on Wurst rn, btw",
+            "Klientus ist keine Rat",
+            "10/10 im HAZE Rating",
+            "RAT im Clientlauncher / Ich wurde geRATTED!",
+            "ESound Calling",
+            "Adapt ist gut",
+            "Dümmer als Toastbrot",
+            "Jetzt erstmal 10 Minuten Rage Stream",
+            "'Nius ist eine neutrale Quelle'~Verschmxtztxcole(geht so leicht in die rechte Richtung)",
+            "'Alice Weidel ist nicht rechts'~Verschmxtztxcole(geht so leicht in die rechte Richtung)",
+            "foiled again",
+            "I love Nekomame",
+            "slurp",
+            "Polar is always watching",
+            "e.setYaw(RotationUtils.serverYaw)",
+            "Aus Protest Vernunft wählen ~ FDP",
+            "Unser Client zuerst ~ FDP",
+            "Piwo",
+            "Bottom Text"
+    };
     public static String killMessage = "This is a custom killMessage";
 
     private final ModeSetting mode;
@@ -39,6 +71,11 @@ public class KillMessage extends Module {
     public void onUpdate() {
         if (System.currentTimeMillis() - lastAttackTime > 20)
             lastAttack = null;
+
+        if (lastAttack != null && lastAttack.isDead) {
+            PacketUtils.sendPacket(new C01PacketChatMessage(getKillMessage()));
+            lastAttack = null;
+        }
     }
 
     @SubscribeEvent
@@ -48,6 +85,8 @@ public class KillMessage extends Module {
             for (int id : packet.getEntityIDs()) {
                 if (id == lastAttack.getEntityId()) {
                     PacketUtils.sendPacket(new C01PacketChatMessage(getKillMessage()));
+                    lastAttack = null;
+                    return;
                 }
             }
         }
@@ -60,43 +99,7 @@ public class KillMessage extends Module {
             case 1:
                 return killMessage;
             case 2:
-                String[] messages = {
-                        "Mit Icarus wäre das nicht passiert",
-                        "POV: Icarus",
-                        "Nova is 'THE BEST CLIENT 2024', trust, no auto ban",
-                        "Vesper ist kein Exitscam, vertrau",
-                        "Spielst du Fortnite?",
-                        "Welcome to Meist... Meist Hacks?... Was ist den Meist Hacks?",
-                        "POV Icarus... Und jetzt einmal kurz... POV Augustus...",
-                        "Ah... Doof gelaufen für Augustus... Vielleicht nächstes Mal...",
-                        "IQ Zellen",
-                        "Bro paid for a cheat to lose against me",
-                        "It's only cheating when you get caught!",
-                        "I'm on Immaculate rn, btw",
-                        "I'm on AstroWare rn, btw",
-                        "I'm on Wurst rn, btw",
-                        "Klientus ist keine Rat",
-                        "10/10 im HAZE Rating",
-                        "RAT im Clientlauncher / Ich wurde geRATTED!",
-                        "ESound Calling",
-                        "Adapt ist gut",
-                        "Dümmer als Toastbrot",
-                        "Jetzt erstmal 10 Minuten Rage Stream",
-                        "'Nius ist eine neutrale Quelle'~Verschmxtztxcole(geht so leicht in die rechte Richtung)",
-                        "'Alice Weidel ist nicht rechts'~Verschmxtztxcole(geht so leicht in die rechte Richtung)",
-                        "foiled again",
-                        "I love Nekomame",
-                        "slurp",
-                        "Polar is always watching",
-                        "e.setYaw(RotationUtils.serverYaw)",
-                        "Aus Protest Vernunft wählen ~ FDP",
-                        "Unser Client zuerst ~ FDP",
-                        "Piwo",
-                        "Bottom Text"
-                };
-                Random random = new Random();
-                int randomIndex = random.nextInt(messages.length);
-                return messages[randomIndex];
+                return BIPAS_MESSAGE[Utils.randomizeInt(0, BIPAS_MESSAGE.length - 1)];
         }
         return "";
     }

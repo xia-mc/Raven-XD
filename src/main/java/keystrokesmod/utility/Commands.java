@@ -1,5 +1,7 @@
 package keystrokesmod.utility;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.mojang.realmsclient.gui.ChatFormatting;
 import keystrokesmod.Raven;
 import keystrokesmod.clickgui.ClickGui;
@@ -14,6 +16,7 @@ import keystrokesmod.module.impl.other.NameHider;
 import keystrokesmod.module.impl.render.Watermark;
 import keystrokesmod.utility.font.IFont;
 import keystrokesmod.utility.profile.Profile;
+import keystrokesmod.utility.profile.ProfileManager;
 import keystrokesmod.utility.render.RenderUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiChat;
@@ -23,6 +26,7 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
+import java.awt.datatransfer.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -273,7 +277,7 @@ public class Commands {
             } else if (firstArg.equals("binds")) {
                 for (Module module : Raven.getModuleManager().getModules()) {
                     if (module.getKeycode() != 0) {
-                        print(ChatFormatting.AQUA + module.getName() + ": " + Utils.getKeyName(module.getKeycode()), 1);
+                        print(ChatFormatting.AQUA + module.getPrettyName() + ": " + Utils.getKeyName(module.getKeycode()), 1);
                     }
                 }
             } else if (firstArg.equals("bind")) {
@@ -289,7 +293,7 @@ public class Commands {
 
                 Module targetModule = null;
                 for (Module module : Raven.getModuleManager().getModules()) {
-                    if (Objects.equals(module.getPrettyName(), args.get(1))) {
+                    if (Objects.equals(module.getName(), args.get(1))) {
                         targetModule = module;
                         break;
                     }
@@ -307,6 +311,78 @@ public class Commands {
 
                 targetModule.setBind(keyCode);
                 print(ChatFormatting.GREEN + "Bind '" + ChatFormatting.RESET + args.get(2) + ChatFormatting.GREEN + "' to " + targetModule.getPrettyName() + ".", 1);
+            } else if (firstArg.equals("import")) {
+                if (!hasArgs) {
+                    print(invSyn, 1);
+                    return;
+                }
+
+                if (args.size() != 2) {
+                    print(invSyn, 1);
+                    return;
+                }
+
+                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                Transferable contents = clipboard.getContents(null);
+                if (!contents.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+                    print(invSyn, 1);
+                    return;
+                }
+
+                Module targetModule = null;
+                for (Module module : Raven.getModuleManager().getModules()) {
+                    if (Objects.equals(module.getPrettyName(), args.get(1))) {
+                        targetModule = module;
+                        break;
+                    }
+                }
+                if (targetModule == null) {
+                    print(ChatFormatting.RED + "Module '" + ChatFormatting.RESET + args.get(1) + ChatFormatting.RED + "' is not found.", 1);
+                    return;
+                }
+
+                try {
+                    JsonObject jsonObject = new Gson().fromJson(((String) contents.getTransferData(DataFlavor.stringFlavor)), JsonObject.class);
+                    ProfileManager.loadFromJsonObject(
+                            jsonObject,
+                            targetModule
+                    );
+                    print("Loaded " + jsonObject.entrySet().size() + " properties from clipboard.", 1);
+                } catch (Exception e) {
+                    print("Fail to import module settings.", 1);
+                }
+            } else if (firstArg.equals("export")) {
+                if (!hasArgs) {
+                    print(invSyn, 1);
+                    return;
+                }
+
+                if (args.size() != 2) {
+                    print(invSyn, 1);
+                    return;
+                }
+
+                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+
+                Module targetModule = null;
+                for (Module module : Raven.getModuleManager().getModules()) {
+                    if (Objects.equals(module.getPrettyName(), args.get(1))) {
+                        targetModule = module;
+                        break;
+                    }
+                }
+                if (targetModule == null) {
+                    print(ChatFormatting.RED + "Module '" + ChatFormatting.RESET + args.get(1) + ChatFormatting.RED + "' is not found.", 1);
+                    return;
+                }
+
+                try {
+                    JsonObject jsonObject = ProfileManager.getJsonObject(targetModule);
+                    clipboard.setContents(new StringSelection(jsonObject.toString()), null);
+                    print("Copied " + jsonObject.entrySet().size() + " properties to clipboard.", 1);
+                } catch (Exception e) {
+                    print("Fail to export module settings.", 1);
+                }
             } else if (firstArg.equals("notebot")) {
                 if (!hasArgs) {
                     print(invSyn, 1);
@@ -451,6 +527,8 @@ public class Commands {
                 print("4 profiles remove [profile]", 0);
                 print("5 binds", 0);
                 print("6 bind [module] [key]", 0);
+                print("7 import [module]", 0);
+                print("8 export [module]", 0);
                 print("&eModule-specific:", 0);
                 print("1 cname [name]", 0);
                 print("2 " + FakeChat.command + " [msg]", 0);
@@ -462,7 +540,7 @@ public class Commands {
     }
 
     public static void print(String m, int t) {
-        if (ModuleManager.commandChat.isEnabled() && (mc.currentScreen instanceof GuiChat || mc.currentScreen == null)) {
+        if (mc.currentScreen instanceof GuiChat || mc.currentScreen == null) {
             if (t == 1 || t == 2) {
                 Utils.sendRawMessage("");
             }

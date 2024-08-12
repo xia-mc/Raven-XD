@@ -90,6 +90,7 @@ public class AutoRod extends IAutoClicker {
                     .filter(p -> !AntiBot.isBot(p))
                     .filter(p -> !ignoreTeammates.isToggled() || !Utils.isTeamMate(p))
                     .filter(p -> !Utils.isFriended(p))
+                    .filter(this::notBehindWall)
                     .min(Comparator.comparingDouble(p -> mc.thePlayer.getDistanceToEntity(p)))
                     .filter(p -> mc.thePlayer.getDistanceToEntity(p) <= range.getInput())
                     .ifPresent(p -> target = p);
@@ -102,6 +103,13 @@ public class AutoRod extends IAutoClicker {
                 fromSlot = SlotHandler.getCurrentSlot();
             SlotHandler.setCurrentSlot(slot);
         }
+    }
+
+    private boolean notBehindWall(EntityLivingBase entity) {
+        Vec3 target = Utils.getEyePos(entity);
+        Vec3 from = Utils.getEyePos();
+
+        return RotationUtils.rayCast(target.distanceTo(from), PlayerRotation.getYaw(target), PlayerRotation.getPitch(target)) == null;
     }
 
     private int getRod() {

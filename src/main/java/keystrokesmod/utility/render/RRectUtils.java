@@ -59,7 +59,7 @@ public class RRectUtils {
         GlStateManager.disableBlend();
     }
 
-    private static void setupRoundedRectUniforms(double x, double y, double width, double height, double radius, ShaderUtils roundedTexturedShader) {
+    static void setupRoundedRectUniforms(double x, double y, double width, double height, double radius, ShaderUtils roundedTexturedShader) {
         ScaledResolution sr = new ScaledResolution(mc);
         roundedTexturedShader.setUniformf("location", x * sr.getScaleFactor(), (Minecraft.getMinecraft().displayHeight - (height * sr.getScaleFactor())) - (y * sr.getScaleFactor()));
         roundedTexturedShader.setUniformf("rectSize", width * sr.getScaleFactor(), height * sr.getScaleFactor());

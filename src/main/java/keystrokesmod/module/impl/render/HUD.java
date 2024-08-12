@@ -58,7 +58,7 @@ public class HUD extends Module {
         super("HUD", Module.category.render);
         this.registerSetting(new DescriptionSetting("Right click bind to hide modules."));
         this.registerSetting(theme = new ModeSetting("Theme", Theme.themes, 0));
-        this.registerSetting(font = new ModeSetting("Font", new String[]{"Minecraft", "Product Sans", "Regular"}, 0));
+        this.registerSetting(font = new ModeSetting("Font", new String[]{"Minecraft", "Product Sans", "Regular", "Tenacity"}, 0));
         this.registerSetting(new ButtonSetting("Edit position", () -> {
             final EditScreen screen = new EditScreen();
             FMLCommonHandler.instance().bus().register(screen);
@@ -395,7 +395,7 @@ public class HUD extends Module {
         return module == ModuleManager.commandLine;
     }
 
-    private static IFont getFontRenderer() {
+    public static IFont getFontRenderer() {
         switch ((int) font.getInput()) {
             default:
             case 0:
@@ -404,6 +404,8 @@ public class HUD extends Module {
                 return FontManager.productSans20;
             case 2:
                 return FontManager.regular22;
+            case 3:
+                return FontManager.tenacity20;
         }
     }
 }

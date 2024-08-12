@@ -2,35 +2,44 @@ package keystrokesmod.module.impl.client;
 
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
+import keystrokesmod.module.impl.client.notification.DefaultNotification;
+import keystrokesmod.module.impl.client.notification.INotification;
 import keystrokesmod.module.setting.impl.ButtonSetting;
+import keystrokesmod.module.setting.impl.ModeValue;
 import keystrokesmod.utility.CoolDown;
 import keystrokesmod.utility.Utils;
-import keystrokesmod.utility.font.FontManager;
-import keystrokesmod.utility.font.impl.FontRenderer;
 import keystrokesmod.utility.render.AnimationUtils;
-import keystrokesmod.utility.render.ColorUtils;
-import keystrokesmod.utility.render.RRectUtils;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Notifications extends Module {
     public static final List<Notification> notifs = new ArrayList<>();
+
+    public static ModeValue mode;
     public static ButtonSetting chatNoti;
     public static ButtonSetting moduleToggled;
     public Notifications() {
         super("Notifications", category.client);
+        this.registerSetting(mode = new ModeValue("Mode", this)
+                .add(new DefaultNotification("Default", this))
+        );
         this.registerSetting(chatNoti = new ButtonSetting("Show in chat", false));
         this.registerSetting(moduleToggled = new ButtonSetting("Module toggled", true));
     }
 
     @Override
     public void onEnable() {
+        mode.enable();
         notifs.clear();
+    }
+
+    @Override
+    public void onDisable() {
+        mode.disable();
     }
 
     public static void sendNotification(NotificationTypes notificationType, String message) {
@@ -62,23 +71,7 @@ public class Notifications extends Module {
         for (int index = 0; index < notifs.size(); index++) {
             Notification noti = notifs.get(index);
             noti.animationY.setAnimation(sr.getScaledHeight() - ((index + 1) * 30), 16);
-            RRectUtils.drawRound(noti.animationX.getValue(), noti.animationY.getValue(), 120, 25, 3, new Color(0, 0, 0, 128));
-            FontManager.icon20.drawString(noti.type == NotificationTypes.INFO ? "G" : "R", noti.animationX.getValue() + 12.5, noti.animationY.getValue() + 15.5, FontRenderer.CenterMode.XY, false, ColorUtils.getFontColor(2).getRGB());
-            String[] messageParts = noti.message.split("§");
-            double x = noti.animationX.getValue() + 25;
-            double y = noti.animationY.getValue() + 15;
-            if (messageParts.length == 1) {
-                FontManager.regular16.drawString(noti.message, x, y, FontRenderer.CenterMode.Y, false, Color.WHITE.getRGB());
-            } else {
-                for (String part : messageParts) {
-                    if (part.isEmpty()) continue;
-                    char colorCode = part.charAt(0);
-                    String text = part.substring(1);
-                    Color color = ColorUtils.getColorFromCode("§" + colorCode);
-                    FontManager.regular16.drawString(text, x, y, FontRenderer.CenterMode.Y, false, color.getRGB());
-                    x += FontManager.regular16.getStringWidth(text);
-                }
-            }
+            ((INotification) mode.getSelected()).render(noti);
             //fontRegular.wrapText(noti.message, noti.animationX.getValue() + 25, noti.animationY.getValue() + 12.5, MinecraftFontRenderer.CenterMode.Y, false, ColorUtils.getFontColor(2).getRGB(), 95);
             if (noti.duration.hasFinished()) {
                 notifs.remove(index);

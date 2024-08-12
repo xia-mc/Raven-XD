@@ -29,7 +29,7 @@ public class Settings extends Module {
         this.registerSetting(new DescriptionSetting("Theme colors"));
         this.registerSetting(offset = new SliderSetting("Offset", 0.5, -3.0, 3.0, 0.1));
         this.registerSetting(timeMultiplier = new SliderSetting("Time multiplier", 0.5, 0.1, 4.0, 0.1));
-        this.registerSetting(toggleSound = new ModeSetting("Toggle sound", new String[]{"None", "Rise", "Sigma"}, 1));
+        this.registerSetting(toggleSound = new ModeSetting("Toggle sound", new String[]{"None", "Rise", "Sigma", "QuickMacro"}, 1));
         this.canBeEnabled = false;
     }
 
@@ -47,6 +47,9 @@ public class Settings extends Module {
                 break;
             case 2:
                 middleSuffix = "sigma";
+                break;
+            case 3:
+                middleSuffix = "quickmacro";
                 break;
         }
         return startSuffix + middleSuffix + endSuffix;

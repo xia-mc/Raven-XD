@@ -5,7 +5,6 @@
   "compatibilityLevel": "JAVA_8",
   "mixins": [
     "client.MixinInventoryPlayer",
-    "world.ScoreAccessor",
     "entity.EntityAccessor",
     "entity.MixinEntity",
     "entity.MixinEntityLivingBase",
@@ -24,7 +23,8 @@
     "render.MixinRendererLivingEntity",
     "world.BlockNoteAccessor",
     "world.MixinBlock",
-    "world.MixinBlockWeb"
+    "world.MixinBlockWeb",
+    "world.ScoreAccessor"
   ],
   "client": [
     "client.GuiConnectingAccessor",
@@ -37,6 +37,7 @@
     "client.MixinPlayerControllerMP",
     "client.PlayerControllerMPAccessor",
     "entity.EntityPlayerSPAccessor",
+    "gui.MixinGuiButton",
     "gui.MixinGuiConnecting",
     "gui.MixinGuiContainer",
     "gui.MixinGuiDownloadTerrain",

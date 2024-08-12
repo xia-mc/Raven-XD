@@ -12,8 +12,6 @@ import keystrokesmod.module.impl.render.TargetHUD;
 import keystrokesmod.module.impl.render.Watermark;
 import keystrokesmod.module.setting.Setting;
 import keystrokesmod.module.setting.impl.ButtonSetting;
-import keystrokesmod.module.setting.impl.ModeValue;
-import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.module.setting.interfaces.InputSetting;
 import keystrokesmod.script.Manager;
@@ -88,7 +86,7 @@ public class ProfileManager {
         }
     }
 
-    private static @NotNull JsonObject getJsonObject(@NotNull Module module) {
+    public static @NotNull JsonObject getJsonObject(@NotNull Module module) {
         JsonObject moduleInformation = new JsonObject();
         moduleInformation.addProperty("name", (module.moduleCategory() == Module.category.scripts && !(module instanceof Manager)) ?  "sc-" + module.getName() :  module.getName());
         moduleInformation.addProperty("prettyName", module.getRawPrettyName());
@@ -215,85 +213,7 @@ public class ProfileManager {
                         continue;
                     }
 
-                    if (moduleInformation.has("prettyName")) {
-                        module.setPrettyName(moduleInformation.get("prettyName").getAsString());
-                    }
-
-                    if (moduleInformation.has("prettyInfo")) {
-                        module.setPrettyInfo(moduleInformation.get("prettyInfo").getAsString());
-                    }
-
-                    if (module.canBeEnabled() && !(module instanceof SubMode)) {
-                        if (moduleInformation.has("enabled")) {
-                            boolean enabled = moduleInformation.get("enabled").getAsBoolean();
-                            if (enabled) {
-                                module.enable();
-                            } else {
-                                module.disable();
-                            }
-                        }
-                        if (moduleInformation.has("hidden")) {
-                            boolean hidden = moduleInformation.get("hidden").getAsBoolean();
-                            module.setHidden(hidden);
-                        }
-                        if (moduleInformation.has("keybind")) {
-                            int keybind = moduleInformation.get("keybind").getAsInt();
-                            module.setBind(keybind);
-                        }
-                    }
-
-                    if (module.getName().equals("HUD")) {
-                        if (moduleInformation.has("posX")) {
-                            HUD.hudX = moduleInformation.get("posX").getAsInt();
-                        }
-                        if (moduleInformation.has("posY")) {
-                            HUD.hudY = moduleInformation.get("posY").getAsInt();
-                        }
-                    }
-
-                    if (module.getName().equals("TargetHUD")) {
-                        if (moduleInformation.has("posX")) {
-                            TargetHUD.posX = moduleInformation.get("posX").getAsInt();
-                        }
-                        if (moduleInformation.has("posY")) {
-                            TargetHUD.posY = moduleInformation.get("posY").getAsInt();
-                        }
-                    }
-
-                    if (module.getName().equals("Gui")) {
-                        if (moduleInformation.has("catPos")) {
-                            ArrayList<CategoryComponent> movedCategories = new ArrayList<>(ClickGui.categories.size());
-                            for (JsonElement jsonElement : moduleInformation.get("catPos").getAsJsonArray()) {
-                                try {
-                                    JsonObject jsonCat = jsonElement.getAsJsonObject();
-                                    CategoryComponent component = ClickGui.categories.values().stream()
-                                            .filter(c -> c.categoryName.name().equals(jsonCat.get("name").getAsString()))
-                                            .findAny()
-                                            .orElseThrow(NoSuchElementException::new);
-
-                                    if (jsonCat.has("x")) {
-                                        component.x(jsonCat.get("x").getAsInt());
-                                    }
-                                    if (jsonCat.has("y")) {
-                                        component.y(jsonCat.get("y").getAsInt());
-                                    }
-                                    if (jsonCat.has("opened")) {
-                                        component.fv(jsonCat.get("opened").getAsBoolean());
-                                    }
-
-                                    movedCategories.add(component);
-                                } catch (NoSuchElementException ignored) {
-                                }
-                            }
-                            for (CategoryComponent component : movedCategories) {
-                                ClickGui.categories.replace(component.categoryName, component);
-                            }
-                        }
-                    }
-
-                    for (Setting setting : module.getSettings()) {
-                        setting.loadProfile(moduleInformation);
-                    }
+                    loadFromJsonObject(moduleInformation, module);
 
                     Raven.currentProfile = getProfile(name);
                 }
@@ -313,6 +233,88 @@ public class ProfileManager {
                     loadProfile("default");
                 }
             }
+        }
+    }
+
+    public static void loadFromJsonObject(@NotNull JsonObject moduleInformation, Module module) {
+        if (moduleInformation.has("prettyName")) {
+            module.setPrettyName(moduleInformation.get("prettyName").getAsString());
+        }
+
+        if (moduleInformation.has("prettyInfo")) {
+            module.setPrettyInfo(moduleInformation.get("prettyInfo").getAsString());
+        }
+
+        if (module.canBeEnabled() && !(module instanceof SubMode)) {
+            if (moduleInformation.has("enabled")) {
+                boolean enabled = moduleInformation.get("enabled").getAsBoolean();
+                if (enabled) {
+                    module.enable();
+                } else {
+                    module.disable();
+                }
+            }
+            if (moduleInformation.has("hidden")) {
+                boolean hidden = moduleInformation.get("hidden").getAsBoolean();
+                module.setHidden(hidden);
+            }
+            if (moduleInformation.has("keybind")) {
+                int keybind = moduleInformation.get("keybind").getAsInt();
+                module.setBind(keybind);
+            }
+        }
+
+        if (module.getName().equals("HUD")) {
+            if (moduleInformation.has("posX")) {
+                HUD.hudX = moduleInformation.get("posX").getAsInt();
+            }
+            if (moduleInformation.has("posY")) {
+                HUD.hudY = moduleInformation.get("posY").getAsInt();
+            }
+        }
+
+        if (module.getName().equals("TargetHUD")) {
+            if (moduleInformation.has("posX")) {
+                TargetHUD.posX = moduleInformation.get("posX").getAsInt();
+            }
+            if (moduleInformation.has("posY")) {
+                TargetHUD.posY = moduleInformation.get("posY").getAsInt();
+            }
+        }
+
+        if (module.getName().equals("Gui")) {
+            if (moduleInformation.has("catPos")) {
+                ArrayList<CategoryComponent> movedCategories = new ArrayList<>(ClickGui.categories.size());
+                for (JsonElement jsonElement : moduleInformation.get("catPos").getAsJsonArray()) {
+                    try {
+                        JsonObject jsonCat = jsonElement.getAsJsonObject();
+                        CategoryComponent component = ClickGui.categories.values().stream()
+                                .filter(c -> c.categoryName.name().equals(jsonCat.get("name").getAsString()))
+                                .findAny()
+                                .orElseThrow(NoSuchElementException::new);
+
+                        if (jsonCat.has("x")) {
+                            component.x(jsonCat.get("x").getAsInt());
+                        }
+                        if (jsonCat.has("y")) {
+                            component.y(jsonCat.get("y").getAsInt());
+                        }
+                        if (jsonCat.has("opened")) {
+                            component.fv(jsonCat.get("opened").getAsBoolean());
+                        }
+
+                        movedCategories.add(component);
+                    } catch (NoSuchElementException ignored) {
+                    }
+                }
+                for (CategoryComponent component : movedCategories) {
+                    ClickGui.categories.replace(component.categoryName, component);
+                }
+            }
+        }
+
+        for (Setting setting : module.getSettings()) {
+            setting.loadProfile(moduleInformation);
         }
     }
 

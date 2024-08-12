@@ -6,7 +6,6 @@ import com.mojang.realmsclient.gui.ChatFormatting;
 import keystrokesmod.Raven;
 import keystrokesmod.event.ClickEvent;
 import keystrokesmod.mixins.impl.client.GuiScreenAccessor;
-import keystrokesmod.mixins.impl.render.MixinFontRenderer;
 import keystrokesmod.module.impl.other.NameHider;
 import keystrokesmod.module.impl.other.SlotHandler;
 import keystrokesmod.module.impl.render.AntiShuffle;

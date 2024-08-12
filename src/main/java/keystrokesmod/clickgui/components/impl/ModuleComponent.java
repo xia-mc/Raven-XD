@@ -68,14 +68,7 @@ public class ModuleComponent implements IComponent {
     }
 
     public static void e() {
-        GL11.glDisable(2929);
-        GL11.glEnable(3042);
-        GL11.glDisable(3553);
-        GL11.glBlendFunc(770, 771);
-        GL11.glDepthMask(true);
-        GL11.glEnable(2848);
-        GL11.glHint(3154, 4354);
-        GL11.glHint(3155, 4354);
+        RenderUtils.enableGL2D();
     }
 
     public static void f() {

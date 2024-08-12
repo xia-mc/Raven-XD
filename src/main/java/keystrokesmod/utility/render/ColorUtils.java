@@ -1,6 +1,8 @@
 package keystrokesmod.utility.render;
 
 import net.minecraft.client.renderer.GlStateManager;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -115,5 +117,44 @@ public class ColorUtils {
             }
         }
         return new Color(255, 255, 255);
+    }
+
+    @Contract("_ -> new")
+    public static @NotNull Color colorFromInt(int color) {
+        Color c = new Color(color);
+        return new Color(c.getRed(), c.getGreen(), c.getBlue(), 255);
+    }
+
+    @Contract("_, _ -> new")
+    public static @NotNull Color brighter(final @NotNull Color color, final float FACTOR) {
+        int r = color.getRed();
+        int g = color.getGreen();
+        int b = color.getBlue();
+        final int alpha = color.getAlpha();
+        final int i = (int)(1.0 / (1.0 - FACTOR));
+        if (r == 0 && g == 0 && b == 0) {
+            return new Color(i, i, i, alpha);
+        }
+        if (r > 0 && r < i) {
+            r = i;
+        }
+        if (g > 0 && g < i) {
+            g = i;
+        }
+        if (b > 0 && b < i) {
+            b = i;
+        }
+        return new Color(Math.min((int)(r / FACTOR), 255), Math.min((int)(g / FACTOR), 255), Math.min((int)(b / FACTOR), 255), alpha);
+    }
+
+    @Contract("_, _, _ -> new")
+    public static @NotNull Color interpolateColorC(final @NotNull Color color1, final @NotNull Color color2, float amount) {
+        amount = Math.min(1.0f, Math.max(0.0f, amount));
+        return new Color(interpolateInt(color1.getRed(), color2.getRed(), amount), interpolateInt(color1.getGreen(), color2.getGreen(), amount), interpolateInt(color1.getBlue(), color2.getBlue(), amount), interpolateInt(color1.getAlpha(), color2.getAlpha(), amount));
+    }
+
+
+    public static int interpolateInt(final int oldValue, final int newValue, final double interpolationValue) {
+        return ((Double) ((double) oldValue + ((double) newValue - (double) oldValue) * (double) (float) interpolationValue)).intValue();
     }
 }

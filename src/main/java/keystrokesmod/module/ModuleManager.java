@@ -11,7 +11,6 @@ import keystrokesmod.module.impl.other.*;
 import keystrokesmod.module.impl.player.*;
 import keystrokesmod.module.impl.render.*;
 import keystrokesmod.module.impl.world.*;
-import keystrokesmod.utility.Utils;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -121,6 +120,8 @@ public class ModuleManager {
     public static ChestAura chestAura;
     public static AutoRod autoRod;
 //    public static AbilitiesBedWars abilitiesBedWars;
+    public static ClientSettings clientSettings;
+    public static ScaffoldHelper scaffoldHelper;
 
     public void register() {
 
@@ -168,6 +169,7 @@ public class ModuleManager {
         this.addModule(noteBot = new NoteBot());
         this.addModule(blockOut = new BlockOut());
 //        this.addModule(abilitiesBedWars = new AbilitiesBedWars());
+        this.addModule(scaffoldHelper = new ScaffoldHelper());
 
         // minigames
         this.addModule(new AutoWho());
@@ -270,6 +272,7 @@ public class ModuleManager {
         this.addModule(watermark = new Watermark());
         this.addModule(new Explosions());
         this.addModule(new KillMessage());
+        this.addModule(clientSettings = new ClientSettings());
 
         // world
         this.addModule(antiBot = new AntiBot());
@@ -301,6 +304,7 @@ public class ModuleManager {
         antiBot.enable();
         commandChat.enable();
         notifications.enable();
+        clientSettings.enable();
         modules.sort(Comparator.comparing(Module::getPrettyName));
     }
 
@@ -338,7 +342,12 @@ public class ModuleManager {
         if (HUD.alphabeticalSort.isToggled()) {
             organizedModules.sort(Comparator.comparing(Module::getPrettyName));
         } else {
-            organizedModules.sort((o1, o2) -> Utils.mc.fontRendererObj.getStringWidth(o2.getPrettyName() + ((HUD.showInfo.isToggled() && !o2.getInfo().isEmpty()) ? " " + o2.getInfo() : "")) - Utils.mc.fontRendererObj.getStringWidth(o1.getPrettyName() + (HUD.showInfo.isToggled() && !(o1.getInfo().isEmpty()) ? " " + o1.getInfo() : "")));
+            organizedModules.sort(Comparator.comparingDouble(module ->
+                    HUD.getFontRenderer().width(
+                            module.getPrettyName()
+                                    + ((HUD.showInfo.isToggled() && !module.getPrettyInfo().isEmpty()) ? " " + module.getPrettyInfo() : "")
+                    )
+            ));
         }
     }
 }

@@ -120,10 +120,10 @@ public class Watermark extends Module {
             case 1:
                 switch ((int) watermarkPhoto.getInput()) {
                     case 0:
-                        RenderUtils.drawImage(WATERMARK.get("default"), posX, posY, 50, 50, new Color(255, 255, 255));
+                        RenderUtils.drawImage(WATERMARK.get("default"), posX, posY, 50, 50);
                         break;
                     case 1:
-                        RenderUtils.drawImage(WATERMARK.get("enders"), posX, posY, 150, 45, new Color(255, 255, 255));
+                        RenderUtils.drawImage(WATERMARK.get("enders"), posX, posY, 150, 45);
                         break;
                 }
             break;

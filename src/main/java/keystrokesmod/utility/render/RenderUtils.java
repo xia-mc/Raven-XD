@@ -7,14 +7,16 @@ import keystrokesmod.module.impl.render.HUD;
 import keystrokesmod.script.classes.Vec3;
 import keystrokesmod.utility.Theme;
 import keystrokesmod.utility.Utils;
-import keystrokesmod.utility.font.FontManager;
 import keystrokesmod.utility.font.IFont;
-import keystrokesmod.utility.font.impl.FontRenderer;
+import keystrokesmod.utility.render.shader.GaussianFilter;
+import keystrokesmod.utility.render.shader.impl.ShaderRoundedRect;
+import keystrokesmod.utility.render.shader.impl.ShaderScissor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.*;
+import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -30,14 +32,23 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
+import static keystrokesmod.utility.render.RRectUtils.roundedOutlineShader;
+import static keystrokesmod.utility.render.RRectUtils.setupRoundedRectUniforms;
 import static org.lwjgl.opengl.GL11.*;
 
 public class RenderUtils {
+    public static final int WHITE = new Color(255, 255, 255).getRGB();
     private static Minecraft mc = Minecraft.getMinecraft();
     public static boolean ring_c = false;
     private static final float renderPartialTicks = 0.0f;
+
+    private static final Map<Integer, Integer> shadowCache = new HashMap<>();
 
     public static void renderBlock(BlockPos blockPos, int color, boolean outline, boolean shade) {
         renderBox(blockPos.getX(), blockPos.getY(), blockPos.getZ(), 1, 1, 1, color, outline, shade);
@@ -80,6 +91,36 @@ public class RenderUtils {
         tessellator.draw();
         GlStateManager.enableTexture2D();
         GlStateManager.disableBlend();
+    }
+
+    /** This will set the alpha limit to a specified value ranging from 0-1
+     * @param limit a value between 0 and 1
+     */
+    public static void setAlphaLimit(float limit) {
+        GlStateManager.enableAlpha();
+        GlStateManager.alphaFunc(GL_GREATER, (float) (limit * .01));
+    }
+
+    public static void drawRect2(double x, double y, double width, double height, int color) {
+        ColorUtils.resetColor();
+        setAlphaLimit(0);
+        GLUtil.setup2DRendering(true);
+
+        Tessellator tessellator = Tessellator.getInstance();
+        WorldRenderer worldrenderer = tessellator.getWorldRenderer();
+
+        worldrenderer.begin(GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
+        worldRendererColor(worldrenderer.pos(x, y, 0.0D), color).endVertex();
+        worldRendererColor(worldrenderer.pos(x, y + height, 0.0D), color).endVertex();
+        worldRendererColor(worldrenderer.pos(x + width, y + height, 0.0D), color).endVertex();
+        worldRendererColor(worldrenderer.pos(x + width, y, 0.0D), color).endVertex();
+        tessellator.draw();
+
+        GLUtil.end2DRendering();
+    }
+
+    private static WorldRenderer worldRendererColor(@NotNull WorldRenderer instance, int colorHex) {
+        return instance.color(colorHex >> 16 & 255, colorHex >> 8 & 255, colorHex & 255, colorHex >> 24 & 255);
     }
 
     public static void drawOutline(float x, float y, float x2, float y2, float lineWidth, int color) {
@@ -878,9 +919,14 @@ public class RenderUtils {
         tessellator.draw();
     }
 
-    public static void drawImage(ResourceLocation res, float x, float y, float width, float height, Color color) {
+    public static void drawImage(ResourceLocation res, float x, float y, float width, float height, @NotNull Color color) {
         RenderUtils.drawImage(res, x, y, width, height, color.getRGB());
     }
+
+    public static void drawImage(ResourceLocation res, float x, float y, float width, float height) {
+        RenderUtils.drawImage(res, x, y, width, height, WHITE);
+    }
+
     public static void drawImage2(ResourceLocation image, float x, float y, int width, int height,float alpha) {
         GlStateManager.disableAlpha();
         GlStateManager.disableRescaleNormal();
@@ -975,5 +1021,122 @@ public class RenderUtils {
         mc.getTextureManager().bindTexture(player.getLocationSkin());
         Gui.drawScaledCustomSizeModalRect((int) x, (int) y, 8.0F, 8.0F, 8, 8, (int) width, (int) height, 64.0F, 64.0F);
         GlStateManager.disableBlend();
+    }
+
+    public static void drawBloomShadow(float x, float y, float width, float height, int blurRadius, Color color, boolean scissor) {
+        drawBloomShadow(x, y, width, height, blurRadius, 0, color.getRGB(), scissor, false, false, false, false);
+    }
+
+    public static void drawBloomShadow(float x, float y, float width, float height, int blurRadius, int color, boolean scissor) {
+        drawBloomShadow(x, y, width, height, blurRadius, 0, color, scissor, false, false, false, false);
+    }
+
+    public static void drawBloomShadow(float x, float y, float width, float height, int blurRadius, int roundRadius, int color, boolean scissor) {
+        drawBloomShadow(x, y, width, height, blurRadius, roundRadius, color, scissor, false, false, false, false);
+    }
+
+    public static void drawBloomShadow(float x, float y, float width, float height, int blurRadius, int roundRadius, int color, boolean scissor, boolean cut_top, boolean cut_bottom, boolean cut_left, boolean cut_right) {
+        width = width + blurRadius * 2;
+        height = height + blurRadius * 2;
+        x -= blurRadius - 0.5f;
+        y -= blurRadius - 0.5f;
+
+        int identifier = Arrays.deepHashCode(new Object[]{width, height, blurRadius, roundRadius});
+        if (!shadowCache.containsKey(identifier)) {
+            if (width <= 0) width = 1;
+            if (height <= 0) height = 1;
+            BufferedImage original = new BufferedImage((int) width, (int) height, BufferedImage.TYPE_INT_ARGB_PRE);
+            Graphics g = original.getGraphics();
+            g.setColor(ColorUtils.colorFromInt(-1));
+            g.fillRoundRect(blurRadius, blurRadius, (int) (width - blurRadius * 2), (int) (height - blurRadius * 2), roundRadius, roundRadius);
+            g.dispose();
+            GaussianFilter op = new GaussianFilter(blurRadius);
+            BufferedImage blurred = op.filter(original, null);
+            int cut_x = blurRadius, cut_y = blurRadius, cut_w = (int) (width - blurRadius * 2), cut_h = (int) (height - blurRadius * 2);
+            if (cut_top) {
+                cut_y = 0;
+                cut_h = (int) (height - blurRadius);
+            }
+
+            if (cut_bottom) {
+                cut_h = (int) (height - blurRadius);
+            }
+
+            if (cut_left) {
+                cut_x = 0;
+                cut_w = (int) (width - blurRadius);
+            }
+
+            if (cut_right) {
+                cut_w = (int) (width - blurRadius);
+            }
+            if (scissor)
+                blurred = new ShaderScissor(cut_x, cut_y, cut_w, cut_h, blurred, 1, false, false).generate();
+            shadowCache.put(identifier, TextureUtil.uploadTextureImageAllocate(TextureUtil.glGenTextures(), blurred, true, false));
+        }
+        drawImage(shadowCache.get(identifier), x, y, width, height, color);
+    }
+
+    public static void color(int color) {
+        float f = (color >> 24 & 0xFF) / 255.0F;
+        float f1 = (color >> 16 & 0xFF) / 255.0F;
+        float f2 = (color >> 8 & 0xFF) / 255.0F;
+        float f3 = (color & 0xFF) / 255.0F;
+        GL11.glColor4f(f1, f2, f3, f);
+    }
+
+    public static void drawImage(int image, float x, float y, float width, float height, int color) {
+        enableGL2D();
+        glPushMatrix();
+        GlStateManager.alphaFunc(GL11.GL_GREATER, 0.01f);
+        glEnable(GL11.GL_TEXTURE_2D);
+        glDisable(GL_CULL_FACE);
+        glEnable(GL11.GL_ALPHA_TEST);
+        GlStateManager.enableBlend();
+        GlStateManager.bindTexture(image);
+
+        color(color);
+
+        GL11.glBegin(GL11.GL_QUADS);
+        GL11.glTexCoord2f(0, 0); // top left
+        GL11.glVertex2f(x, y);
+
+        GL11.glTexCoord2f(0, 1); // bottom left
+        GL11.glVertex2f(x, y + height);
+
+        GL11.glTexCoord2f(1, 1); // bottom right
+        GL11.glVertex2f(x + width, y + height);
+
+        GL11.glTexCoord2f(1, 0); // top right
+        GL11.glVertex2f(x + width, y);
+        GL11.glEnd();
+
+        GlStateManager.enableTexture2D();
+        GlStateManager.disableBlend();
+        GlStateManager.resetColor();
+
+        glEnable(GL_CULL_FACE);
+        glPopMatrix();
+        disableGL2D();
+    }
+
+    public static void enableGL2D() {
+        GL11.glDisable(2929);
+        GL11.glEnable(3042);
+        GL11.glDisable(3553);
+        GL11.glBlendFunc(770, 771);
+        GL11.glDepthMask(true);
+        GL11.glEnable(2848);
+        GL11.glHint(3154, 4354);
+        GL11.glHint(3155, 4354);
+    }
+
+    public static void disableGL2D() {
+        GL11.glEnable(3553);
+        GL11.glDisable(3042);
+        GL11.glEnable(2929);
+        GL11.glDisable(2848);
+        GL11.glHint(3154, 4352);
+        GL11.glHint(3155, 4352);
     }
 }

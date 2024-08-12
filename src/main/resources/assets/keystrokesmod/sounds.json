@@ -23,6 +23,18 @@
       "keystrokesmod:toggle/sigma/disable"
     ]
   },
+  "toggle.quickmacro.enable": {
+    "category": "player",
+    "sounds": [
+      "keystrokesmod:toggle/quickmacro/enable"
+    ]
+  },
+  "toggle.quickmacro.disable": {
+    "category": "player",
+    "sounds": [
+      "keystrokesmod:toggle/quickmacro/disable"
+    ]
+  },
   "click.alan": {
     "category": "player",
     "sounds": [
