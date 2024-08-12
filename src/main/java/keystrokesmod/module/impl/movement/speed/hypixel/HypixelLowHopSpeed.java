@@ -19,7 +19,7 @@ public class HypixelLowHopSpeed extends SubMode<HypixelSpeed> {
 
     public HypixelLowHopSpeed(String name, @NotNull HypixelSpeed parent) {
         super(name, parent);
-        this.registerSetting(strafe = new ButtonSetting("Strafe", true));
+        this.registerSetting(strafe = new ButtonSetting("Strafe", false));
     }
 
     @Override
