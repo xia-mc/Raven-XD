@@ -247,19 +247,17 @@ public class KillAura extends IAutoClicker {
                     if (lag) {
                         blinking = true;
                         if (Raven.badPacketsHandler.playerSlot != mc.thePlayer.inventory.currentItem % 8 + 1) {
-                            mc.thePlayer.sendQueue.addToSendQueue(new C09PacketHeldItemChange(Raven.badPacketsHandler.playerSlot = mc.thePlayer.inventory.currentItem % 8 + 1));
+                            mc.thePlayer.sendQueue.addToSendQueue(new C09PacketHeldItemChange( mc.thePlayer.inventory.currentItem % 8 + 1));
+                            Raven.badPacketsHandler.playerSlot = mc.thePlayer.inventory.currentItem % 8 + 1;
                             swapped = true;
                         }
                         lag = false;
                     } else {
-                        if (Raven.badPacketsHandler.delayAttack) {
-                            return;
-                        }
-                        if (Raven.badPacketsHandler.playerSlot != mc.thePlayer.inventory.currentItem) {
-                            mc.thePlayer.sendQueue.addToSendQueue(new C09PacketHeldItemChange(Raven.badPacketsHandler.playerSlot = mc.thePlayer.inventory.currentItem));
-                            swapped = false;
-                        }
-                        attackAndInteract(target);
+                        // check here for ghost later
+                        mc.thePlayer.sendQueue.addToSendQueue(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
+                        Raven.badPacketsHandler.playerSlot = mc.thePlayer.inventory.currentItem;  // todo recode this with slot handler
+                        swapped = false;
+                        attackAndInteract(target, true);
                         sendBlock();
                         releasePackets();
                         lag = true;
@@ -273,7 +271,7 @@ public class KillAura extends IAutoClicker {
                         lag = false;
                     }
                     else {
-                        attackAndInteract(target); // attack while blinked
+                        attackAndInteract(target, autoBlockMode.getInput() == 5); // attack while blinked
                         releasePackets(); // release
                         sendBlock(); // block after releasing unblock
                         lag = true;
@@ -287,7 +285,7 @@ public class KillAura extends IAutoClicker {
                         if (blocking) {
                             unBlock();
                         } else {
-                            attackAndInteract(target);// attack while blinked
+                            attackAndInteract(target, true);// attack while blinked
                             sendBlock();
                             lag = true;
                         }
@@ -378,7 +376,7 @@ public class KillAura extends IAutoClicker {
         }
         else if (mouseEvent.button == 1) {
             rmbDown = mouseEvent.buttonstate;
-            if (autoBlockMode.getInput() >= 1 && Utils.holdingSword() && block.get()) {
+            if (autoBlockMode.getInput() >= 1 && Utils.holdingSword() && block.get() && autoBlockMode.getInput() != 7) {
                 KeyBinding.setKeyBindState(mc.gameSettings.keyBindUseItem.getKeyCode(), false);
                 if (target == null && mc.objectMouseOver != null) {
                     if (mc.objectMouseOver.entityHit != null && AntiBot.isBot(mc.objectMouseOver.entityHit)) {
@@ -588,15 +586,27 @@ public class KillAura extends IAutoClicker {
         return mc.currentScreen != null && disableInInventory.isToggled();
     }
 
-    private void attackAndInteract(EntityLivingBase target) {
+    private void attackAndInteract(EntityLivingBase target, boolean sendInteractAt) {
         if (target != null && attack) {
             attack = false;
             if (noAimToEntity()) {
                 return;
             }
+            if (ModuleManager.bedAura.rotate) {
+                return;
+            }
             switchTargets = true;
-            // TODO double swing?
             Utils.attackEntity(target, !swing);
+            if (sendInteractAt && rotations != null) {
+                MovingObjectPosition hitObject = mc.objectMouseOver;
+                if (hitObject != null && hitObject.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY && hitObject.entityHit == target) {
+                    Vec3 hitVec = new Vec3(hitObject.hitVec);
+                    hitVec = new Vec3(hitVec.x - target.posX, hitVec.y - target.posY, hitVec.z - target.posZ);
+                    mc.thePlayer.sendQueue.addToSendQueue(new C02PacketUseEntity(target, hitVec.toVec3()));
+                }
+            }
+
+            // todo double interact?
             mc.thePlayer.sendQueue.addToSendQueue(new C02PacketUseEntity(target, C02PacketUseEntity.Action.INTERACT));
         } else if (ModuleManager.antiFireball != null && ModuleManager.antiFireball.isEnabled() && ModuleManager.antiFireball.fireball != null && ModuleManager.antiFireball.attack) {
             Utils.attackEntity(ModuleManager.antiFireball.fireball, !ModuleManager.antiFireball.silentSwing.isToggled());

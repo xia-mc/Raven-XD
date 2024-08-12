@@ -60,7 +60,7 @@ public class BedAura extends Module {
     public double breakProgress;
     private int currentSlot = -1;
     private int lastSlot = -1;
-    private boolean rotate;
+    public boolean rotate;
     public BlockPos currentBlock;
     private long lastCheck = 0;
     public boolean stopAutoblock;
