@@ -19,7 +19,7 @@ public class Gui extends Module {
         this.registerSetting(translucentBackground = new ButtonSetting("Translucent background", true));
         this.registerSetting(toolTip = new ButtonSetting("Tool tip", true));
         this.registerSetting(resetPosition = new ButtonSetting("Reset position", ClickGui::resetPosition));
-        this.registerSetting(font = new ModeSetting("Font", new String[]{"Minecraft", "Product Sans"}, 0));
+        this.registerSetting(font = new ModeSetting("Font", new String[]{"Minecraft", "Product Sans", "Tenacity"}, 0));
     }
 
     public void onEnable() {

@@ -982,7 +982,7 @@ public class RenderUtils {
         return (int) i;
     }
 
-    private static final int TOOLTIP_BACKGROUND = new Color(0, 0, 0, 220).getRGB();
+    private static final int TOOLTIP_BACKGROUND = new Color(0, 0, 0, 100).getRGB();
     private static final int TOOLTIP_TEXT = new Color(229, 229, 229, 255).getRGB();
 
     public static void drawToolTip(@NotNull String toolTip, int x, int y) {
@@ -992,8 +992,8 @@ public class RenderUtils {
         final double width = font.width(split[0]);
         final double height = font.height();
 
-        drawRect(x + 5, y + height - 3, x + 6 + width + 1, y + (height + 1) * split.length, TOOLTIP_BACKGROUND);
         for (String s : split) {
+            drawRect(x + 5, y + height - 2, x + 6 + width + 1, y + height * 2, TOOLTIP_BACKGROUND);
             font.drawString(s, x + 6, y + height - 1, TOOLTIP_TEXT);
             y += (int) Math.round(height);
         }

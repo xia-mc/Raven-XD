@@ -55,7 +55,7 @@ public abstract class MixinGuiButton extends Gui {
             return;
 
         if (this.visible) {
-            IFont font = FontManager.tenacity20;
+            IFont font = ModuleManager.clientTheme.smoothFont.isToggled() ? FontManager.tenacity20 : FontManager.getMinecraft();
             this.hovered = x >= this.xPosition && y >= this.yPosition && x < this.xPosition + this.width && y < this.yPosition + this.height;
 
             if (hovered)

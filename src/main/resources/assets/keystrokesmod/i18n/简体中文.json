@@ -113,6 +113,9 @@
     },
     "Scaffold": {
       "name": "自动搭路"
+    },
+    "NoSlow": {
+      "name": "无减速"
     }
   },
   "replace": {

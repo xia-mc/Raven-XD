@@ -74,6 +74,8 @@ public class ClickGui extends GuiScreen {
                 return FontManager.getMinecraft();
             case 1:
                 return FontManager.productSans20;
+            case 2:
+                return FontManager.tenacity20;
         }
     }
 
