@@ -23,7 +23,7 @@ public abstract class MixinGuiScreen {
 
     @Inject(method = "drawBackground", at = @At("HEAD"), cancellable = true)
     public void onDrawBackground(int p_drawWorldBackground_1_, @NotNull CallbackInfo ci) {
-        if (!ModuleManager.clientSettings.isEnabled() || !ModuleManager.clientSettings.background.isToggled())
+        if (!ModuleManager.clientTheme.isEnabled() || !ModuleManager.clientTheme.background.isToggled())
             return;
 
         BackgroundUtils.renderBackground((GuiScreen) (Object) this);

@@ -7,6 +7,7 @@ import keystrokesmod.clickgui.components.impl.BindComponent;
 import keystrokesmod.clickgui.components.impl.CategoryComponent;
 import keystrokesmod.clickgui.components.impl.ModuleComponent;
 import keystrokesmod.module.Module;
+import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.client.CommandLine;
 import keystrokesmod.module.impl.client.Gui;
 import keystrokesmod.utility.Commands;
@@ -14,6 +15,7 @@ import keystrokesmod.utility.Timer;
 import keystrokesmod.utility.Utils;
 import keystrokesmod.utility.font.FontManager;
 import keystrokesmod.utility.font.IFont;
+import keystrokesmod.utility.render.GradientBlur;
 import net.minecraft.client.gui.*;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraftforge.fml.client.config.GuiButtonExt;
@@ -40,6 +42,13 @@ public class ClickGui extends GuiScreen {
     public static Map<Module.category, CategoryComponent> categories;
     public static List<Module.category> clickHistory;
     private Runnable delayedAction = null;
+
+    private final GradientBlur blur = new GradientBlur(GradientBlur.Type.LR);
+
+    /**
+     * to make smooth mouse scrolled
+     */
+    private int guiYMoveLeft = 0;
 
     public ClickGui() {
         int y = 5;
@@ -86,7 +95,25 @@ public class ClickGui extends GuiScreen {
     }
 
     public void drawScreen(int x, int y, float p) {
-        drawRect(0, 0, this.width, this.height, (int) (this.aR.getValueFloat(0.0F, 0.7F, 2) * 255.0F) << 24);
+        move:
+        if (guiYMoveLeft != 0) {
+            int step = (int) (guiYMoveLeft * 0.15);
+            if (step == 0) {
+                guiYMoveLeft = 0;
+                break move;
+            }
+            for (CategoryComponent category : categories.values()) {
+                category.y(category.getY() + step);
+            }
+            guiYMoveLeft -= step;
+        }
+
+        if (ModuleManager.clientTheme.isEnabled() && ModuleManager.clientTheme.clickGui.isToggled()) {
+            blur.update(0, 0, width, height);
+            blur.render(0, 0, width, height, 1, 0.1f);
+        } else {
+            drawRect(0, 0, this.width, this.height, (int) (this.aR.getValueFloat(0.0F, 0.7F, 2) * 255.0F) << 24);
+        }
         int r;
 
         if (!Gui.removeWatermark.isToggled()) {
@@ -170,14 +197,10 @@ public class ClickGui extends GuiScreen {
     public void mouseScrolled(int dWheel) {
         if (dWheel > 0) {
             // up
-            for (CategoryComponent category : categories.values()) {
-                category.y(category.getY() + 20);
-            }
+            guiYMoveLeft += 30;
         } else if (dWheel < 0) {
             // down
-            for (CategoryComponent category : categories.values()) {
-                category.y(category.getY() - 20);
-            }
+            guiYMoveLeft -= 30;
         }
     }
 

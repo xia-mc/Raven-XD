@@ -24,7 +24,7 @@ public class HypixelLowHopSpeed extends SubMode<HypixelSpeed> {
 
     @Override
     public void onEnable() {
-        angle = mc.thePlayer.rotationYaw;
+        angle = (float) Math.toDegrees(MoveUtil.direction());
     }
 
     @SubscribeEvent
@@ -42,6 +42,7 @@ public class HypixelLowHopSpeed extends SubMode<HypixelSpeed> {
                 break;
             case 5:
                 mc.thePlayer.motionY = MoveUtil.predictedMotion(mc.thePlayer.motionY, 2);
+                angle = (float) Math.toDegrees(MoveUtil.direction());
                 break;
             default:
                 if (strafe.isToggled() && parent.parent.offGroundTicks > 5)

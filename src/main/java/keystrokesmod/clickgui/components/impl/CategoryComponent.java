@@ -112,6 +112,8 @@ public class CategoryComponent {
                 }
             }
         }
+
+        render();
     }
 
     public void x(int n) {

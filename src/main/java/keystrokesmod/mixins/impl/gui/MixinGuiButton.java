@@ -51,7 +51,7 @@ public abstract class MixinGuiButton extends Gui {
 
     @Inject(method = "drawButton", at = @At("HEAD"), cancellable = true)
     public void onDrawButton(Minecraft minecraft, int x, int y, CallbackInfo ci) {
-        if (!ModuleManager.clientSettings.isEnabled() || !ModuleManager.clientSettings.button.isToggled())
+        if (!ModuleManager.clientTheme.isEnabled() || !ModuleManager.clientTheme.button.isToggled())
             return;
 
         if (this.visible) {

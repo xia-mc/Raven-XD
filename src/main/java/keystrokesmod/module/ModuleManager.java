@@ -121,7 +121,7 @@ public class ModuleManager {
     public static ChestAura chestAura;
     public static AutoRod autoRod;
 //    public static AbilitiesBedWars abilitiesBedWars;
-    public static ClientSettings clientSettings;
+    public static ClientTheme clientTheme;
     public static ScaffoldHelper scaffoldHelper;
 
     public void register() {
@@ -273,7 +273,7 @@ public class ModuleManager {
         this.addModule(watermark = new Watermark());
         this.addModule(new Explosions());
         this.addModule(new KillMessage());
-        this.addModule(clientSettings = new ClientSettings());
+        this.addModule(clientTheme = new ClientTheme());
 
         // world
         this.addModule(antiBot = new AntiBot());
@@ -305,7 +305,7 @@ public class ModuleManager {
         antiBot.enable();
         commandChat.enable();
         notifications.enable();
-        clientSettings.enable();
+        clientTheme.enable();
         modules.sort(Comparator.comparing(Module::getPrettyName));
     }
 

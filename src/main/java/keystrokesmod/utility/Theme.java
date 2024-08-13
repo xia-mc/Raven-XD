@@ -1,5 +1,6 @@
 package keystrokesmod.utility;
 
+import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.client.Settings;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -23,7 +24,8 @@ public enum Theme {
     Vine(new Color(17, 192, 45), new Color(201, 234, 198)), // 9
     Descriptor(new Color(95, 235, 255), new Color(68, 102, 250)), // 10
     HiddenBind(new Color(245, 33, 33), new Color(229, 21, 98)), // 11
-    Astolfo(new Color(255,74,255), new Color(74,255,255), new Color(255,255,255)); // 12 (credit @biPas)
+    Astolfo(new Color(255,74,255), new Color(74,255,255), new Color(255,255,255)), // 12 (credit @biPas)
+    Custom();
     private static final Map<Theme, BufferedImage> imageCache = new HashMap<>(values().length);
 
     private final List<Color> gradients;
@@ -56,10 +58,18 @@ public enum Theme {
     }
 
     private static @NotNull Color convert(@Range(from = 0, to = 1) double position, @NotNull Theme theme) {
-        List<Color> colors = theme.gradients;
+        List<Color> colors;
+        if (theme == Custom) {
+            colors = ModuleManager.clientTheme.getColors();
+        } else {
+            colors = theme.gradients;
+        }
 
-        if (colors == null || colors.size() < 2) {
+        if (colors == null) {
             throw new IllegalArgumentException("At least two colors are required for a gradient.");
+        }
+        if (colors.size() < 2) {
+            return colors.get(0);
         }
         if (position < 0 || position > 1) {
             throw new IllegalArgumentException("Position must be between 0 and 1.");

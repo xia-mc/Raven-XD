@@ -39,7 +39,7 @@ public abstract class MixinGuiMainMenu extends GuiScreen {
 
     @Inject(method = "drawScreen", at = @At("HEAD"), cancellable = true)
     public void onDrawScreen(int p_drawScreen_1_, int p_drawScreen_2_, float p_drawScreen_3_, CallbackInfo ci) {
-        if (!ModuleManager.clientSettings.isEnabled() || !ModuleManager.clientSettings.mainMenu.isToggled())
+        if (!ModuleManager.clientTheme.isEnabled() || !ModuleManager.clientTheme.mainMenu.isToggled())
             return;
 
         BackgroundUtils.renderBackground(this);
@@ -71,7 +71,7 @@ public abstract class MixinGuiMainMenu extends GuiScreen {
 
     @Inject(method = "initGui", at = @At("HEAD"), cancellable = true)
     public void onInitGui(CallbackInfo ci) {
-        if (!ModuleManager.clientSettings.isEnabled() || !ModuleManager.clientSettings.mainMenu.isToggled())
+        if (!ModuleManager.clientTheme.isEnabled() || !ModuleManager.clientTheme.mainMenu.isToggled())
             return;
 
         Calendar calendar = Calendar.getInstance();
