@@ -62,6 +62,7 @@ public class AntiVoid extends Module {
 
     @SubscribeEvent
     public void onAABB(BlockAABBEvent event) {
+        if (!Utils.nullCheck()) return;
         if (mc.thePlayer.fallDistance > distance.getInput())
             fallDistanced = true;
         if (mode.getInput() == 3) {
