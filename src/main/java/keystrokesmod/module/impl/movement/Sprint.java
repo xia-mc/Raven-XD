@@ -14,7 +14,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.PlayerTickEvent;
 
 public class Sprint extends Module {
     private final ModeSetting mode = new ModeSetting("Mode", new String[]{"Legit", "Omni"}, 0);
-    private final ModeSetting omniMode = new ModeSetting("Bypass mode", new String[]{"None", "Hypixel", "Legit"}, 1, new ModeOnly(mode, 1));
+    private final ModeSetting omniMode = new ModeSetting("Bypass mode", new String[]{"None", "Legit"}, 1, new ModeOnly(mode, 1));
     public static boolean omni = false;
     public static boolean stopSprint = false;
 
@@ -46,10 +46,6 @@ public class Sprint extends Module {
             case 0:
                 break;
             case 1:
-                if (mc.thePlayer.moveForward <= 0)
-                    event.setSprinting(false);
-                break;
-            case 2:
                 event.setYaw(event.getYaw() + Move.fromMovement(mc.thePlayer.moveForward, mc.thePlayer.moveStrafing).getDeltaYaw());
                 break;
         }
