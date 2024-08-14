@@ -4,6 +4,7 @@ import keystrokesmod.event.PreVelocityEvent;
 import keystrokesmod.event.SendPacketEvent;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.combat.Velocity;
+import keystrokesmod.module.impl.exploit.disabler.hypixel.HypixelMotionDisabler;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.impl.SubMode;
@@ -70,14 +71,14 @@ public class HypixelVelocity extends SubMode<Velocity> {
         if (motionY != 0)
             mc.thePlayer.motionY = motionY;
 
-        if (damageBoost.isToggled()) {
-            MoveUtil.strafe(Math.hypot(motionX, motionZ));
-        } else {
-            if (motionX != 0)
-                mc.thePlayer.motionX = motionX;
-            if (motionZ != 0)
-                mc.thePlayer.motionZ = motionZ;
+        if (damageBoost.isToggled() && !HypixelMotionDisabler.isNoDisable()) {
+            mc.thePlayer.motionY = MoveUtil.predictedMotion(mc.thePlayer.motionY, 2);
         }
+
+        if (motionX != 0)
+            mc.thePlayer.motionX = motionX;
+        if (motionZ != 0)
+            mc.thePlayer.motionZ = motionZ;
     }
 
     @Override
