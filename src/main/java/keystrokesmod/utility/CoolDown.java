@@ -14,11 +14,11 @@ public class CoolDown {
     }
 
     public boolean hasFinished(){
-        if(System.currentTimeMillis() >= start + lasts) {
-            //Utils.Player.sendMessageToSelf("Time finished");
-            return true;
-        }
-        return false;
+        return System.currentTimeMillis() >= start + lasts;
+    }
+
+    public void finish() {
+        start = 0;
     }
 
     public void setCooldown(long time){

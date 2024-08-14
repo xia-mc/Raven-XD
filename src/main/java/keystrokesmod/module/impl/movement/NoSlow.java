@@ -18,9 +18,9 @@ public class NoSlow extends Module {
 
     private static final Supplier<Boolean> nonCustomMode = () -> mode != null && !(mode.getSelected() instanceof CustomNoSlow);
 
-    private static final ButtonSetting sword = new ButtonSetting("Sword", true, nonCustomMode);
-    private static final ButtonSetting bow = new ButtonSetting("Bow", true, nonCustomMode);
-    private static final ButtonSetting rest = new ButtonSetting("Rest", true, nonCustomMode);
+    public static final ButtonSetting sword = new ButtonSetting("Sword", true, nonCustomMode);
+    public static final ButtonSetting bow = new ButtonSetting("Bow", true, nonCustomMode);
+    public static final ButtonSetting rest = new ButtonSetting("Rest", true, nonCustomMode);
 
     public NoSlow() {
         super("NoSlow", category.movement);

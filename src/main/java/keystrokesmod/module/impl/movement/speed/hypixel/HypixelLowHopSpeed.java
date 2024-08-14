@@ -1,14 +1,12 @@
 package keystrokesmod.module.impl.movement.speed.hypixel;
 
 import keystrokesmod.event.PrePlayerInputEvent;
-import keystrokesmod.module.impl.client.Notifications;
 import keystrokesmod.module.impl.exploit.disabler.hypixel.HypixelMotionDisabler;
 import keystrokesmod.module.impl.movement.speed.HypixelSpeed;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.MoveUtil;
 import keystrokesmod.utility.Utils;
-import net.minecraft.potion.Potion;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
@@ -32,7 +30,7 @@ public class HypixelLowHopSpeed extends SubMode<HypixelSpeed> {
 
     @SubscribeEvent
     public void onPrePlayerInput(PrePlayerInputEvent event) {
-        if (!MoveUtil.isMoving() || !HypixelMotionDisabler.isDone()) return;
+        if (!MoveUtil.isMoving() || HypixelMotionDisabler.isNoDisable()) return;
         switch (parent.parent.offGroundTicks) {
             case 0:
                 if (!Utils.jumpDown()) {

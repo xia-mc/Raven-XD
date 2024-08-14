@@ -37,7 +37,7 @@ public class HypixelCriticals extends SubMode<Criticals> {
             offGroundTicks++;
         }
 
-        if (!HypixelMotionDisabler.isDone() || ModuleManager.speed.isEnabled()) return;
+        if (HypixelMotionDisabler.isNoDisable() || ModuleManager.speed.isEnabled()) return;
         if (onlyKillAura.isToggled() && KillAura.target == null) return;
         if (!onlyKillAura.isToggled() && !Utils.isTargetNearby(3.2)) return;
 

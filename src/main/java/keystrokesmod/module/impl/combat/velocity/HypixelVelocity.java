@@ -1,14 +1,22 @@
 package keystrokesmod.module.impl.combat.velocity;
 
 import keystrokesmod.event.PreVelocityEvent;
+import keystrokesmod.event.SendPacketEvent;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.combat.Velocity;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.impl.SubMode;
+import keystrokesmod.utility.CoolDown;
 import keystrokesmod.utility.MoveUtil;
+import keystrokesmod.utility.PacketUtils;
+import net.minecraft.network.Packet;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class HypixelVelocity extends SubMode<Velocity> {
     private final SliderSetting horizontal;
@@ -20,6 +28,8 @@ public class HypixelVelocity extends SubMode<Velocity> {
     private final SliderSetting resetTime;
 
     private long lastVelocityTime = 0;
+    private final CoolDown coolDown = new CoolDown(500);
+    private final Queue<Packet<?>> delayedPackets = new ConcurrentLinkedQueue<>();
 
     public HypixelVelocity(String name, @NotNull Velocity parent) {
         super(name, parent);
@@ -42,8 +52,10 @@ public class HypixelVelocity extends SubMode<Velocity> {
 
         event.setCanceled(true);
 
-        if (!mc.thePlayer.onGround && cancelAir.isToggled())
+        if (!mc.thePlayer.onGround && cancelAir.isToggled()) {
+            coolDown.start();
             return;
+        }
 
         double motionX = event.getMotionX() / 8000.0;
         double motionY = event.getMotionY() / 8000.0;
@@ -65,6 +77,36 @@ public class HypixelVelocity extends SubMode<Velocity> {
                 mc.thePlayer.motionX = motionX;
             if (motionZ != 0)
                 mc.thePlayer.motionZ = motionZ;
+        }
+    }
+
+    @Override
+    public void onDisable() {
+        dispatch();
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public void onSendPacket(@NotNull SendPacketEvent event) {
+        if (event.isCanceled()) return;
+        if (!coolDown.hasFinished() && cancelAir.isToggled()) {
+            event.setCanceled(true);
+            delayedPackets.add(event.getPacket());
+        } else {
+            dispatch();
+        }
+
+        if (mc.thePlayer.onGround) {
+            coolDown.finish();
+        }
+    }
+
+    private void dispatch() {
+        if (delayedPackets.isEmpty()) return;
+        synchronized (delayedPackets) {
+            for (Packet<?> p : delayedPackets) {
+                PacketUtils.sendPacketNoEvent(p);
+            }
+            delayedPackets.clear();
         }
     }
 }

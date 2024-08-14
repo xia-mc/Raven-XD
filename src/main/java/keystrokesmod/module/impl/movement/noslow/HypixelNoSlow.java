@@ -29,7 +29,7 @@ public class HypixelNoSlow extends INoSlow {
     public void onUpdate() {
         if (!mc.thePlayer.isUsingItem() || SlotHandler.getHeldItem() == null) return;
 
-        if (SlotHandler.getHeldItem().getItem() instanceof ItemSword) {
+        if (SlotHandler.getHeldItem().getItem() instanceof ItemSword && NoSlow.sword.isToggled()) {
             PacketUtils.sendPacket(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem % 7 + (int) (Math.random() * 2.0) + 1));
             PacketUtils.sendPacket(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
         }
