@@ -7,6 +7,7 @@ import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.client.Notifications;
 import keystrokesmod.module.impl.combat.autoclicker.IAutoClicker;
 import keystrokesmod.module.impl.combat.autoclicker.NormalAutoClicker;
+import keystrokesmod.module.impl.exploit.disabler.hypixel.HypixelMotionDisabler;
 import keystrokesmod.module.impl.other.RotationHandler;
 import keystrokesmod.module.impl.other.SlotHandler;
 import keystrokesmod.module.impl.other.anticheats.utils.world.PlayerRotation;
@@ -21,7 +22,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockAir;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.client.C0APacketAnimation;
@@ -418,20 +418,14 @@ public class Scaffold extends IAutoClicker {
         }
         if (keepYPosition() && (sprint.getInput() == 3 || sprint.getInput() == 4 || sprint.getInput() == 5)) {
             if (mc.thePlayer.onGround) {
-                if (fast.isToggled())
-                    MoveUtil.strafe(MoveUtil.getAllowedHorizontalDistance());
                 mc.thePlayer.jump();
                 add = 0;
                 if (Math.floor(mc.thePlayer.posY) == Math.floor(startPos) && sprint.getInput() == 5) {
                     placedUp = false;
                 }
             } else if (fast.isToggled()) {
-                if (offGroundTicks == 4) {
-                    mc.thePlayer.motionY -= 0.19;
-                } else if (offGroundTicks == 1) {
-                    MoveUtil.strafe();
-                } else if (BlockUtils.blockRelativeToPlayer(0, mc.thePlayer.motionY, 0) != Blocks.air && offGroundTicks > 2) {
-                    MoveUtil.strafe();
+                if (offGroundTicks == 5 && HypixelMotionDisabler.isDisabled()) {
+                    mc.thePlayer.motionY = MoveUtil.predictedMotion(mc.thePlayer.motionY, 2);
                 }
             }
         }

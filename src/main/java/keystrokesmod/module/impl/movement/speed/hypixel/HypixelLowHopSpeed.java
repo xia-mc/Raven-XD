@@ -30,7 +30,7 @@ public class HypixelLowHopSpeed extends SubMode<HypixelSpeed> {
 
     @SubscribeEvent
     public void onPrePlayerInput(PrePlayerInputEvent event) {
-        if (!MoveUtil.isMoving() || HypixelMotionDisabler.isNoDisable()) return;
+        if (!MoveUtil.isMoving() || !HypixelMotionDisabler.isDisabled()) return;
         switch (parent.parent.offGroundTicks) {
             case 0:
                 if (!Utils.jumpDown()) {

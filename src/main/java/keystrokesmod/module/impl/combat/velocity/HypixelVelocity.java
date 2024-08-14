@@ -2,7 +2,6 @@ package keystrokesmod.module.impl.combat.velocity;
 
 import keystrokesmod.event.PreVelocityEvent;
 import keystrokesmod.event.SendPacketEvent;
-import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.combat.Velocity;
 import keystrokesmod.module.impl.exploit.disabler.hypixel.HypixelMotionDisabler;
 import keystrokesmod.module.setting.impl.ButtonSetting;
@@ -71,7 +70,7 @@ public class HypixelVelocity extends SubMode<Velocity> {
         if (motionY != 0)
             mc.thePlayer.motionY = motionY;
 
-        if (damageBoost.isToggled() && !HypixelMotionDisabler.isNoDisable()) {
+        if (damageBoost.isToggled() && HypixelMotionDisabler.isDisabled()) {
             mc.thePlayer.motionY = MoveUtil.predictedMotion(mc.thePlayer.motionY, 2);
         }
 
