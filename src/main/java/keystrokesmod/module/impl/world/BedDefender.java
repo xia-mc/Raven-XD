@@ -15,6 +15,7 @@ import keystrokesmod.module.setting.impl.ModeValue;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.script.classes.Vec3;
 import keystrokesmod.utility.*;
+import keystrokesmod.utility.aim.AimSimulator;
 import net.minecraft.block.BlockBed;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.network.play.client.C0APacketAnimation;

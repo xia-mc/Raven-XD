@@ -2,7 +2,6 @@ package keystrokesmod.mixins.impl.client;
 
 
 import com.google.common.base.Predicates;
-import keystrokesmod.event.ReachEvent;
 import keystrokesmod.module.impl.other.RotationHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.EntityRenderer;
@@ -10,7 +9,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItemFrame;
 import net.minecraft.util.*;
-import net.minecraftforge.common.MinecraftForge;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
@@ -26,7 +24,7 @@ public class MixinEntityRenderer {
 
     /**
      * @author xia__mc
-     * @reason remove 3.0 reach check to support reach.
+     * @reason fix silent rotation system
      * <p>
      * I'm sorry I must overwrite this...
      */
@@ -38,31 +36,31 @@ public class MixinEntityRenderer {
             this.mc.pointedEntity = null;
             double d0 = this.mc.playerController.getBlockReachDistance();
             this.mc.objectMouseOver = entity.rayTrace(d0, p_getMouseOver_1_);
-            double d1;
+            double d1 = d0;
             Vec3 vec3 = entity.getPositionEyes(p_getMouseOver_1_);
             boolean flag = false;
             if (this.mc.playerController.extendedReach()) {
                 d0 = 6.0;
+                d1 = 6.0;
             } else if (d0 > 3.0) {
                 flag = true;
             }
 
-            ReachEvent reachEvent = new ReachEvent(flag ? 3 : 6, false);
-            MinecraftForge.EVENT_BUS.post(reachEvent);
-
-            if (this.mc.objectMouseOver != null && !reachEvent.isHitThroughBlock()) {
-                d1 = Math.max(this.mc.objectMouseOver.hitVec.distanceTo(vec3), reachEvent.getDistance());
-            } else {
-                d1 = Math.max(reachEvent.getDistance(), 6);
+            if (this.mc.objectMouseOver != null) {
+                d1 = this.mc.objectMouseOver.hitVec.distanceTo(vec3);
             }
 
             Vec3 vec31 = RotationHandler.getLook(p_getMouseOver_1_);
-            double max = Math.max(d0, reachEvent.getDistance());
-            Vec3 vec32 = vec3.addVector(vec31.xCoord * max, vec31.yCoord * max, vec31.zCoord * max);
+            Vec3 vec32 = vec3.addVector(vec31.xCoord * d0, vec31.yCoord * d0, vec31.zCoord * d0);
             this.pointedEntity = null;
             Vec3 vec33 = null;
-            float f = 1.0f;
-            List<Entity> list = this.mc.theWorld.getEntitiesInAABBexcluding(entity, entity.getEntityBoundingBox().addCoord(vec31.xCoord * max, vec31.yCoord * max, vec31.zCoord * max).expand(f, f, f), Predicates.and(EntitySelectors.NOT_SPECTATING, Entity::canBeCollidedWith));
+            float f = 1.0F;
+            List<Entity> list = this.mc.theWorld.getEntitiesInAABBexcluding(
+                    entity, entity.getEntityBoundingBox()
+                            .addCoord(vec31.xCoord * d0, vec31.yCoord * d0, vec31.zCoord * d0)
+                            .expand(f, f, f),
+                    Predicates.and(EntitySelectors.NOT_SPECTATING, Entity::canBeCollidedWith)
+            );
             double d2 = d1;
 
             for (Entity entity1 : list) {
@@ -92,7 +90,7 @@ public class MixinEntityRenderer {
                 }
             }
 
-            if (this.pointedEntity != null && flag && vec3.distanceTo(vec33) > reachEvent.getDistance()) {
+            if (this.pointedEntity != null && flag && vec3.distanceTo(vec33) > 3.0) {
                 this.pointedEntity = null;
                 assert vec33 != null;
                 this.mc.objectMouseOver = new MovingObjectPosition(MovingObjectPosition.MovingObjectType.MISS, vec33, null, new BlockPos(vec33));
@@ -107,5 +105,6 @@ public class MixinEntityRenderer {
 
             this.mc.mcProfiler.endSection();
         }
+
     }
 }

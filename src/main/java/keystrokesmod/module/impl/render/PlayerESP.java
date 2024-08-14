@@ -12,11 +12,12 @@ import keystrokesmod.utility.render.RenderUtils;
 import keystrokesmod.utility.Utils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import java.awt.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public class PlayerESP extends Module {
     public SliderSetting red;
@@ -24,18 +25,20 @@ public class PlayerESP extends Module {
     public SliderSetting blue;
     public ButtonSetting colorByName;
     public ButtonSetting rainbow;
-    private ButtonSetting twoD;
-    private ButtonSetting arrow;
-    private ButtonSetting box;
-    private ButtonSetting health;
+    private final ButtonSetting twoD;
+    private final ButtonSetting arrow;
+    private final ButtonSetting box;
+    private final ButtonSetting health;
     public ButtonSetting outline;
-    private ButtonSetting shaded;
-    private ButtonSetting ring;
-    private SliderSetting expand;
-    private SliderSetting xShift;
-    private ButtonSetting redOnDamage;
-    private ButtonSetting showInvis;
-    private int rgb_c = 0;
+    private final ButtonSetting shaded;
+    private final ButtonSetting ring;
+    private final SliderSetting expand;
+    private final SliderSetting xShift;
+    private final ButtonSetting redOnDamage;
+    private final ButtonSetting showInvis;
+    private int rgb = 0;
+
+    private final Map<EntityLivingBase, Integer> targets = new HashMap<>(10);
 
     public PlayerESP() {
         super("PlayerESP", category.render, 0);
@@ -58,45 +61,51 @@ public class PlayerESP extends Module {
         this.registerSetting(showInvis = new ButtonSetting("Show invis", true));
     }
 
+    @Override
     public void onDisable() {
         RenderUtils.ring_c = false;
+        targets.clear();
     }
 
-    public void guiUpdate() {
-        this.rgb_c = (new Color((int) red.getInput(), (int) green.getInput(), (int) blue.getInput())).getRGB();
+    @Override
+    public void onUpdate() {
+        this.rgb = rainbow.isToggled()
+                ? Utils.getChroma(2L, 0L)
+                : new Color((int) red.getInput(), (int) green.getInput(), (int) blue.getInput()).getRGB();
+
+        targets.clear();
+        if (Utils.nullCheck()) {
+            if (Raven.debugger) {
+                mc.theWorld.loadedEntityList.stream()
+                        .filter(entity -> entity instanceof EntityLivingBase && entity != mc.thePlayer)
+                        .forEach(entity -> {
+                            if (colorByName.isToggled()) {
+                                rgb = getColorFromTags(entity.getDisplayName().getFormattedText());
+                            }
+                            targets.put((EntityLivingBase) entity, rgb);
+                        });
+                return;
+            }
+            mc.theWorld.playerEntities.stream()
+                    .filter(player -> player != mc.thePlayer)
+                    .filter(player -> player.deathTime == 0)
+                    .filter(player -> showInvis.isToggled() || !player.isInvisible())
+                    .filter(player -> !AntiBot.isBot(player))
+                    .forEach(player -> {
+                        if (colorByName.isToggled()) {
+                            rgb = getColorFromTags(player.getDisplayName().getFormattedText());
+                        }
+                        targets.put(player, rgb);
+                    });
+        }
     }
 
     @SubscribeEvent
     public void onRenderWorld(RenderWorldLastEvent e) {
-        if (Utils.nullCheck()) {
-            int rgb = rainbow.isToggled() ? Utils.getChroma(2L, 0L) : this.rgb_c;
-            if (Raven.debugger) {
-                for (final Entity entity : mc.theWorld.loadedEntityList) {
-                    if (entity instanceof EntityLivingBase && entity != mc.thePlayer) {
-                        if (colorByName.isToggled()) {
-                            rgb = getColorFromTags(entity.getDisplayName().getFormattedText());
-                        }
-                        this.render(entity, rgb);
-                    }
-                }
-                return;
-            }
-            for (EntityPlayer player : mc.theWorld.playerEntities) {
-                if (player != mc.thePlayer) {
-                    if (player.deathTime != 0) {
-                        continue;
-                    }
-                    if (!showInvis.isToggled() && player.isInvisible()) {
-                        continue;
-                    }
-                    if (AntiBot.isBot(player)) {
-                        continue;
-                    }
-                    if (colorByName.isToggled()) {
-                        rgb = getColorFromTags(player.getDisplayName().getFormattedText());
-                    }
-                    this.render(player, rgb);
-                }
+        for (Map.Entry<EntityLivingBase, Integer> target : targets.entrySet()) {
+            try {
+                render(target.getKey(), target.getValue());
+            } catch (Exception ignored) {
             }
         }
     }

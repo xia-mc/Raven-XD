@@ -16,6 +16,9 @@ import keystrokesmod.module.setting.impl.*;
 import keystrokesmod.module.setting.utils.ModeOnly;
 import keystrokesmod.script.classes.Vec3;
 import keystrokesmod.utility.*;
+import keystrokesmod.utility.aim.AimSimulator;
+import keystrokesmod.utility.render.ColorUtils;
+import keystrokesmod.utility.render.RenderUtils;
 import lombok.Getter;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.EntityLivingBase;
@@ -25,16 +28,21 @@ import net.minecraft.init.Blocks;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.client.*;
 import net.minecraft.network.play.server.S2FPacketSetSlot;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraftforge.client.event.MouseEvent;
+import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.InputEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.input.Mouse;
 
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -53,8 +61,18 @@ public class KillAura extends IAutoClicker {
     private final ModeSetting rotationMode;
     private final ModeSetting moveFixMode;
     private final ModeSetting rayCastMode;
-    private final ModeSetting rotationTarget;
-    private final ModeSetting rotationSimulator;
+    private final ButtonSetting nearest;
+    private final SliderSetting nearestAccuracy;
+    private final ButtonSetting lazy;
+    private final SliderSetting lazyAccuracy;
+    private final ButtonSetting constant;
+    private final ButtonSetting noise;
+    private final SliderSetting noiseHorizontal;
+    private final SliderSetting noiseVertical;
+    private final SliderSetting noiseAimSpeed;
+    private final SliderSetting noiseDelay;
+    private final ButtonSetting delayAim;
+    private final SliderSetting delayAimAmount;
     private final SliderSetting rotationSpeed;
     private final ModeSetting sortMode;
     private final SliderSetting switchDelay;
@@ -74,6 +92,9 @@ public class KillAura extends IAutoClicker {
     private final ButtonSetting requireMouseDown;
     private final ButtonSetting silentSwing;
     private final ButtonSetting weaponOnly;
+    private final ButtonSetting dot;
+    private final SliderSetting dotSize;
+
     private final String[] rotationModes = new String[]{"None", "Silent", "Lock view"};
     private final List<EntityLivingBase> availableTargets = new ArrayList<>();
     public AtomicBoolean block = new AtomicBoolean();
@@ -92,7 +113,7 @@ public class KillAura extends IAutoClicker {
     private final ConcurrentLinkedQueue<Packet<?>> blinkedPackets = new ConcurrentLinkedQueue<>();
 
     private int blockingTime = 0;
-
+    private final AimSimulator aimSimulator = new AimSimulator();
 
     public KillAura() {
         super("KillAura", category.combat);
@@ -104,21 +125,32 @@ public class KillAura extends IAutoClicker {
         );
         String[] autoBlockModes = new String[]{"Manual", "Vanilla", "Post", "Swap", "Interact A", "Interact B", "Fake", "Partial"};
         this.registerSetting(autoBlockMode = new ModeSetting("Autoblock", autoBlockModes, 0));
-        this.registerSetting(fov = new SliderSetting("FOV", 360.0, 30.0, 360.0, 4.0));
         this.registerSetting(attackMode = new ModeSetting("Attack mode", new String[]{"Legit", "Packet"}, 1));
+        this.registerSetting(new DescriptionSetting("Range"));
         this.registerSetting(attackRange = new SliderSetting("Attack range", 3.0, 3.0, 6.0, 0.1));
         this.registerSetting(swingRange = new SliderSetting("Swing range", 3.0, 3.0, 8.0, 0.1));
         this.registerSetting(blockRange = new SliderSetting("Block range", 6.0, 3.0, 12.0, 0.1));
         this.registerSetting(preAimRange = new SliderSetting("PreAim range", 6.0, 3.0, 12.0, 0.1));
+        this.registerSetting(fov = new SliderSetting("FOV", 360.0, 30.0, 360.0, 4.0));
+        this.registerSetting(new DescriptionSetting("Rotation"));
         this.registerSetting(rotationMode = new ModeSetting("Rotation", rotationModes, 1));
         final ModeOnly doRotation = new ModeOnly(rotationMode, 1, 2);
+        this.registerSetting(rotationSpeed = new SliderSetting("Rotation speed", 10, 0, 10, 0.05, doRotation));
         this.registerSetting(moveFixMode = new ModeSetting("Move fix", RotationHandler.MoveFix.MODES, 0, new ModeOnly(rotationMode, 1)));
-        this.registerSetting(rayCastMode = new ModeSetting("Ray cast", new String[]{"None", "Normal", "Strict"}, 1, new ModeOnly(rotationMode, 0).reserve()));
-        String[] rotationTargets = new String[]{"Head", "Nearest", "Constant"};
-        this.registerSetting(rotationTarget = new ModeSetting("Rotation target", rotationTargets, 0, doRotation));
-        String[] rotationSimulators = new String[]{"None", "Lazy", "Noise"};
-        this.registerSetting(rotationSimulator = new ModeSetting("Rotation simulator", rotationSimulators, 0, doRotation));
-        this.registerSetting(rotationSpeed = new SliderSetting("Rotation speed", 5, 0, 5, 0.05, doRotation));
+        this.registerSetting(rayCastMode = new ModeSetting("Ray cast", new String[]{"None", "Normal", "Strict"}, 1, doRotation));
+        this.registerSetting(nearest = new ButtonSetting("Nearest", false, doRotation));
+        this.registerSetting(nearestAccuracy = new SliderSetting("Nearest accuracy", 1, 0.8, 1, 0.01, doRotation.extend(nearest::isToggled)));
+        this.registerSetting(lazy = new ButtonSetting("Lazy", false, doRotation));
+        this.registerSetting(lazyAccuracy = new SliderSetting("Lazy accuracy", 0.95, 0.6, 1, 0.01, doRotation.extend(lazy::isToggled)));
+        this.registerSetting(constant = new ButtonSetting("Constant", false, doRotation));
+        this.registerSetting(noise = new ButtonSetting("Noise", false, doRotation));
+        this.registerSetting(noiseHorizontal = new SliderSetting("Noise horizontal", 0.35, 0.01, 1, 0.01, doRotation.extend(noise::isToggled)));
+        this.registerSetting(noiseVertical = new SliderSetting("Noise vertical", 0.5, 0.01, 1, 0.01, doRotation.extend(noise::isToggled)));
+        this.registerSetting(noiseAimSpeed = new SliderSetting("Noise aim speed", 0.35, 0.01, 1, 0.01, doRotation.extend(noise::isToggled)));
+        this.registerSetting(noiseDelay = new SliderSetting("Noise delay", 100, 50, 500, 10, doRotation.extend(noise::isToggled)));
+        this.registerSetting(delayAim = new ButtonSetting("Delay aim", false, doRotation));
+        this.registerSetting(delayAimAmount = new SliderSetting("Delay aim amount", 5, 5, 100, 1, doRotation.extend(delayAim::isToggled)));
+        this.registerSetting(new DescriptionSetting("Targets"));
         String[] sortModes = new String[]{"Health", "HurtTime", "Distance", "Yaw"};
         this.registerSetting(sortMode = new ModeSetting("Sort mode", sortModes, 0));
         this.registerSetting(targets = new SliderSetting("Targets", 1.0, 1.0, 10.0, 1.0));
@@ -126,6 +158,7 @@ public class KillAura extends IAutoClicker {
         this.registerSetting(targetInvisible = new ButtonSetting("Target invisible", true));
         this.registerSetting(targetPlayer = new ButtonSetting("Target player", true));
         this.registerSetting(targetEntity = new ButtonSetting("Target entity", false));
+        this.registerSetting(new DescriptionSetting("Miscellaneous"));
         this.registerSetting(disableInInventory = new ButtonSetting("Disable in inventory", true));
         this.registerSetting(disableWhileBlocking = new ButtonSetting("Disable while blocking", false));
         this.registerSetting(disableWhileMining = new ButtonSetting("Disable while mining", false));
@@ -138,6 +171,9 @@ public class KillAura extends IAutoClicker {
         this.registerSetting(requireMouseDown = new ButtonSetting("Require mouse down", false));
         this.registerSetting(silentSwing = new ButtonSetting("Silent swing while blocking", false));
         this.registerSetting(weaponOnly = new ButtonSetting("Weapon only", false));
+        this.registerSetting(new DescriptionSetting("Visual"));
+        this.registerSetting(dot = new ButtonSetting("Dot", false));
+        this.registerSetting(dotSize = new SliderSetting("Dot size", 0.1, 0.05, 0.2, 0.05, dot::isToggled));
     }
 
     public void onEnable() {
@@ -158,31 +194,20 @@ public class KillAura extends IAutoClicker {
     }
 
     private float[] getRotations() {
-        boolean nearest = false, lazy = false, noise = false;
+        aimSimulator.setNearest(nearest.isToggled(), nearestAccuracy.getInput());
+        aimSimulator.setLazy(lazy.isToggled(), lazyAccuracy.getInput());
+        aimSimulator.setNoise(noise.isToggled(),
+                new Pair<>((float) noiseHorizontal.getInput(), (float) noiseVertical.getInput()),
+                noiseAimSpeed.getInput(), (long) noiseDelay.getInput());
+        aimSimulator.setDelay(delayAim.isToggled(), (int) delayAimAmount.getInput());
 
-        switch ((int) rotationTarget.getInput()) {
-            case 1:
-                nearest = true;
-                break;
-            case 2:
-                nearest = true;
-                if (RotationUtils.rayCastIgnoreWall(rotations[0], rotations[1], target))
-                    return rotations;
-                break;
-        }
+        if (constant.isToggled() && !noAimToEntity())
+            return rotations;
 
-        switch ((int) rotationSimulator.getInput()) {
-            case 1:
-                lazy = true;
-                break;
-            case 2:
-                lazy = true;
-                noise = true;
-                break;
-        }
+        Pair<Float, Float> result = aimSimulator.getRotation(target);
 
-        Pair<Float, Float> result = AimSimulator.getLegitAim(target, mc.thePlayer, nearest, lazy, noise, new Pair<>(0.35F, 0.5F), (long) (50 + Math.random() * 50));
-        if (rotationSpeed.getInput() == 5) return new float[]{result.first(), result.second()};
+        if (rotationSpeed.getInput() == 10)
+            return new float[]{result.first(), result.second()};
 
         return new float[]{
                 AimSimulator.rotMove(result.first(), rotations[0], (float) rotationSpeed.getInput()),
@@ -204,6 +229,14 @@ public class KillAura extends IAutoClicker {
                 mc.thePlayer.rotationYaw = rotations[0];
                 mc.thePlayer.rotationPitch = rotations[1];
             }
+        }
+    }
+
+    @SubscribeEvent
+    public void onRenderWorldLast(RenderWorldLastEvent event) {
+        Vec3 hitPos = aimSimulator.getHitPos();
+        if (target != null && rotations != null && dot.isToggled() && hitPos != null) {
+            RenderUtils.drawDot(hitPos, dotSize.getInput(), 0xFF0670BE);
         }
     }
 
@@ -674,14 +707,6 @@ public class KillAura extends IAutoClicker {
         } catch (NullPointerException ignored) {
         }
         return false;
-    }
-
-    @SubscribeEvent
-    public void onReach(ReachEvent event) {
-        if (attackMode.getInput() == 0) {
-            event.setDistance(((float) attackRange.getInput()));
-            event.setHitThroughBlock(hitThroughBlocks.isToggled());
-        }
     }
 
     @Override

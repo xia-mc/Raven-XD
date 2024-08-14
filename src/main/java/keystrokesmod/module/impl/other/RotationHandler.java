@@ -8,7 +8,7 @@ import keystrokesmod.module.setting.impl.DescriptionSetting;
 import keystrokesmod.module.setting.impl.ModeSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.utils.ModeOnly;
-import keystrokesmod.utility.AimSimulator;
+import keystrokesmod.utility.aim.AimSimulator;
 import keystrokesmod.utility.MoveUtil;
 import keystrokesmod.utility.RotationUtils;
 import lombok.Getter;

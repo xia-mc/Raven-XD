@@ -1,6 +1,6 @@
 package keystrokesmod.module.impl.other.anticheats.utils.phys;
 
-import keystrokesmod.utility.AimSimulator;
+import keystrokesmod.utility.aim.AimSimulator;
 import net.minecraft.util.MathHelper;
 import org.jetbrains.annotations.NotNull;
 

@@ -15,6 +15,7 @@ import keystrokesmod.module.setting.impl.*;
 import keystrokesmod.module.setting.utils.ModeOnly;
 import keystrokesmod.utility.*;
 import keystrokesmod.utility.Timer;
+import keystrokesmod.utility.aim.AimSimulator;
 import keystrokesmod.utility.render.RenderUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockAir;

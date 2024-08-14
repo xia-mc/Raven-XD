@@ -1,10 +1,7 @@
 package keystrokesmod.module.impl.combat;
 
 import keystrokesmod.module.Module;
-import keystrokesmod.module.impl.combat.criticals.JumpCriticals;
-import keystrokesmod.module.impl.combat.criticals.LagCriticals;
-import keystrokesmod.module.impl.combat.criticals.NoGroundCriticals;
-import keystrokesmod.module.impl.combat.criticals.TimerCriticals;
+import keystrokesmod.module.impl.combat.criticals.*;
 import keystrokesmod.module.setting.impl.ModeValue;
 
 public class Criticals extends Module {
@@ -17,6 +14,7 @@ public class Criticals extends Module {
                 .add(new TimerCriticals("Timer", this))
                 .add(new JumpCriticals("Jump", this))
                 .add(new LagCriticals("Lag", this))
+                .add(new HypixelCriticals("Hypixel", this))
         );
     }
 

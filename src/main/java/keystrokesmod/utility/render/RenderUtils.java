@@ -378,7 +378,32 @@ public class RenderUtils {
         drawBoundingBox(abb, r, g, b, 0.25f);
     }
 
-    public static void drawBoundingBox(AxisAlignedBB abb, float r, float g, float b, float a) {
+    public static void drawDot(@NotNull Vec3 pos, double size, int color) {
+        double d = size / 2;
+        GlStateManager.pushMatrix();
+        AxisAlignedBB bbox = new AxisAlignedBB(pos.x - d, pos.y - d, pos.z - d, pos.x + d, pos.y + d, pos.z + d);
+
+        AxisAlignedBB axis = new AxisAlignedBB(bbox.minX - mc.thePlayer.posX, bbox.minY - mc.thePlayer.posY, bbox.minZ - mc.thePlayer.posZ, bbox.maxX - mc.thePlayer.posX, bbox.maxY - mc.thePlayer.posY, bbox.maxZ - mc.thePlayer.posZ);
+        float a = (float) (color >> 24 & 255) / 255.0F;
+        float r = (float) (color >> 16 & 255) / 255.0F;
+        float g = (float) (color >> 8 & 255) / 255.0F;
+        float b = (float) (color & 255) / 255.0F;
+        GL11.glBlendFunc(770, 771);
+        GL11.glEnable(3042);
+        GL11.glDisable(3553);
+        GL11.glDisable(2929);
+        GL11.glDepthMask(false);
+        GL11.glLineWidth(2.0F);
+        GL11.glColor4f(r, g, b, a);
+        RenderUtils.drawBoundingBox(axis, r, g, b, a);
+        GL11.glEnable(3553);
+        GL11.glEnable(2929);
+        GL11.glDepthMask(true);
+        GL11.glDisable(3042);
+        GlStateManager.popMatrix();
+    }
+
+    public static void drawBoundingBox(@NotNull AxisAlignedBB abb, float r, float g, float b, float a) {
         Tessellator ts = Tessellator.getInstance();
         WorldRenderer vb = ts.getWorldRenderer();
         vb.begin(7, DefaultVertexFormats.POSITION_COLOR);

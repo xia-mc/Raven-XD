@@ -51,6 +51,10 @@ public class InvMove extends Module {
     public void onPreUpdate(PreUpdateEvent event) {
         if ((mc.currentScreen instanceof GuiContainer || (clickGui.isToggled() && mc.currentScreen instanceof ClickGui))
                 && nameCheck() && targetNearbyCheck() && !scaffold.isEnabled()) {
+            if (mc.currentScreen instanceof ClickGui || clickGui.isToggled()) {
+                doInvMove();
+                return;
+            }
             switch ((int) mode.getInput()) {
                 case 1:
                     if (!blinking) {
@@ -68,9 +72,6 @@ public class InvMove extends Module {
                     MoveUtil.stop();
                     break;
                 case 4:
-                    if (!(mc.currentScreen instanceof ClickGui) || !clickGui.isToggled()) {
-                        return;
-                    }
                     break;
             }
 

@@ -17,6 +17,7 @@ import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.utils.ModeOnly;
 import keystrokesmod.script.classes.Vec3;
 import keystrokesmod.utility.*;
+import keystrokesmod.utility.aim.AimSimulator;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -73,6 +74,7 @@ public class KillAuraV2 extends Module {
     private final ButtonSetting RayCast = new ButtonSetting("Ray cast", true);
 
     private int autoBlock$watchdog$blockingTime = 0;
+    private final AimSimulator aimSimulator = new AimSimulator();
 
     public KillAuraV2() {
         super("KillAuraV2", category.experimental);
@@ -185,7 +187,8 @@ public class KillAuraV2 extends Module {
                     break;
                 case 1:
                     if (target != null) {
-                        Pair<Float, Float> aimResult = AimSimulator.getLegitAim(target, mc.thePlayer, true, true, false, null, 0);
+                        aimSimulator.setNearest(true, 1.0);
+                        Pair<Float, Float> aimResult = aimSimulator.getRotation(target);
                         yaw = aimResult.first();
                         pitch = aimResult.second();
                     }
