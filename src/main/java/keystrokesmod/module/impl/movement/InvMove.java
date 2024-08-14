@@ -51,7 +51,7 @@ public class InvMove extends Module {
     public void onPreUpdate(PreUpdateEvent event) {
         if ((mc.currentScreen instanceof GuiContainer || (clickGui.isToggled() && mc.currentScreen instanceof ClickGui))
                 && nameCheck() && targetNearbyCheck() && !scaffold.isEnabled()) {
-            if (mc.currentScreen instanceof ClickGui || clickGui.isToggled()) {
+            if (mc.currentScreen instanceof ClickGui && clickGui.isToggled()) {
                 doInvMove();
                 return;
             }
