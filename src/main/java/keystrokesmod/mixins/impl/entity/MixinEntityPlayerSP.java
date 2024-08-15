@@ -15,7 +15,6 @@ import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.network.play.client.C0BPacketEntityAction;
-import net.minecraft.network.play.client.C0CPacketInput;
 import net.minecraft.potion.Potion;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.MovementInput;
@@ -23,6 +22,10 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import org.spongepowered.asm.mixin.*;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(value = EntityPlayerSP.class, priority = 999)
 public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
@@ -104,38 +107,25 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
 
     @Shadow protected abstract boolean isOpenBlockSpace(BlockPos p_isOpenBlockSpace_1_);
 
-    /**
-     * @author strangerrrs
-     * @reason mixin on update
-     */
-    @Overwrite
-    public void onUpdate() {
-        if (this.worldObj.isBlockLoaded(new BlockPos(this.posX, 0.0, this.posZ))) {
-            RotationUtils.prevRenderPitch = RotationUtils.renderPitch;
-            RotationUtils.prevRenderYaw = RotationUtils.renderYaw;
+    @Inject(method = "onUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/entity/AbstractClientPlayer;onUpdate()V"))
+    public void onPreUpdate(CallbackInfo ci) {
+        RotationUtils.prevRenderPitch = RotationUtils.renderPitch;
+        RotationUtils.prevRenderYaw = RotationUtils.renderYaw;
 
-            net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new PreUpdateEvent());
+        MinecraftForge.EVENT_BUS.post(new PreUpdateEvent());
+    }
 
-            super.onUpdate();
-
-            if (this.isRiding()) {
-                this.sendQueue.addToSendQueue(new C03PacketPlayer.C05PacketPlayerLook(this.rotationYaw, this.rotationPitch, this.onGround));
-                this.sendQueue.addToSendQueue(new C0CPacketInput(this.moveStrafing, this.moveForward, this.movementInput.jump, this.movementInput.sneak));
-            } else {
-                this.onUpdateWalkingPlayer();
-            }
-
-            net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new PostUpdateEvent());
-        }
-
+    @Inject(method = "onUpdate", at = @At("RETURN"))
+    public void onPostUpdate(CallbackInfo ci) {
+        MinecraftForge.EVENT_BUS.post(new PostUpdateEvent());
     }
 
     /**
      * @author strangerrrs
      * @reason mixin on update walking player
      */
-    @Overwrite
-    public void onUpdateWalkingPlayer() {
+    @Inject(method = "onUpdateWalkingPlayer", at = @At("HEAD"), cancellable = true)
+    public void onUpdateWalkingPlayer(CallbackInfo ci) {
         PreMotionEvent preMotionEvent = new PreMotionEvent(
                 this.posX,
                 this.getEntityBoundingBox().minY,
@@ -223,14 +213,15 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
         }
 
         net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new PostMotionEvent());
+        ci.cancel();
     }
 
     /**
      * @author strangerrrs
      * @reason mixin on living update
      */
-    @Overwrite
-    public void onLivingUpdate() {
+    @Inject(method = "onLivingUpdate", at = @At("HEAD"), cancellable = true)
+    public void onLivingUpdate(CallbackInfo ci) {
         if (this.sprintingTicksLeft > 0) {
             --this.sprintingTicksLeft;
             if (this.sprintingTicksLeft == 0) {
@@ -374,14 +365,15 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
             this.sendPlayerAbilities();
         }
 
+        ci.cancel();
     }
 
     /**
      * @author xia__mc
      * @reason for vulcan phase
      */
-    @Overwrite
-    protected boolean pushOutOfBlocks(double p_pushOutOfBlocks_1_, double p_pushOutOfBlocks_3_, double p_pushOutOfBlocks_5_) {
+    @Inject(method = "pushOutOfBlocks", at = @At("HEAD"), cancellable = true)
+    protected void pushOutOfBlocks(double p_pushOutOfBlocks_1_, double p_pushOutOfBlocks_3_, double p_pushOutOfBlocks_5_, CallbackInfoReturnable<Boolean> cir) {
         if (!this.noClip) {
             BlockPos blockpos = new BlockPos(p_pushOutOfBlocks_1_, p_pushOutOfBlocks_3_, p_pushOutOfBlocks_5_);
             double d0 = p_pushOutOfBlocks_1_ - (double) blockpos.getX();
@@ -391,7 +383,7 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
                 PushOutOfBlockEvent event = new PushOutOfBlockEvent();
                 MinecraftForge.EVENT_BUS.post(event);
                 if (event.isCanceled())
-                    return false;
+                    cir.setReturnValue(false);
 
                 int i = -1;
                 double d2 = 9999.0;
@@ -433,6 +425,6 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
             }
 
         }
-        return false;
+        cir.setReturnValue(false);
     }
 }

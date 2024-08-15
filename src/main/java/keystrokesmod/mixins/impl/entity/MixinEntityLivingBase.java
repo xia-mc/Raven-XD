@@ -2,6 +2,7 @@ package keystrokesmod.mixins.impl.entity;
 
 import com.google.common.collect.Maps;
 import keystrokesmod.event.JumpEvent;
+import keystrokesmod.event.MoveEvent;
 import keystrokesmod.event.SwingAnimationEvent;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.movement.Sprint;
@@ -20,11 +21,12 @@ import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.MinecraftForge;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Map;
@@ -39,13 +41,13 @@ public abstract class MixinEntityLivingBase extends Entity {
     private final Map<Integer, PotionEffect> raven_bS$activePotionsMap = Maps.newHashMap();
 
     @Shadow
-    public PotionEffect getActivePotionEffect(Potion potionIn) {
-        return this.raven_bS$activePotionsMap.get(Integer.valueOf(potionIn.id));
+    public PotionEffect getActivePotionEffect(@NotNull Potion potionIn) {
+        return this.raven_bS$activePotionsMap.get(potionIn.id);
     }
 
     @Shadow
-    public boolean isPotionActive(Potion potionIn) {
-        return this.raven_bS$activePotionsMap.containsKey(Integer.valueOf(potionIn.id));
+    public boolean isPotionActive(@NotNull Potion potionIn) {
+        return this.raven_bS$activePotionsMap.containsKey(potionIn.id);
     }
 
     @Shadow
@@ -57,12 +59,29 @@ public abstract class MixinEntityLivingBase extends Entity {
     @Shadow
     public float swingProgress;
 
+    @Redirect(method = "moveEntityWithHeading", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/EntityLivingBase;moveEntity(DDD)V"))
+    public void onMoveEntity(EntityLivingBase instance, double x, double y, double z) {
+        if (instance instanceof EntityPlayerSP) {
+            MoveEvent event = new MoveEvent(x, y, z);
+            MinecraftForge.EVENT_BUS.post(event);
+
+            if (event.isCanceled())
+                return;
+
+            x = event.getX();
+            y = event.getY();
+            z = event.getZ();
+        }
+
+        instance.moveEntity(x, y, z);
+    }
+
     /**
      * @author strangerrs
      * @reason mixin func110146f
      */
-    @Overwrite
-    protected float func_110146_f(float p_1101461, float p_1101462) {
+    @Inject(method = "func_110146_f", at = @At("HEAD"), cancellable = true)
+    protected void func_110146_f(float p_1101461, float p_1101462, CallbackInfoReturnable<Float> cir) {
         float rotationYaw = this.rotationYaw;
         if (RotationHandler.fullBody != null && RotationHandler.rotateBody != null && !RotationHandler.fullBody.isToggled() && RotationHandler.rotateBody.isToggled() && (EntityLivingBase) (Object) this instanceof EntityPlayerSP) {
             if (this.swingProgress > 0F) {
@@ -94,7 +113,7 @@ public abstract class MixinEntityLivingBase extends Entity {
             p_1101462 *= -1.0F;
         }
 
-        return p_1101462;
+        cir.setReturnValue(p_1101462);
     }
 
     @Shadow
@@ -106,8 +125,8 @@ public abstract class MixinEntityLivingBase extends Entity {
      * @author strangerrs
      * @reason mixin jump
      */
-    @Overwrite
-    protected void jump() {
+    @Inject(method = "jump", at = @At("HEAD"), cancellable = true)
+    protected void jump(CallbackInfo ci) {
         JumpEvent jumpEvent = new JumpEvent(this.getJumpUpwardsMotion(), RotationHandler.getMovementYaw(this));
         MinecraftForge.EVENT_BUS.post(jumpEvent);
         if (jumpEvent.isCanceled()) {
@@ -134,6 +153,7 @@ public abstract class MixinEntityLivingBase extends Entity {
 
         this.isAirBorne = true;
         ForgeHooks.onLivingJump(((EntityLivingBase) (Object) this));
+        ci.cancel();
     }
 
     @Inject(method = "isPotionActive(Lnet/minecraft/potion/Potion;)Z", at = @At("HEAD"), cancellable = true)

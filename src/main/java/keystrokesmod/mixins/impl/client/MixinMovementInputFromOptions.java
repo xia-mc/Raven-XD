@@ -11,6 +11,9 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(MovementInputFromOptions.class)
 public abstract class MixinMovementInputFromOptions extends MovementInput {
@@ -21,8 +24,8 @@ public abstract class MixinMovementInputFromOptions extends MovementInput {
      * @author xia__mc
      * @reason to fix movement
      */
-    @Overwrite
-    public void updatePlayerMoveState() {
+    @Inject(method = "updatePlayerMoveState", at = @At("HEAD"), cancellable = true)
+    public void updatePlayerMoveState(CallbackInfo ci) {
         this.moveStrafe = 0.0F;
         this.moveForward = 0.0F;
 
@@ -61,5 +64,6 @@ public abstract class MixinMovementInputFromOptions extends MovementInput {
         }
 
         MinecraftForge.EVENT_BUS.post(new PostPlayerInputEvent());
+        ci.cancel();
     }
 }

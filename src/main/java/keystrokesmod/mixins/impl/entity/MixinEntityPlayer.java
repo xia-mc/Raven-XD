@@ -1,7 +1,6 @@
 package keystrokesmod.mixins.impl.entity;
 
 import keystrokesmod.module.ModuleManager;
-import keystrokesmod.module.impl.combat.Velocity;
 import keystrokesmod.module.impl.movement.KeepSprint;
 import keystrokesmod.module.impl.render.Particles;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -23,6 +22,10 @@ import net.minecraftforge.common.ForgeHooks;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(value = EntityPlayer.class)
 public abstract class MixinEntityPlayer extends EntityLivingBase {
@@ -62,8 +65,8 @@ public abstract class MixinEntityPlayer extends EntityLivingBase {
      * @author strangerrrs
      * @reason mixin attack target entity with current item
      */
-    @Overwrite
-    public void attackTargetEntityWithCurrentItem(Entity p_attackTargetEntityWithCurrentItem_1_) {
+    @Inject(method = "attackTargetEntityWithCurrentItem", at = @At("HEAD"), cancellable = true)
+    public void attackTargetEntityWithCurrentItem(Entity p_attackTargetEntityWithCurrentItem_1_, CallbackInfo ci) {
         if (ForgeHooks.onPlayerAttackTarget(((EntityPlayer) (Object) this), p_attackTargetEntityWithCurrentItem_1_)) {
             if (p_attackTargetEntityWithCurrentItem_1_.canAttackWithItem() && !p_attackTargetEntityWithCurrentItem_1_.hitByEntity(this)) {
                 float f = (float) this.getEntityAttribute(SharedMonsterAttributes.attackDamage).getAttributeValue();
@@ -104,9 +107,6 @@ public abstract class MixinEntityPlayer extends EntityLivingBase {
                             if (ModuleManager.keepSprint != null && ModuleManager.keepSprint.isEnabled()) {
                                 KeepSprint.keepSprint(p_attackTargetEntityWithCurrentItem_1_);
                             }
-//                            else if (ModuleManager.hitSelect != null && ModuleManager.hitSelect.isEnabled()) {
-//                                HitSelect.hitSelect(p_attackTargetEntityWithCurrentItem_1_);
-//                            }
                             else {
                                 this.motionX *= 0.6D;
                                 this.motionZ *= 0.6D;
@@ -171,17 +171,18 @@ public abstract class MixinEntityPlayer extends EntityLivingBase {
             }
 
         }
+        ci.cancel();
     }
 
-    /**
-     * @author strangerrrs
-     * @reason mixin isBlocking
-     */
-    @Overwrite
-    public boolean isBlocking() {
-        if (ModuleManager.killAura != null && ModuleManager.killAura.isEnabled()) {
-            ModuleManager.killAura.block.get();
-        }
-        return this.isUsingItem() && this.itemInUse.getItem().getItemUseAction(this.itemInUse) == EnumAction.BLOCK;
-    }
+//    /**
+//     * @author strangerrrs
+//     * @reason mixin isBlocking
+//     */
+//    @Inject(method = "isBlocking", at = @At("HEAD"), cancellable = true)
+//    public void isBlocking(CallbackInfoReturnable<Boolean> cir) {
+//        if (ModuleManager.killAura != null && ModuleManager.killAura.isEnabled()) {
+//            ModuleManager.killAura.block.get();
+//        }
+//        cir.setReturnValue(this.isUsingItem() && this.itemInUse.getItem().getItemUseAction(this.itemInUse) == EnumAction.BLOCK);
+//    }
 }

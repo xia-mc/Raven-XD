@@ -12,6 +12,9 @@ import net.minecraft.util.*;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
 
@@ -28,8 +31,8 @@ public class MixinEntityRenderer {
      * <p>
      * I'm sorry I must overwrite this...
      */
-    @Overwrite
-    public void getMouseOver(float p_getMouseOver_1_) {
+    @Inject(method = "getMouseOver", at = @At("HEAD"), cancellable = true)
+    public void getMouseOver(float p_getMouseOver_1_, CallbackInfo ci) {
         Entity entity = this.mc.getRenderViewEntity();
         if (entity != null && this.mc.theWorld != null) {
             this.mc.mcProfiler.startSection("pick");
@@ -106,5 +109,6 @@ public class MixinEntityRenderer {
             this.mc.mcProfiler.endSection();
         }
 
+        ci.cancel();
     }
 }

@@ -1,5 +1,6 @@
 package keystrokesmod.module.impl.world;
 
+import keystrokesmod.event.SafeWalkEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.setting.impl.ButtonSetting;
@@ -84,6 +85,11 @@ public class SafeWalk extends Module {
         if (shift.isToggled() && guiOpenEvent.gui == null) {
             this.isSneaking = mc.thePlayer.isSneaking();
         }
+    }
+
+    @SubscribeEvent
+    public void onSafeWalk(@NotNull SafeWalkEvent event) {
+        event.setSafeWalk(true);
     }
 
     private void setSneakState(boolean down) {

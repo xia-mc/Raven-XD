@@ -112,6 +112,7 @@ public class Scaffold extends IAutoClicker {
     public boolean tower$noBlockPlace = false;
     private Float lastYaw = null, lastPitch = null;
     private boolean polar$waitingForExpand = false;
+    private boolean jumpScaffold$fast$cycle = false;
     public Scaffold() {
         super("Scaffold", category.world);
         this.registerSetting(clickMode = new ModeValue("Click mode", this)
@@ -128,7 +129,7 @@ public class Scaffold extends IAutoClicker {
         this.registerSetting(motion = new SliderSetting("Motion", 1.0, 0.5, 1.2, 0.01, () -> !moveFix.isToggled()));
         this.registerSetting(strafe = new SliderSetting("Strafe", 0, -45, 45, 5));
         this.registerSetting(sprint = new ModeSetting("Sprint", sprintModes, 0));
-        this.registerSetting(fast = new ButtonSetting("Fast", false, new ModeOnly(sprint, 3, 4, 5)));
+        this.registerSetting(fast = new ButtonSetting("Fast", false, new ModeOnly(sprint, 3, 4, 5, 11)));
         this.registerSetting(precision = new ModeSetting("Precision", precisionModes, 4));
         this.registerSetting(cancelSprint = new ButtonSetting("Cancel sprint", false, new ModeOnly(sprint, 0).reserve()));
         this.registerSetting(rayCast = new ButtonSetting("Ray cast", false));
@@ -423,12 +424,15 @@ public class Scaffold extends IAutoClicker {
                 if (Math.floor(mc.thePlayer.posY) == Math.floor(startPos) && sprint.getInput() == 5) {
                     placedUp = false;
                 }
-            } else if (fast.isToggled()) {
-                if (offGroundTicks == 5 && HypixelMotionDisabler.isDisabled()) {
-                    mc.thePlayer.motionY = MoveUtil.predictedMotion(mc.thePlayer.motionY, 2);
-                }
             }
         }
+        if (keepYPosition() && fast.isToggled()) {
+            if (offGroundTicks == 5 && HypixelMotionDisabler.isDisabled() && !isDiagonal()) {
+                mc.thePlayer.motionY = MoveUtil.predictedMotion(mc.thePlayer.motionY, jumpScaffold$fast$cycle ? 1 : 2);
+                jumpScaffold$fast$cycle = !jumpScaffold$fast$cycle;
+            }
+        }
+
         double original = startPos;
         if (sprint.getInput() == 3) {
             if (groundDistance() >= 2 && add == 0) {
@@ -1037,5 +1041,11 @@ public class Scaffold extends IAutoClicker {
     @Override
     public String getInfo() {
         return sprintModes[(int) sprint.getInput()];
+    }
+
+    @SubscribeEvent
+    public void onSafeWalk(@NotNull SafeWalkEvent event) {
+        if (safeWalk.isToggled())
+            event.setSafeWalk(true);
     }
 }
