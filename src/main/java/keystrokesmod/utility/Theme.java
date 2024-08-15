@@ -94,7 +94,7 @@ public enum Theme {
     @Contract("_ -> new")
     public static int @NotNull [] getGradients(int index) {
         Theme[] values = values();
-        if (index >= 0 && index < values.length && values[index] != null) {
+        if (index >= 0 && index < values.length && values[index] != null && !values[index].gradients.isEmpty()) {
             Color firstGradient = values[index].gradients.get(0);
             Color secondGradient = values[index].gradients.get(1);
             if (firstGradient != null && secondGradient != null) {
