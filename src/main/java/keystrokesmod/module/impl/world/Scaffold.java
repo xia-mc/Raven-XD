@@ -55,7 +55,7 @@ public class Scaffold extends IAutoClicker {
     private final ModeSetting sprint;
     private final ButtonSetting fast;
     private final ButtonSetting cancelSprint;
-    private final ButtonSetting rayCast;
+    private final ButtonSetting legit;
     private final ButtonSetting recycleRotation;
     private final ButtonSetting sneak;
     private final SliderSetting sneakEveryBlocks;
@@ -132,7 +132,7 @@ public class Scaffold extends IAutoClicker {
         this.registerSetting(fast = new ButtonSetting("Fast", false, new ModeOnly(sprint, 3, 4, 5, 11)));
         this.registerSetting(precision = new ModeSetting("Precision", precisionModes, 4));
         this.registerSetting(cancelSprint = new ButtonSetting("Cancel sprint", false, new ModeOnly(sprint, 0).reserve()));
-        this.registerSetting(rayCast = new ButtonSetting("Ray cast", false));
+        this.registerSetting(legit = new ButtonSetting("Legit", false));
         this.registerSetting(recycleRotation = new ButtonSetting("Recycle rotation", false));
         this.registerSetting(sneak = new ButtonSetting("Sneak", false));
         this.registerSetting(sneakEveryBlocks = new SliderSetting("Sneak every blocks", 0, 1, 10, 1, sneak::isToggled));
@@ -297,6 +297,10 @@ public class Scaffold extends IAutoClicker {
     @Override
     public boolean click() {
         place = true;
+        if (legit.isToggled()) {
+            Utils.sendClick(1, true);
+            Utils.sendClick(1, false);
+        }
         return true;
     }
 
@@ -875,14 +879,8 @@ public class Scaffold extends IAutoClicker {
             return;
         }
 
-        if (rayCast.isToggled()) {
-            MovingObjectPosition hitResult = RotationUtils.rayCast(4.5, placeYaw, placePitch);
-            if (hitResult != null && hitResult.getBlockPos().equals(block.getBlockPos())) {
-                block.sideHit = hitResult.sideHit;
-                block.hitVec = hitResult.hitVec;
-            } else {
-                return;
-            }
+        if (legit.isToggled()) {
+            return;
         }
 
         ScaffoldPlaceEvent event = new ScaffoldPlaceEvent(block, extra);

@@ -2,6 +2,7 @@ package keystrokesmod.module.impl.player;
 
 import keystrokesmod.Raven;
 import keystrokesmod.event.PreMotionEvent;
+import keystrokesmod.event.RenderContainerEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.setting.impl.ButtonSetting;
@@ -56,6 +57,12 @@ public class ChestStealer extends Module {
         Utils.correctValue(minStartDelay, maxStartDelay);
         Utils.correctValue(minStealDelay, maxStealDelay);
         Utils.correctValue(minCloseDelay, maxCloseDelay);
+    }
+
+    @SubscribeEvent
+    public void onRenderContainer(RenderContainerEvent event) {
+        if (silent.isToggled())
+            event.setCanceled(true);
     }
 
     @Override

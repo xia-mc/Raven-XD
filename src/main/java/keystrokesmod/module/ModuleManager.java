@@ -123,6 +123,7 @@ public class ModuleManager {
 //    public static AbilitiesBedWars abilitiesBedWars;
     public static ClientTheme clientTheme;
     public static ScaffoldHelper scaffoldHelper;
+    public static AutoChest autoChest;
 
     public void register() {
 
@@ -238,6 +239,7 @@ public class ModuleManager {
         this.addModule(fakePotion = new FakePotion());
         this.addModule(autoWeb = new AutoWeb());
         this.addModule(chestAura = new ChestAura());
+        this.addModule(autoChest = new AutoChest());
 
         // render
         this.addModule(ambience = new Ambience());
