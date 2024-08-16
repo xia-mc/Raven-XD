@@ -171,6 +171,7 @@ public class ModuleManager {
         this.addModule(blockOut = new BlockOut());
 //        this.addModule(abilitiesBedWars = new AbilitiesBedWars());
         this.addModule(scaffoldHelper = new ScaffoldHelper());
+        this.addModule(new Yeet());
 
         // minigames
         this.addModule(new AutoWho());
