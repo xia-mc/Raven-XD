@@ -60,6 +60,7 @@ public class Module {
         this.enabled = false;
         mc = Minecraft.getMinecraft();
         this.settings = new ArrayList<>();
+        Raven.moduleCounter++;
     }
 
     public static Module getModule(Class<? extends Module> a) {
@@ -207,7 +208,6 @@ public class Module {
                 this.settings.add(setting);
             }
         }
-        Raven.settingCounter++;
     }
 
     public void registerSetting(Setting @NotNull ... setting) {
@@ -218,8 +218,7 @@ public class Module {
 
     public void unregisterSetting(Setting setting) {
         synchronized (settings) {
-            if (this.settings.remove(setting))
-                Raven.settingCounter--;
+            this.settings.remove(setting);
         }
     }
 

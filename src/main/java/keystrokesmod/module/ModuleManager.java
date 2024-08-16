@@ -313,7 +313,6 @@ public class ModuleManager {
 
     public void addModule(Module m) {
         modules.add(m);
-        Raven.moduleCounter++;
     }
 
     public List<Module> getModules() {
