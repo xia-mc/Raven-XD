@@ -37,7 +37,7 @@ public class HypixelFireballLongJump extends SubMode<LongJump> {
     private final ButtonSetting autoDisable;
 
     private int lastSlot = -1;
-    private int normal$ticks = -1;
+    private int ticks = -1;
     private int sameY$ticks = -1;
     private int offGroundTicks = 0;
     private boolean setSpeed;
@@ -83,7 +83,7 @@ public class HypixelFireballLongJump extends SubMode<LongJump> {
                 return;
             }
             if (thrown) {
-                normal$ticks = 0;
+                ticks = 0;
                 sameY$ticks = 0;
                 setSpeed = true;
                 thrown = false;
@@ -148,23 +148,23 @@ public class HypixelFireballLongJump extends SubMode<LongJump> {
                         if (autoDisable.isToggled())
                             parent.disable();
                     }
-                } else if (normal$ticks > 1) {
+                } else if (ticks > 1) {
                     if (autoDisable.isToggled())
                         parent.disable();
                 }
 
                 if (setSpeed) {
                     this.setSpeed();
-                    normal$ticks++;
+                    ticks++;
                 }
 
                 if (setSpeed) {
-                    if (normal$ticks > 1) {
+                    if (ticks > 1) {
                         setSpeed = false;
-                        normal$ticks = 0;
+                        ticks = 0;
                         return;
                     }
-                    normal$ticks++;
+                    ticks++;
                     setSpeed();
                 }
                 break;
@@ -189,7 +189,7 @@ public class HypixelFireballLongJump extends SubMode<LongJump> {
         if (lastSlot != -1) {
             SlotHandler.setCurrentSlot(lastSlot);
         }
-        normal$ticks = sameY$ticks = lastSlot = -1;
+        ticks = sameY$ticks = lastSlot = -1;
         setSpeed = sentPlace = false;
         initTicks = 0;
     }

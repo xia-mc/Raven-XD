@@ -211,12 +211,12 @@ public class Scaffold extends IAutoClicker {
             case 0:
                 break;
             case 1:
-                yaw = getYaw() + (float) strafe.getInput();
+                yaw = getYaw() + (isDiagonal() ? 0 : (float) strafe.getInput());
                 pitch = 85;
                 break;
             case 2:
                 if (!forceStrict && MoveUtil.isMoving()) {
-                    yaw = getYaw() + (float) strafe.getInput();
+                    yaw = getYaw() + (isDiagonal() ? 0 : (float) strafe.getInput());
                     pitch = 85;
                     break;
                 }
@@ -236,7 +236,7 @@ public class Scaffold extends IAutoClicker {
                 }
                 break;
             case 5:
-                yaw = RotationUtils.normalize(getYaw()) + (float) strafe.getInput();
+                yaw = RotationUtils.normalize(getYaw()) + (isDiagonal() ? 0 : (float) strafe.getInput());
                 pitch = placePitch;
                 break;
             case 6:
