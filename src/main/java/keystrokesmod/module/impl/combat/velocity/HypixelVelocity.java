@@ -67,17 +67,24 @@ public class HypixelVelocity extends SubMode<Velocity> {
             motionZ *= horizontal.getInput() / 100;
         }
 
-        if (motionY != 0)
-            mc.thePlayer.motionY = motionY;
+        mc.thePlayer.motionY = choose(mc.thePlayer.motionY, motionY);
 
         if (damageBoost.isToggled() && HypixelMotionDisabler.isDisabled()) {
             mc.thePlayer.motionY = MoveUtil.predictedMotion(mc.thePlayer.motionY, 2);
         }
 
-        if (motionX != 0)
-            mc.thePlayer.motionX = motionX;
-        if (motionZ != 0)
-            mc.thePlayer.motionZ = motionZ;
+        mc.thePlayer.motionX = choose(mc.thePlayer.motionX, motionX);
+        mc.thePlayer.motionZ = choose(mc.thePlayer.motionZ, motionZ);
+    }
+
+    private double choose(double curMotion, double packetMotion) {
+        if (curMotion < 0 || packetMotion < 0)
+            return packetMotion;
+        if (packetMotion == 0)
+            return curMotion;
+        if (curMotion - packetMotion > 0)
+            return curMotion;
+        return packetMotion;
     }
 
     @Override
