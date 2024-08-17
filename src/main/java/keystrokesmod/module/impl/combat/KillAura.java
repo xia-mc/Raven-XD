@@ -17,7 +17,6 @@ import keystrokesmod.module.setting.utils.ModeOnly;
 import keystrokesmod.script.classes.Vec3;
 import keystrokesmod.utility.*;
 import keystrokesmod.utility.aim.AimSimulator;
-import keystrokesmod.utility.render.ColorUtils;
 import keystrokesmod.utility.render.RenderUtils;
 import lombok.Getter;
 import net.minecraft.client.settings.KeyBinding;
@@ -28,19 +27,16 @@ import net.minecraft.init.Blocks;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.client.*;
 import net.minecraft.network.play.server.S2FPacketSetSlot;
-import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraftforge.client.event.MouseEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.InputEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.input.Mouse;
 
-import java.awt.*;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -66,6 +62,7 @@ public class KillAura extends IAutoClicker {
     private final ButtonSetting lazy;
     private final SliderSetting lazyAccuracy;
     private final ButtonSetting constant;
+    private final ButtonSetting constantOnlyIfNotMoving;
     private final ButtonSetting noise;
     private final SliderSetting noiseHorizontal;
     private final SliderSetting noiseVertical;
@@ -143,6 +140,7 @@ public class KillAura extends IAutoClicker {
         this.registerSetting(lazy = new ButtonSetting("Lazy", false, doRotation));
         this.registerSetting(lazyAccuracy = new SliderSetting("Lazy accuracy", 0.95, 0.6, 1, 0.01, doRotation.extend(lazy::isToggled)));
         this.registerSetting(constant = new ButtonSetting("Constant", false, doRotation));
+        this.registerSetting(constantOnlyIfNotMoving = new ButtonSetting("Constant only if not moving", false, doRotation.extend(constant::isToggled)));
         this.registerSetting(noise = new ButtonSetting("Noise", false, doRotation));
         this.registerSetting(noiseHorizontal = new SliderSetting("Noise horizontal", 0.35, 0.01, 1, 0.01, doRotation.extend(noise::isToggled)));
         this.registerSetting(noiseVertical = new SliderSetting("Noise vertical", 0.5, 0.01, 1, 0.01, doRotation.extend(noise::isToggled)));
@@ -201,7 +199,7 @@ public class KillAura extends IAutoClicker {
                 noiseAimSpeed.getInput(), (long) noiseDelay.getInput());
         aimSimulator.setDelay(delayAim.isToggled(), (int) delayAimAmount.getInput());
 
-        if (constant.isToggled() && !noAimToEntity())
+        if (constant.isToggled() && !noAimToEntity() && !(constantOnlyIfNotMoving.isToggled() && (MoveUtil.isMoving() || MoveUtil.isMoving(target))))
             return rotations;
 
         Pair<Float, Float> result = aimSimulator.getRotation(target);
