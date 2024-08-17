@@ -200,7 +200,7 @@ public class Scaffold extends IAutoClicker {
         jump$bridged = 0;
 
         if (hover.isToggled() && mc.thePlayer.onGround)
-            mc.thePlayer.jump();
+            mc.thePlayer.motionY = MoveUtil.jumpMotion();
     }
 
     @SubscribeEvent
