@@ -57,6 +57,7 @@ public class Scaffold extends IAutoClicker {
     private final ButtonSetting cancelSprint;
     private final ButtonSetting legit;
     private final ButtonSetting recycleRotation;
+    private final ButtonSetting hover;
     private final ButtonSetting sneak;
     private final SliderSetting sneakEveryBlocks;
     private final ButtonSetting jump;
@@ -133,6 +134,7 @@ public class Scaffold extends IAutoClicker {
         this.registerSetting(precision = new ModeSetting("Precision", precisionModes, 4));
         this.registerSetting(cancelSprint = new ButtonSetting("Cancel sprint", false, new ModeOnly(sprint, 0).reserve()));
         this.registerSetting(legit = new ButtonSetting("Legit", false));
+        this.registerSetting(hover = new ButtonSetting("Hover", false));
         this.registerSetting(recycleRotation = new ButtonSetting("Recycle rotation", false));
         this.registerSetting(sneak = new ButtonSetting("Sneak", false));
         this.registerSetting(sneakEveryBlocks = new SliderSetting("Sneak every blocks", 0, 1, 10, 1, sneak::isToggled));
@@ -196,6 +198,9 @@ public class Scaffold extends IAutoClicker {
         startPos = mc.thePlayer.posY;
         sneak$bridged = 0;
         jump$bridged = 0;
+
+        if (hover.isToggled() && mc.thePlayer.onGround)
+            mc.thePlayer.jump();
     }
 
     @SubscribeEvent
