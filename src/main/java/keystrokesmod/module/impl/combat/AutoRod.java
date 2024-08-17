@@ -83,9 +83,10 @@ public class AutoRod extends IAutoClicker {
     @SubscribeEvent
     public void onPreUpdate(PreUpdateEvent event) {
         target = null;
-        if (KillAura.target != null && !ModuleManager.killAura.isAttack()) {
-            target = KillAura.target;
-        } else {
+        if (KillAura.target != null) {
+            if (!ModuleManager.killAura.isAttack())
+                target = KillAura.target;
+        } else if (!onlyWhileKillAura.isToggled()) {
             mc.theWorld.playerEntities.parallelStream()
                     .filter(p -> p != mc.thePlayer)
                     .filter(p -> !AntiBot.isBot(p))
@@ -103,6 +104,9 @@ public class AutoRod extends IAutoClicker {
             if (fromSlot == -1)
                 fromSlot = SlotHandler.getCurrentSlot();
             SlotHandler.setCurrentSlot(slot);
+        } else if (fromSlot != -1) {
+            SlotHandler.setCurrentSlot(fromSlot);
+            fromSlot = -1;
         }
     }
 
