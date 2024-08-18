@@ -3,16 +3,15 @@ package keystrokesmod.clickgui.components.impl;
 import keystrokesmod.Raven;
 import keystrokesmod.clickgui.components.IComponent;
 import keystrokesmod.module.Module;
+import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.client.Gui;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.Timer;
 import keystrokesmod.utility.font.IFont;
-import keystrokesmod.utility.render.RenderUtils;
+import keystrokesmod.utility.render.*;
 import keystrokesmod.utility.Utils;
 import keystrokesmod.utility.profile.Manager;
 import keystrokesmod.utility.profile.Profile;
-import keystrokesmod.utility.render.Animation;
-import keystrokesmod.utility.render.Easing;
 import lombok.Getter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
@@ -47,13 +46,20 @@ public class CategoryComponent {
     private final Animation openCloseAnimation;
     public int scale;
     private float big;
-    private final int translucentBackground = new Color(0, 0, 0, 110).getRGB();
-    private final int background = new Color(0, 0, 0, 255).getRGB();
-    private final int regularOutline = new Color(81, 99, 149).getRGB();
-    private final int regularOutline2 = new Color(97, 67, 133).getRGB();
-    private final int categoryNameColor = new Color(220, 220, 220).getRGB();
-    private final int categoryCloseColor = new Color(250, 95, 85).getRGB();
-    private final int categoryOpenColor = new Color(135, 238, 144).getRGB();
+
+    // old theme
+    private static final int translucentBackground = new Color(0, 0, 0, 110).getRGB();
+    private static final int background = new Color(0, 0, 0, 255).getRGB();
+    private static final int regularOutline = new Color(81, 99, 149).getRGB();
+    private static final int regularOutline2 = new Color(97, 67, 133).getRGB();
+    private static final int categoryNameColor = new Color(220, 220, 220).getRGB();
+    private static final int categoryCloseColor = new Color(250, 95, 85).getRGB();
+    private static final int categoryOpenColor = new Color(135, 238, 144).getRGB();
+
+    // new theme
+    private static final int TRANSLUCENT_NEW_BACKGROUND = new Color(210, 210, 210, 200).getRGB();
+    private static final int NEW_BACKGROUND = new Color(210, 210, 210, 255).getRGB();
+    private static final int NEW_CATEGORY_NAME_COLOR = new Color(100, 100, 100).getRGB();
 
     public CategoryComponent(Module.category category) {
         this.categoryName = category;
@@ -177,18 +183,27 @@ public class CategoryComponent {
 
         GL11.glPushMatrix();
         GL11.glEnable(GL11.GL_SCISSOR_TEST);
-        RenderUtils.scissor(0, this.y - 2, this.x + this.width + 4, extra - this.y + 4);
-        RenderUtils.drawRoundedGradientOutlinedRectangle(
-                this.x - 2, this.y, this.x + this.width + 2, extra, 9,
-                Gui.translucentBackground.isToggled() ? translucentBackground : background,
-                ((categoryOpened || hovering) && Gui.rainBowOutlines.isToggled()) ? RenderUtils.setAlpha(Utils.getChroma(2, 0), 0.5) : regularOutline,
-                ((categoryOpened || hovering) && Gui.rainBowOutlines.isToggled()) ? RenderUtils.setAlpha(Utils.getChroma(2, 700), 0.5) : regularOutline2
-        );
-        renderer.drawString(this.n4m ? this.pvp : this.categoryName.name(), (float) (this.x + 2), (float) (this.y + 4), categoryNameColor, false);
+        if (ModuleManager.clientTheme.clickGui.isToggled()) {
+            RenderUtils.scissor(0, this.y - 2, this.x + this.width + 4, extra - this.y + 4);
+            RenderUtils.drawRoundedRectangle(this.x - 2, this.y, this.x + this.width + 2, extra, 5,
+                    Gui.translucentBackground.isToggled() ? TRANSLUCENT_NEW_BACKGROUND : NEW_BACKGROUND);
+            renderer.drawString(this.n4m ? this.pvp : this.categoryName.name(), (float) (this.x + 2), (float) (this.y + 4), NEW_CATEGORY_NAME_COLOR, false);
+        } else {
+            RenderUtils.scissor(0, this.y - 2, this.x + this.width + 4, extra - this.y + 4);
+            RenderUtils.drawRoundedGradientOutlinedRectangle(
+                    this.x - 2, this.y, this.x + this.width + 2, extra, 9,
+                    Gui.translucentBackground.isToggled() ? translucentBackground : background,
+                    ((categoryOpened || hovering) && Gui.rainBowOutlines.isToggled()) ? RenderUtils.setAlpha(Utils.getChroma(2, 0), 0.5) : regularOutline,
+                    ((categoryOpened || hovering) && Gui.rainBowOutlines.isToggled()) ? RenderUtils.setAlpha(Utils.getChroma(2, 700), 0.5) : regularOutline2
+            );
+            renderer.drawString(this.n4m ? this.pvp : this.categoryName.name(), (float) (this.x + 2), (float) (this.y + 4), categoryNameColor, false);
+        }
 
         if (!this.n4m) {
             GL11.glPushMatrix();
-            renderer.drawString(this.categoryOpened ? "-" : "+", (float) (this.x + 80), (float) ((double) this.y + 4.5D), this.categoryOpened ? categoryCloseColor : categoryOpenColor, false);
+            if (!ModuleManager.clientTheme.clickGui.isToggled()) {
+                renderer.drawString(this.categoryOpened ? "-" : "+", (float) (this.x + 80), (float) ((double) this.y + 4.5D), this.categoryOpened ? categoryCloseColor : categoryOpenColor, false);
+            }
             GL11.glPopMatrix();
 
             if (this.categoryOpened && !this.modules.isEmpty()) {

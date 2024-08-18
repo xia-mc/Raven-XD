@@ -4,6 +4,7 @@ import keystrokesmod.Raven;
 import keystrokesmod.clickgui.components.Component;
 import keystrokesmod.clickgui.components.IComponent;
 import keystrokesmod.module.Module;
+import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.client.Gui;
 import keystrokesmod.module.setting.Setting;
 import keystrokesmod.utility.render.RenderUtils;
@@ -16,12 +17,13 @@ import java.awt.*;
 import java.util.ArrayList;
 
 public class ModuleComponent implements IComponent {
-    private final int c2 = (new Color(154, 2, 255)).getRGB();
-    private final int hoverColor = (new Color(0, 0, 0, 110)).getRGB();
-    private final int unsavedColor = new Color(114, 188, 250).getRGB();
-    private final int invalidColor = new Color(255, 80, 80).getRGB();
-    private final int enabledColor = new Color(24, 154, 255).getRGB();
-    private final int disabledColor = new Color(192, 192, 192).getRGB();
+    private static final int c2 = (new Color(154, 2, 255)).getRGB();
+    private static final int hoverColor = (new Color(0, 0, 0, 110)).getRGB();
+    private static final int UNSAVED_COLOR = new Color(114, 188, 250).getRGB();
+    private static final int INVALID_COLOR = new Color(255, 80, 80).getRGB();
+    private static final int ENABLED_COLOR = new Color(24, 154, 255).getRGB();
+    private static final int DISABLED_COLOR = new Color(192, 192, 192).getRGB();
+    public static final int NEW_ENABLED_COLOR = new Color(255, 255, 255, 0).getRGB();
     public Module mod;
     public CategoryComponent categoryComponent;
     public int o;
@@ -72,12 +74,7 @@ public class ModuleComponent implements IComponent {
     }
 
     public static void f() {
-        GL11.glEnable(3553);
-        GL11.glDisable(3042);
-        GL11.glEnable(2929);
-        GL11.glDisable(2848);
-        GL11.glHint(3154, 4352);
-        GL11.glHint(3155, 4352);
+        RenderUtils.disableGL2D();
         GL11.glEdgeFlag(true);
     }
 
@@ -106,18 +103,31 @@ public class ModuleComponent implements IComponent {
 
     public void render() {
         if (hovering) {
-            RenderUtils.drawRoundedRectangle(this.categoryComponent.getX(), this.categoryComponent.getY() + o, this.categoryComponent.getX() + this.categoryComponent.gw(), this.categoryComponent.getY() + 16 + this.o, 8, hoverColor);
+            if (ModuleManager.clientTheme.clickGui.isToggled()) {
+                RenderUtils.drawRect(this.categoryComponent.getX(), this.categoryComponent.getY() + o, this.categoryComponent.getX() + this.categoryComponent.gw(), this.categoryComponent.getY() + 16 + this.o, mod.isEnabled() ? Component.NEW_TOGGLE_HOVER_COLOR : Component.NEW_HOVER_COLOR);
+            } else {
+                RenderUtils.drawRoundedRectangle(this.categoryComponent.getX(), this.categoryComponent.getY() + o, this.categoryComponent.getX() + this.categoryComponent.gw(), this.categoryComponent.getY() + 16 + this.o, 8, hoverColor);
+            }
+        } else if (ModuleManager.clientTheme.clickGui.isToggled() && mod.isEnabled()) {
+            RenderUtils.drawRect(this.categoryComponent.getX(), this.categoryComponent.getY() + o, this.categoryComponent.getX() + this.categoryComponent.gw(), this.categoryComponent.getY() + 16 + this.o, Component.NEW_TOGGLE_DEFAULT_COLOR);
         }
         v((float) this.categoryComponent.getX(), (float) (this.categoryComponent.getY() + this.o), (float) (this.categoryComponent.getX() + this.categoryComponent.gw()), (float) (this.categoryComponent.getY() + 15 + this.o), this.mod.isEnabled() ? this.c2 : -12829381, this.mod.isEnabled() ? this.c2 : -12302777);
         GL11.glPushMatrix();
-        int button_rgb = this.mod.isEnabled() ? enabledColor : disabledColor;
+        int button_rgb = DISABLED_COLOR;
+        if (mod.isEnabled()) {
+            button_rgb = ModuleManager.clientTheme.clickGui.isToggled() ? NEW_ENABLED_COLOR : ENABLED_COLOR;
+        }
         if (this.mod.script != null && this.mod.script.error) {
-            button_rgb = invalidColor;
+            button_rgb = INVALID_COLOR;
         }
         if (this.mod.moduleCategory() == Module.category.profiles && !(this.mod instanceof Manager) && !((ProfileModule) this.mod).saved && Raven.currentProfile.getModule() == this.mod) {
-            button_rgb = unsavedColor;
+            button_rgb = UNSAVED_COLOR;
         }
-        getFont().drawStringWithShadow(this.mod.getPrettyName(), (float) (this.categoryComponent.getX() + (double) this.categoryComponent.gw() / 2 - getFont().width(this.mod.getPrettyName()) / 2), (float) (this.categoryComponent.getY() + this.o + 4), button_rgb);
+        if (ModuleManager.clientTheme.clickGui.isToggled()) {
+            getFont().drawString(this.mod.getPrettyName(), (float) (this.categoryComponent.getX() + (double) this.categoryComponent.gw() / 2 - getFont().width(this.mod.getPrettyName()) / 2), (float) (this.categoryComponent.getY() + this.o + 4), button_rgb);
+        } else {
+            getFont().drawStringWithShadow(this.mod.getPrettyName(), (float) (this.categoryComponent.getX() + (double) this.categoryComponent.gw() / 2 - getFont().width(this.mod.getPrettyName()) / 2), (float) (this.categoryComponent.getY() + this.o + 4), button_rgb);
+        }
         GL11.glPopMatrix();
         if (this.po && !this.settings.isEmpty()) {
             for (Component c : this.settings) {

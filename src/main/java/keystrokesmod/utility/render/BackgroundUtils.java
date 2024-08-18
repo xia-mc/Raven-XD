@@ -18,7 +18,6 @@ public class BackgroundUtils {
             huoCheX = -width;
 
         RenderUtils.drawImage(new ResourceLocation("keystrokesmod:textures/backgrounds/bg.png"), 0, 0, width, height);
-//        RenderUtils.drawBloomShadow(0, 0, width, height, 12, 6, BLOOM_COLOR, false);
         RenderUtils.drawImage(new ResourceLocation("keystrokesmod:textures/backgrounds/qi.png"), 0, 0, width, height);
         RenderUtils.drawImage(new ResourceLocation("keystrokesmod:textures/backgrounds/DianXian.png"), 0, 0, width, height);
         RenderUtils.drawImage(new ResourceLocation("keystrokesmod:textures/backgrounds/huoChe.png"), huoCheX, height / 3F, width * 2F, height / 3F);
