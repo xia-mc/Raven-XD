@@ -1,10 +1,8 @@
-import net.minecraftforge.gradle.user.IReobfuscator
-
 buildscript {
     repositories {
         maven {
             name = "forge"
-            url = "https://files.minecraftforge.net/maven"
+            url = "https://maven.minecraftforge.net"
         }
         maven {
             url 'https://repo.spongepowered.org/maven'
@@ -30,7 +28,7 @@ version = "2.1-dev"
 compileJava {
     sourceCompatibility = '1.8'
     targetCompatibility = '1.8'
-    options.encoding 'UTF-8'
+    options.encoding = 'UTF-8'
 }
 
 minecraft {
@@ -79,10 +77,21 @@ dependencies {
     implementation 'org.jetbrains:annotations:24.1.0'
     implementation files('libraries/json-20220924.jar')
     implementation files('libraries/discord-rpc.jar')
+//    implementation files('libraries/ViaAprilFools-3.0.2-SNAPSHOT.jar')
+//    implementation files('libraries/ViaBackwards-5.0.4-SNAPSHOT.jar')
+//    implementation files('libraries/ViaLegacy-3.0.3-SNAPSHOT.jar')
+//    implementation files('libraries/ViaLoader-3.0.3-SNAPSHOT.jar')
+//    implementation files('libraries/ViaRewind-4.0.3-SNAPSHOT.jar')
+//    implementation files('libraries/ViaVersion-5.0.4-SNAPSHOT.jar')
 
-//    // Ensure these dependencies are also embedded
-    embed files("libraries/discord-rpc.jar")
+    embed files('libraries/discord-rpc.jar')
     embed files('libraries/json-20220924.jar')
+//    embed files('libraries/ViaAprilFools-3.0.2-SNAPSHOT.jar')
+//    embed files('libraries/ViaBackwards-5.0.4-SNAPSHOT.jar')
+//    embed files('libraries/ViaLegacy-3.0.3-SNAPSHOT.jar')
+//    embed files('libraries/ViaLoader-3.0.3-SNAPSHOT.jar')
+//    embed files('libraries/ViaRewind-4.0.3-SNAPSHOT.jar')
+//    embed files('libraries/ViaVersion-5.0.4-SNAPSHOT.jar')
 }
 
 processResources {

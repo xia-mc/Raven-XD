@@ -3,39 +3,41 @@ package keystrokesmod.mixins.impl.client;
 import keystrokesmod.event.ClickEvent;
 import keystrokesmod.event.PreTickEvent;
 import keystrokesmod.event.RightClickEvent;
+import keystrokesmod.event.WorldChangeEvent;
 import keystrokesmod.module.ModuleManager;
-import keystrokesmod.module.impl.client.Notifications;
 import keystrokesmod.module.impl.combat.HitBox;
 import keystrokesmod.module.impl.combat.Reach;
 import keystrokesmod.module.impl.exploit.ExploitFixer;
 import keystrokesmod.module.impl.render.Animations;
 import keystrokesmod.module.impl.render.FreeLook;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.settings.GameSettings;
+import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraftforge.common.MinecraftForge;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import static keystrokesmod.Raven.mc;
+
 @Mixin(value = Minecraft.class, priority = 1001)
 public abstract class MixinMinecraft {
 
-    @Shadow public GameSettings gameSettings;
-
-    @Shadow public EntityPlayerSP thePlayer;
-
-    @Shadow protected abstract void clickMouse();
-
-    @Shadow public MovingObjectPosition objectMouseOver;
+    @Unique private @Nullable WorldClient raven_XD$lastWorld = null;
 
     @Inject(method = "runTick", at = @At("HEAD"))
     private void runTickPre(CallbackInfo ci) {
         MinecraftForge.EVENT_BUS.post(new PreTickEvent());
+
+        if (raven_XD$lastWorld != mc.theWorld) {
+            MinecraftForge.EVENT_BUS.post(new WorldChangeEvent());
+        }
+
+        this.raven_XD$lastWorld = mc.theWorld;
     }
 
     @Inject(method = "runTick", at = @At(value = "INVOKE",
@@ -44,9 +46,9 @@ public abstract class MixinMinecraft {
     ))
     private void onRunTick$usingWhileDigging(CallbackInfo ci) {
         if (ModuleManager.animations != null && ModuleManager.animations.isEnabled() && Animations.swingWhileDigging.isToggled()
-                && this.gameSettings.keyBindAttack.isKeyDown()) {
-            if (this.objectMouseOver != null && this.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
-                this.thePlayer.swingItem();
+                && mc.gameSettings.keyBindAttack.isKeyDown()) {
+            if (mc.objectMouseOver != null && mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
+                mc.thePlayer.swingItem();
             }
         }
     }

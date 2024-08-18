@@ -8,58 +8,27 @@ import net.minecraft.entity.*;
 import net.minecraft.entity.boss.EntityDragonPart;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.server.S12PacketEntityVelocity;
 import net.minecraft.potion.Potion;
 import net.minecraft.stats.AchievementList;
-import net.minecraft.stats.StatBase;
 import net.minecraft.stats.StatList;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import static keystrokesmod.Raven.mc;
 
 @Mixin(value = EntityPlayer.class)
 public abstract class MixinEntityPlayer extends EntityLivingBase {
     public MixinEntityPlayer(World p_i1594_1_) {
         super(p_i1594_1_);
     }
-
-    @Shadow
-    public abstract ItemStack getHeldItem();
-
-    @Shadow
-    public abstract void onCriticalHit(Entity p_onCriticalHit_1_);
-
-    @Shadow
-    public abstract void onEnchantmentCritical(Entity p_onEnchantmentCritical_1_);
-
-    @Shadow
-    public abstract void triggerAchievement(StatBase p_triggerAchievement_1_);
-
-    @Shadow
-    public abstract ItemStack getCurrentEquippedItem();
-
-    @Shadow
-    public abstract void destroyCurrentEquippedItem();
-
-    @Shadow
-    public abstract void addStat(StatBase p_addStat_1_, int p_addStat_2_);
-
-    @Shadow
-    public abstract void addExhaustion(float p_addExhaustion_1_);
-    @Shadow
-    private ItemStack itemInUse;
-    @Shadow
-    public abstract boolean isUsingItem();
 
     /**
      * @author strangerrrs
@@ -123,15 +92,15 @@ public abstract class MixinEntityPlayer extends EntityLivingBase {
                         }
 
                         for (int criticals = 0; criticals < Particles.getCriticalsMultiplier(flag); criticals++) {
-                            this.onCriticalHit(p_attackTargetEntityWithCurrentItem_1_);
+                            mc.thePlayer.onCriticalHit(p_attackTargetEntityWithCurrentItem_1_);
                         }
 
                         for (int sharpness = 0; sharpness < Particles.getSharpnessMultiplier(f1 > 0.0F); sharpness++) {
-                            this.onEnchantmentCritical(p_attackTargetEntityWithCurrentItem_1_);
+                            mc.thePlayer.onEnchantmentCritical(p_attackTargetEntityWithCurrentItem_1_);
                         }
 
                         if (f >= 18.0F) {
-                            this.triggerAchievement(AchievementList.overkill);
+                            mc.thePlayer.triggerAchievement(AchievementList.overkill);
                         }
 
                         this.setLastAttacker(p_attackTargetEntityWithCurrentItem_1_);
@@ -140,7 +109,7 @@ public abstract class MixinEntityPlayer extends EntityLivingBase {
                         }
 
                         EnchantmentHelper.applyArthropodEnchantments(this, p_attackTargetEntityWithCurrentItem_1_);
-                        ItemStack itemstack = this.getCurrentEquippedItem();
+                        ItemStack itemstack = mc.thePlayer.getCurrentEquippedItem();
                         Entity entity = p_attackTargetEntityWithCurrentItem_1_;
                         if (p_attackTargetEntityWithCurrentItem_1_ instanceof EntityDragonPart) {
                             IEntityMultiPart ientitymultipart = ((EntityDragonPart) p_attackTargetEntityWithCurrentItem_1_).entityDragonObj;
@@ -152,18 +121,18 @@ public abstract class MixinEntityPlayer extends EntityLivingBase {
                         if (itemstack != null && entity instanceof EntityLivingBase) {
                             itemstack.hitEntity((EntityLivingBase) entity, ((EntityPlayer) (Object) this));
                             if (itemstack.stackSize <= 0) {
-                                this.destroyCurrentEquippedItem();
+                                mc.thePlayer.destroyCurrentEquippedItem();
                             }
                         }
 
                         if (p_attackTargetEntityWithCurrentItem_1_ instanceof EntityLivingBase) {
-                            this.addStat(StatList.damageDealtStat, Math.round(f * 10.0F));
+                            mc.thePlayer.addStat(StatList.damageDealtStat, Math.round(f * 10.0F));
                             if (j > 0) {
                                 p_attackTargetEntityWithCurrentItem_1_.setFire(j * 4);
                             }
                         }
 
-                        this.addExhaustion(0.3F);
+                        mc.thePlayer.addExhaustion(0.3F);
                     } else if (flag1) {
                         p_attackTargetEntityWithCurrentItem_1_.extinguish();
                     }
@@ -174,15 +143,4 @@ public abstract class MixinEntityPlayer extends EntityLivingBase {
         ci.cancel();
     }
 
-//    /**
-//     * @author strangerrrs
-//     * @reason mixin isBlocking
-//     */
-//    @Inject(method = "isBlocking", at = @At("HEAD"), cancellable = true)
-//    public void isBlocking(CallbackInfoReturnable<Boolean> cir) {
-//        if (ModuleManager.killAura != null && ModuleManager.killAura.isEnabled()) {
-//            ModuleManager.killAura.block.get();
-//        }
-//        cir.setReturnValue(this.isUsingItem() && this.itemInUse.getItem().getItemUseAction(this.itemInUse) == EnumAction.BLOCK);
-//    }
 }

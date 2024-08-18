@@ -144,7 +144,7 @@ public abstract class MixinItemRenderer {
      * @reason fix crash issue with LabyMod.
      */
     @Overwrite
-    public void func_178105_d(float p_178105_1_) {
+    private void func_178105_d(float p_178105_1_) {
         float f = -0.4F * MathHelper.sin(MathHelper.sqrt_float(p_178105_1_) * 3.1415927F);
         float f1 = 0.2F * MathHelper.sin(MathHelper.sqrt_float(p_178105_1_) * 3.1415927F * 2.0F);
         float f2 = -0.2F * MathHelper.sin(p_178105_1_ * 3.1415927F);

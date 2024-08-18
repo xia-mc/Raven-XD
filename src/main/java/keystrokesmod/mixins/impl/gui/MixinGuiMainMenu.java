@@ -35,8 +35,6 @@ public abstract class MixinGuiMainMenu extends GuiScreen {
 
     @Shadow private GuiScreen field_183503_M;
 
-    @Shadow private String splashText;
-
     @Inject(method = "drawScreen", at = @At("HEAD"), cancellable = true)
     public void onDrawScreen(int p_drawScreen_1_, int p_drawScreen_2_, float p_drawScreen_3_, CallbackInfo ci) {
         if (!ModuleManager.clientTheme.isEnabled() || !ModuleManager.clientTheme.mainMenu.isToggled())
@@ -73,18 +71,6 @@ public abstract class MixinGuiMainMenu extends GuiScreen {
     public void onInitGui(CallbackInfo ci) {
         if (!ModuleManager.clientTheme.isEnabled() || !ModuleManager.clientTheme.mainMenu.isToggled())
             return;
-
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(new Date());
-        final int month = calendar.get(Calendar.MONTH) + 1;
-        final int day = calendar.get(Calendar.DATE);
-        if (month == 12 && day == 24) {
-            this.splashText = "Merry X-mas!";
-        } else if (month == 1 && day == 1) {
-            this.splashText = "Happy new year!";
-        } else if (month == 6 && day == 5) {
-            this.splashText = "RavenXD was born today!";
-        }
 
         int j = this.height / 4 + 48;
         this.buttonList.add(new GuiButton(1, this.width / 2 - 103, j, 200, 18, "SinglePlayer"));

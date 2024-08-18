@@ -21,7 +21,6 @@ import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.MinecraftForge;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -30,6 +29,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Map;
+
+import static keystrokesmod.Raven.mc;
 
 @Mixin(EntityLivingBase.class)
 public abstract class MixinEntityLivingBase extends Entity {
@@ -40,24 +41,15 @@ public abstract class MixinEntityLivingBase extends Entity {
     @Unique
     private final Map<Integer, PotionEffect> raven_bS$activePotionsMap = Maps.newHashMap();
 
-    @Shadow
-    public PotionEffect getActivePotionEffect(@NotNull Potion potionIn) {
+    @Unique
+    public PotionEffect raven_XD$getActivePotionEffect(@NotNull Potion potionIn) {
         return this.raven_bS$activePotionsMap.get(potionIn.id);
     }
 
-    @Shadow
-    public boolean isPotionActive(@NotNull Potion potionIn) {
+    @Unique
+    public boolean raven_XD$isPotionActive(@NotNull Potion potionIn) {
         return this.raven_bS$activePotionsMap.containsKey(potionIn.id);
     }
-
-    @Shadow
-    public float rotationYawHead;
-
-    @Shadow
-    public float renderYawOffset;
-
-    @Shadow
-    public float swingProgress;
 
     @Redirect(method = "moveEntityWithHeading", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/EntityLivingBase;moveEntity(DDD)V"))
     public void onMoveEntity(EntityLivingBase instance, double x, double y, double z) {
@@ -84,15 +76,15 @@ public abstract class MixinEntityLivingBase extends Entity {
     protected void func_110146_f(float p_1101461, float p_1101462, CallbackInfoReturnable<Float> cir) {
         float rotationYaw = this.rotationYaw;
         if (RotationHandler.fullBody != null && RotationHandler.rotateBody != null && !RotationHandler.fullBody.isToggled() && RotationHandler.rotateBody.isToggled() && (EntityLivingBase) (Object) this instanceof EntityPlayerSP) {
-            if (this.swingProgress > 0F) {
+            if (mc.thePlayer.swingProgress > 0F) {
                 p_1101461 = RotationUtils.renderYaw;
             }
             rotationYaw = RotationUtils.renderYaw;
-            rotationYawHead = RotationUtils.renderYaw;
+            mc.thePlayer.rotationYawHead = RotationUtils.renderYaw;
         }
-        float f = MathHelper.wrapAngleTo180_float(p_1101461 - this.renderYawOffset);
-        this.renderYawOffset += f * 0.3F;
-        float f1 = MathHelper.wrapAngleTo180_float(rotationYaw - this.renderYawOffset);
+        float f = MathHelper.wrapAngleTo180_float(p_1101461 - ((EntityLivingBase)(Object)this).renderYawOffset);
+        ((EntityLivingBase)(Object)this).renderYawOffset += f * 0.3F;
+        float f1 = MathHelper.wrapAngleTo180_float(rotationYaw - ((EntityLivingBase)(Object)this).renderYawOffset);
         boolean flag = f1 < 90.0F || f1 >= 90.0F;
 
         if (f1 < -75.0F) {
@@ -103,10 +95,10 @@ public abstract class MixinEntityLivingBase extends Entity {
             f1 = 75.0F;
         }
 
-        this.renderYawOffset = rotationYaw - f1;
+        ((EntityLivingBase)(Object)this).renderYawOffset = rotationYaw - f1;
 
         if (f1 * f1 > 2500.0F) {
-            this.renderYawOffset += f1 * 0.2F;
+            ((EntityLivingBase)(Object)this).renderYawOffset += f1 * 0.2F;
         }
 
         if (flag) {
@@ -116,8 +108,8 @@ public abstract class MixinEntityLivingBase extends Entity {
         cir.setReturnValue(p_1101462);
     }
 
-    @Shadow
-    protected float getJumpUpwardsMotion() {
+    @Unique
+    protected float raven_XD$getJumpUpwardsMotion() {
         return 0.42F;
     }
 
@@ -127,7 +119,7 @@ public abstract class MixinEntityLivingBase extends Entity {
      */
     @Inject(method = "jump", at = @At("HEAD"), cancellable = true)
     protected void jump(CallbackInfo ci) {
-        JumpEvent jumpEvent = new JumpEvent(this.getJumpUpwardsMotion(), RotationHandler.getMovementYaw(this));
+        JumpEvent jumpEvent = new JumpEvent(this.raven_XD$getJumpUpwardsMotion(), RotationHandler.getMovementYaw(this));
         MinecraftForge.EVENT_BUS.post(jumpEvent);
         if (jumpEvent.isCanceled()) {
             return;
@@ -135,8 +127,8 @@ public abstract class MixinEntityLivingBase extends Entity {
 
         this.motionY = jumpEvent.getMotionY();
 
-        if (this.isPotionActive(Potion.jump)) {
-            this.motionY += (float) (this.getActivePotionEffect(Potion.jump).getAmplifier() + 1) * 0.1F;
+        if (this.raven_XD$isPotionActive(Potion.jump)) {
+            this.motionY += (float) (this.raven_XD$getActivePotionEffect(Potion.jump).getAmplifier() + 1) * 0.1F;
         }
 
         if (this.isSprinting()) {

@@ -1,50 +1,21 @@
 package keystrokesmod.mixins.impl.entity;
 
-import keystrokesmod.event.MoveEvent;
 import keystrokesmod.event.PrePlayerInputEvent;
 import keystrokesmod.event.SafeWalkEvent;
-import keystrokesmod.event.StepEvent;
-import keystrokesmod.module.ModuleManager;
-import keystrokesmod.utility.rise.RiseSecret;
 import keystrokesmod.module.impl.other.RotationHandler;
-import keystrokesmod.module.impl.world.SafeWalk;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockFence;
-import net.minecraft.block.BlockFenceGate;
-import net.minecraft.block.BlockWall;
-import net.minecraft.block.material.Material;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.crash.CrashReport;
-import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.util.*;
-import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.List;
-import java.util.Random;
-
 @Mixin(Entity.class)
 public abstract class MixinEntity {
-
-    @Shadow
-    public float rotationYaw;
-
-    @Shadow public double motionX;
-
-    @Shadow public double motionZ;
 
     @Redirect(method = "moveEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;isSneaking()Z"))
     public boolean onSafeWalk(@NotNull Entity instance) {
@@ -59,7 +30,7 @@ public abstract class MixinEntity {
      */
     @Inject(method = "moveFlying", at = @At("HEAD"), cancellable = true)
     public void moveFlying(float p_moveFlying_1_, float p_moveFlying_2_, float p_moveFlying_3_, CallbackInfo ci) {
-        float yaw = this.rotationYaw;
+        float yaw = ((Entity)(Object) this).rotationYaw;
         if((Object) this instanceof EntityPlayerSP) {
             PrePlayerInputEvent prePlayerInput = new PrePlayerInputEvent(p_moveFlying_1_, p_moveFlying_2_, p_moveFlying_3_, RotationHandler.getMovementYaw((Entity) (Object) this));
             net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(prePlayerInput);
@@ -84,8 +55,8 @@ public abstract class MixinEntity {
             p_moveFlying_2_ *= f;
             float f1 = MathHelper.sin(yaw * 3.1415927F / 180.0F);
             float f2 = MathHelper.cos(yaw * 3.1415927F / 180.0F);
-            this.motionX += p_moveFlying_1_ * f2 - p_moveFlying_2_ * f1;
-            this.motionZ += p_moveFlying_2_ * f2 + p_moveFlying_1_ * f1;
+            ((Entity)(Object) this).motionX += p_moveFlying_1_ * f2 - p_moveFlying_2_ * f1;
+            ((Entity)(Object) this).motionZ += p_moveFlying_2_ * f2 + p_moveFlying_1_ * f1;
         }
         ci.cancel();
     }
