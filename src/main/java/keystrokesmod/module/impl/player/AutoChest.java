@@ -61,7 +61,7 @@ public class AutoChest extends Module {
         ItemStack[] inventory = mc.thePlayer.inventory.mainInventory;
         for (int i = 0; i < inventory.length; i++) {
             ItemStack stack = inventory[i];
-            if (ITEMS.contains(stack.getItem())) {
+            if (stack != null && ITEMS.contains(stack.getItem())) {
                 ContainerUtils.click(i + (int) debug.getInput());
                 clickDelay = Utils.randomizeInt(minDelay.getInput() / 50, maxDelay.getInput() / 50);
                 onPreMotion(event);
