@@ -1,0 +1,130 @@
+{
+  "modules": {
+    "AimAssist": {
+      "name": "Zielhilfe",
+      "toolTip": "Zielt sanft auf das nächstgelegene Ziel"
+    },
+    "ArmedAura": {
+      "name": "Waffenaura",
+      "toolTip": "Zielen und schießen Sie automatisch wie in einem CS2-Cheat"
+    },
+    "AutoClicker": {
+      "name": "Autoklicker"
+    },
+    "BlockHit": {
+      "name": "Blocktreffer",
+      "toolTip": "Automatisches Blocken"
+    },
+    "Criticals": {
+      "name": "Kritische Treffer",
+      "toolTip": "Verursacht kritische Treffer, welche mehr Schaden verursachen"
+    },
+    "HitBox": {
+      "name": "Trefferbox"
+    },
+    "HitSelect": {
+      "name": "Schlagselektierung",
+      "toolTip": "Wählt den besten Zeitpunkt für Schlag",
+      "settings": {
+        "Mode": {
+          "settingName": "Paradigma",
+          "toolTip": "Pause: Hält das Klicken rechtmäßig an\nAktiv: bricht Angriffe ab, erlaubt aber Klicks",
+          "options": ["Pause ", "Aktiv"]
+        }
+      }
+    },
+    "KillAura": {
+      "name": "Aura Des Tötens"
+    },
+    "Reach": {
+      "name": "Reichweite"
+    },
+    "Velocity": {
+      "name": "Rückstoß"
+    },
+    "AirStuck": {
+      "name": "Feststecken"
+    },
+    "Fly": {
+      "name": "Fliegen"
+    },
+    "InvMove": {
+      "name": "Inventar Bewegen"
+    },
+    "Jesus": {
+      "name": "Jesus"
+    },
+    "KeepSprint": {
+      "name": "Weiter Sprinten"
+    },
+    "Phase": {
+      "name": "Wände Durchdringen"
+    },
+    "Speed": {
+      "name": "Geschwindigkeit"
+    },
+    "Sprint": {
+      "name": "Sprinten"
+    },
+    "WallClimb": {
+      "name": "Wandklettern"
+    },
+    "Anticheat": {
+      "name": "Betrugsbekämpfung"
+    },
+    "AntiVoid": {
+      "name": "Herunterfallschutz"
+    },
+    "AutoHeal": {
+      "name": "Automatisches Heilen"
+    },
+    "Backtrack": {
+      "name": "Alte Spielerpositionen"
+    },
+    "ChestStealer": {
+      "name": "Truhenräuber"
+    },
+    "FakeLag": {
+      "name": "Gefälschtes Zurückhängen"
+    },
+    "InvManager": {
+      "name": "Automatische Inventarsortierung"
+    },
+    "NoFall": {
+      "name": "Kein Fallschaden"
+    },
+    "AntiBot": {
+      "name": "Robotter Ignorieren"
+    },
+    "AutoTool": {
+      "name": "Automatische Werkzeuge"
+    },
+    "BedAura": {
+      "name": "Bettenzerstörer"
+    },
+    "FastPlace": {
+      "name": "Schnelles Plazieren"
+    },
+    "Legit Scaffold": {
+      "name": "Legitime Gerüste"
+    },
+    "SafeWalk": {
+      "name": "Sicheres Laufen"
+    },
+    "Scaffold": {
+      "name": "Gerüst"
+    },
+    "NoSlow": {
+      "name": "Nicht Verlangsamen"
+    }
+  },
+  "replace": {
+    "Fail to check latest version.": "Prüfung auf die neueste Version fehlgeschlagen.",
+    "You are not at latest version.": "Ihre Version ist nicht die neueste.",
+    "Run command 'update' to download latest version.": "Führen Sie den Befehl „update“ aus, um die neueste Version herunterzuladen.",
+    "Fetching download link...": "Download-Link abrufen...",
+    "Downloading...": "Herunterladen...",
+    "Download success! Restart client to finish update.": "Der Download war erfolgreich! Starten Sie den Client neu, um die Aktualisierung abzuschließen.",
+    "Fail to download latest version.": "Der Download der neuesten Version ist fehlgeschlagen."
+  }
+}
