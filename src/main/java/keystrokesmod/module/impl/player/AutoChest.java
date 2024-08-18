@@ -28,7 +28,7 @@ public class AutoChest extends Module {
     private int clickDelay = 0;
 
     public AutoChest() {
-        super("AutoChest", category.render, "Auto put resources into chest. (Hypixel)");
+        super("AutoChest", category.experimental, "Auto put resources into chest. (Hypixel)");
         this.registerSetting(minDelay = new SliderSetting("Min delay", 50, 0, 500, 10));
         this.registerSetting(maxDelay = new SliderSetting("Max delay", 50, 0, 500, 10));
         this.registerSetting(silent = new ButtonSetting("Silent", false));
