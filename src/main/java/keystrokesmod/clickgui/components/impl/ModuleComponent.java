@@ -24,6 +24,7 @@ public class ModuleComponent implements IComponent {
     private static final int ENABLED_COLOR = new Color(24, 154, 255).getRGB();
     private static final int DISABLED_COLOR = new Color(192, 192, 192).getRGB();
     public static final int NEW_ENABLED_COLOR = new Color(255, 255, 255, 0).getRGB();
+    public static final int NEW_DISABLED_COLOR = new Color(255, 255, 255).getRGB();
     public Module mod;
     public CategoryComponent categoryComponent;
     public int o;
@@ -103,19 +104,18 @@ public class ModuleComponent implements IComponent {
 
     public void render() {
         if (hovering) {
-            if (ModuleManager.clientTheme.clickGui.isToggled()) {
-                RenderUtils.drawRect(this.categoryComponent.getX(), this.categoryComponent.getY() + o, this.categoryComponent.getX() + this.categoryComponent.gw(), this.categoryComponent.getY() + 16 + this.o, mod.isEnabled() ? Component.NEW_TOGGLE_HOVER_COLOR : Component.NEW_HOVER_COLOR);
+            if (ModuleManager.clientTheme.test.isToggled()) {
+                RenderUtils.drawRoundedRectangle(this.categoryComponent.getX(), this.categoryComponent.getY() + o, this.categoryComponent.getX() + this.categoryComponent.gw(), this.categoryComponent.getY() + 16 + this.o, 5, mod.isEnabled() ? Component.NEW_TOGGLE_HOVER_COLOR : Component.NEW_HOVER_COLOR);
             } else {
                 RenderUtils.drawRoundedRectangle(this.categoryComponent.getX(), this.categoryComponent.getY() + o, this.categoryComponent.getX() + this.categoryComponent.gw(), this.categoryComponent.getY() + 16 + this.o, 8, hoverColor);
             }
-        } else if (ModuleManager.clientTheme.clickGui.isToggled() && mod.isEnabled()) {
-            RenderUtils.drawRect(this.categoryComponent.getX(), this.categoryComponent.getY() + o, this.categoryComponent.getX() + this.categoryComponent.gw(), this.categoryComponent.getY() + 16 + this.o, Component.NEW_TOGGLE_DEFAULT_COLOR);
+        } else if (ModuleManager.clientTheme.test.isToggled() && mod.isEnabled()) {
+            RenderUtils.drawRoundedRectangle(this.categoryComponent.getX(), this.categoryComponent.getY() + o, this.categoryComponent.getX() + this.categoryComponent.gw(), this.categoryComponent.getY() + 16 + this.o, 5, Component.NEW_TOGGLE_DEFAULT_COLOR);
         }
         v((float) this.categoryComponent.getX(), (float) (this.categoryComponent.getY() + this.o), (float) (this.categoryComponent.getX() + this.categoryComponent.gw()), (float) (this.categoryComponent.getY() + 15 + this.o), this.mod.isEnabled() ? this.c2 : -12829381, this.mod.isEnabled() ? this.c2 : -12302777);
-        GL11.glPushMatrix();
-        int button_rgb = DISABLED_COLOR;
+        int button_rgb = ModuleManager.clientTheme.test.isToggled() ? NEW_DISABLED_COLOR : DISABLED_COLOR;
         if (mod.isEnabled()) {
-            button_rgb = ModuleManager.clientTheme.clickGui.isToggled() ? NEW_ENABLED_COLOR : ENABLED_COLOR;
+            button_rgb = ModuleManager.clientTheme.test.isToggled() ? NEW_ENABLED_COLOR : ENABLED_COLOR;
         }
         if (this.mod.script != null && this.mod.script.error) {
             button_rgb = INVALID_COLOR;
@@ -123,7 +123,8 @@ public class ModuleComponent implements IComponent {
         if (this.mod.moduleCategory() == Module.category.profiles && !(this.mod instanceof Manager) && !((ProfileModule) this.mod).saved && Raven.currentProfile.getModule() == this.mod) {
             button_rgb = UNSAVED_COLOR;
         }
-        if (ModuleManager.clientTheme.clickGui.isToggled()) {
+        GL11.glPushMatrix();
+        if (ModuleManager.clientTheme.test.isToggled()) {
             getFont().drawString(this.mod.getPrettyName(), (float) (this.categoryComponent.getX() + (double) this.categoryComponent.gw() / 2 - getFont().width(this.mod.getPrettyName()) / 2), (float) (this.categoryComponent.getY() + this.o + 4), button_rgb);
         } else {
             getFont().drawStringWithShadow(this.mod.getPrettyName(), (float) (this.categoryComponent.getX() + (double) this.categoryComponent.gw() / 2 - getFont().width(this.mod.getPrettyName()) / 2), (float) (this.categoryComponent.getY() + this.o + 4), button_rgb);

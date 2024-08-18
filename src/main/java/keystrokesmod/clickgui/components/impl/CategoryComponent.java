@@ -183,7 +183,7 @@ public class CategoryComponent {
 
         GL11.glPushMatrix();
         GL11.glEnable(GL11.GL_SCISSOR_TEST);
-        if (ModuleManager.clientTheme.clickGui.isToggled()) {
+        if (ModuleManager.clientTheme.test.isToggled()) {
             RenderUtils.scissor(0, this.y - 2, this.x + this.width + 4, extra - this.y + 4);
             RenderUtils.drawRoundedRectangle(this.x - 2, this.y, this.x + this.width + 2, extra, 5,
                     Gui.translucentBackground.isToggled() ? TRANSLUCENT_NEW_BACKGROUND : NEW_BACKGROUND);
@@ -201,7 +201,7 @@ public class CategoryComponent {
 
         if (!this.n4m) {
             GL11.glPushMatrix();
-            if (!ModuleManager.clientTheme.clickGui.isToggled()) {
+            if (!ModuleManager.clientTheme.test.isToggled()) {
                 renderer.drawString(this.categoryOpened ? "-" : "+", (float) (this.x + 80), (float) ((double) this.y + 4.5D), this.categoryOpened ? categoryCloseColor : categoryOpenColor, false);
             }
             GL11.glPopMatrix();

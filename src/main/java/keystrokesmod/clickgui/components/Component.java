@@ -37,7 +37,7 @@ public abstract class Component implements IComponent {
 
     public final void drawScreen(int x, int y) {
         boolean hover = isHover(x, y);
-        if (ModuleManager.clientTheme.clickGui.isToggled()) {
+        if (ModuleManager.clientTheme.test.isToggled()) {
             color = hover ? NEW_HOVER_COLOR : NEW_DEFAULT_COLOR;
             toggleColor = hover ? NEW_TOGGLE_HOVER_COLOR : NEW_TOGGLE_DEFAULT_COLOR;
         } else {
