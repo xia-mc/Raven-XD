@@ -1,5 +1,6 @@
 package keystrokesmod.module.impl.world;
 
+import keystrokesmod.event.PreUpdateEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.other.SlotHandler;
@@ -63,7 +64,8 @@ public class AutoPlace extends Module {
         this.resetVariables();
     }
 
-    public void onUpdate() {
+    @SubscribeEvent
+    public void onPreUpdate(PreUpdateEvent event) {
         if (mc.currentScreen != null || mc.thePlayer.capabilities.isFlying) {
             return;
         }
