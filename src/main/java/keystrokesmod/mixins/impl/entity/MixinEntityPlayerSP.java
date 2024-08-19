@@ -7,7 +7,6 @@ import keystrokesmod.module.impl.movement.NoSlow;
 import keystrokesmod.module.impl.movement.Sprint;
 import keystrokesmod.module.impl.movement.fly.SpoofFly;
 import keystrokesmod.module.impl.other.RotationHandler;
-import keystrokesmod.module.impl.world.Scaffold;
 import keystrokesmod.utility.RotationUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
@@ -16,6 +15,7 @@ import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.network.play.client.C0BPacketEntityAction;
+import net.minecraft.network.play.client.C0CPacketInput;
 import net.minecraft.potion.Potion;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.MovementInput;
@@ -25,14 +25,20 @@ import net.minecraftforge.common.MinecraftForge;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(value = EntityPlayerSP.class, priority = 999)
 public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
+    @Shadow
+    public int sprintingTicksLeft;
+
     public MixinEntityPlayerSP(World p_i45074_1_, GameProfile p_i45074_2_) {
         super(p_i45074_1_, p_i45074_2_);
     }
+
+    @Override
+    @Shadow
+    public abstract void setSprinting(boolean p_setSprinting_1_);
 
     @Shadow
     protected int sprintToggleTimer;
@@ -45,22 +51,33 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
     @Shadow
     public MovementInput movementInput;
 
+    @Override
+    @Shadow
+    public abstract void sendPlayerAbilities();
+
+    @Shadow
+    protected abstract boolean isCurrentViewEntity();
+
+    @Shadow
+    public abstract boolean isRidingHorse();
+
     @Shadow
     private int horseJumpPowerCounter;
     @Shadow
     private float horseJumpPower;
 
     @Shadow
-    private boolean serverSprintState;
+    protected abstract void sendHorseJump();
 
+    @Shadow
+    private boolean serverSprintState;
     @Shadow
     @Final
     public NetHandlerPlayClient sendQueue;
 
-    @Unique
-    private boolean raven_XD$isCurrentViewEntity() {
-        return this.mc.getRenderViewEntity() == this;
-    }
+    @Override
+    @Shadow
+    public abstract boolean isSneaking();
 
     @Shadow
     private boolean serverSneakState;
@@ -80,7 +97,7 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
     @Unique
     private boolean raven_bS$isHeadspaceFree(BlockPos p_isHeadspaceFree_1_, int p_isHeadspaceFree_2_) {
         for(int y = 0; y < p_isHeadspaceFree_2_; ++y) {
-            if (!this.raven_XD$isOpenBlockSpace(p_isHeadspaceFree_1_.add(0, y, 0))) {
+            if (!this.isOpenBlockSpace(p_isHeadspaceFree_1_.add(0, y, 0))) {
                 return false;
             }
         }
@@ -88,35 +105,40 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
         return true;
     }
 
-    @Unique
-    private boolean raven_XD$isOpenBlockSpace(BlockPos p_isOpenBlockSpace_1_) {
-        return !this.worldObj.getBlockState(p_isOpenBlockSpace_1_).getBlock().isNormalCube();
-    }
+    @Shadow protected abstract boolean isOpenBlockSpace(BlockPos p_isOpenBlockSpace_1_);
 
-    @Unique
-    private void raven_XD$sendHorseJump() {
-        this.sendQueue.addToSendQueue(new C0BPacketEntityAction(this, C0BPacketEntityAction.Action.RIDING_JUMP, (int)(this.horseJumpPower * 100.0F)));
-    }
+    /**
+     * @author strangerrrs
+     * @reason mixin on update
+     */
+    @Overwrite
+    public void onUpdate() {
+        if (this.worldObj.isBlockLoaded(new BlockPos(this.posX, 0.0, this.posZ))) {
+            RotationUtils.prevRenderPitch = RotationUtils.renderPitch;
+            RotationUtils.prevRenderYaw = RotationUtils.renderYaw;
 
-    @Inject(method = "onUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/entity/AbstractClientPlayer;onUpdate()V"))
-    public void onPreUpdate(CallbackInfo ci) {
-        RotationUtils.prevRenderPitch = RotationUtils.renderPitch;
-        RotationUtils.prevRenderYaw = RotationUtils.renderYaw;
+            net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new PreUpdateEvent());
 
-        MinecraftForge.EVENT_BUS.post(new PreUpdateEvent());
-    }
+            super.onUpdate();
 
-    @Inject(method = "onUpdate", at = @At("RETURN"))
-    public void onPostUpdate(CallbackInfo ci) {
-        MinecraftForge.EVENT_BUS.post(new PostUpdateEvent());
+            if (this.isRiding()) {
+                this.sendQueue.addToSendQueue(new C03PacketPlayer.C05PacketPlayerLook(this.rotationYaw, this.rotationPitch, this.onGround));
+                this.sendQueue.addToSendQueue(new C0CPacketInput(this.moveStrafing, this.moveForward, this.movementInput.jump, this.movementInput.sneak));
+            } else {
+                this.onUpdateWalkingPlayer();
+            }
+
+            net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new PostUpdateEvent());
+        }
+
     }
 
     /**
      * @author strangerrrs
      * @reason mixin on update walking player
      */
-    @Inject(method = "onUpdateWalkingPlayer", at = @At("HEAD"), cancellable = true)
-    public void onUpdateWalkingPlayer(CallbackInfo ci) {
+    @Overwrite
+    public void onUpdateWalkingPlayer() {
         PreMotionEvent preMotionEvent = new PreMotionEvent(
                 this.posX,
                 this.getEntityBoundingBox().minY,
@@ -152,7 +174,7 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
             this.serverSneakState = flag1;
         }
 
-        if (this.raven_XD$isCurrentViewEntity()) {
+        if (this.isCurrentViewEntity()) {
             if (PreMotionEvent.setRenderYaw()) {
                 RotationUtils.setRenderYaw(preMotionEvent.getYaw());
                 preMotionEvent.setRenderYaw(false);
@@ -204,18 +226,17 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
         }
 
         net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new PostMotionEvent());
-        ci.cancel();
     }
 
     /**
      * @author strangerrrs
      * @reason mixin on living update
      */
-    @Inject(method = "onLivingUpdate", at = @At("HEAD"), cancellable = true)
-    public void onLivingUpdate(CallbackInfo ci) {
-        if (mc.thePlayer.sprintingTicksLeft > 0) {
-            --mc.thePlayer.sprintingTicksLeft;
-            if (mc.thePlayer.sprintingTicksLeft == 0) {
+    @Overwrite
+    public void onLivingUpdate() {
+        if (this.sprintingTicksLeft > 0) {
+            --this.sprintingTicksLeft;
+            if (this.sprintingTicksLeft == 0) {
                 this.setSprinting(false);
             }
         }
@@ -293,7 +314,7 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
             this.setSprinting(true);
         }
 
-        if (this.isSprinting() && (!Sprint.omni() && (this.movementInput.moveForward < f || this.isCollidedHorizontally || !flag3) || (ModuleManager.scaffold != null && ModuleManager.scaffold.isEnabled() && !Scaffold.sprint() && !ModuleManager.tower.canSprint()))) {
+        if (this.isSprinting() && (!Sprint.omni() && (this.movementInput.moveForward < f || this.isCollidedHorizontally || !flag3) || (ModuleManager.scaffold != null && ModuleManager.scaffold.isEnabled() && !ModuleManager.scaffold.sprint() && !ModuleManager.tower.canSprint()))) {
             this.setSprinting(false);
         }
 
@@ -314,7 +335,7 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
             }
         }
 
-        if (this.capabilities.isFlying && this.raven_XD$isCurrentViewEntity()) {
+        if (this.capabilities.isFlying && this.isCurrentViewEntity()) {
             if (this.movementInput.sneak) {
                 this.motionY -= this.capabilities.getFlySpeed() * 3.0F;
             }
@@ -324,7 +345,7 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
             }
         }
 
-        if (((EntityPlayerSP)(Object) this).isRidingHorse()) {
+        if (this.isRidingHorse()) {
             if (this.horseJumpPowerCounter < 0) {
                 ++this.horseJumpPowerCounter;
                 if (this.horseJumpPowerCounter == 0) {
@@ -334,7 +355,7 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
 
             if (flag && !this.movementInput.jump) {
                 this.horseJumpPowerCounter = -10;
-                this.raven_XD$sendHorseJump();
+                this.sendHorseJump();
             } else if (!flag && this.movementInput.jump) {
                 this.horseJumpPowerCounter = 0;
                 this.horseJumpPower = 0.0F;
@@ -356,7 +377,6 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
             this.sendPlayerAbilities();
         }
 
-        ci.cancel();
     }
 
     /**

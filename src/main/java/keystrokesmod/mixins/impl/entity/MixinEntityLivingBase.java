@@ -21,6 +21,7 @@ import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.MinecraftForge;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -34,6 +35,8 @@ import static keystrokesmod.Raven.mc;
 
 @Mixin(EntityLivingBase.class)
 public abstract class MixinEntityLivingBase extends Entity {
+    @Shadow protected abstract float getJumpUpwardsMotion();
+
     public MixinEntityLivingBase(World worldIn) {
         super(worldIn);
     }
@@ -108,18 +111,13 @@ public abstract class MixinEntityLivingBase extends Entity {
         cir.setReturnValue(p_1101462);
     }
 
-    @Unique
-    protected float raven_XD$getJumpUpwardsMotion() {
-        return 0.42F;
-    }
-
     /**
      * @author strangerrs
      * @reason mixin jump
      */
     @Inject(method = "jump", at = @At("HEAD"), cancellable = true)
     protected void jump(CallbackInfo ci) {
-        JumpEvent jumpEvent = new JumpEvent(this.raven_XD$getJumpUpwardsMotion(), RotationHandler.getMovementYaw(this));
+        JumpEvent jumpEvent = new JumpEvent(getJumpUpwardsMotion(), RotationHandler.getMovementYaw(this));
         MinecraftForge.EVENT_BUS.post(jumpEvent);
         if (jumpEvent.isCanceled()) {
             return;

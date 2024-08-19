@@ -7,7 +7,10 @@ import net.minecraft.client.settings.GameSettings;
 import net.minecraft.util.MovementInput;
 import net.minecraft.util.MovementInputFromOptions;
 import net.minecraftforge.common.MinecraftForge;
-import org.spongepowered.asm.mixin.*;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Overwrite;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -17,28 +20,50 @@ public abstract class MixinMovementInputFromOptions extends MovementInput {
 
     @Shadow @Final private GameSettings gameSettings;
 
-    @Unique private double raven_XD$sneakMultiplier = 0.3;
+    /**
+     * @author xia__mc
+     * @reason to fix movement
+     */
+    @Inject(method = "updatePlayerMoveState", at = @At("HEAD"), cancellable = true)
+    public void updatePlayerMoveState(CallbackInfo ci) {
+        this.moveStrafe = 0.0F;
+        this.moveForward = 0.0F;
 
-    @Inject(method = "updatePlayerMoveState", at = @At(value = "FIELD", target = "net/minecraft/util/MovementInputFromOptions.sneak:Z", shift = At.Shift.AFTER))
-    public void onPrePlayerMove(CallbackInfo ci) {
+        if (this.gameSettings.keyBindForward.isKeyDown()) {
+            ++this.moveForward;
+        }
+
+        if (this.gameSettings.keyBindBack.isKeyDown()) {
+            --this.moveForward;
+        }
+
+        if (this.gameSettings.keyBindLeft.isKeyDown()) {
+            ++this.moveStrafe;
+        }
+
+        if (this.gameSettings.keyBindRight.isKeyDown()) {
+            --this.moveStrafe;
+        }
+
+        this.jump = this.gameSettings.keyBindJump.isKeyDown();
+        this.sneak = this.gameSettings.keyBindSneak.isKeyDown();
+
         final MoveInputEvent moveInputEvent = new MoveInputEvent(moveForward, moveStrafe, jump, sneak, 0.3D);
 
         MinecraftForge.EVENT_BUS.post(moveInputEvent);
 
-        this.raven_XD$sneakMultiplier = moveInputEvent.getSneakSlowDownMultiplier();
+        final double sneakMultiplier = moveInputEvent.getSneakSlowDownMultiplier();
         this.moveForward = moveInputEvent.getForward();
         this.moveStrafe = moveInputEvent.getStrafe();
         this.jump = moveInputEvent.isJump();
         this.sneak = moveInputEvent.isSneak();
-    }
 
-    @Inject(method = "updatePlayerMoveState", at = @At("RETURN"))
-    public void onPostPlayerMove(CallbackInfo ci) {
         if (this.sneak) {
-            this.moveStrafe = (float) ((double) this.moveStrafe * raven_XD$sneakMultiplier);
-            this.moveForward = (float) ((double) this.moveForward * raven_XD$sneakMultiplier);
+            this.moveStrafe = (float) ((double) this.moveStrafe * sneakMultiplier);
+            this.moveForward = (float) ((double) this.moveForward * sneakMultiplier);
         }
 
         MinecraftForge.EVENT_BUS.post(new PostPlayerInputEvent());
+        ci.cancel();
     }
 }

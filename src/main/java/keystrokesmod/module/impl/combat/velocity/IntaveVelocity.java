@@ -33,7 +33,7 @@ public class IntaveVelocity extends SubMode<Velocity> {
         this.registerSetting(reduceUnnecessarySlowdown = new ButtonSetting("Reduce unnecessary slowdown", false));
         this.registerSetting(chance = new SliderSetting("Chance", 100, 0, 100, 1, "%"));
         this.registerSetting(jump = new ButtonSetting("Jump", false));
-        this.registerSetting(jumpInInv = new ButtonSetting("Jump in inv", false));
+        this.registerSetting(jumpInInv = new ButtonSetting("Jump in inv", false, jump::isToggled));
         this.registerSetting(jumpChance = new SliderSetting("Jump chance", 80, 0, 100, 1, "%", jump::isToggled));
         this.registerSetting(notWhileSpeed = new ButtonSetting("Not while speed", false));
         this.registerSetting(notWhileJumpBoost = new ButtonSetting("Not while jump boost", false));

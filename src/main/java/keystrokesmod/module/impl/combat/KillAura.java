@@ -627,17 +627,14 @@ public class KillAura extends IAutoClicker {
                 return;
             }
             switchTargets = true;
-            Utils.attackEntity(target, !swing);
-            if (sendInteractAt && rotations != null) {
-                MovingObjectPosition hitObject = mc.objectMouseOver;
-                if (hitObject != null && hitObject.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY && hitObject.entityHit == target) {
-                    Vec3 hitVec = new Vec3(hitObject.hitVec);
+            Utils.attackEntity(target, !silentSwing.isToggled());
+            if (sendInteractAt) {
+                Vec3 hitVec = aimSimulator.getHitPos();
+                if (hitVec != null) {
                     hitVec = new Vec3(hitVec.x - target.posX, hitVec.y - target.posY, hitVec.z - target.posZ);
                     mc.thePlayer.sendQueue.addToSendQueue(new C02PacketUseEntity(target, hitVec.toVec3()));
                 }
             }
-
-            // todo double interact?
             mc.thePlayer.sendQueue.addToSendQueue(new C02PacketUseEntity(target, C02PacketUseEntity.Action.INTERACT));
         } else if (ModuleManager.antiFireball != null && ModuleManager.antiFireball.isEnabled() && ModuleManager.antiFireball.fireball != null && ModuleManager.antiFireball.attack) {
             Utils.attackEntity(ModuleManager.antiFireball.fireball, !ModuleManager.antiFireball.silentSwing.isToggled());
@@ -713,12 +710,14 @@ public class KillAura extends IAutoClicker {
             case 0:
                 if (target != null && mc.thePlayer.getDistanceToEntity(target) <= swingRange.getInput()) {
                     Utils.sendClick(0, true);
+                    Utils.sendClick(0, false);
                     return true;
                 }
                 return false;
             default:
             case 1:
-                attack = true;
+                if (swing)
+                    attack = true;
                 return swing;
         }
     }
