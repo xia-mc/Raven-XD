@@ -49,8 +49,8 @@ public class DefaultNotification extends SubMode<Notifications> implements INoti
                 char colorCode = part.charAt(0);
                 String text = part.substring(1);
                 Color color = ColorUtils.getColorFromCode("§" + colorCode);
-                FontManager.regular16.drawString(text, x, y, CenterMode.Y, false, color.getRGB());
-                x += FontManager.regular16.getStringWidth(text);
+                getFont().drawString(text, x, y, CenterMode.Y, false, color.getRGB());
+                x += getFont().width(text);
             }
         }
     }
