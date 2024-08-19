@@ -14,7 +14,7 @@ public class FontManager {
             regular16, regular22,
             icon20,
             productSans16, productSans20, productSansLight, productSansMedium,
-            tenacity20, tenacity80;
+            tenacity16, tenacity20, tenacity80;
 
     private static int prevScale;
 
@@ -35,6 +35,7 @@ public class FontManager {
             productSans20 = new FontRenderer(FontUtil.getResource(locationMap, "product_sans_regular.ttf", 20));
             productSansLight = new FontRenderer(FontUtil.getResource(locationMap, "product_sans_light.ttf", 22));
             productSansMedium = new FontRenderer(FontUtil.getResource(locationMap, "product_sans_medium.ttf", 22));
+            tenacity16 = new FontRenderer(FontUtil.getResource(locationMap, "tenacity.ttf", 16));
             tenacity20 = new FontRenderer(FontUtil.getResource(locationMap, "tenacity.ttf", 20));
             tenacity80 = new FontRenderer(FontUtil.getResource(locationMap, "tenacity.ttf", 80));
         }

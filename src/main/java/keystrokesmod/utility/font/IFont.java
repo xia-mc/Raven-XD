@@ -2,21 +2,24 @@ package keystrokesmod.utility.font;
 
 public interface IFont {
 
-    double drawString(String text, double x, double y, int color, boolean dropShadow);
+    void drawString(String text, double x, double y, int color, boolean dropShadow);
 
-    double drawString(String text, double x, double y, int color);
+    void drawString(String text, double x, double y, int color);
 
-    default double drawStringWithShadow(String text, double x, double y, int color) {
-        return drawString(text, x, y, color, true);
+    default void drawStringWithShadow(String text, double x, double y, int color) {
+        drawString(text, x, y, color, true);
     }
 
     double width(String text);
 
-    double drawCenteredString(String text, double x, double y, int color);
+    void drawCenteredString(String text, double x, double y, int color);
 
-    default double drawRightString(String text, double x, double y, int color) {
-        return drawString(text, x - (int) width(text), y, color, false);
+    default void drawRightString(String text, double x, double y, int color) {
+        drawString(text, x - (int) width(text), y, color, false);
     }
 
     double height();
+
+    void drawString(String text, double x, double y, CenterMode centerMode, boolean dropShadow, int color);
+
 }

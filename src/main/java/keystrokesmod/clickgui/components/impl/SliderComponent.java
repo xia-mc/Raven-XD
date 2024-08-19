@@ -7,6 +7,7 @@ import keystrokesmod.module.setting.Setting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.utility.Utils;
 import keystrokesmod.utility.profile.ProfileModule;
+import keystrokesmod.utility.render.RenderUtils;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
@@ -35,14 +36,14 @@ public class SliderComponent extends Component {
     }
 
     public void render() {
-        net.minecraft.client.gui.Gui.drawRect(this.parent.categoryComponent.getX() + 4, this.parent.categoryComponent.getY() + this.o + 11, this.parent.categoryComponent.getX() + 4 + this.parent.categoryComponent.gw() - 8, this.parent.categoryComponent.getY() + this.o + 15, -12302777);
+        RenderUtils.drawRoundedRectangle(this.parent.categoryComponent.getX() + 4, this.parent.categoryComponent.getY() + this.o + 11, this.parent.categoryComponent.getX() + 4 + this.parent.categoryComponent.gw() - 8, this.parent.categoryComponent.getY() + this.o + 15, 3, -12302777);
         int l = this.parent.categoryComponent.getX() + 4;
         int r = this.parent.categoryComponent.getX() + 4 + (int) this.w;
         if (r - l > 84) {
             r = l + 84;
         }
 
-        net.minecraft.client.gui.Gui.drawRect(l, this.parent.categoryComponent.getY() + this.o + 11, r, this.parent.categoryComponent.getY() + this.o + 15, Color.getHSBColor((float) (System.currentTimeMillis() % 11000L) / 11000.0F, 0.75F, 0.9F).getRGB());
+        RenderUtils.drawRoundedRectangle(l, this.parent.categoryComponent.getY() + this.o + 11, r, this.parent.categoryComponent.getY() + this.o + 15, 3, Color.getHSBColor((float) (System.currentTimeMillis() % 11000L) / 11000.0F, 0.75F, 0.9F).getRGB());
         GL11.glPushMatrix();
         GL11.glScaled(0.5D, 0.5D, 0.5D);
         String value;

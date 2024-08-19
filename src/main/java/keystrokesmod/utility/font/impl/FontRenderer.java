@@ -1,6 +1,6 @@
 package keystrokesmod.utility.font.impl;
 
-import keystrokesmod.utility.font.FontManager;
+import keystrokesmod.utility.font.CenterMode;
 import keystrokesmod.utility.font.IFont;
 import keystrokesmod.utility.render.ColorUtils;
 import net.minecraft.client.Minecraft;
@@ -34,37 +34,40 @@ public class FontRenderer extends CharRenderer implements IFont {
         this.setupBoldItalicIDs();
     }
 
-    public double drawString(String text, double x, double y, @NotNull CenterMode centerMode, boolean shadow, int color) {
+    public void drawString(String text, double x, double y, @NotNull CenterMode centerMode, boolean dropShadow, int color) {
         switch (centerMode) {
             case X:
-                if (shadow) {
+                if (dropShadow) {
                     this.drawString(text, x - this.getStringWidth(text) / 2 + 0.5, y + 0.5, color, true);
                 }
-                return this.drawString(text, x - this.getStringWidth(text) / 2, y, color, false);
+                this.drawString(text, x - this.getStringWidth(text) / 2, y, color, false);
+                return;
             case Y:
-                if (shadow) {
+                if (dropShadow) {
                     this.drawString(text, x + 0.5, y - this.getHeight() / 2 + 0.5, color, true);
                 }
-                return this.drawString(text, x, y - this.getHeight() / 2, color, false);
+                this.drawString(text, x, y - this.getHeight() / 2, color, false);
+                return;
             case XY:
-                if (shadow) {
+                if (dropShadow) {
                     this.drawString(text, x - this.getStringWidth(text) / 2 + 0.5, y - this.getHeight() / 2 + 0.5, color, true);
                 }
-                return this.drawString(text, x - this.getStringWidth(text) / 2, y - this.getHeight() / 2, color, false);
+                this.drawString(text, x - this.getStringWidth(text) / 2, y - this.getHeight() / 2, color, false);
+                return;
             default:
             case NONE:
-                if (shadow) {
+                if (dropShadow) {
                     this.drawString(text, x + 0.5, y + 0.5, color, true);
                 }
-                return this.drawString(text, x, y, color, false);
+                this.drawString(text, x, y, color, false);
         }
     }
 
-    public double drawString(String text, double x, double y, int color, boolean shadow) {
+    public void drawString(String text, double x, double y, int color, boolean shadow) {
         ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());
 
         if (text == null) {
-            return 0;
+            return;
         }
 
         if (shadow) {
@@ -130,12 +133,11 @@ public class FontRenderer extends CharRenderer implements IFont {
         GL11.glHint(GL11.GL_POLYGON_SMOOTH_HINT, GL11.GL_DONT_CARE);
         GL11.glPopMatrix();
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        return x / 2f;
     }
 
     @Override
-    public double drawString(String text, double x, double y, int color) {
-        return drawString(text, x, y, color, false);
+    public void drawString(String text, double x, double y, int color) {
+        drawString(text, x, y, color, false);
     }
 
     @Override
@@ -144,8 +146,8 @@ public class FontRenderer extends CharRenderer implements IFont {
     }
 
     @Override
-    public double drawCenteredString(String text, double x, double y, int color) {
-        return drawString(text, x, y, CenterMode.X, false, color);
+    public void drawCenteredString(String text, double x, double y, int color) {
+        drawString(text, x, y, CenterMode.X, false, color);
     }
 
     @Override
@@ -263,10 +265,4 @@ public class FontRenderer extends CharRenderer implements IFont {
         }
     }
 
-    public enum CenterMode {
-        X,
-        Y,
-        XY,
-        NONE
-    }
 }
