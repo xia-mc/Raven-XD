@@ -1,5 +1,6 @@
 package keystrokesmod.module.impl.combat.criticals;
 
+import keystrokesmod.event.PostVelocityEvent;
 import keystrokesmod.event.PreMotionEvent;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.combat.Criticals;
@@ -15,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 public class HypixelCriticals extends SubMode<Criticals> {
     private final ButtonSetting onlyKillAura;
     private final ButtonSetting autoJump;
+    private final ButtonSetting velocity;
 
     private int offGroundTicks = 0;
 
@@ -22,6 +24,7 @@ public class HypixelCriticals extends SubMode<Criticals> {
         super(name, parent);
         this.registerSetting(onlyKillAura = new ButtonSetting("Only killAura", true));
         this.registerSetting(autoJump = new ButtonSetting("Auto jump", false));
+        this.registerSetting(velocity = new ButtonSetting("Velocity", false));
     }
 
     @Override
@@ -49,6 +52,13 @@ public class HypixelCriticals extends SubMode<Criticals> {
             case 5:
                 mc.thePlayer.motionY = MoveUtil.predictedMotion(mc.thePlayer.motionY, 2);
                 break;
+        }
+    }
+
+    @SubscribeEvent
+    public void onPostVelocity(PostVelocityEvent event) {
+        if (velocity.isToggled()) {
+            mc.thePlayer.motionY = MoveUtil.predictedMotion(mc.thePlayer.motionY, 2);
         }
     }
 }

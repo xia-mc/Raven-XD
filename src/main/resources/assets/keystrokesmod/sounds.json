@@ -58,5 +58,11 @@
     "sounds": [
       "keystrokesmod:alarm"
     ]
+  },
+  "yeet": {
+    "category": "player",
+    "sounds": [
+      "keystrokesmod:yeet"
+    ]
   }
 }

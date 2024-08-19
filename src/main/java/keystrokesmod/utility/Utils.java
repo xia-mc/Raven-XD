@@ -12,6 +12,7 @@ import keystrokesmod.module.impl.render.AntiShuffle;
 import keystrokesmod.utility.i18n.I18nManager;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.entity.boss.EntityWither;
 import net.minecraftforge.client.event.MouseEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
@@ -1006,14 +1007,9 @@ public class Utils {
 
     public static boolean isLobby() {
         if (Utils.isHypixel()) {
-            List<String> sidebarLines = Utils.getSidebarLines();
-            if (!sidebarLines.isEmpty()) {
-                try {
-                    String[] parts = Utils.stripColor(sidebarLines.get(1)).split(" {2}");
-                    return parts.length > 1 && parts[1].charAt(0) == 'L';
-                } catch (IndexOutOfBoundsException ignored) {
-                }
-            }
+            return mc.theWorld.loadedEntityList.parallelStream()
+                    .filter(e -> e instanceof EntityWither)
+                    .anyMatch(Entity::isInvisible);
         }
         return false;
     }

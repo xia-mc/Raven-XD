@@ -10,6 +10,7 @@ import keystrokesmod.module.impl.combat.Reach;
 import keystrokesmod.module.impl.exploit.ExploitFixer;
 import keystrokesmod.module.impl.render.Animations;
 import keystrokesmod.module.impl.render.FreeLook;
+import keystrokesmod.utility.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.crash.CrashReport;
@@ -33,7 +34,7 @@ public abstract class MixinMinecraft {
     private void runTickPre(CallbackInfo ci) {
         MinecraftForge.EVENT_BUS.post(new PreTickEvent());
 
-        if (raven_XD$lastWorld != mc.theWorld) {
+        if (raven_XD$lastWorld != mc.theWorld && Utils.nullCheck()) {
             MinecraftForge.EVENT_BUS.post(new WorldChangeEvent());
         }
 

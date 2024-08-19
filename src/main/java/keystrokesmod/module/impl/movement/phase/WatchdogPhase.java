@@ -2,6 +2,7 @@ package keystrokesmod.module.impl.movement.phase;
 
 import keystrokesmod.event.BlockAABBEvent;
 import keystrokesmod.event.PreMotionEvent;
+import keystrokesmod.event.WorldChangeEvent;
 import keystrokesmod.mixins.impl.client.PlayerControllerMPAccessor;
 import keystrokesmod.module.impl.movement.Phase;
 import keystrokesmod.module.setting.impl.ButtonSetting;
@@ -88,7 +89,7 @@ public class WatchdogPhase extends SubMode<Phase> {
     }
 
     @SubscribeEvent
-    public void onWorldChange(@NotNull WorldEvent.Load event) {
+    public void onWorldChange(@NotNull WorldChangeEvent event) {
         this.phase = false;
         this.phaseTime = 0;
     }

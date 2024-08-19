@@ -22,6 +22,7 @@ public class Phase extends Module {
                 .add(new WatchdogPhase("Watchdog", this))
                 .add(new WatchdogAutoPhase("Watchdog Auto", this))
                 .add(new VulcanPhase("Vulcan", this))
+                .add(new GrimACPhase("GrimAC", this))
         );
         this.registerSetting(cancelS08 = new ButtonSetting("Cancel S08", false));
         this.registerSetting(cancelPush = new ButtonSetting("Cancel push", true));
