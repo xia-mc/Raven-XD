@@ -18,7 +18,7 @@ import org.lwjgl.input.Keyboard;
 public class SafeWalk extends Module {
     private final SliderSetting shiftDelay;
     private final SliderSetting motion;
-    public static ButtonSetting shift, blocksOnly, pitchCheck, disableOnForward;
+    private static ButtonSetting shift, blocksOnly, pitchCheck, disableOnForward;
     public ButtonSetting tower;
     private boolean isSneaking;
     private long b = 0L;
@@ -89,7 +89,8 @@ public class SafeWalk extends Module {
 
     @SubscribeEvent
     public void onSafeWalk(@NotNull SafeWalkEvent event) {
-        event.setSafeWalk(true);
+        if (canSafeWalk())
+            event.setSafeWalk(true);
     }
 
     private void setSneakState(boolean down) {
