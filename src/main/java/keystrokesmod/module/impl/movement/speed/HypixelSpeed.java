@@ -1,10 +1,7 @@
 package keystrokesmod.module.impl.movement.speed;
 
 import keystrokesmod.module.impl.movement.Speed;
-import keystrokesmod.module.impl.movement.speed.hypixel.GroundStrafeSpeed;
-import keystrokesmod.module.impl.movement.speed.hypixel.HypixelGroundSpeed;
-import keystrokesmod.module.impl.movement.speed.hypixel.HypixelLowHopSpeed;
-import keystrokesmod.module.impl.movement.speed.hypixel.RiseWatchdogSpeed;
+import keystrokesmod.module.impl.movement.speed.hypixel.*;
 import keystrokesmod.module.setting.impl.ModeValue;
 import keystrokesmod.module.setting.impl.SubMode;
 import org.jetbrains.annotations.NotNull;

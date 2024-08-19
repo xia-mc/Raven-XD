@@ -257,4 +257,9 @@ public class BlockUtils {
     public static Block blockRelativeToPlayer(final double offsetX, final double offsetY, final double offsetZ) {
         return mc.theWorld.getBlockState(new BlockPos(mc.thePlayer).add(offsetX, offsetY, offsetZ)).getBlock();
     }
+
+    public static boolean isBlockOver(double height, boolean boundingBox) {
+        AxisAlignedBB bb = mc.thePlayer.getEntityBoundingBox().offset(0.0, height / 2.0, 0.0).expand(0.0, height - (double) mc.thePlayer.height, 0.0);
+        return !mc.theWorld.getCollidingBoundingBoxes(mc.thePlayer, bb).isEmpty();
+    }
 }
