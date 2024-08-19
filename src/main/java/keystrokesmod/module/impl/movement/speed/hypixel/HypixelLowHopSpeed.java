@@ -30,12 +30,12 @@ public class HypixelLowHopSpeed extends SubMode<HypixelSpeed> {
         switch (parent.parent.offGroundTicks) {
             case 0:
                 if (!Utils.jumpDown()) {
-                    mc.thePlayer.jump();
                     if (fast.isToggled()) {
                         MoveUtil.strafe(0.485);
                     } else {
                         MoveUtil.strafe(MoveUtil.getAllowedHorizontalDistance() - Math.random() / 100f);
                     }
+                    mc.thePlayer.jump();
                 }
                 break;
             case 5:
