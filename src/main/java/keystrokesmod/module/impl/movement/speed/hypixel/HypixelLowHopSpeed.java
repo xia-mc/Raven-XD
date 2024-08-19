@@ -9,6 +9,7 @@ import keystrokesmod.module.setting.impl.ModeSetting;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.MoveUtil;
 import keystrokesmod.utility.Utils;
+import net.minecraft.potion.Potion;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
@@ -31,11 +32,16 @@ public class HypixelLowHopSpeed extends SubMode<HypixelSpeed> {
             case 0:
                 if (!Utils.jumpDown()) {
                     if (fast.isToggled()) {
-                        MoveUtil.strafe(0.485);
+                        mc.thePlayer.jump();
+                        if (mc.thePlayer.isPotionActive(Potion.moveSpeed)) {
+                            MoveUtil.strafe(0.6);
+                        } else {
+                            MoveUtil.strafe(0.485);
+                        }
                     } else {
                         MoveUtil.strafe(MoveUtil.getAllowedHorizontalDistance() - Math.random() / 100f);
+                        mc.thePlayer.jump();
                     }
-                    mc.thePlayer.jump();
                 }
                 break;
             case 5:
