@@ -2,6 +2,7 @@ package keystrokesmod.module.impl.combat.velocity;
 
 import keystrokesmod.event.PreVelocityEvent;
 import keystrokesmod.event.SendPacketEvent;
+import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.combat.Velocity;
 import keystrokesmod.module.impl.exploit.disabler.hypixel.HypixelMotionDisabler;
 import keystrokesmod.module.setting.impl.ButtonSetting;
@@ -44,6 +45,8 @@ public class HypixelVelocity extends SubMode<Velocity> {
 
     @SubscribeEvent
     public void onPreVelocity(@NotNull PreVelocityEvent event) {
+        if (ModuleManager.longJump.isEnabled()) return;
+
         final long time = System.currentTimeMillis();
 
         if (onlyFirstHit.isToggled() && time - lastVelocityTime < resetTime.getInput())
