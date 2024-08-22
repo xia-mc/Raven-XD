@@ -3,6 +3,7 @@ package keystrokesmod.module.impl.other;
 import keystrokesmod.event.MoveInputEvent;
 import keystrokesmod.event.RotationEvent;
 import keystrokesmod.module.Module;
+import keystrokesmod.module.impl.movement.TargetStrafe;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.DescriptionSetting;
 import keystrokesmod.module.setting.impl.ModeSetting;
@@ -161,7 +162,7 @@ public final class RotationHandler extends Module {
                     final float forward = event.getForward();
                     final float strafe = event.getStrafe();
 
-                    final double angle = MathHelper.wrapAngleTo180_double(Math.toDegrees(MoveUtil.direction(mc.thePlayer.rotationYaw, forward, strafe)));
+                    final double angle = MathHelper.wrapAngleTo180_double(Math.toDegrees(MoveUtil.direction(TargetStrafe.getMovementYaw(), forward, strafe)));
 
                     if (forward == 0 && strafe == 0) {
                         return;
