@@ -184,4 +184,9 @@ public class ColorUtils {
         float b = 0.003921569f * (float) color.getBlue();
         return new Color(r, g, b, alpha);
     }
+
+    public static float calculateGaussianValue(final float x, final float sigma) {
+        final double output = 1.0 / Math.sqrt(6.283185307179586 * (sigma * sigma));
+        return (float) (output * Math.exp(-(x * x) / (2.0 * (sigma * sigma))));
+    }
 }

@@ -81,11 +81,7 @@ public class HypixelVelocity extends SubMode<Velocity> {
     }
 
     private double choose(double curMotion, double packetMotion) {
-        if (curMotion < 0 || packetMotion < 0)
-            return packetMotion;
         if (packetMotion == 0)
-            return curMotion;
-        if (curMotion - packetMotion > 0)
             return curMotion;
         return packetMotion;
     }

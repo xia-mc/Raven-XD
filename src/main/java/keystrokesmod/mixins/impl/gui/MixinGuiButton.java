@@ -4,6 +4,7 @@ import keystrokesmod.module.ModuleManager;
 import keystrokesmod.utility.font.FontManager;
 import keystrokesmod.utility.font.IFont;
 import keystrokesmod.utility.render.*;
+import keystrokesmod.utility.render.blur.GaussianBlur;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiButton;
@@ -19,6 +20,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.awt.*;
+
+import static keystrokesmod.Raven.mc;
 
 
 @Mixin(GuiButton.class)
@@ -59,18 +62,24 @@ public abstract class MixinGuiButton extends Gui {
             this.hovered = x >= this.xPosition && y >= this.yPosition && x < this.xPosition + this.width && y < this.yPosition + this.height;
 
             if (hovered)
-                ravenXD$hoverValue = Math.min(ravenXD$hoverValue + 70, 200);
+                ravenXD$hoverValue = (int) Math.min(ravenXD$hoverValue + 4.0 * 150 / Minecraft.getDebugFPS(), 200);
             else
-                ravenXD$hoverValue = Math.max(ravenXD$hoverValue - 70, 102);
+                ravenXD$hoverValue = (int) Math.max(ravenXD$hoverValue - 4.0 * 150 / Minecraft.getDebugFPS(), 102);
 
             Color rectColor = new Color(35, 37, 43, ravenXD$hoverValue);
             rectColor = raven_XD$interpolateColorC(rectColor, ColorUtils.brighter(rectColor, 0.4f), -1);
             RenderUtils.drawBloomShadow(xPosition - 3, yPosition - 3, width + 6, height + 6, 12, new Color(0, 0, 0, 50), false);
-            RRectUtils.drawRoundOutline(xPosition, this.yPosition, width, height, (float)3.5, 0.0015f, rectColor, new Color(30, 30, 30, 100));
-            RRectUtils.drawRoundOutline(xPosition, this.yPosition, width, height, (float)3.5, 0.0015f,  new Color(0, 0, 0, 5) , new Color(0, 0, 0, 5));
-            RRectUtils.drawRoundOutline(xPosition, yPosition, width, height, (float)3.5, 0.0015f,  new Color(0, 0, 0, 50) , new Color(200, 200, 200, 60));
+            RRectUtils.drawRoundOutline(xPosition, this.yPosition, width, height, 3.5F, 0.0015f, rectColor, new Color(30, 30, 30, 100));
+            if (ModuleManager.clientTheme.buttonBlur.isToggled())
+                GaussianBlur.startBlur();
+            RRectUtils.drawRoundOutline(xPosition, this.yPosition, width, height, 3.5F, 0.0015f,  new Color(0, 0, 0, 5) , new Color(0, 0, 0, 5));
+            RRectUtils.drawRoundOutline(xPosition, yPosition, width, height, 3.5F, 0.0015f,  new Color(0, 0, 0, 50) , new Color(200, 200, 200, 60));
+            if (ModuleManager.clientTheme.buttonBlur.isToggled())
+                GaussianBlur.endBlur(20, 5);
 
-            font.drawCenteredString(displayString, this.xPosition + this.width / 2.0f, this.yPosition + height / 2f - font.height() / 2f, -1);
+            this.mouseDragged(minecraft, x, y);
+
+            font.drawCenteredString(ModuleManager.clientTheme.buttonLowerCase.isToggled() ? displayString.toLowerCase() : displayString, this.xPosition + this.width / 2.0f, this.yPosition + height / 2f - font.height() / 2f, -1);
         }
 
         ci.cancel();

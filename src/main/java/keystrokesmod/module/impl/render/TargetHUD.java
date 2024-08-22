@@ -3,10 +3,7 @@ package keystrokesmod.module.impl.render;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.combat.KillAura;
 import keystrokesmod.module.impl.render.targetvisual.ITargetVisual;
-import keystrokesmod.module.impl.render.targetvisual.targethud.ExhibitionTargetHUD;
-import keystrokesmod.module.impl.render.targetvisual.targethud.RavenTargetHUD;
-import keystrokesmod.module.impl.render.targetvisual.targethud.TestTargetHUD;
-import keystrokesmod.module.impl.render.targetvisual.targethud.WurstTargetHUD;
+import keystrokesmod.module.impl.render.targetvisual.targethud.*;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.ModeValue;
 import keystrokesmod.utility.Utils;
@@ -38,6 +35,7 @@ public class TargetHUD extends Module {
                 .add(new ExhibitionTargetHUD("Exhibition", this))
                 .add(new WurstTargetHUD("Wurst", this))
                 .add(new TestTargetHUD("Test", this))
+                .add(new RavenNewTargetHUD("RavenNew", this))
         );
         this.registerSetting(onlyKillAura = new ButtonSetting("Only killAura", true));
     }

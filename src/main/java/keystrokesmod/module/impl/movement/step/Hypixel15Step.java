@@ -10,7 +10,7 @@ import keystrokesmod.utility.MoveUtil;
 import keystrokesmod.utility.Utils;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-public class HypixelStep extends SubMode<Step> {
+public class Hypixel15Step extends SubMode<Step> {
     private final SliderSetting delay = new SliderSetting("Delay", 1000, 0, 5000, 250, "ms");
     private final ButtonSetting test = new ButtonSetting("Test", false);
 
@@ -18,7 +18,7 @@ public class HypixelStep extends SubMode<Step> {
     private boolean stepping = false;
     private long lastStep = -1;
 
-    public HypixelStep(String name, Step parent) {
+    public Hypixel15Step(String name, Step parent) {
         super(name, parent);
         this.registerSetting(delay, test);
     }

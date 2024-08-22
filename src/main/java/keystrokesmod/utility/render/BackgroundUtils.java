@@ -1,5 +1,6 @@
 package keystrokesmod.utility.render;
 
+import keystrokesmod.utility.render.blur.GaussianBlur;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.util.ResourceLocation;
 import org.jetbrains.annotations.NotNull;

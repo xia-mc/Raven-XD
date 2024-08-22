@@ -54,6 +54,7 @@ public class KillAura extends IAutoClicker {
     private final SliderSetting swingRange;
     private final SliderSetting blockRange;
     private final SliderSetting preAimRange;
+
     private final ModeSetting rotationMode;
     private final ModeSetting moveFixMode;
     private final ModeSetting rayCastMode;
@@ -71,12 +72,14 @@ public class KillAura extends IAutoClicker {
     private final ButtonSetting delayAim;
     private final SliderSetting delayAimAmount;
     private final SliderSetting rotationSpeed;
+
     private final ModeSetting sortMode;
     private final SliderSetting switchDelay;
     private final SliderSetting targets;
     private final ButtonSetting targetInvisible;
     private final ButtonSetting targetPlayer;
     private final ButtonSetting targetEntity;
+
     private final ButtonSetting disableInInventory;
     private final ButtonSetting disableWhileBlocking;
     private final ButtonSetting disableWhileMining;
@@ -89,6 +92,7 @@ public class KillAura extends IAutoClicker {
     private final ButtonSetting requireMouseDown;
     private final ButtonSetting silentSwing;
     private final ButtonSetting weaponOnly;
+
     private final ButtonSetting dot;
     private final SliderSetting dotSize;
 

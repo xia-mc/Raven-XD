@@ -114,6 +114,8 @@ public class Scaffold extends IAutoClicker {
     private Float lastYaw = null, lastPitch = null;
     private boolean polar$waitingForExpand = false;
     private boolean jumpScaffold$fast$cycle = false;
+    private HoverState hoverState = HoverState.DONE;
+
     public Scaffold() {
         super("Scaffold", category.world);
         this.registerSetting(clickMode = new ModeValue("Click mode", this)
@@ -200,8 +202,9 @@ public class Scaffold extends IAutoClicker {
         jump$bridged = 0;
 
         if (hover.isToggled() && mc.thePlayer.onGround) {
-            mc.thePlayer.motionY = MoveUtil.jumpMotion();
-            delay = true;
+            hoverState = HoverState.JUMP;
+        } else {
+            hoverState = HoverState.DONE;
         }
     }
 
@@ -382,6 +385,20 @@ public class Scaffold extends IAutoClicker {
         } else {
             offGroundTicks++;
         }
+
+        switch (hoverState) {
+            case JUMP:
+                if (mc.thePlayer.onGround && !Utils.jumpDown()) {
+                    mc.thePlayer.jump();
+                    hoverState = HoverState.FALL;
+                }
+                break;
+            case FALL:
+                if (mc.thePlayer.onGround)
+                    hoverState = HoverState.DONE;
+                break;
+        }
+
         if ((rotation.getInput() == 4 || autoJump.isToggled()) && mc.thePlayer.onGround && MoveUtil.isMoving() && !Utils.jumpDown()) {
             mc.thePlayer.jump();
         }
@@ -524,7 +541,7 @@ public class Scaffold extends IAutoClicker {
                     for (int j = 0; j < expDist; j++) {
                         targetPos = RotationUtils.getExtendedPos(groundPos, mc.thePlayer.rotationYaw, j);
 
-                        if (sameY.isToggled()) {
+                        if (sameY.isToggled() || hoverState != HoverState.DONE) {
                             targetPos = new BlockPos(targetPos.getX(), startPos, targetPos.getZ());
                         }
 
@@ -1011,7 +1028,13 @@ public class Scaffold extends IAutoClicker {
                                     for (float checkPitch : var21) {
                                         float fixedPitch = RotationUtils.clampTo90((float) ((double) (targetRotation[1] + checkPitch) + this.getRandom()));
                                         MovingObjectPosition raycast = RotationUtils.rayTraceCustom(mc.playerController.getBlockReachDistance(), fixedYaw, fixedPitch);
-                                        if (raycast != null && raycast.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK && raycast.getBlockPos().equals(targetPos) && raycast.sideHit == enumFacing.getEnumFacing() && (rayCasted == null || !BlockUtils.isSamePos(raycast.getBlockPos(), rayCasted.getBlockPos())) && ((ItemBlock) heldItem.getItem()).canPlaceBlockOnSide(mc.theWorld, raycast.getBlockPos(), raycast.sideHit, mc.thePlayer, heldItem) && rayCasted == null) {
+                                        if (raycast != null
+                                                && raycast.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK
+                                                && raycast.getBlockPos().equals(targetPos)
+                                                && raycast.sideHit == enumFacing.getEnumFacing()
+                                                && (rayCasted == null || !BlockUtils.isSamePos(raycast.getBlockPos(), rayCasted.getBlockPos()))
+                                                && ((ItemBlock) heldItem.getItem()).canPlaceBlockOnSide(mc.theWorld, raycast.getBlockPos(), raycast.sideHit, mc.thePlayer, heldItem)
+                                        ) {
                                             this.forceStrict = this.forceStrict(checkYaw) && i == 1;
 
                                             rayCasted = raycast;
@@ -1052,5 +1075,11 @@ public class Scaffold extends IAutoClicker {
     public void onSafeWalk(@NotNull SafeWalkEvent event) {
         if (safeWalk.isToggled())
             event.setSafeWalk(true);
+    }
+
+    enum HoverState {
+        JUMP,
+        FALL,
+        DONE
     }
 }

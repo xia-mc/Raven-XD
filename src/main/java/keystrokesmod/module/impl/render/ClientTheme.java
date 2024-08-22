@@ -14,6 +14,8 @@ import java.util.List;
 public class ClientTheme extends Module {
     public final ButtonSetting button;
     public final ButtonSetting smoothFont;
+    public final ButtonSetting buttonBlur;
+    public final ButtonSetting buttonLowerCase;
     public final ButtonSetting background;
     public final ButtonSetting mainMenu;
     public final ButtonSetting clickGui;
@@ -34,6 +36,8 @@ public class ClientTheme extends Module {
         this.registerSetting(new DescriptionSetting("Rendering"));
         this.registerSetting(button = new ButtonSetting("Button", true));
         this.registerSetting(smoothFont = new ButtonSetting("Smooth font", true, button::isToggled));
+        this.registerSetting(buttonBlur = new ButtonSetting("Blur", false, button::isToggled));
+        this.registerSetting(buttonLowerCase = new ButtonSetting("Button lower case", false, button::isToggled));
         this.registerSetting(background = new ButtonSetting("Background", true));
         this.registerSetting(mainMenu = new ButtonSetting("Main menu", true));
         this.registerSetting(clickGui = new ButtonSetting("ClickGui", true));

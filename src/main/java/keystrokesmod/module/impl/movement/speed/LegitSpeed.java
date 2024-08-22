@@ -17,7 +17,7 @@ public class LegitSpeed extends SubMode<Speed> {
     public LegitSpeed(String name, @NotNull Speed parent) {
         super(name, parent);
         this.registerSetting(rotation = new ButtonSetting("Rotation", false));
-        this.registerSetting(cpuSpeedUpExploit = new ButtonSetting("CPU SpeedUp Exploit", true));
+        this.registerSetting(cpuSpeedUpExploit = new ButtonSetting("CPU SpeedUp Exploit", false));
     }
 
     @SubscribeEvent

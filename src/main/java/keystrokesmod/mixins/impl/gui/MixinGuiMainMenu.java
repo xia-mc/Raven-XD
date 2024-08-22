@@ -72,12 +72,12 @@ public abstract class MixinGuiMainMenu extends GuiScreen {
         if (!ModuleManager.clientTheme.isEnabled() || !ModuleManager.clientTheme.mainMenu.isToggled())
             return;
 
-        int j = this.height / 4 + 48;
+        int j = this.height / 4 + 54;
         this.buttonList.add(new GuiButton(1, this.width / 2 - 103, j, 200, 18, "SinglePlayer"));
-        this.buttonList.add(new GuiButton(2, this.width / 2 - 103, j + 24, 200, 18, "MultiPlayer"));
-        this.buttonList.add(new GuiButton(6, this.width / 2 - 103, j + 48, 200, 18, "Mods"));
-        this.buttonList.add(new GuiButton(0, this.width / 2 - 103, j + 72 + 12, 98, 18, "Options"));
-        this.buttonList.add(new GuiButton(4, this.width / 2 - 1, j + 72 + 12, 98, 18, "Quit"));
+        this.buttonList.add(new GuiButton(2, this.width / 2 - 103, j + 22, 200, 18, "MultiPlayer"));
+        this.buttonList.add(new GuiButton(6, this.width / 2 - 103, j + 44, 200, 18, "Mods"));
+        this.buttonList.add(new GuiButton(0, this.width / 2 - 103, j + 66 + 12, 98, 18, "Options"));
+        this.buttonList.add(new GuiButton(4, this.width / 2 - 1, j + 66 + 12, 98, 18, "Quit"));
 
         this.mc.setConnectedToRealms(false);
         ci.cancel();

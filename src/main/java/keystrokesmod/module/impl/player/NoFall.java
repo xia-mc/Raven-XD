@@ -20,6 +20,7 @@ public class NoFall extends Module {
                 .add(new OnGround1NoFall("OnGround1", this))
                 .add(new OnGround2NoFall("OnGround2", this))
                 .add(new VulcanNoFall("Vulcan", this))
+                .add(new HypixelNoGroundNoFall("HypixelNoGround", this))
         );
         this.registerSetting(ignoreVoid = new ButtonSetting("Ignore void", true));
     }

@@ -9,7 +9,6 @@ import keystrokesmod.utility.Theme;
 import keystrokesmod.utility.Utils;
 import keystrokesmod.utility.font.IFont;
 import keystrokesmod.utility.render.shader.GaussianFilter;
-import keystrokesmod.utility.render.shader.impl.ShaderRoundedRect;
 import keystrokesmod.utility.render.shader.impl.ShaderScissor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
@@ -18,6 +17,7 @@ import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.shader.Framebuffer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -28,6 +28,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Timer;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 
@@ -38,8 +39,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import static keystrokesmod.utility.render.RRectUtils.roundedOutlineShader;
-import static keystrokesmod.utility.render.RRectUtils.setupRoundedRectUniforms;
 import static org.lwjgl.opengl.GL11.*;
 
 public class RenderUtils {
@@ -48,7 +47,7 @@ public class RenderUtils {
     public static boolean ring_c = false;
     private static final float renderPartialTicks = 0.0f;
 
-    private static final Map<Integer, Integer> shadowCache = new HashMap<>();
+    private static final Map<Integer, Integer> shadowCache = new HashMap<>(5);
 
     public static void renderBlock(BlockPos blockPos, int color, boolean outline, boolean shade) {
         renderBox(blockPos.getX(), blockPos.getY(), blockPos.getZ(), 1, 1, 1, color, outline, shade);
@@ -1067,7 +1066,9 @@ public class RenderUtils {
         y -= blurRadius - 0.5f;
 
         int identifier = Arrays.deepHashCode(new Object[]{width, height, blurRadius, roundRadius});
-        if (!shadowCache.containsKey(identifier)) {
+        @Nullable Integer image = shadowCache.get(identifier);
+
+        if (image == null) {
             if (width <= 0) width = 1;
             if (height <= 0) height = 1;
             BufferedImage original = new BufferedImage((int) width, (int) height, BufferedImage.TYPE_INT_ARGB_PRE);
@@ -1097,9 +1098,10 @@ public class RenderUtils {
             }
             if (scissor)
                 blurred = new ShaderScissor(cut_x, cut_y, cut_w, cut_h, blurred, 1, false, false).generate();
-            shadowCache.put(identifier, TextureUtil.uploadTextureImageAllocate(TextureUtil.glGenTextures(), blurred, true, false));
+            image = TextureUtil.uploadTextureImageAllocate(TextureUtil.glGenTextures(), blurred, true, false);
+            shadowCache.put(identifier, image);
         }
-        drawImage(shadowCache.get(identifier), x, y, width, height, color);
+        drawImage(image, x, y, width, height, color);
     }
 
     public static void color(int color) {
@@ -1163,5 +1165,32 @@ public class RenderUtils {
         GL11.glDisable(2848);
         GL11.glHint(3154, 4352);
         GL11.glHint(3155, 4352);
+    }
+
+    public static Framebuffer createFrameBuffer(Framebuffer framebuffer) {
+        return createFrameBuffer(framebuffer, false);
+    }
+
+    public static Framebuffer createFrameBuffer(Framebuffer framebuffer, boolean depth) {
+        if (needsNewFramebuffer(framebuffer)) {
+            if (framebuffer != null) {
+                framebuffer.deleteFramebuffer();
+            }
+            return new Framebuffer(mc.displayWidth, mc.displayHeight, depth);
+        }
+        return framebuffer;
+    }
+
+    public static boolean needsNewFramebuffer(Framebuffer framebuffer) {
+        return framebuffer == null || framebuffer.framebufferWidth != mc.displayWidth || framebuffer.framebufferHeight != mc.displayHeight;
+    }
+
+    /**
+     * Bind a texture using the specified integer refrence to the texture.
+     *
+     * @see org.lwjgl.opengl.GL13 for more information about texture bindings
+     */
+    public static void bindTexture(int texture) {
+        glBindTexture(GL_TEXTURE_2D, texture);
     }
 }
