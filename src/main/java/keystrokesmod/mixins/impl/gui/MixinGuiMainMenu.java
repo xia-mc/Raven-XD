@@ -22,6 +22,9 @@ import java.awt.*;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
 
 
 @Mixin(value = GuiMainMenu.class, priority = 1983)
@@ -35,6 +38,17 @@ public abstract class MixinGuiMainMenu extends GuiScreen {
 
     @Shadow private GuiScreen field_183503_M;
 
+    private static final List<String> SPLASH_TEXTS = Arrays.asList(
+            "Raven... but funny?",
+            "beep boop beep",
+            "Made with... something by xia__mc!",
+            "System.out.println(\"Hello world!\");!",
+            "Make sure to thank the contributors!",
+            "Sub to xia__mc & qloha on YT!",
+            "i <3 java"
+    );
+    private String splashText;
+
     @Inject(method = "drawScreen", at = @At("HEAD"), cancellable = true)
     public void onDrawScreen(int p_drawScreen_1_, int p_drawScreen_2_, float p_drawScreen_3_, CallbackInfo ci) {
         if (!ModuleManager.clientTheme.isEnabled() || !ModuleManager.clientTheme.mainMenu.isToggled())
@@ -43,6 +57,7 @@ public abstract class MixinGuiMainMenu extends GuiScreen {
         BackgroundUtils.renderBackground(this);
 
         FontManager.tenacity80.drawCenteredString("Raven XD", width / 2.0, height * 0.2, LOGO_COLOR);
+        FontManager.tenacity20.drawString(splashText, width / 2.3, height * 0.2, LOGO_COLOR);
 
         List<String> branding = Lists.reverse(FMLCommonHandler.instance().getBrandings(true));
 
@@ -71,6 +86,8 @@ public abstract class MixinGuiMainMenu extends GuiScreen {
     public void onInitGui(CallbackInfo ci) {
         if (!ModuleManager.clientTheme.isEnabled() || !ModuleManager.clientTheme.mainMenu.isToggled())
             return;
+        Random random = new Random();
+        splashText = SPLASH_TEXTS.get(random.nextInt(SPLASH_TEXTS.size()));
 
         int j = this.height / 4 + 48;
         this.buttonList.add(new GuiButton(1, this.width / 2 - 103, j, 200, 18, "SinglePlayer"));
