@@ -117,7 +117,7 @@ public abstract class MixinEntityLivingBase extends Entity {
      */
     @Inject(method = "jump", at = @At("HEAD"), cancellable = true)
     protected void jump(CallbackInfo ci) {
-        JumpEvent jumpEvent = new JumpEvent(getJumpUpwardsMotion(), RotationHandler.getMovementYaw(this));
+        JumpEvent jumpEvent = new JumpEvent((float) MoveUtil.jumpMotion(), RotationHandler.getMovementYaw(this));
         MinecraftForge.EVENT_BUS.post(jumpEvent);
         if (jumpEvent.isCanceled()) {
             return;
