@@ -1,9 +1,7 @@
 package keystrokesmod.module.impl.movement;
 
 import keystrokesmod.module.Module;
-import keystrokesmod.module.impl.movement.longjump.HypixelFireballLongJump;
-import keystrokesmod.module.impl.movement.longjump.HypixelLongJump;
-import keystrokesmod.module.impl.movement.longjump.VulcanLongJump;
+import keystrokesmod.module.impl.movement.longjump.*;
 import keystrokesmod.module.setting.impl.ModeValue;
 
 public class LongJump extends Module {
@@ -15,6 +13,8 @@ public class LongJump extends Module {
                 .add(new HypixelLongJump("Hypixel", this))
                 .add(new HypixelFireballLongJump("HypixelFireball", this))
                 .add(new VulcanLongJump("Vulcan", this))
+                .add(new GrimBoatLongJump("GrimBoat", this))
+                .add(new GrimVelocityLongJump("Test", this))
         );
     }
 
