@@ -100,6 +100,6 @@ public class RavenNewTargetHUD extends SubMode<TargetHUD> implements ITargetVisu
         float lastHealthBar = (float) healthBarAnimation.getValue();
 
         int k = Utils.merge(Theme.getGradients((int) theme.getInput())[0], Math.min(255, 210));  // magic var lol
-        RenderUtils.drawRoundedGradientRect((float) current$minX + 6, (float) current$maxY, lastHealthBar, (float) (current$maxY + 5), 4.0f, k, k, k, Theme.getGradient((int) theme.getInput(), 300)); // health bar
+        RenderUtils.drawRoundedGradientRect((float) current$minX + 6, (float) current$maxY - 9, lastHealthBar, (float) (current$maxY - 4), 4.0f, k, k, k, Theme.getGradient((int) theme.getInput(), 300)); // health bar
     }
 }
