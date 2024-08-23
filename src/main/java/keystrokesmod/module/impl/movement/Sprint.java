@@ -1,6 +1,7 @@
 package keystrokesmod.module.impl.movement;
 
 import keystrokesmod.event.PreMotionEvent;
+import keystrokesmod.event.SprintEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.setting.impl.ModeSetting;
@@ -24,11 +25,18 @@ public class Sprint extends Module {
     }
 
     public static boolean omni() {
-        return omni || ModuleManager.sprint != null && ModuleManager.sprint.isEnabled() && ModuleManager.sprint.mode.getInput() == 1 && MoveUtil.isMoving();
+        final SprintEvent event = new SprintEvent(
+                MoveUtil.isMoving(),
+                omni || ModuleManager.sprint != null && ModuleManager.sprint.isEnabled() && ModuleManager.sprint.mode.getInput() == 1
+        );
+
+        return event.isSprint() && event.isOmni();
     }
 
     public static boolean stopSprint() {
-        return stopSprint;
+        final SprintEvent event = new SprintEvent(!stopSprint, false);
+
+        return event.isSprint();
     }
 
     @SubscribeEvent
