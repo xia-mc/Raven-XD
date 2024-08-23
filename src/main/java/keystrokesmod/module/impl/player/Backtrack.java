@@ -18,7 +18,6 @@ import keystrokesmod.utility.Utils;
 import keystrokesmod.utility.backtrack.TimedPacket;
 import keystrokesmod.utility.render.Animation;
 import keystrokesmod.utility.render.Easing;
-import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.INetHandlerPlayClient;
@@ -81,7 +80,6 @@ public class Backtrack extends Module {
 
     @Override
     public void onDisable() {
-        super.onDisable();
         if (mc.thePlayer == null)
             return;
 

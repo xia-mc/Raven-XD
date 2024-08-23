@@ -7,6 +7,7 @@ import keystrokesmod.module.impl.client.Settings;
 import keystrokesmod.module.setting.Setting;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.ModeValue;
+import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.script.Script;
 import keystrokesmod.utility.Utils;
 import keystrokesmod.utility.i18n.I18nModule;
@@ -36,6 +37,7 @@ public class Module {
     @Getter
     @Setter
     private boolean enabled;
+    @Getter
     private int keycode;
     private final @Nullable String toolTip;
     protected static Minecraft mc;
@@ -60,10 +62,11 @@ public class Module {
         this.enabled = false;
         mc = Minecraft.getMinecraft();
         this.settings = new ArrayList<>();
-        Raven.moduleCounter++;
+        if (!(this instanceof SubMode))
+            Raven.moduleCounter++;
     }
 
-    public static Module getModule(Class<? extends Module> a) {
+    public static @Nullable Module getModule(Class<? extends Module> a) {
         Iterator<Module> var1 = ModuleManager.modules.iterator();
 
         Module module;
@@ -131,7 +134,10 @@ public class Module {
         }
         else {
             FMLCommonHandler.instance().bus().register(this);
-            this.onEnable();
+            try {
+                this.onEnable();
+            } catch (Exception ignored) {
+            }
         }
     }
 
@@ -146,7 +152,10 @@ public class Module {
         }
         else {
             FMLCommonHandler.instance().bus().unregister(this);
-            this.onDisable();
+            try {
+                this.onDisable();
+            } catch (Exception ignored) {
+            }
         }
     }
 
@@ -226,10 +235,10 @@ public class Module {
         return this.moduleCategory;
     }
 
-    public void onEnable() {
+    public void onEnable() throws Exception {
     }
 
-    public void onDisable() {
+    public void onDisable() throws Exception {
     }
 
     public void toggle() {
@@ -247,17 +256,13 @@ public class Module {
 
     }
 
-    public void onUpdate() {
+    public void onUpdate() throws Exception {
     }
 
-    public void guiUpdate() {
+    public void guiUpdate() throws Exception {
     }
 
-    public void guiButtonToggled(ButtonSetting b) {
-    }
-
-    public int getKeycode() {
-        return this.keycode;
+    public void guiButtonToggled(ButtonSetting b) throws Exception {
     }
 
     public void setBind(int keybind) {

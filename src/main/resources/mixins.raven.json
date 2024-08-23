@@ -10,6 +10,7 @@
     "entity.MixinEntityLivingBase",
     "entity.MixinEntityPlayer",
     "entity.MixinEntityPlayerSP",
+    "event.MixinEventBus",
     "network.C02PacketUseEntityAccessor",
     "network.MixinModList",
     "network.MixinNetworkManager",

@@ -131,7 +131,6 @@ public class KillAuraV2 extends Module {
         }
         wasBlocking = false;
         autoBlock$watchdog$blockingTime = 0;
-        super.onDisable();
     }
 
     @SubscribeEvent

@@ -4,13 +4,19 @@ import io.netty.channel.ChannelHandlerContext;
 import keystrokesmod.Raven;
 import keystrokesmod.event.ReceivePacketEvent;
 import keystrokesmod.event.SendPacketEvent;
+import keystrokesmod.module.ModuleManager;
+import keystrokesmod.module.impl.client.Notifications;
+import keystrokesmod.module.impl.exploit.ExploitFixer;
 import keystrokesmod.utility.PacketUtils;
+import net.minecraft.network.INetHandler;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
+import net.minecraft.network.ThreadQuickExitException;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(value = NetworkManager.class, priority = 1001)
@@ -48,6 +54,24 @@ public abstract class MixinNetworkManager {
                 ci.cancel();
             }
         } catch (Exception ignored) {
+        }
+    }
+
+    @Redirect(method = "channelRead0(Lio/netty/channel/ChannelHandlerContext;Lnet/minecraft/network/Packet;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/Packet;processPacket(Lnet/minecraft/network/INetHandler;)V"))
+    public void onProcessPacket(Packet<?> instance, INetHandler handler) {
+        try {
+            ((Packet<INetHandler>) instance).processPacket(handler);
+        } catch (ThreadQuickExitException ignored) {  // 😅 Minecraft wtf
+        } catch (Exception e) {
+            try {
+                if (ModuleManager.exploitFixer != null && ModuleManager.exploitFixer.isEnabled() && ExploitFixer.safePacketProcess != null && ExploitFixer.safePacketProcess.isToggled()) {
+                    Notifications.sendNotification(
+                            Notifications.NotificationTypes.WARN,
+                            String.format("Catch %s on processing packet <%s>", e.getClass(), instance.toString()),
+                            5000);
+                }
+            } catch (Throwable ignored) {
+            }
         }
     }
 }

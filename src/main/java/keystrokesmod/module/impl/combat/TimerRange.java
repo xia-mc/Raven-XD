@@ -1,17 +1,27 @@
 package keystrokesmod.module.impl.combat;
 
 import akka.japi.Pair;
+import keystrokesmod.event.MoveEvent;
+import keystrokesmod.event.RotationEvent;
+import keystrokesmod.event.SendPacketEvent;
 import keystrokesmod.module.Module;
+import keystrokesmod.module.impl.other.RotationHandler;
 import keystrokesmod.module.impl.world.AntiBot;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.script.classes.Vec3;
+import keystrokesmod.utility.PacketUtils;
 import keystrokesmod.utility.Utils;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.network.Packet;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Comparator;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class TimerRange extends Module {
     private final SliderSetting lagTicks;
@@ -23,9 +33,13 @@ public class TimerRange extends Module {
     private final ButtonSetting ignoreTeammates;
     private final ButtonSetting onlyOnGround;
 
+    private State state = State.NONE;
     private int hasLag = 0;
-    private long lastTimerTime = 0;
-    private long lastLagTime = 0;
+    private long lastTimerTime = -1;
+    private final Queue<Packet<?>> delayedPackets = new ConcurrentLinkedQueue<>();
+    private float yaw, pitch;
+    private double motionX, motionY, motionZ;
+
     public TimerRange() {
         super("TimerRange", category.combat, "Use timer help you to beat opponent.");
         this.registerSetting(lagTicks = new SliderSetting("Lag ticks", 2, 0, 10, 1));
@@ -40,40 +54,72 @@ public class TimerRange extends Module {
 
     @SubscribeEvent
     public void onRender(TickEvent.RenderTickEvent e) {
-        if (!shouldStart()) {
-            reset();
-            return;
+        switch (state) {
+            case NONE:
+                if (shouldStart())
+                    state = State.TIMER;
+                break;
+            case TIMER:
+                for (int i = 0; i < timerTicks.getInput(); i++) {
+                    mc.thePlayer.onUpdate();
+                }
+                yaw = RotationHandler.getRotationYaw();
+                pitch = RotationHandler.getRotationPitch();
+                motionX = mc.thePlayer.motionX;
+                motionY = mc.thePlayer.motionY;
+                motionZ = mc.thePlayer.motionZ;
+                state = State.LAG;
+                break;
+            case LAG:
+                if (hasLag >= lagTicks.getInput())
+                    done();
+                else
+                    hasLag++;
+                break;
         }
+    }
 
-        if (hasLag < lagTicks.getInput()) {
-            if (System.currentTimeMillis() - lastLagTime >= 50) {
-                hasLag++;
-                lastLagTime = System.currentTimeMillis();
-                Utils.getTimer().timerSpeed = 0.0F;
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public void onSendPacket(SendPacketEvent event) {
+        if (state != State.NONE) {
+            synchronized (delayedPackets) {
+                delayedPackets.add(event.getPacket());
+                event.setCanceled(true);
             }
-            return;
         }
+    }
 
-        Utils.resetTimer();
-        for (int i = 0; i < timerTicks.getInput(); i++) {
-            mc.thePlayer.onUpdate();
+    @SubscribeEvent
+    public void onMove(@NotNull MoveEvent event) {
+        event.setCanceled(true);
+        mc.thePlayer.motionX = motionX;
+        mc.thePlayer.motionY = motionY;
+        mc.thePlayer.motionZ = motionZ;
+    }
+
+    @SubscribeEvent
+    public void onRotation(RotationEvent event) {
+        if (state == State.LAG) {
+            event.setYaw(yaw);
+            event.setPitch(pitch);
         }
-
-        hasLag = 0;
-        lastTimerTime = System.currentTimeMillis();
     }
 
     @Override
     public void onDisable() {
-        reset();
+        done();
     }
 
-    private void reset() {
-        lastTimerTime = 0;
-        lastLagTime = 0;
-        if (hasLag > 0)
-            Utils.resetTimer();
+    private void done() {
+        state = State.NONE;
         hasLag = 0;
+        lastTimerTime = System.currentTimeMillis();
+
+        synchronized (delayedPackets) {
+            for (Packet<?> p : delayedPackets) {
+                PacketUtils.sendPacket(p);
+            }
+        }
     }
 
     private boolean shouldStart() {
@@ -104,5 +150,11 @@ public class TimerRange extends Module {
     @Override
     public String getInfo() {
         return String.valueOf((int) timerTicks.getInput());
+    }
+
+    enum State {
+        NONE,
+        TIMER,
+        LAG
     }
 }
