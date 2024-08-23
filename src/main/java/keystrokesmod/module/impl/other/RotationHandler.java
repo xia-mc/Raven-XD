@@ -146,7 +146,7 @@ public final class RotationHandler extends Module {
 
         RotationEvent rotationEvent = new RotationEvent(getRotationYaw(), getRotationPitch(), MoveFix.values()[(int) defaultMoveFix.getInput()]);
         MinecraftForge.EVENT_BUS.post(rotationEvent);
-        isSet = rotationEvent.isSet() || rotationYaw != null || rotationPitch != null;
+        isSet = (rotationEvent.isSet() || rotationYaw != null || rotationPitch != null) && rotationEvent.isSmoothBack();
         if (isSet) {
             rotationYaw = rotationEvent.getYaw();
             rotationPitch = rotationEvent.getPitch();

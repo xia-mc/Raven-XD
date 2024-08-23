@@ -1,108 +1,79 @@
 package keystrokesmod.module.impl.combat;
 
-import keystrokesmod.Raven;
+import keystrokesmod.event.MoveInputEvent;
 import keystrokesmod.event.PreMotionEvent;
-import keystrokesmod.module.Module;
-import keystrokesmod.module.impl.world.AntiBot;
-import keystrokesmod.module.setting.impl.ButtonSetting;
-import keystrokesmod.module.setting.impl.ModeSetting;
-import keystrokesmod.module.setting.impl.SliderSetting;
-import keystrokesmod.utility.Utils;
-import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraftforge.event.entity.player.AttackEntityEvent;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
+import keystrokesmod.event.SprintEvent;
+import keystrokesmod.mixins.impl.client.KeyBindingAccessor;
+import keystrokesmod.module.impl.combat.morekb.IMoreKB;
+import keystrokesmod.module.impl.combat.morekb.impl.SimpleSprintReset;
+import keystrokesmod.module.setting.impl.ModeValue;
+import keystrokesmod.utility.MoveUtil;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.lwjgl.input.Keyboard;
 
-import java.util.concurrent.TimeUnit;
-
-public class MoreKB extends Module {
-    private final String[] MODES = new String[]{"Legit", "Silent"};
-    private final ModeSetting mode;
-    private final SliderSetting chance;
-    private final SliderSetting delay;
-    private final SliderSetting rePressDelay;
-    private long lastFinish = -1;
-    private final ButtonSetting playersOnly;
-    private final ButtonSetting notWhileRunner;
-    private final ButtonSetting sprintReset;
-    private final ButtonSetting sneak;
-
-    private boolean silentNoSprint = false;
-    private boolean silentSneak = false;
+public class MoreKB extends IMoreKB {
+    private final ModeValue mode;
 
     public MoreKB() {
         super("MoreKB", category.combat);
-        this.registerSetting(mode = new ModeSetting("Mode", MODES, 0));
-        this.registerSetting(chance = new SliderSetting("Chance", 100, 0, 100, 1, "%"));
-        this.registerSetting(delay = new SliderSetting("Delay", 500, 200, 750, 1, "ms"));
-        this.registerSetting(rePressDelay = new SliderSetting("Re-press delay", 100, 1, 500, 1, "ms"));
-        this.registerSetting(playersOnly = new ButtonSetting("Players only", true));
-        this.registerSetting(notWhileRunner = new ButtonSetting("Not while runner", false));
-        this.registerSetting(sprintReset = new ButtonSetting("Sprint reset", true));
-        this.registerSetting(sneak = new ButtonSetting("Sneak", false));
+        this.registerSetting(mode = new ModeValue("Mode", this)
+                .add(new SimpleSprintReset("Legit", this))
+                .add(new SimpleSprintReset("LegitSneak", this))
+                .add(new SimpleSprintReset("LegitFast", this))
+                .add(new SimpleSprintReset("Fast", this))
+                .add(new SimpleSprintReset("Packet", this))
+                .setDefaultValue("LegitFast")
+        );
+    }
+
+    @SubscribeEvent
+    public void onMoveInput(MoveInputEvent event) {
+        if (noSprint() && MoveUtil.isMoving()) {
+            switch ((int) mode.getInput()) {
+                case 1:
+                    event.setSneak(true);
+                    break;
+                case 3:
+                    event.setForward(0.7999f);
+                    break;
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public void onSprint(SprintEvent event) {
+        if (noSprint() && MoveUtil.isMoving() && (int) mode.getInput() == 2) {
+            event.setSprint(false);
+        }
+    }
+
+    @SubscribeEvent
+    public void onPreMotion(PreMotionEvent event) {
+        if (noSprint() && MoveUtil.isMoving()) {
+            if ((int) mode.getInput() == 4) {
+                event.setSprinting(false);
+            }
+        }
     }
 
     @Override
-    public void onDisable() {
-        silentNoSprint = false;
-        silentSneak = false;
-    }
-
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    public void onPreMotion(PreMotionEvent event) {
-        if (silentNoSprint) event.setSprinting(false);
-        if (silentSneak) event.setSneaking(true);
-    }
-
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    public void onAttack(AttackEntityEvent event) {
-        final long currentTimeMillis = System.currentTimeMillis();
-        if (!Utils.nullCheck() || event.entityPlayer != mc.thePlayer || currentTimeMillis - lastFinish < delay.getInput()) return;
-        if (playersOnly.isToggled() && !(event.target instanceof EntityPlayer)) return;
-        if (notWhileRunner.isToggled() && !Utils.inFov(180, event.target, mc.thePlayer)) return;
-        else if (!(event.target instanceof EntityLivingBase)) return;
-        if (((EntityLivingBase) event.target).deathTime != 0) return;
-        if (AntiBot.isBot(event.target)) return;
-
-        if (Math.random() > chance.getInput()) return;
-        // code
-        switch ((int) mode.getInput()) {
-            case 0:
-                if (sprintReset.isToggled()) {
-                    KeyBinding.setKeyBindState(mc.gameSettings.keyBindForward.getKeyCode(), false);
-                    Raven.getExecutor().schedule(() -> KeyBinding.setKeyBindState(mc.gameSettings.keyBindForward.getKeyCode(), Keyboard.isKeyDown(mc.gameSettings.keyBindForward.getKeyCode())),
-                            (long) rePressDelay.getInput(), TimeUnit.MILLISECONDS);
-                }
-                if (sneak.isToggled()) {
-                    KeyBinding.setKeyBindState(mc.gameSettings.keyBindSneak.getKeyCode(), true);
-                    Raven.getExecutor().schedule(() -> KeyBinding.setKeyBindState(mc.gameSettings.keyBindSneak.getKeyCode(), Keyboard.isKeyDown(mc.gameSettings.keyBindSneak.getKeyCode())),
-                            (long) rePressDelay.getInput(), TimeUnit.MILLISECONDS);
-                }
-                break;
-            case 1:
-                if (sprintReset.isToggled()) {
-                    silentNoSprint = true;
-                    Raven.getExecutor().schedule(() -> {
-                        silentNoSprint = false;
-                        }, (long) rePressDelay.getInput(), TimeUnit.MILLISECONDS);
-                }
-                if (sneak.isToggled()) {
-                    silentSneak = true;
-                    Raven.getExecutor().schedule(() -> {
-                        silentSneak = false;
-                        }, (long) rePressDelay.getInput(), TimeUnit.MILLISECONDS);
-                }
-                break;
+    public void stopSprint() {
+        super.stopSprint();
+        if ((int) mode.getInput() == 0) {
+            ((KeyBindingAccessor) mc.gameSettings.keyBindForward).setPressed(false);
         }
+    }
 
-        lastFinish = currentTimeMillis;
+    @Override
+    public void reSprint() {
+        super.reSprint();
+        if ((int) mode.getInput() == 0) {
+            ((KeyBindingAccessor) mc.gameSettings.keyBindForward).setPressed(Keyboard.isKeyDown(mc.gameSettings.keyBindForward.getKeyCode()));
+        }
     }
 
     @Override
     public String getInfo() {
-        return MODES[(int) mode.getInput()];
+        return mode.getSelected().getPrettyName();
     }
 }

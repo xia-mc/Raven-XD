@@ -101,7 +101,10 @@ public class ButtonComponent extends Component {
                 return;
             }
             this.buttonSetting.toggle();
-            this.mod.guiButtonToggled(this.buttonSetting);
+            try {
+                this.mod.guiButtonToggled(this.buttonSetting);
+            } catch (Exception ignored) {
+            }
             if (Raven.currentProfile != null) {
                 ((ProfileModule) Raven.currentProfile.getModule()).saved = false;
             }

@@ -1,9 +1,6 @@
 package keystrokesmod.module.impl.player;
 
-import keystrokesmod.event.BlockAABBEvent;
-import keystrokesmod.event.PreMotionEvent;
-import keystrokesmod.event.PreUpdateEvent;
-import keystrokesmod.event.SendPacketEvent;
+import keystrokesmod.event.*;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.other.SlotHandler;
 import keystrokesmod.module.setting.impl.ButtonSetting;
@@ -176,7 +173,7 @@ public class AntiVoid extends Module {
     }
 
     @SubscribeEvent
-    public void onPreMotion(PreMotionEvent event) {
+    public void onRotation(RotationEvent event) {
         if ((mode.getInput() == 1 || mode.getInput() == 2) && airStuck) {
             mc.thePlayer.setPosition(airStuck$posX, airStuck$posY, airStuck$posZ);
             mc.thePlayer.motionX = mc.thePlayer.motionY = mc.thePlayer.motionZ = 0;

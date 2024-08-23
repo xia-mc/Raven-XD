@@ -46,7 +46,6 @@ public class BridgeAssist extends Module {
     public void onEnable() {
         this.waitingForAim = false;
         this.gliding = false;
-        super.onEnable();
     }
 
     @SubscribeEvent

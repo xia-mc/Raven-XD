@@ -26,10 +26,10 @@ public class LagRange extends Module {
 
     public LagRange() {
         super("LagRange", category.combat);
-        this.registerSetting(lagTime = new SliderSetting("Lag time", 150, 0, 500, 10, "ms"));
+        this.registerSetting(lagTime = new SliderSetting("Lag time", 50, 0, 500, 10, "ms"));
         this.registerSetting(minRange = new SliderSetting("Min range", 3.6, 0, 8, 0.1));
         this.registerSetting(maxRange = new SliderSetting("Max range", 5, 0, 8, 0.1));
-        this.registerSetting(delay = new SliderSetting("Delay", 2000, 500, 10000, 100, "ms"));
+        this.registerSetting(delay = new SliderSetting("Delay", 150, 50, 2000, 50, "ms"));
         this.registerSetting(fov = new SliderSetting("Fov", 180, 0, 360, 30));
         this.registerSetting(ignoreTeammates = new ButtonSetting("Ignore teammates", true));
         this.registerSetting(onlyOnGround = new ButtonSetting("Only onGround", false));

@@ -25,11 +25,9 @@ public class RavenNewTargetHUD extends SubMode<TargetHUD> implements ITargetVisu
     public static final int RECT_COLOR = new Color(255, 255, 255, 255).getRGB();
     public static final int TEXT_DIST_TO_RECT = 6;
     public static final int RECT_SHADOW_DIST = 3;
-    private final GradientBlur blur = new GradientBlur(GradientBlur.Type.LR);
     private final ModeSetting theme;
     private final ModeSetting font;
     private final ButtonSetting showStatus;
-    private final ButtonSetting healthColor;
     private final Animation healthBarAnimation = new Animation(Easing.EASE_OUT_CIRC, 150);
 
     public RavenNewTargetHUD(String name, @NotNull TargetHUD parent) {
@@ -37,7 +35,6 @@ public class RavenNewTargetHUD extends SubMode<TargetHUD> implements ITargetVisu
         this.registerSetting(theme = new ModeSetting("Theme", Theme.themes, 0));
         this.registerSetting(font = new ModeSetting("Font", new String[]{"Minecraft", "ProductSans", "Regular"}, 0));
         this.registerSetting(showStatus = new ButtonSetting("Show win or loss", true));
-        this.registerSetting(healthColor = new ButtonSetting("Traditional health color", false));
     }
 
     private IFont getFont() {
@@ -93,5 +90,16 @@ public class RavenNewTargetHUD extends SubMode<TargetHUD> implements ITargetVisu
         GaussianBlur.endBlur(4, 2);
 
         getFont().drawString(renderText, current$minX + TEXT_DIST_TO_RECT, current$minY + TEXT_DIST_TO_RECT, -1);
+
+        float healthBar = (float) (int) (current$maxX - 6 + (current$minX + 6 - current$maxX - 6) * (1.0 - ((health < 0.05) ? 0.05 : health)));
+
+        if (healthBar - current$minX + 3 < 0) { // if goes below, the rounded health bar glitches out
+            healthBar = current$minX + 3;
+        }
+        healthBarAnimation.run(healthBar);
+        float lastHealthBar = (float) healthBarAnimation.getValue();
+
+        int k = Utils.merge(Theme.getGradients((int) theme.getInput())[0], Math.min(255, 210));  // magic var lol
+        RenderUtils.drawRoundedGradientRect((float) current$minX + 6, (float) current$maxY - 9, lastHealthBar, (float) (current$maxY - 4), 4.0f, k, k, k, Theme.getGradient((int) theme.getInput(), 300)); // health bar
     }
 }

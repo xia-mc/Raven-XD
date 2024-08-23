@@ -3,7 +3,10 @@ package keystrokesmod.module.impl.movement.fly;
 import keystrokesmod.module.impl.movement.Fly;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.impl.SubMode;
+import keystrokesmod.utility.Utils;
 import org.jetbrains.annotations.NotNull;
+
+import javax.rmi.CORBA.Util;
 
 public class Vanilla1Fly extends SubMode<Fly> {
     private final SliderSetting horizontalSpeed;
@@ -29,13 +32,14 @@ public class Vanilla1Fly extends SubMode<Fly> {
 
     @Override
     public void onDisable() {
-        if (mc.thePlayer.capabilities.allowFlying) {
-            mc.thePlayer.capabilities.isFlying = this.lastFlying;
-        } else {
-            mc.thePlayer.capabilities.isFlying = false;
+        if (Utils.nullCheck()) {
+            if (mc.thePlayer.capabilities.allowFlying) {
+                mc.thePlayer.capabilities.isFlying = this.lastFlying;
+            } else {
+                mc.thePlayer.capabilities.isFlying = false;
+            }
+            mc.thePlayer.capabilities.setFlySpeed(0.05F);
         }
         lastFlying = false;
-
-        mc.thePlayer.capabilities.setFlySpeed(0.05F);
     }
 }
