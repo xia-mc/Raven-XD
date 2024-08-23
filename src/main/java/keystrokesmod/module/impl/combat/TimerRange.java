@@ -10,12 +10,12 @@ import keystrokesmod.module.impl.world.AntiBot;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.script.classes.Vec3;
+import keystrokesmod.utility.MoveUtil;
 import keystrokesmod.utility.PacketUtils;
 import keystrokesmod.utility.Utils;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.client.C03PacketPlayer;
-import net.minecraft.network.play.client.C0FPacketConfirmTransaction;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
@@ -34,6 +34,7 @@ public class TimerRange extends Module {
     private final ButtonSetting ignoreTeammates;
     private final ButtonSetting onlyOnGround;
     private final ButtonSetting clearMotion;
+    private final ButtonSetting notWhileKB;
 
     private State state = State.NONE;
     private int hasLag = 0;
@@ -52,7 +53,8 @@ public class TimerRange extends Module {
         this.registerSetting(fov = new SliderSetting("Fov", 180, 0, 360, 30));
         this.registerSetting(ignoreTeammates = new ButtonSetting("Ignore teammates", true));
         this.registerSetting(onlyOnGround = new ButtonSetting("Only onGround", false));
-        this.registerSetting(clearMotion = new ButtonSetting("Clear motion", true));
+        this.registerSetting(clearMotion = new ButtonSetting("Clear motion", false));
+        this.registerSetting(notWhileKB = new ButtonSetting("Not while kb", false));
     }
 
     @Override
@@ -155,6 +157,7 @@ public class TimerRange extends Module {
         if (onlyOnGround.isToggled() && !mc.thePlayer.onGround) return false;
         if (!Utils.isMoving()) return false;
         if (fov.getInput() == 0) return false;
+        if (notWhileKB.isToggled() && mc.thePlayer.hurtTime > 0) return false;
         if (System.currentTimeMillis() - lastTimerTime < delay.getInput()) return false;
 
         EntityPlayer target = mc.theWorld.playerEntities.parallelStream()
