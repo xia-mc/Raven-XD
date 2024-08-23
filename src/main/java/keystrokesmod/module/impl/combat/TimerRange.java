@@ -14,9 +14,10 @@ import keystrokesmod.utility.PacketUtils;
 import keystrokesmod.utility.Utils;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.Packet;
+import net.minecraft.network.play.client.C03PacketPlayer;
+import net.minecraft.network.play.client.C0FPacketConfirmTransaction;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Comparator;
@@ -32,6 +33,7 @@ public class TimerRange extends Module {
     private final SliderSetting fov;
     private final ButtonSetting ignoreTeammates;
     private final ButtonSetting onlyOnGround;
+    private final ButtonSetting clearMotion;
 
     private State state = State.NONE;
     private int hasLag = 0;
@@ -50,10 +52,11 @@ public class TimerRange extends Module {
         this.registerSetting(fov = new SliderSetting("Fov", 180, 0, 360, 30));
         this.registerSetting(ignoreTeammates = new ButtonSetting("Ignore teammates", true));
         this.registerSetting(onlyOnGround = new ButtonSetting("Only onGround", false));
+        this.registerSetting(clearMotion = new ButtonSetting("Clear motion", true));
     }
 
-    @SubscribeEvent
-    public void onRender(TickEvent.RenderTickEvent e) {
+    @Override
+    public void onUpdate() {
         switch (state) {
             case NONE:
                 if (shouldStart())
@@ -68,6 +71,7 @@ public class TimerRange extends Module {
                 motionX = mc.thePlayer.motionX;
                 motionY = mc.thePlayer.motionY;
                 motionZ = mc.thePlayer.motionZ;
+                hasLag = 0;
                 state = State.LAG;
                 break;
             case LAG:
@@ -79,13 +83,25 @@ public class TimerRange extends Module {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @SubscribeEvent(priority = EventPriority.HIGH)
     public void onSendPacket(SendPacketEvent event) {
-        if (state != State.NONE) {
-            synchronized (delayedPackets) {
-                delayedPackets.add(event.getPacket());
-                event.setCanceled(true);
-            }
+        switch (state) {
+            case TIMER:
+                synchronized (delayedPackets) {
+                    delayedPackets.add(event.getPacket());
+                    event.setCanceled(true);
+                }
+                break;
+            case LAG:
+                if (event.getPacket() instanceof C03PacketPlayer) {
+                    event.setCanceled(true);
+                } else {
+                    synchronized (delayedPackets) {
+                        delayedPackets.add(event.getPacket());
+                        event.setCanceled(true);
+                    }
+                }
+                break;
         }
     }
 
@@ -104,6 +120,7 @@ public class TimerRange extends Module {
         if (state == State.LAG) {
             event.setYaw(yaw);
             event.setPitch(pitch);
+            event.noSmoothBack();
         }
     }
 
@@ -121,6 +138,15 @@ public class TimerRange extends Module {
             for (Packet<?> p : delayedPackets) {
                 PacketUtils.sendPacket(p);
             }
+            delayedPackets.clear();
+        }
+
+        if (clearMotion.isToggled()) {
+            mc.thePlayer.motionX = mc.thePlayer.motionY = mc.thePlayer.motionZ = 0;
+        } else {
+            mc.thePlayer.motionX = motionX;
+            mc.thePlayer.motionY = motionY;
+            mc.thePlayer.motionZ = motionZ;
         }
     }
 
@@ -131,7 +157,7 @@ public class TimerRange extends Module {
         if (fov.getInput() == 0) return false;
         if (System.currentTimeMillis() - lastTimerTime < delay.getInput()) return false;
 
-        EntityPlayer target = mc.theWorld.playerEntities.stream()
+        EntityPlayer target = mc.theWorld.playerEntities.parallelStream()
                 .filter(p -> p != mc.thePlayer)
                 .filter(p -> !ignoreTeammates.isToggled() || !Utils.isTeamMate(p))
                 .filter(p -> !Utils.isFriended(p))
