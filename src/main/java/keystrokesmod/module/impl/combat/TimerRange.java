@@ -91,10 +91,12 @@ public class TimerRange extends Module {
 
     @SubscribeEvent
     public void onMove(@NotNull MoveEvent event) {
-        event.setCanceled(true);
-        mc.thePlayer.motionX = motionX;
-        mc.thePlayer.motionY = motionY;
-        mc.thePlayer.motionZ = motionZ;
+        if (state == State.LAG) {
+            event.setCanceled(true);
+            mc.thePlayer.motionX = motionX;
+            mc.thePlayer.motionY = motionY;
+            mc.thePlayer.motionZ = motionZ;
+        }
     }
 
     @SubscribeEvent
