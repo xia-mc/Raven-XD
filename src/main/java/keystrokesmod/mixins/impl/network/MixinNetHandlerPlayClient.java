@@ -5,6 +5,7 @@ import keystrokesmod.Raven;
 import keystrokesmod.event.PostVelocityEvent;
 import keystrokesmod.event.PreVelocityEvent;
 import keystrokesmod.module.ModuleManager;
+import keystrokesmod.utility.Reflection;
 import keystrokesmod.utility.Utils;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.network.play.server.S12PacketEntityVelocity;
@@ -28,10 +29,12 @@ public abstract class MixinNetHandlerPlayClient {
             MinecraftForge.EVENT_BUS.post(event);
             if (event.isCanceled()) ci.cancel();
 
-            S12PacketEntityVelocityAccessor accessor = (S12PacketEntityVelocityAccessor) packet;
-            accessor.setMotionX(event.getMotionX());
-            accessor.setMotionY(event.getMotionY());
-            accessor.setMotionZ(event.getMotionZ());
+            try {
+                Reflection.S12PacketEntityVelocityXMotion.set(packet, event.getMotionX());
+                Reflection.S12PacketEntityVelocityYMotion.set(packet, event.getMotionY());
+                Reflection.S12PacketEntityVelocityZMotion.set(packet, event.getMotionZ());
+            } catch (IllegalAccessException ignored) {
+            }
         }
     }
 

@@ -1,13 +1,11 @@
 package keystrokesmod.module.impl.movement.fly;
 
 import keystrokesmod.event.MoveEvent;
-import keystrokesmod.event.ReceivePacketEvent;
-import keystrokesmod.mixins.impl.network.S12PacketEntityVelocityAccessor;
+import keystrokesmod.event.PreVelocityEvent;
 import keystrokesmod.module.impl.movement.Fly;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.impl.SubMode;
-import net.minecraft.network.play.server.S12PacketEntityVelocity;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
@@ -43,17 +41,12 @@ public class MatrixTNTFly extends SubMode<Fly> {
     }
 
     @SubscribeEvent
-    public void onReceivePacket(@NotNull ReceivePacketEvent event) {
-        if (event.getPacket() instanceof S12PacketEntityVelocity) {
-            final S12PacketEntityVelocity packet = (S12PacketEntityVelocity) event.getPacket();
-            if (packet.getEntityID() == mc.thePlayer.getEntityId()) {
-                ((S12PacketEntityVelocityAccessor) packet).setMotionX((int) (packet.getMotionX() * horizontalSpeed.getInput()));
-                ((S12PacketEntityVelocityAccessor) packet).setMotionY(0);
-                ((S12PacketEntityVelocityAccessor) packet).setMotionZ((int) (packet.getMotionZ() * horizontalSpeed.getInput()));
-                velocityTicks = 0;
-                fly = true;
-            }
-        }
+    public void onPreVelocity(@NotNull PreVelocityEvent event) {
+        event.setMotionX((int) (event.getMotionX() * horizontalSpeed.getInput()));
+        event.setMotionY(0);
+        event.setMotionZ((int) (event.getMotionZ() * horizontalSpeed.getInput()));
+        velocityTicks = 0;
+        fly = true;
     }
 
     @Override

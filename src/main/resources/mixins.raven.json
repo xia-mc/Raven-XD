@@ -45,7 +45,6 @@
     "gui.MixinGuiScreen",
     "network.MixinClientSpoofer",
     "network.MixinNetHandlerPlayClient",
-    "network.S12PacketEntityVelocityAccessor",
     "render.ItemRendererAccessor",
     "render.MixinBlockRendererDispatcher",
     "render.MixinEntityRenderer",

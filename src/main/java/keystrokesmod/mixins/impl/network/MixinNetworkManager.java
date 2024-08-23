@@ -1,5 +1,6 @@
 package keystrokesmod.mixins.impl.network;
 
+import com.mojang.realmsclient.gui.ChatFormatting;
 import io.netty.channel.ChannelHandlerContext;
 import keystrokesmod.Raven;
 import keystrokesmod.event.ReceivePacketEvent;
@@ -8,6 +9,7 @@ import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.client.Notifications;
 import keystrokesmod.module.impl.exploit.ExploitFixer;
 import keystrokesmod.utility.PacketUtils;
+import keystrokesmod.utility.Utils;
 import net.minecraft.network.INetHandler;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
@@ -18,6 +20,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import java.util.Arrays;
 
 @Mixin(value = NetworkManager.class, priority = 1001)
 public abstract class MixinNetworkManager {
@@ -65,10 +69,18 @@ public abstract class MixinNetworkManager {
         } catch (Exception e) {
             try {
                 if (ModuleManager.exploitFixer != null && ModuleManager.exploitFixer.isEnabled() && ExploitFixer.safePacketProcess != null && ExploitFixer.safePacketProcess.isToggled()) {
-                    Notifications.sendNotification(
-                            Notifications.NotificationTypes.WARN,
-                            String.format("Catch %s on processing packet <%s>", e.getClass(), instance.toString()),
-                            5000);
+                    final StringBuilder stackTraces = new StringBuilder();
+
+                    Arrays.stream(e.getStackTrace())
+                            .limit(4)
+                            .parallel()
+                            .map(s -> "\n  " + ChatFormatting.RED + "at " + ChatFormatting.AQUA + s)
+                            .forEach(stackTraces::append);
+
+                    Utils.sendMessage(String.format(
+                            "%sCatch %s on processing packet <%s>.%s",
+                            ChatFormatting.RED, e.getClass(), instance.toString(), stackTraces
+                    ));
                 }
             } catch (Throwable ignored) {
             }
