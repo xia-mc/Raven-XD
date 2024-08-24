@@ -250,6 +250,9 @@ public class MoveUtil {
      * @return modified motion
      */
     public static double jumpBoostMotion(final double motionY) {
+        if (!Utils.nullCheck())
+            return 0.42f;
+
         if (mc.thePlayer.isPotionActive(Potion.jump)) {
             return motionY + (mc.thePlayer.getActivePotionEffect(Potion.jump).getAmplifier() + 1) * 0.1F;
         }

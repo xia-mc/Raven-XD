@@ -124,6 +124,7 @@ public class ModuleManager {
     public static ClientTheme clientTheme;
     public static ScaffoldHelper scaffoldHelper;
     public static AutoChest autoChest;
+    public static SilenceIRC silenceIRC;
 
     public void register() {
 
@@ -219,6 +220,7 @@ public class ModuleManager {
         this.addModule(autoRegister = new AutoRegister());
         this.addModule(viewPackets = new ViewPackets());
         this.addModule(new FlagDetector());
+        this.addModule(silenceIRC = new SilenceIRC());
 
         // player
         this.addModule(new AntiAFK());

@@ -35,7 +35,7 @@ public class HypixelNoGroundNoFall extends SubMode<NoFall> {
             state = State.FALL;
         }
 
-        if (!(notWhileBreaking.isToggled() && ((PlayerControllerMPAccessor) mc.playerController).isHittingBlock()))
+        if (notWhileBreaking.isToggled() && ((PlayerControllerMPAccessor) mc.playerController).isHittingBlock())
             state = State.NONE;
 
         if (state != State.NONE)

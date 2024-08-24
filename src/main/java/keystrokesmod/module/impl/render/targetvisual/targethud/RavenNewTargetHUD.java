@@ -20,11 +20,10 @@ import java.awt.*;
 import static keystrokesmod.module.impl.render.TargetHUD.*;
 
 public class RavenNewTargetHUD extends SubMode<TargetHUD> implements ITargetVisual {
-    public static final Color SHADOW_COLOR = new Color(0, 0, 0, 60);
-    public static final Color NONE_COLOR = new Color(0, 0, 0, 0);
-    public static final int RECT_COLOR = new Color(255, 255, 255, 255).getRGB();
+    public static final int SHADOW_COLOR = new Color(0, 0, 0, 80).getRGB();
+    public static final int RECT_COLOR = new Color(255, 255, 255, 30).getRGB();
     public static final int TEXT_DIST_TO_RECT = 6;
-    public static final int RECT_SHADOW_DIST = 3;
+    public static final int RECT_SHADOW_DIST = 6;
     private final ModeSetting theme;
     private final ModeSetting font;
     private final ButtonSetting showStatus;
@@ -70,24 +69,22 @@ public class RavenNewTargetHUD extends SubMode<TargetHUD> implements ITargetVisu
         current$maxX = current$minX + (int) Math.round(getFont().width(renderText)) + 12;
         current$maxY = current$minY + 16 + 12;
 
+        RenderUtils.drawBloomShadow(
+                (float) (current$minX - RECT_SHADOW_DIST), (float) (current$minY - RECT_SHADOW_DIST),
+                (float) (current$maxX - current$minX + RECT_SHADOW_DIST * 2.0), (float) (current$maxY - current$minY + RECT_SHADOW_DIST * 2.0),
+                6, 8, SHADOW_COLOR, false);
+
+        RenderUtils.drawBloomShadow(
+                current$minX, current$minY,
+                current$maxX - current$minX, current$maxY - current$minY,
+                6, 8, RECT_COLOR, false);
+
         GaussianBlur.startBlur();
         RenderUtils.drawBloomShadow(
                 current$minX, current$minY,
                 current$maxX - current$minX, current$maxY - current$minY,
-                6, 4, -1, false);
+                6, 8, -1, false);
         GaussianBlur.endBlur(8, 2);
-
-        RRectUtils.drawRoundOutline(
-                current$minX - RECT_SHADOW_DIST, current$minY - RECT_SHADOW_DIST,
-                current$maxX - current$minX + RECT_SHADOW_DIST * 2.0, current$maxY - current$minY + RECT_SHADOW_DIST * 2.0,
-                3, 2, NONE_COLOR, SHADOW_COLOR);
-
-        GaussianBlur.startBlur();
-        RenderUtils.drawBloomShadow(
-                (float) (current$minX - RECT_SHADOW_DIST), (float) (current$minY - RECT_SHADOW_DIST),
-                (float) (current$maxX - current$minX + RECT_SHADOW_DIST * 2.0), (float) (current$maxY - current$minY + RECT_SHADOW_DIST * 2.0),
-                3, 2, NONE_COLOR.getRGB(), false);
-        GaussianBlur.endBlur(4, 2);
 
         getFont().drawString(renderText, current$minX + TEXT_DIST_TO_RECT, current$minY + TEXT_DIST_TO_RECT, -1);
 

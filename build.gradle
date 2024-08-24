@@ -23,7 +23,7 @@ apply plugin: 'java'
 
 group = "keystrokesmod"
 archivesBaseName = "raven-XD"
-//version = "2.2.1"
+version = "2.3-Dev"
 
 compileJava {
     sourceCompatibility = '1.8'
@@ -75,6 +75,7 @@ dependencies {
     }
     implementation 'org.projectlombok:lombok:1.18.22'
     implementation 'org.jetbrains:annotations:24.1.0'
+    implementation 'cn.hutool:hutool-all:5.8.26'
     implementation files('libraries/json-20220924.jar')
     implementation files('libraries/discord-rpc.jar')
 //    implementation files('libraries/ViaAprilFools-3.0.2-SNAPSHOT.jar')

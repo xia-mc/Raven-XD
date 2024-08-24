@@ -72,7 +72,7 @@ public abstract class MixinNetworkManager {
                     final StringBuilder stackTraces = new StringBuilder();
 
                     Arrays.stream(e.getStackTrace())
-                            .limit(4)
+                            .limit(7)
                             .parallel()
                             .map(s -> "\n  " + ChatFormatting.RED + "at " + ChatFormatting.AQUA + s)
                             .forEach(stackTraces::append);

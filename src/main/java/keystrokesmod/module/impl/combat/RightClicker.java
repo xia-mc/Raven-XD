@@ -68,6 +68,7 @@ public class RightClicker extends IAutoClicker {
         }
 
         Utils.sendClick(1, true);
+        Utils.sendClick(1, false);
         return true;
     }
 }

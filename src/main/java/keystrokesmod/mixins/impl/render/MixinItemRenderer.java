@@ -19,10 +19,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.MathHelper;
 import net.minecraftforge.common.MinecraftForge;
 import org.jetbrains.annotations.NotNull;
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
-import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -58,6 +55,9 @@ public abstract class MixinItemRenderer {
 
     @Shadow private ItemStack itemToRender;
 
+    @Unique
+    private boolean raven_XD$lastIsSpoofItem = false;
+
     /**
      * @author xia__mc
      * @reason for Animations module.
@@ -83,8 +83,13 @@ public abstract class MixinItemRenderer {
 
             ItemStack itemToRender = SlotHandler.getRenderHeldItem();
             if (itemToRender != null) {
-                if (itemToRender != SlotHandler.getHeldItem())
+                if (itemToRender != SlotHandler.getHeldItem()) {
                     animationProgression = 0.0F;
+                    raven_XD$lastIsSpoofItem = true;
+                } else if (raven_XD$lastIsSpoofItem) {
+                    animationProgression = 0.0F;
+                    raven_XD$lastIsSpoofItem = false;
+                }
 
                 EnumAction enumaction = itemToRender.getItemUseAction();
                 final int itemInUseCount = thePlayer.getItemInUseCount();

@@ -445,6 +445,9 @@ public class KillAura extends IAutoClicker {
                 if (noAim) break;
                 Object[] rayCasted = Reach.getEntity(attackRange.getInput(), -0.05, rotationMode.getInput() == 1 ? rotations : null);
                 noAim = rayCasted == null || rayCasted[0] != target;
+                break;
+            case 0:
+                return false;
         }
 
         return noAim;

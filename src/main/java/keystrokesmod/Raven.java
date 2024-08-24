@@ -26,6 +26,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import org.jetbrains.annotations.NotNull;
+import silencefix.SFIRCListener;
+import silencefix.SilenceFixIRC;
 
 @Mod(
         modid = "keystrokes",
