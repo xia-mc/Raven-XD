@@ -9,6 +9,7 @@ import keystrokesmod.utility.render.BackgroundUtils;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import org.spongepowered.asm.mixin.Mixin;
@@ -19,10 +20,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.awt.*;
-import java.util.Calendar;
-import java.util.Date;
+import java.util.Arrays;
 import java.util.List;
-
+import java.util.Random;
 
 @Mixin(value = GuiMainMenu.class, priority = 1983)
 public abstract class MixinGuiMainMenu extends GuiScreen {
@@ -35,6 +35,21 @@ public abstract class MixinGuiMainMenu extends GuiScreen {
 
     @Shadow private GuiScreen field_183503_M;
 
+    private static final List<String> SPLASH_TEXTS = Arrays.asList(
+            "Raven... but funny?",
+            "beep boop beep",
+            "Made with... something by xia__mc!",
+            "System.out.println(\"Hello world!\");!",
+            "Make sure to thank the contributors!",
+            "Sub to xia__mc & qloha on YT!",
+            "i <3 java"
+    );
+    private String splashText;
+
+    // Add variables for animation
+    private long startTime;
+    private static final float ANIMATION_DURATION = 500.0f; // 0.5 second
+
     @Inject(method = "drawScreen", at = @At("HEAD"), cancellable = true)
     public void onDrawScreen(int p_drawScreen_1_, int p_drawScreen_2_, float p_drawScreen_3_, CallbackInfo ci) {
         if (!ModuleManager.clientTheme.isEnabled() || !ModuleManager.clientTheme.mainMenu.isToggled())
@@ -43,6 +58,18 @@ public abstract class MixinGuiMainMenu extends GuiScreen {
         BackgroundUtils.renderBackground(this);
 
         FontManager.tenacity80.drawCenteredString("Raven XD", width / 2.0, height * 0.2, LOGO_COLOR);
+
+        // Calculate the scale factor for the throbbing effect
+        long currentTime = System.currentTimeMillis();
+        float elapsedTime = (currentTime - startTime) % ANIMATION_DURATION;
+        float scale = 1.0f + 0.1f * (float)Math.sin((elapsedTime / ANIMATION_DURATION) * 2 * Math.PI);
+
+        // Apply the scale factor to the splash text
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(width / 2.0 + 20, height * 0.275, 0); // Move text 20 pixels to the right
+        GlStateManager.scale(scale, scale, 1.0f);
+        FontManager.tenacity20.drawCenteredString(splashText, 0, 0, LOGO_COLOR);
+        GlStateManager.popMatrix();
 
         List<String> branding = Lists.reverse(FMLCommonHandler.instance().getBrandings(true));
 
@@ -71,13 +98,18 @@ public abstract class MixinGuiMainMenu extends GuiScreen {
     public void onInitGui(CallbackInfo ci) {
         if (!ModuleManager.clientTheme.isEnabled() || !ModuleManager.clientTheme.mainMenu.isToggled())
             return;
+        Random random = new Random();
+        splashText = SPLASH_TEXTS.get(random.nextInt(SPLASH_TEXTS.size()));
 
-        int j = this.height / 4 + 54;
+        // Initialize the animation start time
+        startTime = System.currentTimeMillis();
+
+        int j = this.height / 4 + 48;
         this.buttonList.add(new GuiButton(1, this.width / 2 - 103, j, 200, 18, "SinglePlayer"));
-        this.buttonList.add(new GuiButton(2, this.width / 2 - 103, j + 22, 200, 18, "MultiPlayer"));
-        this.buttonList.add(new GuiButton(6, this.width / 2 - 103, j + 44, 200, 18, "Mods"));
-        this.buttonList.add(new GuiButton(0, this.width / 2 - 103, j + 66 + 12, 98, 18, "Options"));
-        this.buttonList.add(new GuiButton(4, this.width / 2 - 1, j + 66 + 12, 98, 18, "Quit"));
+        this.buttonList.add(new GuiButton(2, this.width / 2 - 103, j + 24, 200, 18, "MultiPlayer"));
+        this.buttonList.add(new GuiButton(6, this.width / 2 - 103, j + 48, 200, 18, "Mods"));
+        this.buttonList.add(new GuiButton(0, this.width / 2 - 103, j + 72 + 12, 98, 18, "Options"));
+        this.buttonList.add(new GuiButton(4, this.width / 2 - 1, j + 72 + 12, 98, 18, "Quit"));
 
         this.mc.setConnectedToRealms(false);
         ci.cancel();
