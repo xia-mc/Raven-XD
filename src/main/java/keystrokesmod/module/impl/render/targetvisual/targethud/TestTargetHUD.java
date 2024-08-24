@@ -65,7 +65,6 @@ public class TestTargetHUD extends SubMode<TargetHUD> implements ITargetVisual {
         final int n3 = mc.fontRendererObj.getStringWidth(string) + n2 + 30;
         final int n4 = scaledResolution.getScaledWidth() / 2 - n3 / 2 + posX;
         final int n5 = scaledResolution.getScaledHeight() / 2 + 15 + posY;
-
         current$minX = n4 - n2;
         current$minY = n5 - n2;
         current$maxX = n4 + n3;
@@ -74,7 +73,6 @@ public class TestTargetHUD extends SubMode<TargetHUD> implements ITargetVisual {
         final int n10 = 255;
         final int n11 = Math.min(n10, 110);
         final int n12 = Math.min(n10, 210);
-        final int[] array = Theme.getGradients((int) theme.getInput());
 
         backgroundWidthAnimation.run(current$maxX - current$minX);
         float animatedWidth = (float) backgroundWidthAnimation.getValue();
@@ -90,9 +88,6 @@ public class TestTargetHUD extends SubMode<TargetHUD> implements ITargetVisual {
 
         RenderUtils.drawRoundedRectangle((float) n13, (float) n15, (float) n14, (float) (n15 + 5), 4.0f, Utils.merge(Color.black.getRGB(), n11));
 
-        int k = Utils.merge(array[0], n12);
-        int n16 = Utils.merge(array[1], n12);
-
         float healthBar = (float) (int) (n14 + (n13 - n14) * (1.0 - ((health < 0.05) ? 0.05 : health)));
         if (healthBar - n13 < 3) {
             healthBar = n13 + 3;
@@ -101,10 +96,14 @@ public class TestTargetHUD extends SubMode<TargetHUD> implements ITargetVisual {
         healthBarAnimation.run(healthBar);
         float lastHealthBar = (float) healthBarAnimation.getValue();
 
+        RenderUtils.drawRoundedGradientRect((float) n13, (float) n15, lastHealthBar, (float) (n15 + 5), 4.0f,
+                Utils.merge(Theme.getGradients((int) theme.getInput())[0], n12), Utils.merge(Theme.getGradients((int) theme.getInput())[0], n12),
+                Utils.merge(Theme.getGradients((int) theme.getInput())[1], n12), Utils.merge(Theme.getGradients((int) theme.getInput())[1], n12));
+
         if (healthColor.isToggled()) {
-            k = n16 = Utils.merge(Utils.getColorForHealth(health), n12);
+            int healthTextColor = Utils.getColorForHealth(health);
+            RenderUtils.drawRoundedRectangle((float) n13, (float) n15, lastHealthBar, (float) (n15 + 5), 4.0f, healthTextColor);
         }
-        RenderUtils.drawRoundedGradientRect((float) n13, (float) n15, lastHealthBar, (float) (n15 + 5), 4.0f, k, k, k, n16);
 
         GlStateManager.pushMatrix();
         GlStateManager.enableBlend();
@@ -115,14 +114,12 @@ public class TestTargetHUD extends SubMode<TargetHUD> implements ITargetVisual {
 
         if (target instanceof AbstractClientPlayer) {
             AbstractClientPlayer player = (AbstractClientPlayer) target;
-
             double targetX = current$minX + 5;
             double targetY = current$minY + 4;
             playerXAnimation.run(targetX);
             playerYAnimation.run(targetY);
             double animatedX = playerXAnimation.getValue();
             double animatedY = playerYAnimation.getValue();
-
             double offset = -(player.hurtTime * 10);
             Color dynamicColor = new Color(255, (int) (255 + offset), (int) (255 + offset));
             GlStateManager.color(dynamicColor.getRed() / 255F, dynamicColor.getGreen() / 255F, dynamicColor.getBlue() / 255F, dynamicColor.getAlpha() / 255F);
