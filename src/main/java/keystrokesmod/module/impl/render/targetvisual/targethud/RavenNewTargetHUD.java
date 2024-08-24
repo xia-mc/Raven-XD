@@ -14,9 +14,7 @@ import keystrokesmod.utility.render.blur.GaussianBlur;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.entity.EntityLivingBase;
 import org.jetbrains.annotations.NotNull;
-
 import java.awt.*;
-
 import static keystrokesmod.module.impl.render.TargetHUD.*;
 
 public class RavenNewTargetHUD extends SubMode<TargetHUD> implements ITargetVisual {
@@ -27,6 +25,7 @@ public class RavenNewTargetHUD extends SubMode<TargetHUD> implements ITargetVisu
     private final ModeSetting theme;
     private final ModeSetting font;
     private final ButtonSetting showStatus;
+    private final ButtonSetting healthColor;
     private final Animation healthBarAnimation = new Animation(Easing.EASE_OUT_CIRC, 150);
 
     public RavenNewTargetHUD(String name, @NotNull TargetHUD parent) {
@@ -34,6 +33,7 @@ public class RavenNewTargetHUD extends SubMode<TargetHUD> implements ITargetVisu
         this.registerSetting(theme = new ModeSetting("Theme", Theme.themes, 0));
         this.registerSetting(font = new ModeSetting("Font", new String[]{"Minecraft", "ProductSans", "Regular"}, 0));
         this.registerSetting(showStatus = new ButtonSetting("Show win or loss", true));
+        this.registerSetting(healthColor = new ButtonSetting("Traditional health color", false));
     }
 
     private IFont getFont() {
@@ -62,7 +62,6 @@ public class RavenNewTargetHUD extends SubMode<TargetHUD> implements ITargetVisu
         }
 
         final String renderText = name + " " + healthText;
-
         final ScaledResolution scaled = new ScaledResolution(mc);
         current$minX = scaled.getScaledWidth() / 2 + posX;
         current$minY = scaled.getScaledHeight() / 2 + 15 + posY;
@@ -89,14 +88,19 @@ public class RavenNewTargetHUD extends SubMode<TargetHUD> implements ITargetVisu
         getFont().drawString(renderText, current$minX + TEXT_DIST_TO_RECT, current$minY + TEXT_DIST_TO_RECT, -1);
 
         float healthBar = (float) (int) (current$maxX - 6 + (current$minX + 6 - current$maxX - 6) * (1.0 - ((health < 0.05) ? 0.05 : health)));
-
         if (healthBar - current$minX + 3 < 0) { // if goes below, the rounded health bar glitches out
             healthBar = current$minX + 3;
         }
         healthBarAnimation.run(healthBar);
         float lastHealthBar = (float) healthBarAnimation.getValue();
 
-        int k = Utils.merge(Theme.getGradients((int) theme.getInput())[0], Math.min(255, 210));  // magic var lol
-        RenderUtils.drawRoundedGradientRect((float) current$minX + 6, (float) current$maxY - 9, lastHealthBar, (float) (current$maxY - 4), 4.0f, k, k, k, Theme.getGradient((int) theme.getInput(), 300)); // health bar
+        RenderUtils.drawRoundedGradientRect((float) current$minX + 6, (float) current$maxY - 9, lastHealthBar, (float) (current$maxY - 4), 4.0f,
+                Utils.merge(Theme.getGradients((int) theme.getInput())[0], Math.min(255, 210)), Utils.merge(Theme.getGradients((int) theme.getInput())[0], Math.min(255, 210)),
+                Utils.merge(Theme.getGradients((int) theme.getInput())[1], Math.min(255, 210)), Utils.merge(Theme.getGradients((int) theme.getInput())[1], Math.min(255, 210)));
+
+        if (healthColor.isToggled()) {
+            int healthTextColor = Utils.getColorForHealth(health);
+            RenderUtils.drawRoundedRectangle((float) current$minX + 6, (float) current$maxY - 9, lastHealthBar, (float) (current$maxY - 4), 4.0f, healthTextColor);
+        }
     }
 }

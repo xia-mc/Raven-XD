@@ -16,9 +16,7 @@ import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.EntityLivingBase;
 import org.jetbrains.annotations.NotNull;
-
 import java.awt.*;
-
 import static keystrokesmod.module.impl.render.TargetHUD.*;
 
 public class RavenTargetHUD extends SubMode<TargetHUD> implements ITargetVisual {
@@ -78,28 +76,26 @@ public class RavenTargetHUD extends SubMode<TargetHUD> implements ITargetVisual 
         final int n13 = current$minX + 6;
         final int n14 = current$maxX - 6;
         RenderUtils.drawRoundedRectangle((float) n13, (float) current$maxY, (float) n14, (float) (current$maxY + 5), 4.0f, Utils.merge(Color.black.getRGB(), n11)); // background
-        int k = Utils.merge(array[0], n12);
-        int n16 = Utils.merge(array[1], n12);
         float healthBar = (float) (int) (n14 + (n13 - n14) * (1.0 - ((health < 0.05) ? 0.05 : health)));
-
         if (healthBar - n13 < 3) { // if goes below, the rounded health bar glitches out
             healthBar = n13 + 3;
         }
 
         healthBarAnimation.run(healthBar);
         float lastHealthBar = (float) healthBarAnimation.getValue();
+        RenderUtils.drawRoundedGradientRect((float) n13, (float) current$maxY, lastHealthBar, (float) (current$maxY + 5), 4.0f,
+                Utils.merge(array[0], n12), Utils.merge(array[0], n12),
+                Utils.merge(array[1], n12), Utils.merge(array[1], n12));
+
         if (healthColor.isToggled()) {
-            k = n16 = Utils.merge(Utils.getColorForHealth(health), n12);
+            int healthTextColor = Utils.getColorForHealth(health);
+            RenderUtils.drawRoundedRectangle((float) n13, (float) current$maxY, lastHealthBar, (float) (current$maxY + 5), 4.0f, healthTextColor);
         }
-        RenderUtils.drawRoundedGradientRect((float) n13, (float) current$maxY, lastHealthBar, (float) (current$maxY + 5), 4.0f, k, k, k, n16); // health bar
         GlStateManager.pushMatrix();
         GlStateManager.enableBlend();
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
         getFont().drawString(name, (float) n4, (float) n5, (new Color(220, 220, 220, 255).getRGB() & 0xFFFFFF) | Utils.clamp(n10 + 15) << 24, true);
-
-        int healthTextColor = Utils.getColorForHealth(health);
-
-        getFont().drawString(healthText, (float) (n4 + mc.fontRendererObj.getStringWidth(name)), (float) n5, (healthTextColor & 0xFFFFFF) | Utils.clamp(n10 + 15) << 24, true);
+        getFont().drawString(healthText, (float) (n4 + mc.fontRendererObj.getStringWidth(name)), (float) n5, (new Color(220, 220, 220, 255).getRGB() & 0xFFFFFF) | Utils.clamp(n10 + 15) << 24, true);
         GlStateManager.disableBlend();
         GlStateManager.popMatrix();
     }
