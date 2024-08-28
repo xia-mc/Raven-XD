@@ -85,7 +85,9 @@ public class RavenNewTargetHUD extends SubMode<TargetHUD> implements ITargetVisu
                 6, 8, -1, false);
         GaussianBlur.endBlur(8, 2);
 
-        getFont().drawString(renderText, current$minX + TEXT_DIST_TO_RECT, current$minY + TEXT_DIST_TO_RECT, -1);
+        int healthTextColor = Utils.getColorForHealth(health);
+        getFont().drawString(name, current$minX + TEXT_DIST_TO_RECT, current$minY + TEXT_DIST_TO_RECT, -1);
+        getFont().drawString(healthText, current$minX + TEXT_DIST_TO_RECT + getFont().width(name), current$minY + TEXT_DIST_TO_RECT, healthTextColor);
 
         float healthBar = (float) (int) (current$maxX - 6 + (current$minX + 6 - current$maxX - 6) * (1.0 - ((health < 0.05) ? 0.05 : health)));
         if (healthBar - current$minX + 3 < 0) { // if goes below, the rounded health bar glitches out
@@ -99,7 +101,6 @@ public class RavenNewTargetHUD extends SubMode<TargetHUD> implements ITargetVisu
                 Utils.merge(Theme.getGradients((int) theme.getInput())[1], Math.min(255, 210)), Utils.merge(Theme.getGradients((int) theme.getInput())[1], Math.min(255, 210)));
 
         if (healthColor.isToggled()) {
-            int healthTextColor = Utils.getColorForHealth(health);
             RenderUtils.drawRoundedRectangle((float) current$minX + 6, (float) current$maxY - 9, lastHealthBar, (float) (current$maxY - 4), 4.0f, healthTextColor);
         }
     }

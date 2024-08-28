@@ -94,8 +94,9 @@ public class RavenTargetHUD extends SubMode<TargetHUD> implements ITargetVisual 
         GlStateManager.pushMatrix();
         GlStateManager.enableBlend();
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
+        int healthTextColor = Utils.getColorForHealth(health);
         getFont().drawString(name, (float) n4, (float) n5, (new Color(220, 220, 220, 255).getRGB() & 0xFFFFFF) | Utils.clamp(n10 + 15) << 24, true);
-        getFont().drawString(healthText, (float) (n4 + mc.fontRendererObj.getStringWidth(name)), (float) n5, (new Color(220, 220, 220, 255).getRGB() & 0xFFFFFF) | Utils.clamp(n10 + 15) << 24, true);
+        getFont().drawString(healthText, (float) (n4 + mc.fontRendererObj.getStringWidth(name)), (float) n5, healthTextColor, true);
         GlStateManager.disableBlend();
         GlStateManager.popMatrix();
     }
