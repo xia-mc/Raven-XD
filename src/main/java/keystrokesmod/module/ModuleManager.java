@@ -344,10 +344,9 @@ public class ModuleManager {
     }
 
     private static double getWidth(@NotNull Module module) {
-        return HUD.getFontRenderer().width(
-                module.getPrettyName()
-                        + ((HUD.showInfo.isToggled() && !module.getPrettyInfo().isEmpty()) ? " " + module.getPrettyInfo() : "")
-        );
+        String text = module.getPrettyName()
+                + ((HUD.showInfo.isToggled() && !module.getPrettyInfo().isEmpty()) ? " " + module.getPrettyInfo() : "");
+        return HUD.getFontRenderer().width(HUD.lowercase.isToggled() ? text.toLowerCase() : text);
     }
 
     public static void sort() {

@@ -35,7 +35,7 @@ public class HUD extends Module {
     private final ButtonSetting sidebar;
     public static ButtonSetting alphabeticalSort;
     private static ButtonSetting alignRight;
-    private static ButtonSetting lowercase;
+    public static ButtonSetting lowercase;
     public static ButtonSetting showInfo;
     private static final ButtonSetting combat = new ButtonSetting("Combat", true);
     private static final ButtonSetting movement = new ButtonSetting("Movement", true);

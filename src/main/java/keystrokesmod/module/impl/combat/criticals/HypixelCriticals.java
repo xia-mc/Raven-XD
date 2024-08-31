@@ -50,7 +50,8 @@ public class HypixelCriticals extends SubMode<Criticals> {
                     mc.thePlayer.jump();
                 break;
             case 5:
-                mc.thePlayer.motionX = 0.05;
+                if (!MoveUtil.isMoving())
+                    mc.thePlayer.motionX = 0.02;
                 mc.thePlayer.motionY = MoveUtil.predictedMotion(mc.thePlayer.motionY, 2);
                 break;
         }
