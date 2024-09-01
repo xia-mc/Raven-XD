@@ -1,6 +1,5 @@
 package keystrokesmod.module;
 
-import keystrokesmod.Raven;
 import keystrokesmod.module.impl.client.*;
 import keystrokesmod.module.impl.combat.*;
 import keystrokesmod.module.impl.exploit.*;
@@ -125,6 +124,8 @@ public class ModuleManager {
     public static ScaffoldHelper scaffoldHelper;
     public static AutoChest autoChest;
     public static SilenceIRC silenceIRC;
+    public static Teleport teleport;
+    public static AntiFalseFlag antiFalseFlag;
 
     public void register() {
 
@@ -201,6 +202,7 @@ public class ModuleManager {
         this.addModule(jesus = new Jesus());
         this.addModule(noWeb = new NoWeb());
         this.addModule(new SaveMoveKeys());
+        this.addModule(teleport = new Teleport());
 
         // other
         this.addModule(new Anticheat());
@@ -305,6 +307,7 @@ public class ModuleManager {
         this.addModule(pingSpoof = new PingSpoof());
         this.addModule(exploitFixer = new ExploitFixer());
         this.addModule(ghostBlock = new GhostBlock());
+        this.addModule(antiFalseFlag = new AntiFalseFlag());
 
         // enable
         antiBot.enable();

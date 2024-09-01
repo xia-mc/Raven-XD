@@ -1,8 +1,8 @@
 package keystrokesmod.module.impl.world;
 
+import keystrokesmod.event.BlockPlaceEvent;
 import keystrokesmod.mixins.impl.client.KeyBindingAccessor;
 import keystrokesmod.module.Module;
-import keystrokesmod.module.impl.other.RotationHandler;
 import keystrokesmod.module.impl.other.SlotHandler;
 import keystrokesmod.module.impl.render.FreeLook;
 import keystrokesmod.module.setting.impl.ButtonSetting;
@@ -19,6 +19,8 @@ import org.lwjgl.input.Keyboard;
 public class LegitScaffold extends Module {
     private final SliderSetting minDelay = new SliderSetting("Min delay", 100, 0, 500, 1, "ms");
     private final SliderSetting maxDelay = new SliderSetting("Max delay", 200, 0, 500, 1, "ms");
+    private final SliderSetting straightEveryBlock = new SliderSetting("Straight every block", 1, 1, 8, 1);
+    private final SliderSetting diagonalEveryBlock = new SliderSetting("Diagonal every block", 1, 1, 8, 1);
     private final ButtonSetting pitchCheck = new ButtonSetting("Pitch check", true);
     private final SliderSetting pitch = new SliderSetting("Pitch", 45, 0, 90, 5, pitchCheck::isToggled);
     private final ButtonSetting onlySPressed = new ButtonSetting("Only S pressed", false);
@@ -26,6 +28,7 @@ public class LegitScaffold extends Module {
     private final ButtonSetting showBlockCount = new ButtonSetting("Show block count", false);
 
     private long lastSneakTime = -1;
+    private int blockPlaced = 0;
 
     public LegitScaffold() {
         super("Legit scaffold", category.world);
@@ -40,12 +43,27 @@ public class LegitScaffold extends Module {
     @Override
     public void onDisable() {
         lastSneakTime = -1;
+        blockPlaced = 0;
         setSneak(Keyboard.isKeyDown(mc.gameSettings.keyBindSneak.getKeyCode()));
+    }
+
+    @SubscribeEvent
+    public void onPlaceBlock(BlockPlaceEvent event) {
+        blockPlaced++;
     }
 
     @SubscribeEvent
     public void onRender(TickEvent.RenderTickEvent event) {
         if (!Utils.nullCheck() || mc.currentScreen != null) return;
+
+        if ((onlySPressed.isToggled() && !mc.gameSettings.keyBindBack.isKeyDown())
+                || (pitchCheck.isToggled() && (FreeLook.viewData != null ? FreeLook.viewData.rotationPitch : mc.thePlayer.rotationPitch) < pitch.getInput())
+                || (onlySneak.isToggled() && !Keyboard.isKeyDown(mc.gameSettings.keyBindSneak.getKeyCode()))
+        ) {
+            setSneak(Keyboard.isKeyDown(mc.gameSettings.keyBindSneak.getKeyCode()));
+            blockPlaced = 0;
+            return;
+        }
 
         ItemStack item = SlotHandler.getHeldItem();
         if (showBlockCount.isToggled()) {
@@ -56,16 +74,8 @@ public class LegitScaffold extends Module {
             }
         }
 
-        if ((onlySPressed.isToggled() && !mc.gameSettings.keyBindBack.isKeyDown())
-                || (pitchCheck.isToggled() && (FreeLook.viewData != null ? FreeLook.viewData.rotationPitch : mc.thePlayer.rotationPitch) < pitch.getInput())
-                || (onlySneak.isToggled() && !Keyboard.isKeyDown(mc.gameSettings.keyBindSneak.getKeyCode()))
-        ) {
-            setSneak(Keyboard.isKeyDown(mc.gameSettings.keyBindSneak.getKeyCode()));
-            return;
-        }
-
         final long currentTime = System.currentTimeMillis();
-        if (Utils.overAir() || Utils.onEdge()) {
+        if ((Utils.overAir() || Utils.onEdge()) && blockPlaced % (int) (Scaffold.isDiagonal() ? diagonalEveryBlock.getInput() : straightEveryBlock.getInput()) == 0) {
             setSneak(true);
             lastSneakTime = currentTime;
         } else if (lastSneakTime != -1

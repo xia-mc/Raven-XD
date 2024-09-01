@@ -84,7 +84,7 @@ public class AutoRod extends IAutoClicker {
     public void onPreUpdate(PreUpdateEvent event) {
         target = null;
         if (KillAura.target != null) {
-            if (!ModuleManager.killAura.isAttack())
+            if (new Vec3(KillAura.target).distanceTo(mc.thePlayer) > 3.2)
                 target = KillAura.target;
         } else if (!onlyWhileKillAura.isToggled()) {
             mc.theWorld.playerEntities.parallelStream()

@@ -112,14 +112,14 @@ public class Module {
         }
     }
 
-    public boolean canBeEnabled() {
+    public final boolean canBeEnabled() {
         if (this.script != null && script.error) {
             return false;
         }
         return this.canBeEnabled;
     }
 
-    public void enable() {
+    public final void enable() {
         if (!this.canBeEnabled() || this.isEnabled()) {
             return;
         }
@@ -141,7 +141,7 @@ public class Module {
         }
     }
 
-    public void disable() {
+    public final void disable() {
         if (!this.isEnabled()) {
             return;
         }
@@ -195,12 +195,12 @@ public class Module {
         return prettyInfo.isEmpty() ? getInfo() : prettyInfo;
     }
 
-    public void setPrettyName(String name) {
+    public final void setPrettyName(String name) {
         this.prettyName = name;
         ModuleManager.sort();
     }
 
-    public void setPrettyInfo(String name) {
+    public final void setPrettyInfo(String name) {
         this.prettyInfo = name;
         ModuleManager.sort();
     }
@@ -231,7 +231,7 @@ public class Module {
         }
     }
 
-    public Module.category moduleCategory() {
+    public final Module.category moduleCategory() {
         return this.moduleCategory;
     }
 

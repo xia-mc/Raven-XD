@@ -22,7 +22,7 @@ public class Fly extends Module {
                 .add(new VulcanFly("Vulcan", this))
                 .add(new MatrixBowFly("MatrixBow", this))
                 .add(new MatrixTNTFly("MatrixTNT", this))
-                .add(new SpoofFly("Spoof", this))
+                .add(new FakeFly("Fake", this))
         );
         this.registerSetting(showBPS = new ButtonSetting("Show BPS", false));
         this.registerSetting(stopAtEnd = new ButtonSetting("Stop at end", false));

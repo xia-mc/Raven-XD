@@ -36,7 +36,7 @@ public class Sprint extends Module {
     public static boolean stopSprint() {
         final SprintEvent event = new SprintEvent(!stopSprint, false);
 
-        return event.isSprint();
+        return !event.isSprint();
     }
 
     @SubscribeEvent

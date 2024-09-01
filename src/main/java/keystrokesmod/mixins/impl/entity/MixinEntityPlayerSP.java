@@ -5,7 +5,7 @@ import keystrokesmod.event.*;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.movement.NoSlow;
 import keystrokesmod.module.impl.movement.Sprint;
-import keystrokesmod.module.impl.movement.fly.SpoofFly;
+import keystrokesmod.module.impl.movement.fly.FakeFly;
 import keystrokesmod.module.impl.other.RotationHandler;
 import keystrokesmod.utility.RotationUtils;
 import net.minecraft.client.Minecraft;
@@ -26,6 +26,8 @@ import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import static keystrokesmod.event.PushOutOfBlockEvent.Direction.*;
 
 @Mixin(value = EntityPlayerSP.class, priority = 999)
 public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
@@ -180,7 +182,7 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
                 preMotionEvent.setRenderYaw(false);
             }
 
-            if (SpoofFly.hideRotation()) {
+            if (FakeFly.hideRotation()) {
                 RotationUtils.renderPitch = rotationPitch;
                 RotationUtils.renderYaw = rotationYaw;
             } else {
@@ -396,47 +398,49 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
             double d1 = p_pushOutOfBlocks_5_ - (double) blockpos.getZ();
             int entHeight = Math.max((int) Math.ceil(this.height), 1);
             if (!this.raven_bS$isHeadspaceFree(blockpos, entHeight)) {
-                PushOutOfBlockEvent event = new PushOutOfBlockEvent();
-                MinecraftForge.EVENT_BUS.post(event);
-                if (event.isCanceled())
-                    cir.setReturnValue(false);
-
-                int i = -1;
+                PushOutOfBlockEvent.Direction direction = null;
                 double d2 = 9999.0;
                 if (this.raven_bS$isHeadspaceFree(blockpos.west(), entHeight) && d0 < d2) {
                     d2 = d0;
-                    i = 0;
+                    direction = NEGATIVE_X;
                 }
 
                 if (this.raven_bS$isHeadspaceFree(blockpos.east(), entHeight) && 1.0 - d0 < d2) {
                     d2 = 1.0 - d0;
-                    i = 1;
+                    direction = POSITIVE_X;
                 }
 
                 if (this.raven_bS$isHeadspaceFree(blockpos.north(), entHeight) && d1 < d2) {
                     d2 = d1;
-                    i = 4;
+                    direction = NEGATIVE_Z;
                 }
 
                 if (this.raven_bS$isHeadspaceFree(blockpos.south(), entHeight) && 1.0 - d1 < d2) {
-                    i = 5;
+                    direction = POSITIVE_Z;
                 }
 
-                float f = 0.1F;
-                if (i == 0) {
-                    this.motionX = -f;
-                }
+                if (direction != null) {
+                    PushOutOfBlockEvent event = new PushOutOfBlockEvent(direction, 0.1F);
+                    MinecraftForge.EVENT_BUS.post(event);
+                    if (event.isCanceled())
+                        cir.setReturnValue(false);
+                    direction = event.getDirection();
+                    final float pushMotion = event.getPushMotion();
 
-                if (i == 1) {
-                    this.motionX = f;
-                }
-
-                if (i == 4) {
-                    this.motionZ = -f;
-                }
-
-                if (i == 5) {
-                    this.motionZ = f;
+                    switch (direction) {
+                        case POSITIVE_X:
+                            this.motionX = pushMotion;
+                            break;
+                        case NEGATIVE_X:
+                            this.motionX = -pushMotion;
+                            break;
+                        case POSITIVE_Z:
+                            this.motionZ = pushMotion;
+                            break;
+                        case NEGATIVE_Z:
+                            this.motionZ = -pushMotion;
+                            break;
+                    }
                 }
             }
 

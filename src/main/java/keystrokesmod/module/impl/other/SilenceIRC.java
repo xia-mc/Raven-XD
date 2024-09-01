@@ -15,7 +15,7 @@ public class SilenceIRC extends Module {
     private static boolean started = false;
 
     public SilenceIRC() {
-        super("SilenceIRC", category.other);
+        super("SilenceIRC", category.experimental);
 
     }
 

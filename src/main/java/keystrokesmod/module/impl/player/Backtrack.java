@@ -10,6 +10,7 @@ import keystrokesmod.event.PreUpdateEvent;
 import keystrokesmod.event.ReceivePacketEvent;
 import keystrokesmod.mixins.impl.network.S14PacketEntityAccessor;
 import keystrokesmod.module.Module;
+import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.DescriptionSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.script.classes.Vec3;
@@ -37,6 +38,7 @@ public class Backtrack extends Module {
     private final SliderSetting maxDistance = new SliderSetting("Max distance", 6.0, 0.0, 10.0, 0.1);
     private final SliderSetting stopOnTargetHurtTime = new SliderSetting("Stop on target HurtTime", -1, -1, 10, 1);
     private final SliderSetting stopOnSelfHurtTime = new SliderSetting("Stop on self HurtTime", -1, -1, 10, 1);
+    private final ButtonSetting drawRealPosition = new ButtonSetting("Draw real position", true);
 
     private final Queue<TimedPacket> packetQueue = new ConcurrentLinkedQueue<>();
     private final List<Packet<?>> skipPackets = new ArrayList<>();
@@ -57,6 +59,7 @@ public class Backtrack extends Module {
         this.registerSetting(maxDistance);
         this.registerSetting(stopOnTargetHurtTime);
         this.registerSetting(stopOnSelfHurtTime);
+        this.registerSetting(drawRealPosition);
     }
 
     @Override
@@ -140,7 +143,9 @@ public class Backtrack extends Module {
         animationX.run(pos.xCoord);
         animationY.run(pos.yCoord);
         animationZ.run(pos.zCoord);
-        Blink.drawBox(new net.minecraft.util.Vec3(animationX.getValue(), animationY.getValue(), animationZ.getValue()));
+        if (drawRealPosition.isToggled()) {
+            Blink.drawBox(new net.minecraft.util.Vec3(animationX.getValue(), animationY.getValue(), animationZ.getValue()));
+        }
     }
 
     @SubscribeEvent

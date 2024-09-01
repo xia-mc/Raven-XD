@@ -358,7 +358,7 @@ public class Utils {
         return txt.replaceAll("&", "§");
     }
 
-    public static void correctValue(SliderSetting c, SliderSetting d) {
+    public static void correctValue(@NotNull SliderSetting c, @NotNull SliderSetting d) {
         if (c.getInput() > d.getInput()) {
             double p = c.getInput();
             c.setValue(d.getInput());

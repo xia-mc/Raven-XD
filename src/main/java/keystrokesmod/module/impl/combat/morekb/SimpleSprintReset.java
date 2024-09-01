@@ -1,6 +1,5 @@
-package keystrokesmod.module.impl.combat.morekb.impl;
+package keystrokesmod.module.impl.combat.morekb;
 
-import keystrokesmod.module.impl.combat.morekb.IMoreKB;
 import keystrokesmod.module.impl.world.AntiBot;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
@@ -29,11 +28,17 @@ public class SimpleSprintReset extends SubMode<IMoreKB> {
         super(name, parent);
         this.registerSetting(minRePressDelay = new SliderSetting("Min Re-press delay", 2, 0, 10, 1, "ticks"));
         this.registerSetting(maxRePressDelay = new SliderSetting("Max Re-press delay", 4, 0, 10, 1, "ticks"));
-        this.registerSetting(minDelayBetween = new SliderSetting("Min delay between", 10, 4, 13, 1, "ticks"));
-        this.registerSetting(maxDelayBetween = new SliderSetting("Max delay between", 10, 4, 13, 1, "ticks"));
+        this.registerSetting(minDelayBetween = new SliderSetting("Min delay between", 10, 0, 13, 1, "ticks"));
+        this.registerSetting(maxDelayBetween = new SliderSetting("Max delay between", 10, 0, 13, 1, "ticks"));
         this.registerSetting(chance = new SliderSetting("Chance", 100, 0, 100, 1, "%"));
         this.registerSetting(playersOnly = new ButtonSetting("Players only", true));
         this.registerSetting(notWhileRunner = new ButtonSetting("Not while runner", false));
+    }
+
+    @Override
+    public void guiUpdate() throws Exception {
+        Utils.correctValue(minRePressDelay, maxRePressDelay);
+        Utils.correctValue(minDelayBetween, maxDelayBetween);
     }
 
     @Override

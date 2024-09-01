@@ -17,12 +17,12 @@ import java.util.Set;
 
 import static keystrokesmod.module.ModuleManager.scaffold;
 
-public class SpoofFly extends SubMode<Fly> {
+public class FakeFly extends SubMode<Fly> {
     private final ButtonSetting keep;
 
     private static final Set<BlockPos> hiddenPos = new HashSet<>();
 
-    public SpoofFly(String name, @NotNull Fly parent) {
+    public FakeFly(String name, @NotNull Fly parent) {
         super(name, parent);
         this.registerSetting(keep = new ButtonSetting("Keep", true));
 
@@ -41,7 +41,7 @@ public class SpoofFly extends SubMode<Fly> {
     }
 
     public static boolean hideRotation() {
-        return ModuleManager.fly.isEnabled() && ModuleManager.fly.mode.getSubModeValues().get((int) ModuleManager.fly.mode.getInput()) instanceof SpoofFly;
+        return ModuleManager.fly.isEnabled() && ModuleManager.fly.mode.getSubModeValues().get((int) ModuleManager.fly.mode.getInput()) instanceof FakeFly;
     }
 
     @Override

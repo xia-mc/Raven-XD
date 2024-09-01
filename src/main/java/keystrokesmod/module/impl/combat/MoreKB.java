@@ -5,9 +5,12 @@ import keystrokesmod.event.PreMotionEvent;
 import keystrokesmod.event.SprintEvent;
 import keystrokesmod.mixins.impl.client.KeyBindingAccessor;
 import keystrokesmod.module.impl.combat.morekb.IMoreKB;
-import keystrokesmod.module.impl.combat.morekb.impl.SimpleSprintReset;
+import keystrokesmod.module.impl.combat.morekb.SimpleSprintReset;
 import keystrokesmod.module.setting.impl.ModeValue;
 import keystrokesmod.utility.MoveUtil;
+import keystrokesmod.utility.Utils;
+import net.minecraft.client.gui.inventory.GuiInventory;
+import net.minecraft.client.settings.KeyBinding;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.lwjgl.input.Keyboard;
 
@@ -22,8 +25,20 @@ public class MoreKB extends IMoreKB {
                 .add(new SimpleSprintReset("LegitFast", this))
                 .add(new SimpleSprintReset("Fast", this))
                 .add(new SimpleSprintReset("Packet", this))
+                .add(new SimpleSprintReset("LegitBlock", this))
+                .add(new SimpleSprintReset("LegitInv", this))
                 .setDefaultValue("LegitFast")
         );
+    }
+
+    @Override
+    public void onEnable() throws Exception {
+        mode.enable();
+    }
+
+    @Override
+    public void onDisable() throws Exception {
+        mode.disable();
     }
 
     @SubscribeEvent
@@ -59,16 +74,36 @@ public class MoreKB extends IMoreKB {
     @Override
     public void stopSprint() {
         super.stopSprint();
-        if ((int) mode.getInput() == 0) {
-            ((KeyBindingAccessor) mc.gameSettings.keyBindForward).setPressed(false);
+        switch ((int) mode.getInput()) {
+            case 0:
+                ((KeyBindingAccessor) mc.gameSettings.keyBindForward).setPressed(false);
+                break;
+            case 5:
+                Utils.sendClick(1, true);
+                break;
+            case 6:
+                ((KeyBindingAccessor) mc.gameSettings.keyBindInventory).setPressed(true);
+                KeyBinding.onTick(mc.gameSettings.keyBindInventory.getKeyCode());
+                ((KeyBindingAccessor) mc.gameSettings.keyBindInventory).setPressed(false);
+                KeyBinding.onTick(mc.gameSettings.keyBindInventory.getKeyCode());
+                break;
         }
     }
 
     @Override
     public void reSprint() {
         super.reSprint();
-        if ((int) mode.getInput() == 0) {
-            ((KeyBindingAccessor) mc.gameSettings.keyBindForward).setPressed(Keyboard.isKeyDown(mc.gameSettings.keyBindForward.getKeyCode()));
+        switch ((int) mode.getInput()) {
+            case 0:
+                ((KeyBindingAccessor) mc.gameSettings.keyBindForward).setPressed(Keyboard.isKeyDown(mc.gameSettings.keyBindForward.getKeyCode()));
+                break;
+            case 5:
+                Utils.sendClick(1, false);
+                break;
+            case 6:
+                if (mc.currentScreen instanceof GuiInventory)
+                    mc.thePlayer.closeScreen();
+                break;
         }
     }
 

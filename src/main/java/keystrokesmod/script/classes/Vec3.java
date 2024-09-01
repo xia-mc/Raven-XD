@@ -26,6 +26,10 @@ public class Vec3 {
         this(entity.posX, entity.posY, entity.posZ);
     }
 
+    public Vec3(@NotNull BlockPos blockPos) {
+        this(blockPos.getX() + 0.5, blockPos.getY() + 0.5, blockPos.getZ() + 0.5);
+    }
+
     public boolean equals(Vec3 vector2) {
         if (this == vector2) {
             return true;
