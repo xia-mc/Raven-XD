@@ -20,14 +20,14 @@ public class BedProximityAlert extends Module {
     private final SliderSetting Distance;
     private final ButtonSetting shouldPing;
     private final ButtonSetting tellTheteam;
-    private final ButtonSetting checkTeamMate;
+    private final ButtonSetting ignoreTeammates;
 
     public BedProximityAlert() {
         super("BedProximityAlert", category.other);
         this.registerSetting(Distance = new SliderSetting("Distance", 40, 10, 120, 1));
         this.registerSetting(shouldPing = new ButtonSetting("Should ping", true));
         this.registerSetting(tellTheteam = new ButtonSetting("Tell the team", false));
-        this.registerSetting(checkTeamMate = new ButtonSetting("Check if teammate", false));
+        this.registerSetting(ignoreTeammates = new ButtonSetting("Check if teammate", false));
         playerAlertStatus = new HashMap<>();
     }
 
@@ -44,7 +44,7 @@ public class BedProximityAlert extends Module {
                 if (otherPlayer == player) {
                     continue;
                 }
-                if (!tellTheteam.isToggled()) {
+                if (!ignoreTeammates.isToggled()) {
                     if (Utils.isTeamMate(otherPlayer)){
                         return;
                     }
