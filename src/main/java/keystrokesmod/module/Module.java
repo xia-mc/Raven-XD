@@ -133,10 +133,10 @@ public class Module {
             Raven.scriptManager.onEnable(script);
         }
         else {
-            FMLCommonHandler.instance().bus().register(this);
             try {
+                FMLCommonHandler.instance().bus().register(this);
                 this.onEnable();
-            } catch (Exception ignored) {
+            } catch (Throwable ignored) {
             }
         }
     }
@@ -151,10 +151,10 @@ public class Module {
             Raven.scriptManager.onDisable(script);
         }
         else {
-            FMLCommonHandler.instance().bus().unregister(this);
             try {
+                FMLCommonHandler.instance().bus().unregister(this);
                 this.onDisable();
-            } catch (Exception ignored) {
+            } catch (Throwable ignored) {
             }
         }
     }
@@ -235,10 +235,10 @@ public class Module {
         return this.moduleCategory;
     }
 
-    public void onEnable() throws Exception {
+    public void onEnable() throws Throwable {
     }
 
-    public void onDisable() throws Exception {
+    public void onDisable() throws Throwable {
     }
 
     public void toggle() {
@@ -256,10 +256,10 @@ public class Module {
 
     }
 
-    public void onUpdate() throws Exception {
+    public void onUpdate() throws Throwable {
     }
 
-    public void guiUpdate() throws Exception {
+    public void guiUpdate() throws Throwable {
     }
 
     public void guiButtonToggled(ButtonSetting b) throws Exception {
