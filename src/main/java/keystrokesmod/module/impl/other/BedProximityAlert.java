@@ -27,7 +27,7 @@ public class BedProximityAlert extends Module {
         this.registerSetting(Distance = new SliderSetting("Distance", 40, 10, 120, 1));
         this.registerSetting(shouldPing = new ButtonSetting("Should ping", true));
         this.registerSetting(tellTheteam = new ButtonSetting("Tell the team", false));
-        this.registerSetting(ignoreTeammates = new ButtonSetting("Check if teammate", false));
+        this.registerSetting(ignoreTeammates = new ButtonSetting("Ignore teammates", false));
         playerAlertStatus = new HashMap<>();
     }
 
