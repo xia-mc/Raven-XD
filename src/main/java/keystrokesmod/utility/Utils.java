@@ -38,7 +38,6 @@ import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.ContainerPlayer;
 import net.minecraft.item.*;
-import net.minecraft.network.play.client.C03PacketPlayer.C05PacketPlayerLook;
 import net.minecraft.network.play.client.C0APacketAnimation;
 import net.minecraft.potion.Potion;
 import net.minecraft.scoreboard.*;
@@ -584,22 +583,14 @@ public class Utils {
         return mc.thePlayer.moveForward != 0.0F || mc.thePlayer.moveStrafing != 0.0F;
     }
 
-    /**
-     * it's UNFAIR if pc == true!
-     * TODO we need a rotation system.
-     */
-    public static void aim(Entity en, float ps, boolean pc) {
+    public static void aim(Entity en, float ps) {
         if (en != null) {
             float[] t = getRotation(en);
             if (t != null) {
                 float y = t[0];
                 float p = t[1] + 4.0F + ps;
-                if (pc) {
-                    mc.getNetHandler().addToSendQueue(new C05PacketPlayerLook(y, p, mc.thePlayer.onGround));
-                } else {
-                    mc.thePlayer.rotationYaw = y;
-                    mc.thePlayer.rotationPitch = p;
-                }
+                mc.thePlayer.rotationYaw = y;
+                mc.thePlayer.rotationPitch = p;
             }
 
         }
