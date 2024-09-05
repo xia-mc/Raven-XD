@@ -76,9 +76,11 @@ public class HypixelTeleport extends SubMode<Teleport> {
                 if (event.getPacket() instanceof C03PacketPlayer) {
                     if (!MoveUtil.isMoving() && event.getPacket().getClass() == C03PacketPlayer.class) {
                         event.setCanceled(true);
+                        if (hasLag == 0) {
+                            yaw = mc.thePlayer.rotationYaw;
+                            pitch = mc.thePlayer.rotationPitch;
+                        }
                         hasLag++;
-                        yaw = mc.thePlayer.rotationYaw;
-                        pitch = mc.thePlayer.rotationPitch;
                     } else {
                         hasLag = 0;
                     }

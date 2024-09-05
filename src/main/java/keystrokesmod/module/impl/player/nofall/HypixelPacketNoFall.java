@@ -18,6 +18,7 @@ public class HypixelPacketNoFall extends SubMode<NoFall> {
     private final ModeSetting calcateMode;
     private final ButtonSetting prediction;
     private final SliderSetting minFallDistance;
+    private final ButtonSetting lowTimer;
     private final ButtonSetting notWhileKillAura;
 
     private double fallDistance = 0;
@@ -28,6 +29,7 @@ public class HypixelPacketNoFall extends SubMode<NoFall> {
         this.registerSetting(calcateMode = new ModeSetting("Calcate mode", new String[]{"Position", "Motion"}, 0));
         this.registerSetting(prediction = new ButtonSetting("Prediction", false));
         this.registerSetting(minFallDistance = new SliderSetting("Minimum fall distance", 3.0, 0.0, 8.0, 0.1));
+        this.registerSetting(lowTimer = new ButtonSetting("Low timer", true));
         this.registerSetting(notWhileKillAura = new ButtonSetting("Not while killAura", true));
     }
 
@@ -59,10 +61,12 @@ public class HypixelPacketNoFall extends SubMode<NoFall> {
         }
 
         if (fallDistance >= minFallDistance.getInput() && !parent.noAction() && !(notWhileKillAura.isToggled() && KillAura.target != null) && !ModuleManager.scaffold.isEnabled()) {
-            Utils.getTimer().timerSpeed = (float) 0.5;
+            if (lowTimer.isToggled()) {
+                Utils.getTimer().timerSpeed = (float) 0.5;
+                timed = true;
+            }
             mc.getNetHandler().addToSendQueue(new C03PacketPlayer(true));
             fallDistance = 0;
-            timed = true;
         } else if (timed) {
             Utils.resetTimer();
             timed = false;

@@ -17,6 +17,8 @@ import keystrokesmod.module.setting.utils.ModeOnly;
 import keystrokesmod.script.classes.Vec3;
 import keystrokesmod.utility.*;
 import keystrokesmod.utility.aim.AimSimulator;
+import keystrokesmod.utility.render.Animation;
+import keystrokesmod.utility.render.Easing;
 import keystrokesmod.utility.render.RenderUtils;
 import lombok.Getter;
 import net.minecraft.client.settings.KeyBinding;
@@ -35,6 +37,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.lwjgl.input.Mouse;
 
 import java.util.*;
@@ -115,6 +118,9 @@ public class KillAura extends IAutoClicker {
 
     private int blockingTime = 0;
     private final AimSimulator aimSimulator = new AimSimulator();
+    private @Nullable Animation animationX;
+    private @Nullable Animation animationY;
+    private @Nullable Animation animationZ;
 
     public KillAura() {
         super("KillAura", category.combat);
@@ -237,8 +243,24 @@ public class KillAura extends IAutoClicker {
     @SubscribeEvent
     public void onRenderWorldLast(RenderWorldLastEvent event) {
         Vec3 hitPos = aimSimulator.getHitPos();
-        if (target != null && rotations != null && dot.isToggled() && hitPos != null) {
-            RenderUtils.drawDot(hitPos, dotSize.getInput(), 0xFF0670BE);
+        if (target != null) {
+            if (rotations != null && dot.isToggled() && hitPos != null) {
+                if (animationX == null || animationY == null || animationZ == null) {
+                    animationX = new Animation(Easing.EASE_OUT_CIRC, 50);
+                    animationY = new Animation(Easing.EASE_OUT_CIRC, 50);
+                    animationZ = new Animation(Easing.EASE_OUT_CIRC, 50);
+
+                    animationX.setValue(hitPos.x);
+                    animationY.setValue(hitPos.y);
+                    animationZ.setValue(hitPos.z);
+                }
+                animationX.run(hitPos.x);
+                animationY.run(hitPos.y);
+                animationZ.run(hitPos.z);
+                RenderUtils.drawDot(new Vec3(animationX.getValue(), animationY.getValue(), animationZ.getValue()), dotSize.getInput(), 0xFF0670BE);
+            }
+        } else {
+            animationX = animationY = animationZ = null;
         }
     }
 

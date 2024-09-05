@@ -1,61 +1,61 @@
 package keystrokesmod.module.impl.movement.fly;
 
-import keystrokesmod.event.*;
 import keystrokesmod.module.impl.movement.Fly;
-import keystrokesmod.module.impl.other.SlotHandler;
+import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.impl.SubMode;
-import keystrokesmod.utility.ContainerUtils;
 import keystrokesmod.utility.MoveUtil;
-import net.minecraft.item.ItemBow;
-import net.minecraft.util.MathHelper;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.utility.PacketUtils;
+import keystrokesmod.utility.Utils;
+import net.minecraft.network.play.client.C03PacketPlayer;
 import org.jetbrains.annotations.NotNull;
 
 public class TestFly extends SubMode<Fly> {
-    private int ticksSinceVelocity = 999;
-    private float yaw;
+    private int enableTicks = 0;
 
-    private final SliderSetting speed;
-    private final SliderSetting motionY;
+    private final SliderSetting extraSpeed;
+    private final SliderSetting timer;
+    private final ButtonSetting resetMotion;
+    private final SliderSetting resetEveryTicks;
+    private final ButtonSetting groundSpoof;
 
     public TestFly(String name, @NotNull Fly parent) {
         super(name, parent);
-        this.registerSetting(speed = new SliderSetting("Speed", 1.0, 1.0, 2.0, 0.01));
-        this.registerSetting(motionY = new SliderSetting("MotionY", 0.42, 0.2, 1, 0.01));
-    }
-
-    @SubscribeEvent
-    public void onPreMotionEvent(@NotNull PreMotionEvent event) {
-        event.setPitch(-89);
-        event.setYaw(yaw);
+        this.registerSetting(extraSpeed = new SliderSetting("Extra Speed", 0.0, 0.0, 0.3, 0.01));
+        this.registerSetting(timer = new SliderSetting("Timer", 0.42, 0.2, 1, 0.01));
+        this.registerSetting(resetMotion = new ButtonSetting("Reset motion", false));
+        this.registerSetting(resetEveryTicks = new SliderSetting("Reset every ticks", 5, 2, 10, 1, resetMotion::isToggled));
+        this.registerSetting(groundSpoof = new ButtonSetting("Ground spoof", false, resetMotion::isToggled));
     }
 
     @Override
-    public void onEnable() throws Exception {
-        yaw = mc.thePlayer.rotationYaw;
+    public void onEnable() throws Throwable {
+        enableTicks = 0;
     }
 
     @Override
-    public void onUpdate() {
-        SlotHandler.setCurrentSlot(ContainerUtils.getSlot(ItemBow.class));
-        ticksSinceVelocity++;
-    }
-
-    @SubscribeEvent
-    public void onPreVelocity(@NotNull PreVelocityEvent event) {
-        ticksSinceVelocity = 0;
-        final float yaw = (float) MoveUtil.direction();
-        event.setMotionX((int) (-MathHelper.sin(yaw) * event.getMotionX() * speed.getInput()));
-        event.setMotionY((int) (motionY.getInput() * 8000.0));
-        event.setMotionZ((int) (MathHelper.cos(yaw) * event.getMotionZ() * speed.getInput()));
-        this.yaw = mc.thePlayer.rotationYaw;
-    }
-
-    @SubscribeEvent
-    public void onMove(@NotNull MoveEvent event) {
-        if (ticksSinceVelocity >= 6) {
-            event.setCanceled(true);
+    public void onUpdate() throws Throwable {
+        if (mc.thePlayer.onGround) {
+            enableTicks = 0;
+            Utils.resetTimer();
+            return;
+        } else {
+            enableTicks++;
         }
+
+        Utils.getTimer().timerSpeed = (float) timer.getInput();
+        MoveUtil.moveFlying(extraSpeed.getInput());
+        if (resetMotion.isToggled()) {
+            if (enableTicks % (int) resetEveryTicks.getInput() == 0) {
+                mc.thePlayer.motionY *= 0.1;
+                if (groundSpoof.isToggled())
+                    PacketUtils.sendPacket(new C03PacketPlayer(true));
+            }
+        }
+    }
+
+    @Override
+    public void onDisable() throws Throwable {
+        Utils.resetTimer();
     }
 }

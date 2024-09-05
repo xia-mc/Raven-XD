@@ -53,7 +53,7 @@ public class SimpleMotionModifier extends SubMode<Module> {
         this.registerSetting(editMultiplyXZAmount = new SliderSetting("Edit multiply xz amount", 0.02, 0, 1, 0.01, () -> editMultiplyXZ.isToggled() && isEdit()));
         this.registerSetting(editTimerSpeed = new ButtonSetting("Edit timer speed", false, this::isEdit));
         this.registerSetting(timerSpeedAmount = new SliderSetting("Timer speed amount", 1, 0.1, 4, 0.0001, () -> editTimerSpeed.isToggled() && isEdit()));
-        this.registerSetting(strafe = new ButtonSetting("Strafe", false));
+        this.registerSetting(strafe = new ButtonSetting("Strafe", false, this::isEdit));
     }
 
     public void update() {
