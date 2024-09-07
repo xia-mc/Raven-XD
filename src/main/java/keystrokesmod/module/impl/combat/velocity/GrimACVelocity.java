@@ -43,11 +43,12 @@ public class GrimACVelocity extends SubMode<Velocity> {
                 && !(onlyWhileMoving.isToggled() && !MoveUtil.isMoving())
                 && mc.objectMouseOver != null && mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY
                 && mc.objectMouseOver.entityHit instanceof EntityLivingBase) {
-            if (!((EntityPlayerSPAccessor) mc.thePlayer).isServerSprint()) {
+            final boolean noSprint = !((EntityPlayerSPAccessor) mc.thePlayer).isServerSprint();
+            if (noSprint)
                 PacketUtils.sendPacket(new C0BPacketEntityAction(mc.thePlayer, C0BPacketEntityAction.Action.START_SPRINTING));
-                ((EntityPlayerSPAccessor) mc.thePlayer).setServerSprint(true);
-            }
             doReduce();
+            if (noSprint)
+                PacketUtils.sendPacket(new C0BPacketEntityAction(mc.thePlayer, C0BPacketEntityAction.Action.STOP_SPRINTING));
 
             if (debug.isToggled())
                 Utils.sendMessage(String.format("%d Reduced %.3f %.3f", (int) reduceTimes.getInput() - unReduceTimes,  mc.thePlayer.motionX, mc.thePlayer.motionZ));
