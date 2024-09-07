@@ -1,7 +1,8 @@
 package keystrokesmod.module.impl.combat.velocity;
 
 import keystrokesmod.event.PostVelocityEvent;
-import keystrokesmod.event.PreMotionEvent;
+import keystrokesmod.event.PreUpdateEvent;
+import keystrokesmod.mixins.impl.entity.EntityPlayerSPAccessor;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.combat.Velocity;
 import keystrokesmod.module.impl.exploit.viaversionfix.ViaVersionFixHelper;
@@ -36,19 +37,17 @@ public class GrimACVelocity extends SubMode<Velocity> {
     }
 
     @SubscribeEvent
-    public void onPreMotion(PreMotionEvent event) {
+    public void onPreUpdate(PreUpdateEvent event) {
         if (ModuleManager.blink.isEnabled()) return;
         if (unReduceTimes > 0 && mc.thePlayer.hurtTime > 0
                 && !(onlyWhileMoving.isToggled() && !MoveUtil.isMoving())
                 && mc.objectMouseOver != null && mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY
                 && mc.objectMouseOver.entityHit instanceof EntityLivingBase) {
-            if (event.isSprinting()) {
+            if (!((EntityPlayerSPAccessor) mc.thePlayer).isServerSprint()) {
                 PacketUtils.sendPacket(new C0BPacketEntityAction(mc.thePlayer, C0BPacketEntityAction.Action.START_SPRINTING));
-                doReduce();
-                PacketUtils.sendPacket(new C0BPacketEntityAction(mc.thePlayer, C0BPacketEntityAction.Action.STOP_SPRINTING));
-            } else {
-                doReduce();
+                ((EntityPlayerSPAccessor) mc.thePlayer).setServerSprint(true);
             }
+            doReduce();
 
             if (debug.isToggled())
                 Utils.sendMessage(String.format("%d Reduced %.3f %.3f", (int) reduceTimes.getInput() - unReduceTimes,  mc.thePlayer.motionX, mc.thePlayer.motionZ));

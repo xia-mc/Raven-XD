@@ -23,7 +23,7 @@ apply plugin: 'java'
 
 group = "keystrokesmod"
 archivesBaseName = "raven-XD"
-//version = "Dev"
+version = "Dev"
 
 compileJava {
     sourceCompatibility = '1.8'

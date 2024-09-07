@@ -4,12 +4,10 @@ import keystrokesmod.event.PreVelocityEvent;
 import keystrokesmod.event.SendPacketEvent;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.combat.Velocity;
-import keystrokesmod.module.impl.exploit.disabler.hypixel.HypixelMotionDisabler;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.CoolDown;
-import keystrokesmod.utility.MoveUtil;
 import keystrokesmod.utility.PacketUtils;
 import net.minecraft.network.Packet;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
@@ -72,8 +70,8 @@ public class HypixelVelocity extends SubMode<Velocity> {
 
         mc.thePlayer.motionY = choose(mc.thePlayer.motionY, motionY);
 
-        if (damageBoost.isToggled() && HypixelMotionDisabler.isDisabled()) {
-            mc.thePlayer.motionY = MoveUtil.predictedMotion(mc.thePlayer.motionY, 2);
+        if (damageBoost.isToggled()) {
+            mc.thePlayer.jump();
         }
 
         mc.thePlayer.motionX = choose(mc.thePlayer.motionX, motionX);
