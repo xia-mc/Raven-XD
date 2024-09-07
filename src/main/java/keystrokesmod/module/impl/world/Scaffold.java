@@ -446,7 +446,9 @@ public class Scaffold extends IAutoClicker {
         }
         if (keepYPosition() && (sprint.getInput() == 3 || sprint.getInput() == 4 || sprint.getInput() == 5)) {
             if (mc.thePlayer.onGround) {
-                mc.thePlayer.jump();
+                if (!Utils.jumpDown()) {
+                    mc.thePlayer.jump();
+                }
                 add = 0;
                 if (Math.floor(mc.thePlayer.posY) == Math.floor(startPos) && sprint.getInput() == 5) {
                     placedUp = false;
@@ -582,9 +584,8 @@ public class Scaffold extends IAutoClicker {
                                     if (heldItem != null && heldItem.getItem() instanceof ItemBlock && ((ItemBlock) heldItem.getItem()).canPlaceBlockOnSide(mc.theWorld, raycast.getBlockPos(), raycast.sideHit, mc.thePlayer, heldItem)) {
                                         if (rayCasted == null) {
                                             forceStrict = (forceStrict(checkYaw)) && i == 1;
-                                            rayCasted = raycast;
                                             if (recycleRotation.isToggled()) {
-                                                Optional<Triple<BlockPos, EnumFacing, keystrokesmod.script.classes.Vec3>> placeSide = RotationUtils.getPlaceSide(targetPos);
+                                                Optional<Triple<BlockPos, EnumFacing, keystrokesmod.script.classes.Vec3>> placeSide = RotationUtils.getPlaceSide(raycast.getBlockPos());
                                                 if (placeSide.isPresent()) {
                                                     rayCasted = new MovingObjectPosition(placeSide.get().getRight().toVec3(), placeSide.get().getMiddle(), placeSide.get().getLeft());
                                                     placeYaw = PlayerRotation.getYaw(placeSide.get().getRight());
@@ -592,6 +593,7 @@ public class Scaffold extends IAutoClicker {
                                                     break;
                                                 }
                                             }
+                                            rayCasted = raycast;
                                             placeYaw = fixedYaw;
                                             placePitch = fixedPitch;
                                             break;

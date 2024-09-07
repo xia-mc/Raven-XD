@@ -8,12 +8,14 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
 public class VulcanLongJump extends SubMode<LongJump> {
+    private final ButtonSetting teleport;
     private final ButtonSetting autoDisable;
 
     private int ticks;
 
     public VulcanLongJump(String name, @NotNull LongJump parent) {
         super(name, parent);
+        this.registerSetting(teleport = new ButtonSetting("Teleport", true));
         this.registerSetting(autoDisable = new ButtonSetting("Auto disable", true));
     }
 
@@ -28,7 +30,8 @@ public class VulcanLongJump extends SubMode<LongJump> {
         if (ticks == 1) {
             mc.thePlayer.motionY = 0;
             mc.thePlayer.onGround = true;
-            mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY + 9.9, mc.thePlayer.posZ);
+            if (teleport.isToggled())
+                mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY + 9.9, mc.thePlayer.posZ);
         }
 
         if (ticks > 0 && !(ticks >3)) {

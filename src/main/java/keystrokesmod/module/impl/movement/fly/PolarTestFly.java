@@ -45,23 +45,17 @@ public class PolarTestFly extends SubMode<Fly> {
 
     @Override
     public void onEnable() throws Throwable {
+        Utils.getTimer().timerSpeed = 0.1f;
         editMotion.enable();
         ((SimpleMotionModifier) editMotion.getSelected()).update();
-        Utils.getTimer().timerSpeed = 0.01f;
     }
 
     @SubscribeEvent
-    public void onReceivePacket(ReceivePacketEvent event) {
-        if (mc.thePlayer.ticksExisted < 20) {
-            delayedPackets.clear();
-            return;
-        }
-
+    public void onReceivePacket(@NotNull ReceivePacketEvent event) {
         if (event.getPacket() instanceof S08PacketPlayerPosLook) {
             if (mc.thePlayer.capabilities.allowFlying && !delayed) {
                 delayed = true;
             } else if (delayed) {
-                delayedPackets.add((Packet<INetHandlerPlayClient>) event.getPacket());
                 Notifications.sendNotification(Notifications.NotificationTypes.WARN, "Flag detected! You may need to disable the Disabler");
             }
         }

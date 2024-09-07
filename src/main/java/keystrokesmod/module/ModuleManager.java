@@ -126,6 +126,7 @@ public class ModuleManager {
     public static SilenceIRC silenceIRC;
     public static Teleport teleport;
     public static AntiFalseFlag antiFalseFlag;
+    public static ViaVersionFix viaVersionFix;
 
     public void register() {
 
@@ -308,6 +309,7 @@ public class ModuleManager {
         this.addModule(exploitFixer = new ExploitFixer());
         this.addModule(ghostBlock = new GhostBlock());
         this.addModule(antiFalseFlag = new AntiFalseFlag());
+        this.addModule(viaVersionFix = new ViaVersionFix());
 
         // enable
         antiBot.enable();

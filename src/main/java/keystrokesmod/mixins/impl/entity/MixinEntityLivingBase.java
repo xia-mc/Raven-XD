@@ -5,6 +5,7 @@ import keystrokesmod.event.JumpEvent;
 import keystrokesmod.event.MoveEvent;
 import keystrokesmod.event.SwingAnimationEvent;
 import keystrokesmod.module.ModuleManager;
+import keystrokesmod.module.impl.exploit.viaversionfix.ViaVersionFixHelper;
 import keystrokesmod.module.impl.movement.Sprint;
 import keystrokesmod.module.impl.other.RotationHandler;
 import keystrokesmod.utility.MoveUtil;
@@ -163,5 +164,21 @@ public abstract class MixinEntityLivingBase extends Entity {
         MinecraftForge.EVENT_BUS.post(swingAnimationEvent);
 
         cir.setReturnValue((int) (swingAnimationEvent.getAnimationEnd() * Utils.getTimer().timerSpeed));
+    }
+
+    /**
+     * A part of ViaVersionFix.
+     * In 1.8, the minimum motion before reset is 0.005, but in 1.12, this value is 0.003.
+     * To reduce overwrites, I make this redirect mixin.
+     * It works like this:
+     *     abs(motion) < 0.003
+     *   = abs(motion) + 0.002 < 0.005
+     * @param motion the single axis motion of current entity
+     * @return abs result
+     */
+    @Redirect(method = "onLivingUpdate", at = @At(value = "INVOKE", target = "Ljava/lang/Math;abs(D)D"))
+    private double onAbsMotion(double motion) {
+        final double absResult = Math.abs(motion);
+        return ViaVersionFixHelper.is122() ? absResult + 0.002 : absResult;
     }
 }

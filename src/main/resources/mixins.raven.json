@@ -12,6 +12,9 @@
     "entity.MixinEntityPlayerSP",
     "event.MixinEventBus",
     "network.C02PacketUseEntityAccessor",
+    "network.C03PacketPlayerAccessor",
+    "network.C07PacketPlayerDiggingAccessor",
+    "network.C08PacketPlayerBlockPlacementAccessor",
     "network.MixinModList",
     "network.MixinNetworkManager",
     "network.S08PacketPlayerPosLookAccessor",
@@ -23,6 +26,7 @@
     "render.MixinRendererLivingEntity",
     "world.BlockNoteAccessor",
     "world.MixinBlock",
+    "world.MixinBlockLadder",
     "world.MixinBlockWeb",
     "world.ScoreAccessor"
   ],

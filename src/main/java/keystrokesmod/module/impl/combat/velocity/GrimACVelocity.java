@@ -1,16 +1,21 @@
 package keystrokesmod.module.impl.combat.velocity;
 
 import keystrokesmod.event.PostVelocityEvent;
-import keystrokesmod.event.PreUpdateEvent;
+import keystrokesmod.event.PreMotionEvent;
 import keystrokesmod.module.ModuleManager;
-import keystrokesmod.module.impl.combat.KillAura;
 import keystrokesmod.module.impl.combat.Velocity;
+import keystrokesmod.module.impl.exploit.viaversionfix.ViaVersionFixHelper;
 import keystrokesmod.module.setting.impl.ButtonSetting;
-import keystrokesmod.module.setting.impl.DescriptionSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.MoveUtil;
+import keystrokesmod.utility.PacketUtils;
 import keystrokesmod.utility.Utils;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.network.play.client.C02PacketUseEntity;
+import net.minecraft.network.play.client.C0APacketAnimation;
+import net.minecraft.network.play.client.C0BPacketEntityAction;
+import net.minecraft.util.MovingObjectPosition;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
@@ -24,7 +29,6 @@ public class GrimACVelocity extends SubMode<Velocity> {
 
     public GrimACVelocity(String name, @NotNull Velocity parent) {
         super(name, parent);
-        this.registerSetting(new DescriptionSetting("Only work on 1.9+"));
         this.registerSetting(reduceCountEveryTime = new SliderSetting("Reduce count every time", 4, 1, 10, 1));
         this.registerSetting(reduceTimes = new SliderSetting("Reduce times", 1, 1, 5, 1));
         this.registerSetting(onlyWhileMoving = new ButtonSetting("Only while moving", false));
@@ -32,16 +36,37 @@ public class GrimACVelocity extends SubMode<Velocity> {
     }
 
     @SubscribeEvent
-    public void onPreUpdate(PreUpdateEvent event) {
-        if (unReduceTimes > 0 && mc.thePlayer.hurtTime > 0 && !(onlyWhileMoving.isToggled() && !MoveUtil.isMoving()) && !ModuleManager.killAura.noAimToEntity()) {
-            for (int i = 0; i < (int) reduceCountEveryTime.getInput(); i++) {
-                Utils.attackEntity(KillAura.target, debug.isToggled());
+    public void onPreMotion(PreMotionEvent event) {
+        if (ModuleManager.blink.isEnabled()) return;
+        if (unReduceTimes > 0 && mc.thePlayer.hurtTime > 0
+                && !(onlyWhileMoving.isToggled() && !MoveUtil.isMoving())
+                && mc.objectMouseOver != null && mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY
+                && mc.objectMouseOver.entityHit instanceof EntityLivingBase) {
+            if (event.isSprinting()) {
+                PacketUtils.sendPacket(new C0BPacketEntityAction(mc.thePlayer, C0BPacketEntityAction.Action.START_SPRINTING));
+                doReduce();
+                PacketUtils.sendPacket(new C0BPacketEntityAction(mc.thePlayer, C0BPacketEntityAction.Action.STOP_SPRINTING));
+            } else {
+                doReduce();
             }
+
             if (debug.isToggled())
                 Utils.sendMessage(String.format("%d Reduced %.3f %.3f", (int) reduceTimes.getInput() - unReduceTimes,  mc.thePlayer.motionX, mc.thePlayer.motionZ));
             unReduceTimes--;
         } else {
             unReduceTimes = 0;
+        }
+    }
+
+    private void doReduce() {
+        for (int i = 0; i < (int) reduceCountEveryTime.getInput(); i++) {
+            if (ViaVersionFixHelper.is122()) {
+                PacketUtils.sendPacketNoEvent(new C0APacketAnimation());
+            }
+            PacketUtils.sendPacketNoEvent(new C0APacketAnimation());
+            PacketUtils.sendPacketNoEvent(new C02PacketUseEntity(mc.objectMouseOver.entityHit, C02PacketUseEntity.Action.ATTACK));
+            mc.thePlayer.motionX *= 0.6;
+            mc.thePlayer.motionZ *= 0.6;
         }
     }
 

@@ -5,7 +5,6 @@ import keystrokesmod.mixins.impl.client.KeyBindingAccessor;
 import keystrokesmod.module.impl.movement.NoSlow;
 import keystrokesmod.module.impl.other.SlotHandler;
 import keystrokesmod.utility.PacketUtils;
-import net.minecraft.item.ItemBow;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.client.C07PacketPlayerDigging;
@@ -40,13 +39,8 @@ public class GrimACNoSlow extends INoSlow {
         return item != null && item.getItem() instanceof ItemFood && item.stackSize > 1;
     }
 
-    private boolean canBowNoSlow() {
-        final ItemStack item = SlotHandler.getHeldItem();
-        return item != null && item.getItem() instanceof ItemBow;
-    }
-
     @Override
     public float getSlowdown() {
-        return canBowNoSlow() ? 1 : 0.2f;
+        return canFoodNoSlow() ? 0.2f : 1;
     }
 }
