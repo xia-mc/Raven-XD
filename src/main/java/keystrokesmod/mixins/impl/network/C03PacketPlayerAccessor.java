@@ -10,4 +10,7 @@ public interface C03PacketPlayerAccessor {
 
     @Accessor("pitch")
     void setPitch(float pitch);
+
+    @Accessor("rotating")
+    boolean isRotating();
 }

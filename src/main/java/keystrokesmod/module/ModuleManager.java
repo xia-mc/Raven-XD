@@ -127,6 +127,7 @@ public class ModuleManager {
     public static Teleport teleport;
     public static AntiFalseFlag antiFalseFlag;
     public static ViaVersionFix viaVersionFix;
+    public static AutoGapple autoGapple;
 
     public void register() {
 
@@ -164,6 +165,7 @@ public class ModuleManager {
         this.addModule(projectileAimBot = new ProjectileAimBot());
         this.addModule(airStuck = new AirStuck());
         this.addModule(autoRod = new AutoRod());
+        this.addModule(autoGapple = new AutoGapple());
 
         // fun
         this.addModule(new ExtraBobbing());

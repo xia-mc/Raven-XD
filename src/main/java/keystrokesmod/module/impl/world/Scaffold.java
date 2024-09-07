@@ -764,7 +764,6 @@ public class Scaffold extends IAutoClicker {
     public static boolean sprint() {
         if (ModuleManager.scaffold.isEnabled()
                 && ModuleManager.scaffold.sprint.getInput() > 0
-                && ModuleManager.scaffold.placeBlock != null
                 && (!ModuleManager.scaffold.fastOnRMB.isToggled() || Mouse.isButtonDown(1))) {
             switch ((int) ModuleManager.scaffold.sprint.getInput()) {
                 case 1:
