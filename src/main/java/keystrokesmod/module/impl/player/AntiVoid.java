@@ -15,6 +15,7 @@ import net.minecraft.block.BlockAir;
 import net.minecraft.item.ItemSword;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.client.C03PacketPlayer;
+import net.minecraft.network.play.server.S08PacketPlayerPosLook;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -188,6 +189,18 @@ public class AntiVoid extends Module {
 
         if ((mode.getInput() == 1 || mode.getInput() == 2) && airStuck) {
             event.setCanceled(true);
+        }
+    }
+
+    @SubscribeEvent
+    public void onReceivePacket(@NotNull ReceivePacketEvent event) {
+        if (event.getPacket() instanceof S08PacketPlayerPosLook && airStuck) {
+            final S08PacketPlayerPosLook p = (S08PacketPlayerPosLook) event.getPacket();
+            airStuck$posX = p.getX();
+            airStuck$posY = p.getY();
+            airStuck$posZ = p.getZ();
+            airStuck$yaw = p.getYaw();
+            airStuck$pitch = p.getPitch();
         }
     }
 

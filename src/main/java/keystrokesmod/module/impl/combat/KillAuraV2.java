@@ -9,13 +9,11 @@ import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.other.RotationHandler;
 import keystrokesmod.module.impl.other.SlotHandler;
-import keystrokesmod.module.impl.other.anticheats.utils.world.PlayerRotation;
 import keystrokesmod.module.impl.world.AntiBot;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.ModeSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.utils.ModeOnly;
-import keystrokesmod.script.classes.Vec3;
 import keystrokesmod.utility.*;
 import keystrokesmod.utility.aim.AimSimulator;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -146,6 +144,9 @@ public class KillAuraV2 extends Module {
         }
 
         if (ModuleManager.scaffold.isEnabled()) return;
+        if (ModuleManager.autoGapple != null && ModuleManager.autoGapple.disableKillAura.isToggled() && ModuleManager.autoGapple.working) {
+            return;
+        }
         // Gets all entities in specified range, sorts them using your specified sort mode, and adds them to target list
 
         this.sortTargets();
@@ -185,9 +186,10 @@ public class KillAuraV2 extends Module {
             switch ((int) rotationMode.getInput()) {
                 case 0:
                     if (target != null) {
-                        Vec3 eyePos = Utils.getEyePos(target);
-                        yaw = PlayerRotation.getYaw(eyePos);
-                        pitch = PlayerRotation.getPitch(eyePos);
+                        aimSimulator.setNearest(false, 1);
+                        Pair<Float, Float> aimResult = aimSimulator.getRotation(target);
+                        yaw = aimResult.first();
+                        pitch = aimResult.second();
                     }
                     break;
                 case 1:
@@ -207,7 +209,7 @@ public class KillAuraV2 extends Module {
             }
             event.setMoveFix(RotationHandler.MoveFix.values()[(int) moveFixMode.getInput()]);
 
-            if (RayCast.isToggled() && !RotationUtils.isMouseOver(lastYaw, lastPitch, target, (float) attackRange.getInput()))
+            if (aimSimulator.getHitPos().distanceTo(Utils.getEyePos()) > attackRange.getInput())
                 return;
 
             if (attackTimer.hasTimeElapsed(cps, true)) {

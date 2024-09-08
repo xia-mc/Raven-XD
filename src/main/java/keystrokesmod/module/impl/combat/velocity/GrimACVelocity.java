@@ -4,6 +4,7 @@ import keystrokesmod.event.PostVelocityEvent;
 import keystrokesmod.event.PreUpdateEvent;
 import keystrokesmod.mixins.impl.entity.EntityPlayerSPAccessor;
 import keystrokesmod.module.ModuleManager;
+import keystrokesmod.module.impl.combat.AutoGapple;
 import keystrokesmod.module.impl.combat.Velocity;
 import keystrokesmod.module.impl.exploit.viaversionfix.ViaVersionFixHelper;
 import keystrokesmod.module.setting.impl.ButtonSetting;
@@ -67,6 +68,8 @@ public class GrimACVelocity extends SubMode<Velocity> {
             PacketUtils.sendPacketNoEvent(new C02PacketUseEntity(mc.objectMouseOver.entityHit, C02PacketUseEntity.Action.ATTACK));
             mc.thePlayer.motionX *= 0.6;
             mc.thePlayer.motionZ *= 0.6;
+            AutoGapple.motionX *= 0.6;
+            AutoGapple.motionZ *= 0.6;
         }
     }
 

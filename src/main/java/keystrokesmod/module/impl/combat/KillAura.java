@@ -277,6 +277,11 @@ public class KillAura extends IAutoClicker {
             resetBlinkState(true);
             return;
         }
+        if (ModuleManager.autoGapple != null && ModuleManager.autoGapple.disableKillAura.isToggled() && ModuleManager.autoGapple.working) {
+            resetBlinkState(true);
+            return;
+        }
+
         if ((mc.thePlayer.isBlocking() || block.get()) && disableWhileBlocking.isToggled()) {
             resetBlinkState(true);
             return;

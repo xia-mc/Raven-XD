@@ -41,6 +41,7 @@ public class GrimACNoSlow extends INoSlow {
 
     @Override
     public float getSlowdown() {
-        return canFoodNoSlow() ? 0.2f : 1;
+        ItemStack item = SlotHandler.getHeldItem();
+        return item != null && item.getItem() instanceof ItemFood ? .2f : 1;
     }
 }
