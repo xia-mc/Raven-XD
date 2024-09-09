@@ -21,7 +21,7 @@ public class ModuleManager {
     public static List<Module> organizedModules = new ArrayList<>();
 
     public static Module longJump;
-    public static Module blink;
+    public static Blink blink;
     public static Module nameHider;
     public static Module fastPlace;
     public static MurderMystery murderMystery;

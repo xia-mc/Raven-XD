@@ -14,10 +14,10 @@ import keystrokesmod.utility.render.RenderUtils;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.Packet;
+import net.minecraft.network.play.INetHandlerPlayClient;
 import net.minecraft.network.play.INetHandlerPlayServer;
-import net.minecraft.network.play.client.C03PacketPlayer;
-import net.minecraft.network.play.client.C07PacketPlayerDigging;
-import net.minecraft.network.play.client.C0FPacketConfirmTransaction;
+import net.minecraft.network.play.client.*;
+import net.minecraft.network.play.server.S12PacketEntityVelocity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
@@ -32,6 +32,7 @@ public class AutoGapple extends Module {
     private final SliderSetting delayBetweenHeal;
     private final SliderSetting releaseTicksAfterVelocity;
     public final ButtonSetting disableKillAura;
+    private final ButtonSetting airStuck;
     private final ButtonSetting visual;
 
     public boolean working = false;
@@ -41,8 +42,9 @@ public class AutoGapple extends Module {
 
     public static double motionX, motionY, motionZ;
     private float yaw, pitch;
-    private final Animation animation = new Animation(Easing.EASE_OUT_QUART, 200);
-    private final Queue<Packet<INetHandlerPlayServer>> delayedPackets = new ConcurrentLinkedQueue<>();
+    private final Animation animation = new Animation(Easing.EASE_OUT_CIRC, 500);
+    private final Queue<Packet<INetHandlerPlayServer>> delayedSend = new ConcurrentLinkedQueue<>();
+    private final Queue<Packet<INetHandlerPlayClient>> delayedReceive = new ConcurrentLinkedQueue<>();
 
     public AutoGapple() {
         super("AutoGapple", category.combat, "Made for QuickMacro.");
@@ -50,88 +52,111 @@ public class AutoGapple extends Module {
         this.registerSetting(delayBetweenHeal = new SliderSetting("Delay between heal", 5, 0, 20, 1));
         this.registerSetting(releaseTicksAfterVelocity = new SliderSetting("Release ticks after velocity", 1, 0, 5, 1));
         this.registerSetting(disableKillAura = new ButtonSetting("Disable killAura", false));
+        this.registerSetting(airStuck = new ButtonSetting("Air stuck", false));
         this.registerSetting(visual = new ButtonSetting("Visual", true));
     }
 
     @Override
     public void onDisable() throws Throwable {
-        if (working)
-            PacketUtils.sendPacket(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN));
         working = false;
         eatingTicksLeft = 0;
         releaseLeft = 0;
-        synchronized (delayedPackets) {
-            for (Packet<INetHandlerPlayServer> p : delayedPackets) {
+        synchronized (delayedSend) {
+            for (Packet<INetHandlerPlayServer> p : delayedSend) {
                 PacketUtils.sendPacketNoEvent(p);
             }
-            delayedPackets.clear();
+            delayedSend.clear();
         }
     }
 
     @SubscribeEvent
     public void onPreUpdate(PreUpdateEvent event) {
         if (eatingTicksLeft == 0) {
-            working = false;
-            synchronized (delayedPackets) {
-                for (Packet<INetHandlerPlayServer> p : delayedPackets) {
-                    PacketUtils.sendPacketNoEvent(p);
-                }
-                delayedPackets.clear();
+            if (working) {
+                working = false;
+                int lastSlot = SlotHandler.getCurrentSlot();
+                PacketUtils.sendPacket(new C09PacketHeldItemChange(foodSlot));
+                SlotHandler.setCurrentSlot(foodSlot);
+                PacketUtils.sendPacket(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.DROP_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN));
+                PacketUtils.sendPacket(new C08PacketPlayerBlockPlacement(SlotHandler.getHeldItem()));
+                mc.thePlayer.moveForward *= 0.2f;
+                mc.thePlayer.moveStrafing *= 0.2f;
+                release();
+                PacketUtils.sendPacket(new C09PacketHeldItemChange(lastSlot));
+                SlotHandler.setCurrentSlot(lastSlot);
+                releaseLeft = (int) delayBetweenHeal.getInput();
+                foodSlot = -1;
             }
-            releaseLeft = (int) delayBetweenHeal.getInput();
-            foodSlot = -1;
         }
-        if (releaseLeft > 0)
-            working = false;
         if (eatingTicksLeft > 0)
             working = true;
+        if (releaseLeft > 0)
+            working = false;
         if (releaseLeft > 0)
             releaseLeft--;
         if (eatingTicksLeft > 0) {
             eatingTicksLeft--;
         }
 
-        if (foodSlot != -1 && working)
-            SlotHandler.setCurrentSlot(foodSlot);
         if (!Utils.nullCheck() || mc.thePlayer.getHealth() >= minHealth.getInput())
             return;
-        if (working)
+        if (eatingTicksLeft > 0)
             return;
 
         foodSlot = eat();
         if (foodSlot != -1) {
             animation.reset();
-            eatingTicksLeft = 32;
+            eatingTicksLeft = 35;
             animation.setValue(eatingTicksLeft);
         }
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGH)
     public void onSendPacket(SendPacketEvent event) {
-        if (eatingTicksLeft > 0 && event.getPacket() instanceof C07PacketPlayerDigging) {
-            if (((C07PacketPlayerDigging) event.getPacket()).getStatus() == C07PacketPlayerDigging.Action.RELEASE_USE_ITEM) {
+        if (airStuck.isToggled()) {
+            if (working && event.getPacket() instanceof C0FPacketConfirmTransaction) {
                 event.setCanceled(true);
-                synchronized (delayedPackets) {
-                    for (Packet<INetHandlerPlayServer> p : delayedPackets) {
-                        PacketUtils.sendPacketNoEvent(p);
-                    }
-                    delayedPackets.clear();
-                }
+                delayedSend.add((C0FPacketConfirmTransaction) event.getPacket());
+            }
+            if (working && event.getPacket() instanceof C08PacketPlayerBlockPlacement) {
+                event.setCanceled(true);
+                delayedSend.add((C03PacketPlayer) event.getPacket());
+            }
+            if (working && event.getPacket() instanceof C03PacketPlayer) {
+                event.setCanceled(true);
+                delayedSend.add((C03PacketPlayer) event.getPacket());
             }
         }
-        if (working && event.getPacket() instanceof C0FPacketConfirmTransaction) {
-            event.setCanceled(true);
-            delayedPackets.add((C0FPacketConfirmTransaction) event.getPacket());
+    }
+
+    private void release() {
+        synchronized (delayedSend) {
+            for (Packet<INetHandlerPlayServer> p : delayedSend) {
+                PacketUtils.sendPacket(p);
+            }
+            delayedSend.clear();
         }
-        if (working && event.getPacket() instanceof C03PacketPlayer) {
-            event.setCanceled(true);
-            delayedPackets.add((C03PacketPlayer) event.getPacket());
+        synchronized (delayedReceive) {
+            for (Packet<INetHandlerPlayClient> p : delayedReceive) {
+                PacketUtils.receivePacket(p);
+            }
+            delayedReceive.clear();
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    public void onReceivePacket(ReceivePacketEvent event) {
+        if (airStuck.isToggled()) {
+            if (working && event.getPacket() instanceof S12PacketEntityVelocity) {
+                event.setCanceled(true);
+                delayedReceive.add((S12PacketEntityVelocity) event.getPacket());
+            }
         }
     }
 
     @SubscribeEvent
     public void onMove(MoveEvent event) {
-        if (working) {
+        if (working && airStuck.isToggled()) {
             event.setCanceled(true);
             mc.thePlayer.motionX = motionX;
             mc.thePlayer.motionY = motionY;
@@ -159,16 +184,20 @@ public class AutoGapple extends Module {
                 break;
             }
         }
-        if (slot == -1) return -1;
-
-        SlotHandler.setCurrentSlot(slot);
-        mc.playerController.sendUseItem(mc.thePlayer, mc.theWorld, SlotHandler.getHeldItem());
         return slot;
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onRotation(RotationEvent event) {
-        if (working) {
+        if (working && airStuck.isToggled()) {
+            event.setYaw(yaw);
+            event.setPitch(pitch);
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public void onPreMotion(PreMotionEvent event) {
+        if (working && airStuck.isToggled()) {
             event.setYaw(yaw);
             event.setPitch(pitch);
         }

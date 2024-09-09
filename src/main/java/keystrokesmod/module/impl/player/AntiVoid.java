@@ -2,7 +2,9 @@ package keystrokesmod.module.impl.player;
 
 import keystrokesmod.event.*;
 import keystrokesmod.module.Module;
+import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.other.SlotHandler;
+import keystrokesmod.module.impl.player.blink.NormalBlink;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.DescriptionSetting;
 import keystrokesmod.module.setting.impl.ModeSetting;
@@ -42,6 +44,7 @@ public class AntiVoid extends Module {
     private int delayed = -1;
 
     private boolean fallDistanced = false;
+    private NormalBlink blink = null;
 
     public AntiVoid() {
         super("AntiVoid", category.player);
@@ -49,6 +52,13 @@ public class AntiVoid extends Module {
         this.registerSetting(mode = new ModeSetting("Mode", MODES, 0));
         this.registerSetting(distance = new SliderSetting("Distance", 5, 0, 10, 1));
         this.registerSetting(toggleScaffold = new ButtonSetting("Toggle scaffold", false));
+    }
+
+    @Override
+    public void onEnable() throws Throwable {
+        if (blink == null) {
+            blink = new NormalBlink("AntiVoid$Blink", ModuleManager.blink);
+        }
     }
 
     @Override
@@ -112,7 +122,7 @@ public class AntiVoid extends Module {
                                 scaffold.enable();
                             }
 
-                            ((Blink) blink).blinkedPackets.clear();
+                            blink.blinkedPackets.clear();
 
                             mc.thePlayer.fallDistance = 0;
 

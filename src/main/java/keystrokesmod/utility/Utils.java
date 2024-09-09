@@ -11,6 +11,7 @@ import keystrokesmod.module.impl.other.SlotHandler;
 import keystrokesmod.module.impl.render.AntiShuffle;
 import keystrokesmod.utility.i18n.I18nManager;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.boss.EntityWither;
 import net.minecraftforge.client.event.MouseEvent;
@@ -978,9 +979,7 @@ public class Utils {
     }
 
     public static boolean isTargetNearby() {
-        return mc.theWorld.playerEntities.stream()
-                .filter(target -> target != mc.thePlayer)
-                .anyMatch(target -> new keystrokesmod.script.classes.Vec3(target).distanceTo(mc.thePlayer) < 6);
+        return isTargetNearby(6);
     }
 
     public static boolean isTargetNearby(double dist) {
@@ -1051,8 +1050,10 @@ public class Utils {
     }
 
     public static void inventoryClick(@NotNull GuiScreen s) {
-        int x = Mouse.getX() * s.width / mc.displayWidth;
-        int y = s.height - Mouse.getY() * s.height / mc.displayHeight - 1;
+        final ScaledResolution sr = new ScaledResolution(mc);
+
+        int x = Mouse.getX() * s.width / sr.getScaledWidth();
+        int y = s.height - Mouse.getY() * s.height / sr.getScaledHeight() - 1;
 
         ClickEvent event = new ClickEvent();
         MinecraftForge.EVENT_BUS.post(event);
