@@ -210,7 +210,11 @@ public class AutoGapple extends Module {
                     data.vec3 = new Vec3(wrapper.getX() / 32.0D, wrapper.getY() / 32.0D, wrapper.getZ() / 32.0D);
                 }
             } else if (p instanceof S12PacketEntityVelocity) {
-                if (((S12PacketEntityVelocity) p).getEntityID() == mc.thePlayer.getEntityId()) {
+                S12PacketEntityVelocity velo = (S12PacketEntityVelocity) p;
+                if (velo.getEntityID() == mc.thePlayer.getEntityId()) {
+                    motionX = velo.getMotionX() / 8000.0;
+                    motionY = velo.getMotionY() / 8000.0;
+                    motionZ = velo.getMotionZ() / 8000.0;
                     if (releaseTicksAfterVelocity.getInput() > 0) {
                         working = false;
                         releaseLeft = (int) releaseTicksAfterVelocity.getInput();

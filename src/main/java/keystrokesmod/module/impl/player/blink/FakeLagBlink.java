@@ -39,10 +39,12 @@ public class FakeLagBlink extends SubMode<Blink> {
     private final Queue<TimedPacket> packetQueue = new ConcurrentLinkedQueue<>();
     private boolean needToDisable = false;
     private Vec3 vec3 = Vec3.ZERO;
+    private long startTime = 0;
+    private long stopTime = 0;
+    private long blinkedTime = 0;
     private final Animation animationX = new Animation(Easing.EASE_OUT_CIRC, 200);
     private final Animation animationY = new Animation(Easing.EASE_OUT_CIRC, 200);
     private final Animation animationZ = new Animation(Easing.EASE_OUT_CIRC, 200);
-    private final Animation animationProgressBar = new Animation(Easing.EASE_OUT_CIRC, 500);
 
     public FakeLagBlink(String name, @NotNull Blink parent) {
         super(name, parent);
@@ -55,19 +57,20 @@ public class FakeLagBlink extends SubMode<Blink> {
 
     @Override
     public void onEnable() throws Throwable {
-        packetQueue.clear();
         needToDisable = false;
         vec3 = new Vec3(mc.thePlayer);
         animationX.setValue(vec3.x());
         animationY.setValue(vec3.y());
         animationZ.setValue(vec3.z());
-        animationProgressBar.setValue(0);
+        startTime = System.currentTimeMillis();
+        blinkedTime = 0;
     }
 
     @Override
     public void onDisable() throws Throwable {
         if (!needToDisable) {
             MinecraftForge.EVENT_BUS.register(this);
+            stopTime = System.currentTimeMillis();
             needToDisable = true;
         }
     }
@@ -89,6 +92,15 @@ public class FakeLagBlink extends SubMode<Blink> {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onRenderTick(TickEvent.RenderTickEvent ev) {
+        final double progress;
+        if (needToDisable) {
+            progress = (blinkedTime / maxBlinkTime.getInput()) - Math.min((System.currentTimeMillis() - stopTime) / (maxBlinkTime.getInput() / releaseSpeed.getInput()), 1);
+        } else {
+            blinkedTime = Math.min(System.currentTimeMillis() - startTime, (long) maxBlinkTime.getInput());
+            progress = blinkedTime / maxBlinkTime.getInput();
+        }
+        RenderUtils.drawProgressBar(progress, "Blink");
+
         if (!Utils.nullCheck()) {
             sendPacket(false);
             return;
@@ -102,13 +114,6 @@ public class FakeLagBlink extends SubMode<Blink> {
             }
         }
         sendPacket(true);
-
-        if (packetQueue.isEmpty()) {
-            animationProgressBar.run(0);
-        } else {
-            animationProgressBar.run(System.currentTimeMillis() - packetQueue.element().getMillis());
-        }
-        RenderUtils.drawProgressBar(Math.min(1, (animationProgressBar.getValue() + 50) / maxBlinkTime.getInput()), "Blink");
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
@@ -122,15 +127,10 @@ public class FakeLagBlink extends SubMode<Blink> {
                 || packet instanceof C01PacketChatMessage) {
             return;
         }
-        long receiveTime = System.currentTimeMillis();
-        if (!Utils.nullCheck()) {
-            sendPacket(false);
-            return;
-        }
         if (e.isCanceled()) {
             return;
         }
-        packetQueue.add(new TimedPacket(packet, receiveTime));
+        packetQueue.add(new TimedPacket(packet, System.currentTimeMillis()));
         e.setCanceled(true);
     }
 
@@ -139,10 +139,10 @@ public class FakeLagBlink extends SubMode<Blink> {
             while (!packetQueue.isEmpty()) {
                 boolean shouldSend;
                 if (delay && !(antiAim.isToggled() && shouldAntiAim())) {
-                    shouldSend = packetQueue.element().getCold().getCum((int) this.maxBlinkTime.getInput());
+                    shouldSend = packetQueue.element().getCold().getCum((long) maxBlinkTime.getInput());
                 } else {
                     if (slowRelease.isToggled()) {
-                        shouldSend = packetQueue.element().getCold().getCum((int) (this.maxBlinkTime.getInput() / releaseSpeed.getInput()));
+                        shouldSend = packetQueue.element().getCold().getCum((long) (maxBlinkTime.getInput() * ((blinkedTime / maxBlinkTime.getInput()) - Math.min((System.currentTimeMillis() - stopTime) / (maxBlinkTime.getInput() / releaseSpeed.getInput()), 1))));
                     } else {
                         shouldSend = true;
                     }
