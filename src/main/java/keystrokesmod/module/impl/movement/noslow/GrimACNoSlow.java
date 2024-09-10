@@ -5,6 +5,7 @@ import keystrokesmod.mixins.impl.client.KeyBindingAccessor;
 import keystrokesmod.module.impl.movement.NoSlow;
 import keystrokesmod.module.impl.other.SlotHandler;
 import keystrokesmod.utility.PacketUtils;
+import keystrokesmod.utility.Utils;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.client.C07PacketPlayerDigging;
@@ -26,7 +27,7 @@ public class GrimACNoSlow extends INoSlow {
                 event.setCanceled(true);
                 PacketUtils.sendPacketNoEvent(event.getPacket());
                 PacketUtils.sendPacketNoEvent(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.DROP_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN));
-                ((KeyBindingAccessor) mc.gameSettings.keyBindUseItem).setPressed(false);
+                Utils.sendClick(1, false);
             } else if (event.getPacket() instanceof C07PacketPlayerDigging) {
                 if (((C07PacketPlayerDigging) event.getPacket()).getStatus() == C07PacketPlayerDigging.Action.RELEASE_USE_ITEM)
                     event.setCanceled(true);
@@ -36,7 +37,7 @@ public class GrimACNoSlow extends INoSlow {
 
     private boolean canFoodNoSlow() {
         final ItemStack item = SlotHandler.getHeldItem();
-        return item != null && item.getItem() instanceof ItemFood && item.stackSize > 1;
+        return item != null && item.getItem() instanceof ItemFood && item.stackSize > 2;
     }
 
     @Override

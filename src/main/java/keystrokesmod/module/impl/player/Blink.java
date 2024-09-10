@@ -35,6 +35,11 @@ public class Blink extends Module {
         mode.disable();
     }
 
+    @Override
+    public String getInfo() {
+        return mode.getSelected().getInfo();
+    }
+
     public static void drawBox(@NotNull Vec3 pos) {
         GlStateManager.pushMatrix();
         double x = pos.xCoord - mc.getRenderManager().viewerPosX;

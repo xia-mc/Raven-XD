@@ -49,8 +49,9 @@ public class Scaffold extends IAutoClicker {
     private final SliderSetting motion;
     private final ModeSetting rotation;
     private final ButtonSetting moveFix;
-    private final SliderSetting tellyStartTick;
-    private final SliderSetting tellyStopTick;
+    private final SliderSetting straightTicks;
+    private final SliderSetting diagonalTicks;
+    private final SliderSetting jumpDownTicks;
     private final SliderSetting strafe;
     private final ModeSetting sprint;
     private final ButtonSetting fast;
@@ -109,6 +110,7 @@ public class Scaffold extends IAutoClicker {
     private int jump$bridged = 0;
     private boolean placedUp;
     private int offGroundTicks = 0;
+    private int onGroundTicks = 0;
     private boolean telly$noBlockPlace = false;
     public boolean tower$noBlockPlace = false;
     private Float lastYaw = null, lastPitch = null;
@@ -126,8 +128,9 @@ public class Scaffold extends IAutoClicker {
         this.registerSetting(alwaysPlaceIfPossible = new ButtonSetting("Always place if possible", false));
         this.registerSetting(rotation = new ModeSetting("Rotation", rotationModes, 1));
         this.registerSetting(aimSpeed = new SliderSetting("Aim speed", 20, 5, 20, 0.1, new ModeOnly(rotation, 0).reserve()));
-        this.registerSetting(tellyStartTick = new SliderSetting("Telly start", 3, 0, 11, 1, "tick", new ModeOnly(rotation, 4)));
-        this.registerSetting(tellyStopTick = new SliderSetting("Telly stop", 8, 0, 11, 1, "tick", new ModeOnly(rotation, 4)));
+        this.registerSetting(straightTicks = new SliderSetting("Straight ticks", 6, 1, 8, 1, new ModeOnly(rotation, 4)));
+        this.registerSetting(diagonalTicks = new SliderSetting("Diagonal ticks", 4, 1, 8, 1, new ModeOnly(rotation, 4)));
+        this.registerSetting(jumpDownTicks = new SliderSetting("Jump down ticks", 1, 1, 8, 1, new ModeOnly(rotation, 4)));
         this.registerSetting(moveFix = new ButtonSetting("MoveFix", false, new ModeOnly(rotation, 0).reserve()));
         this.registerSetting(motion = new SliderSetting("Motion", 1.0, 0.5, 1.2, 0.01, () -> !moveFix.isToggled()));
         this.registerSetting(strafe = new SliderSetting("Strafe", 0, -45, 45, 5));
@@ -235,14 +238,12 @@ public class Scaffold extends IAutoClicker {
                 pitch = placePitch;
                 break;
             case 4:
-                if (offGroundTicks >= tellyStartTick.getInput() && offGroundTicks < tellyStopTick.getInput() && placeBlock != null && MoveUtil.isMoving() && !Utils.jumpDown()) {
-                    telly$noBlockPlace = true;
+                if (telly$noBlockPlace) {
                     yaw = event.getYaw();
                     pitch = event.getPitch();
                 } else {
                     yaw = placeYaw;
                     pitch = placePitch;
-                    telly$noBlockPlace = false;
                 }
                 break;
             case 5:
@@ -250,17 +251,17 @@ public class Scaffold extends IAutoClicker {
                 pitch = placePitch;
                 break;
             case 6:
-                if (MoveUtil.isMoving()) {
-                    mc.thePlayer.setSprinting(true);
-                }
-                if (!MoveUtil.isMoving()) {
-                    yaw = placeYaw;
-                } else if (place) {
-                    yaw = forceStrict ? placeYaw : getYaw();
-                } else {
-                    yaw = (float) (event.getYaw() + (Math.random() - 0.5) * 0.940004);
-                }
                 pitch = placePitch;
+                if (!MoveUtil.isMoving()) {
+                    yaw = getYaw();
+                    break;
+                }
+                if (place) {
+                    yaw = placeYaw;
+                } else {
+                    yaw = (float) (event.getYaw() + (Math.random() - 0.5) * 0.4);  // to bypass grimAC rotation check
+                }
+                mc.thePlayer.setSprinting(true);
                 break;
         }
         boolean instant = aimSpeed.getInput() == aimSpeed.getMax();
@@ -382,8 +383,37 @@ public class Scaffold extends IAutoClicker {
     public void onPreUpdate(PreUpdateEvent e) { // place here
         if (mc.thePlayer.onGround) {
             offGroundTicks = 0;
+            onGroundTicks++;
         } else {
             offGroundTicks++;
+            onGroundTicks = 0;
+        }
+
+        if (rotation.getInput() == 4) {
+            if (offGroundTicks == 0) {
+                if (onGroundTicks == 0)
+                    telly$noBlockPlace = true;
+                else if (MoveUtil.isMoving() && !Utils.jumpDown())
+                    mc.thePlayer.jump();
+            } else if (BlockUtils.insideBlock(mc.thePlayer.getEntityBoundingBox().offset(mc.thePlayer.motionX * 0.5, mc.thePlayer.motionY + 0.1, mc.thePlayer.motionZ * 0.5))) {
+                telly$noBlockPlace = true;
+            } else {
+                if (Utils.jumpDown()) {
+                    if (offGroundTicks == (int) jumpDownTicks.getInput()) {
+                        telly$noBlockPlace = false;
+                    }
+                } else {
+                    if (Scaffold.isDiagonal()) {
+                        if (offGroundTicks == (int) diagonalTicks.getInput()) {
+                            telly$noBlockPlace = false;
+                        }
+                    } else {
+                        if (offGroundTicks == (int) straightTicks.getInput()) {
+                            telly$noBlockPlace = false;
+                        }
+                    }
+                }
+            }
         }
 
         switch (hoverState) {
@@ -399,7 +429,7 @@ public class Scaffold extends IAutoClicker {
                 break;
         }
 
-        if ((rotation.getInput() == 4 || autoJump.isToggled()) && mc.thePlayer.onGround && MoveUtil.isMoving() && !Utils.jumpDown()) {
+        if ((rotation.getInput() != 4 && autoJump.isToggled()) && mc.thePlayer.onGround && MoveUtil.isMoving() && !Utils.jumpDown()) {
             mc.thePlayer.jump();
         }
 

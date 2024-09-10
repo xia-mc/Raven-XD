@@ -44,7 +44,7 @@ public class AntiVoid extends Module {
     private int delayed = -1;
 
     private boolean fallDistanced = false;
-    private NormalBlink blink = null;
+    private final NormalBlink blink = new NormalBlink("Blink", this);
 
     public AntiVoid() {
         super("AntiVoid", category.player);
@@ -52,13 +52,6 @@ public class AntiVoid extends Module {
         this.registerSetting(mode = new ModeSetting("Mode", MODES, 0));
         this.registerSetting(distance = new SliderSetting("Distance", 5, 0, 10, 1));
         this.registerSetting(toggleScaffold = new ButtonSetting("Toggle scaffold", false));
-    }
-
-    @Override
-    public void onEnable() throws Throwable {
-        if (blink == null) {
-            blink = new NormalBlink("AntiVoid$Blink", ModuleManager.blink);
-        }
     }
 
     @Override

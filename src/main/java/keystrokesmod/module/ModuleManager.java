@@ -121,7 +121,6 @@ public class ModuleManager {
     public static AutoRod autoRod;
 //    public static AbilitiesBedWars abilitiesBedWars;
     public static ClientTheme clientTheme;
-    public static ScaffoldHelper scaffoldHelper;
     public static AutoChest autoChest;
     public static SilenceIRC silenceIRC;
     public static Teleport teleport;
@@ -176,7 +175,6 @@ public class ModuleManager {
         this.addModule(noteBot = new NoteBot());
         this.addModule(blockOut = new BlockOut());
 //        this.addModule(abilitiesBedWars = new AbilitiesBedWars());
-        this.addModule(scaffoldHelper = new ScaffoldHelper());
         this.addModule(new Yeet());
 
         // minigames

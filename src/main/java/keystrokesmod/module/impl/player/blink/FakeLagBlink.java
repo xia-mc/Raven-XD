@@ -48,7 +48,7 @@ public class FakeLagBlink extends SubMode<Blink> {
         super(name, parent);
         this.registerSetting(maxBlinkTime = new SliderSetting("Max blink time", 20000, 1000, 30000, 500, "ms"));
         this.registerSetting(slowRelease = new ButtonSetting("Slow release", false));
-        this.registerSetting(releaseSpeed = new SliderSetting("Release speed", 2, 2, 10, 0.1, "x"));
+        this.registerSetting(releaseSpeed = new SliderSetting("Release speed", 2, 2, 10, 0.1, "x", slowRelease::isToggled));
         this.registerSetting(antiAim = new ButtonSetting("Anti-Aim", true));
         this.registerSetting(drawRealPosition = new ButtonSetting("Draw real position", true));
     }

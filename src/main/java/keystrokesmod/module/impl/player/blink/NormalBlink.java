@@ -1,6 +1,7 @@
 package keystrokesmod.module.impl.player.blink;
 
 import keystrokesmod.event.SendPacketEvent;
+import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.player.Blink;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
@@ -23,7 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NormalBlink extends SubMode<Blink> {
+public class NormalBlink extends SubMode<Module> {
     private final ButtonSetting pulse;
     private final SliderSetting pulseDelay;
     private final ButtonSetting initialPosition;
@@ -33,7 +34,7 @@ public class NormalBlink extends SubMode<Blink> {
     private long startTime = -1;
     private Vec3 pos;
 
-    public NormalBlink(String name, @NotNull Blink parent) {
+    public NormalBlink(String name, @NotNull Module parent) {
         super(name, parent);
         this.registerSetting(pulse = new ButtonSetting("Pulse", false));
         this.registerSetting(pulseDelay = new SliderSetting("Pulse delay", 1000, 0, 10000, 100, pulse::isToggled));
