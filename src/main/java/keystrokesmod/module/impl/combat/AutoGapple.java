@@ -78,16 +78,16 @@ public class AutoGapple extends Module {
             working = false;
             if (airStuck.isToggled()) {
                 int lastSlot = SlotHandler.getCurrentSlot();
-                PacketUtils.sendPacket(new C09PacketHeldItemChange(foodSlot));
-                SlotHandler.setCurrentSlot(foodSlot);
-                PacketUtils.sendPacket(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.DROP_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN));
-                PacketUtils.sendPacket(new C08PacketPlayerBlockPlacement(SlotHandler.getHeldItem()));
+                if (foodSlot != lastSlot)
+                    PacketUtils.sendPacketNoEvent(new C09PacketHeldItemChange(foodSlot));
+                PacketUtils.sendPacketNoEvent(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.DROP_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN));
+                PacketUtils.sendPacketNoEvent(new C08PacketPlayerBlockPlacement(mc.thePlayer.inventory.mainInventory[foodSlot]));
                 Utils.sendMessage("send.");
                 mc.thePlayer.moveForward *= 0.2f;
                 mc.thePlayer.moveStrafing *= 0.2f;
                 release();
-                PacketUtils.sendPacket(new C09PacketHeldItemChange(lastSlot));
-                SlotHandler.setCurrentSlot(lastSlot);
+                if (foodSlot != lastSlot)
+                    PacketUtils.sendPacketNoEvent(new C09PacketHeldItemChange(lastSlot));
                 releaseLeft = (int) delayBetweenHeal.getInput();
                 foodSlot = -1;
             } else {

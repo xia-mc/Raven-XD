@@ -44,7 +44,7 @@ public class AntiVoid extends Module {
     private int delayed = -1;
 
     private boolean fallDistanced = false;
-    private final NormalBlink blink = new NormalBlink("Blink", this);
+    public final NormalBlink blink = new NormalBlink("Blink", this);
 
     public AntiVoid() {
         super("AntiVoid", category.player);

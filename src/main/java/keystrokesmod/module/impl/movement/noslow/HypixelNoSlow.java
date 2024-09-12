@@ -7,13 +7,12 @@ import keystrokesmod.module.impl.other.SlotHandler;
 import keystrokesmod.utility.ContainerUtils;
 import keystrokesmod.utility.PacketUtils;
 import keystrokesmod.utility.Utils;
+import net.minecraft.item.ItemBow;
 import net.minecraft.item.ItemPotion;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
-import net.minecraft.network.play.client.C07PacketPlayerDigging;
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
 import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumFacing;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -29,10 +28,6 @@ public class HypixelNoSlow extends INoSlow {
     @Override
     public void onUpdate() {
         if (!mc.thePlayer.isUsingItem() || SlotHandler.getHeldItem() == null) return;
-
-        if (SlotHandler.getHeldItem().getItem() instanceof ItemSword && NoSlow.sword.isToggled()) {
-            PacketUtils.sendPacket(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.ABORT_DESTROY_BLOCK, BlockPos.ORIGIN, EnumFacing.UP));
-        }
     }
 
     @SubscribeEvent
@@ -52,7 +47,7 @@ public class HypixelNoSlow extends INoSlow {
                     0, 0, 0
             ));
 
-        } else if (item != null && mc.thePlayer.isUsingItem()) {
+        } else if (item != null && mc.thePlayer.isUsingItem() && !(item.getItem() instanceof ItemSword)) {
             event.setPosY(event.getPosY() + 1E-14);
         }
     }
@@ -62,7 +57,7 @@ public class HypixelNoSlow extends INoSlow {
         if (event.getPacket() instanceof C08PacketPlayerBlockPlacement && !mc.thePlayer.isUsingItem()) {
             C08PacketPlayerBlockPlacement blockPlacement = (C08PacketPlayerBlockPlacement) event.getPacket();
             if (SlotHandler.getHeldItem() != null && blockPlacement.getPlacedBlockDirection() == 255
-                    && ContainerUtils.isRest(SlotHandler.getHeldItem().getItem()) && offGroundTicks < 2) {
+                    && (ContainerUtils.isRest(SlotHandler.getHeldItem().getItem()) || SlotHandler.getHeldItem().getItem() instanceof ItemBow || SlotHandler.getHeldItem().getItem() instanceof ItemPotion) && offGroundTicks < 2) {
                 if (mc.thePlayer.onGround && !Utils.jumpDown()) {
                     mc.thePlayer.jump();
                 }
@@ -75,8 +70,8 @@ public class HypixelNoSlow extends INoSlow {
     @Override
     public float getSlowdown() {
         ItemStack item = SlotHandler.getHeldItem();
-        if (item == null) return 1;
-        if (item.getItem() instanceof ItemPotion) return .8f;
+        if (item != null && item.getItem() instanceof ItemSword)
+            return 0.8f;
         return 1;
     }
 }

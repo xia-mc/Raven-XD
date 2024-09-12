@@ -4,6 +4,7 @@ import keystrokesmod.utility.render.ColorUtils;
 import keystrokesmod.utility.render.RenderUtils;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.shader.Framebuffer;
+import org.jetbrains.annotations.Range;
 import org.lwjgl.BufferUtils;
 
 import java.nio.FloatBuffer;
@@ -23,15 +24,15 @@ public class GaussianBlur {
 
     private static Framebuffer framebuffer = new Framebuffer(1, 1, false);
 
-    private static void setupUniforms(float dir1, float dir2, float radius) {
+    private static void setupUniforms(float dir1, float dir2, @Range(from = 0, to = 64) int radius) {
         gaussianBlur.setUniformi("textureIn", 0);
         gaussianBlur.setUniformf("texelSize", 1.0F / (float) mc.displayWidth, 1.0F / (float) mc.displayHeight);
         gaussianBlur.setUniformf("direction", dir1, dir2);
         gaussianBlur.setUniformf("radius", radius);
 
-        final FloatBuffer weightBuffer = BufferUtils.createFloatBuffer(256);
+        final FloatBuffer weightBuffer = BufferUtils.createFloatBuffer(64);
         for (int i = 0; i <= radius; i++) {
-            weightBuffer.put(ColorUtils.calculateGaussianValue(i, radius / 2));
+            weightBuffer.put(ColorUtils.calculateGaussianValue(i, radius / 2f));
         }
 
         weightBuffer.rewind();
@@ -48,7 +49,8 @@ public class GaussianBlur {
         glStencilOp(GL_REPLACE, GL_REPLACE, GL_REPLACE);
         glColorMask(false, false, false, false);
     }
-    public static void endBlur(float radius, float compression) {
+
+    public static void endBlur(@Range(from = 0, to = 64) int radius, float compression) {
         StencilUtil.readStencilBuffer(1);
 
         framebuffer = RenderUtils.createFrameBuffer(framebuffer);

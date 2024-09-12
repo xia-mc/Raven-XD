@@ -1198,6 +1198,8 @@ public class RenderUtils {
     }
 
     public static void drawProgressBar(@Range(from = 0, to = 1) double progress, String text) {
+        if (mc.currentScreen != null) return;
+
         final ScaledResolution sr = new ScaledResolution(mc);
         final double width = sr.getScaledWidth_double() / 5;
         final double height = width / 13;

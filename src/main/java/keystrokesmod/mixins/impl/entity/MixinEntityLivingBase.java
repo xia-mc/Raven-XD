@@ -3,6 +3,7 @@ package keystrokesmod.mixins.impl.entity;
 import com.google.common.collect.Maps;
 import keystrokesmod.event.JumpEvent;
 import keystrokesmod.event.MoveEvent;
+import keystrokesmod.event.PreMoveEvent;
 import keystrokesmod.event.SwingAnimationEvent;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.exploit.viaversionfix.ViaVersionFixHelper;
@@ -38,6 +39,8 @@ import static keystrokesmod.Raven.mc;
 public abstract class MixinEntityLivingBase extends Entity {
     @Shadow protected abstract float getJumpUpwardsMotion();
 
+    @Shadow public float moveStrafing;
+
     public MixinEntityLivingBase(World worldIn) {
         super(worldIn);
     }
@@ -53,6 +56,17 @@ public abstract class MixinEntityLivingBase extends Entity {
     @Unique
     public boolean raven_XD$isPotionActive(@NotNull Potion potionIn) {
         return this.raven_bS$activePotionsMap.containsKey(potionIn.id);
+    }
+
+    @Inject(method = "moveEntityWithHeading", at = @At("HEAD"), cancellable = true)
+    public void onPreMoveEntity(float moveForward, float moveStrafing, CallbackInfo ci) {
+        if ((Object) this instanceof EntityPlayerSP) {
+            PreMoveEvent event = new PreMoveEvent();
+            MinecraftForge.EVENT_BUS.post(event);
+
+            if (event.isCanceled())
+                ci.cancel();
+        }
     }
 
     @Redirect(method = "moveEntityWithHeading", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/EntityLivingBase;moveEntity(DDD)V"))

@@ -25,7 +25,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class InvManager extends Module {
-    private final ModeSetting mode = new ModeSetting("Mode", new String[]{"Basic", "OpenInv"}, 1);
+    private final ModeSetting mode = new ModeSetting("Mode", new String[]{"Basic", "OpenInv", "Hypixel"}, 1);
     private final ButtonSetting notWhileMoving = new ButtonSetting("Not while moving", false, new ModeOnly(mode, 0));
     private final SliderSetting minStartDelay = new SliderSetting("Min start delay", 100, 0, 500, 10, "ms");
     private final SliderSetting maxStartDelay = new SliderSetting("Max start delay", 200, 0, 500, 10, "ms");
@@ -83,10 +83,13 @@ public class InvManager extends Module {
     public void onUpdate() {
         switch ((int) mode.getInput()) {
             case 0:
-                invOpen = mc.currentScreen == null && !(notWhileMoving.isToggled() && MoveUtil.isMoving());
+                invOpen = !(notWhileMoving.isToggled() && MoveUtil.isMoving());
                 break;
             case 1:
                 invOpen = mc.currentScreen instanceof GuiInventory;
+                break;
+            case 2:
+                invOpen = true;
                 break;
         }
 
@@ -132,6 +135,8 @@ public class InvManager extends Module {
                     } else {
                         ContainerUtils.click(bestArmorSlot);
                     }
+                    if (mode.getInput() == 2)
+                        MoveUtil.stop();
                     nextTaskTime = System.currentTimeMillis() + Utils.randomizeInt(minArmorDelay.getInput(), maxArmorDelay.getInput());
                     continue armor;
                 }
@@ -148,6 +153,8 @@ public class InvManager extends Module {
             if (!slots.isEmpty()) {
                 for (Pair<Integer, ItemStack> slot : slots) {
                     ContainerUtils.drop(slot.first());
+                    if (mode.getInput() == 2)
+                        MoveUtil.stop();
                     nextTaskTime = System.currentTimeMillis() + Utils.randomizeInt(minCleanDelay.getInput(), maxCleanDelay.getInput());
                     continue clean;
                 }
@@ -165,8 +172,10 @@ public class InvManager extends Module {
     }
 
     private void sort(int from, int to) {
-        if (to == 0 || from == -1 || to == -1) return;
+        if (to == 0 || from == -1 || to == -1 || from == to) return;
         if (ContainerUtils.sort(from, to)) {
+            if (mode.getInput() == 2)
+                MoveUtil.stop();
             nextTaskTime = System.currentTimeMillis() + Utils.randomizeInt(minSortDelay.getInput(), maxSortDelay.getInput());
         }
     }
