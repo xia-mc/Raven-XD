@@ -9,6 +9,7 @@ import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.other.RotationHandler;
 import keystrokesmod.module.impl.other.SlotHandler;
+import keystrokesmod.module.impl.player.Blink;
 import keystrokesmod.module.impl.world.AntiBot;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.ModeSetting;
@@ -144,6 +145,7 @@ public class KillAuraV2 extends Module {
         }
 
         if (ModuleManager.scaffold.isEnabled()) return;
+        if (Blink.isBlinking()) return;
         if (ModuleManager.autoGapple != null && ModuleManager.autoGapple.disableKillAura.isToggled() && ModuleManager.autoGapple.working) {
             return;
         }

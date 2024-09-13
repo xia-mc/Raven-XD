@@ -37,7 +37,7 @@ public class FakeLagBlink extends SubMode<Blink> {
     private final ButtonSetting drawRealPosition;
 
     private final Queue<TimedPacket> packetQueue = new ConcurrentLinkedQueue<>();
-    private boolean needToDisable = false;
+    public boolean needToDisable = false;
     private Vec3 vec3 = Vec3.ZERO;
     private long startTime = 0;
     private long stopTime = 0;
@@ -109,6 +109,7 @@ public class FakeLagBlink extends SubMode<Blink> {
                 sendPacket(false);
                 if (packetQueue.isEmpty()) {
                     MinecraftForge.EVENT_BUS.unregister(this);
+                    needToDisable = false;
                     return;
                 }
             }

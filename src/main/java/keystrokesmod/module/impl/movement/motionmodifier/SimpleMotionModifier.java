@@ -64,20 +64,18 @@ public class SimpleMotionModifier extends SubMode<Module> {
         this.registerSetting(editLimitXZ = new ButtonSetting("Edit limit xz", false, this::isEdit));
         this.registerSetting(editLimitXZAmount = new SliderSetting("Edit limit xz amount", 0.02, 0, 1, 0.01, () -> editMultiplyY.isToggled() && isEdit()));
         this.registerSetting(editLaunchY = new ButtonSetting("Edit launch y", false, this::isEdit));
-        this.registerSetting(editLaunchYAmount = new SliderSetting("Edit launch y amount", 0.42, -1, 5, 0.01, () -> editStaticY.isToggled() && isEdit()));
+        this.registerSetting(editLaunchYAmount = new SliderSetting("Edit launch y amount", 0.42, -1, 5, 0.01, () -> editLaunchY.isToggled() && isEdit()));
         this.registerSetting(editLaunchXZ = new ButtonSetting("Edit launch xz", false, this::isEdit));
-        this.registerSetting(editLaunchXZAmount = new SliderSetting("Edit launch xz amount", 0.2, 0, 5, 0.01, () -> editStaticXZ.isToggled() && isEdit()));
+        this.registerSetting(editLaunchXZAmount = new SliderSetting("Edit launch xz amount", 0.2, 0, 5, 0.01, () -> editLaunchXZ.isToggled() && isEdit()));
         this.registerSetting(editTimerSpeed = new ButtonSetting("Edit timer speed", false, this::isEdit));
         this.registerSetting(timerSpeedAmount = new SliderSetting("Timer speed amount", 1, 0.1, 4, 0.0001, () -> editTimerSpeed.isToggled() && isEdit()));
         this.registerSetting(strafe = new ButtonSetting("Strafe", false, this::isEdit));
     }
 
     @Override
-    public void onEnable() throws Throwable {
-        if (editLaunchY.isToggled())
-            mc.thePlayer.motionY = editLaunchYAmount.getInput();
-        if (editLaunchXZ.isToggled())
-            MoveUtil.strafe(editLaunchXZAmount.getInput());
+    public void onDisable() throws Throwable {
+        if (editTimerSpeed.isToggled())
+            Utils.resetTimer();
     }
 
     public void update() {
@@ -114,6 +112,12 @@ public class SimpleMotionModifier extends SubMode<Module> {
                 mc.thePlayer.motionX = Math.max(mc.thePlayer.motionX, editLimitXZAmount.getInput());
                 mc.thePlayer.motionZ = Math.max(mc.thePlayer.motionZ, editLimitXZAmount.getInput());
             }
+        }
+        if (mc.thePlayer.onGround) {
+            if (editLaunchY.isToggled())
+                mc.thePlayer.motionY = editLaunchYAmount.getInput();
+            if (editLaunchXZ.isToggled())
+                MoveUtil.strafe(editLaunchXZAmount.getInput());
         }
         if (editTimerSpeed.isToggled())
             Utils.getTimer().timerSpeed = (float) timerSpeedAmount.getInput();

@@ -1,6 +1,7 @@
 package keystrokesmod.module.impl.player;
 
 import keystrokesmod.module.Module;
+import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.player.blink.FakeLagBlink;
 import keystrokesmod.module.impl.player.blink.NormalBlink;
 import keystrokesmod.module.setting.impl.ModeValue;
@@ -38,6 +39,17 @@ public class Blink extends Module {
     @Override
     public String getInfo() {
         return mode.getSelected().getInfo();
+    }
+
+    public static boolean isBlinking() {
+        if (ModuleManager.blink == null) return false;
+        if (ModuleManager.blink.isEnabled()) return true;
+        if (ModuleManager.blink.mode.getSelected() instanceof FakeLagBlink) {
+            if (ModuleManager.blink.mode.getSelected().isEnabled())
+                return true;
+            return ((FakeLagBlink) ModuleManager.blink.mode.getSelected()).needToDisable;
+        }
+        return false;
     }
 
     public static void drawBox(@NotNull Vec3 pos) {
