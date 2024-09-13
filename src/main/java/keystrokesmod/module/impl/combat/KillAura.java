@@ -11,6 +11,7 @@ import keystrokesmod.module.impl.combat.autoclicker.RecordAutoClicker;
 import keystrokesmod.module.impl.other.RecordClick;
 import keystrokesmod.module.impl.other.RotationHandler;
 import keystrokesmod.module.impl.other.SlotHandler;
+import keystrokesmod.module.impl.player.antivoid.HypixelAntiVoid;
 import keystrokesmod.module.impl.world.AntiBot;
 import keystrokesmod.module.setting.impl.*;
 import keystrokesmod.module.setting.utils.ModeOnly;
@@ -633,7 +634,7 @@ public class KillAura extends IAutoClicker {
             return true;
         }
         if (ModuleManager.blink.isEnabled()) return true;
-        if (ModuleManager.antiVoid.blink.isEnabled()) return true;
+        if (HypixelAntiVoid.getInstance() != null && HypixelAntiVoid.getInstance().blink.isEnabled()) return true;
         return mc.thePlayer.isDead;
     }
 

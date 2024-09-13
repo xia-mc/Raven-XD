@@ -21,6 +21,7 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 
 public class Module {
@@ -225,7 +226,13 @@ public class Module {
         }
     }
 
-    public void unregisterSetting(Setting setting) {
+    public void registerSetting(@NotNull Iterable<Setting> setting) {
+        for (Setting set : setting) {
+            registerSetting(set);
+        }
+    }
+
+    public void unregisterSetting(@NotNull Setting setting) {
         synchronized (settings) {
             this.settings.remove(setting);
         }

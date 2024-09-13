@@ -298,8 +298,11 @@ public class Scaffold extends IAutoClicker {
                 pitch = (float) diagonalPitch.getInput();
         }
 
-        event.setYaw(lastYaw = instant ? yaw : AimSimulator.rotMove(yaw, lastYaw, (float) aimSpeed.getInput()));
-        event.setPitch(lastPitch = instant ? pitch : AimSimulator.rotMove(pitch, lastPitch, (float) aimSpeed.getInput()));
+        float finalYaw = instant ? yaw : AimSimulator.rotMove(yaw, lastYaw, (float) aimSpeed.getInput());
+        float finalPitch = instant ? pitch : AimSimulator.rotMove(pitch, lastPitch, (float) aimSpeed.getInput());
+
+        event.setYaw(lastYaw = finalYaw);
+        event.setPitch(lastPitch = finalPitch);
         event.setMoveFix(moveFix.isToggled() ? RotationHandler.MoveFix.Silent : RotationHandler.MoveFix.None);
 
         if (clickMode.getInput() == 0)
@@ -400,16 +403,16 @@ public class Scaffold extends IAutoClicker {
                 telly$noBlockPlace = true;
             } else {
                 if (Utils.jumpDown()) {
-                    if (offGroundTicks == (int) jumpDownTicks.getInput()) {
+                    if (offGroundTicks >= (int) jumpDownTicks.getInput()) {
                         telly$noBlockPlace = false;
                     }
                 } else {
                     if (Scaffold.isDiagonal()) {
-                        if (offGroundTicks == (int) diagonalTicks.getInput()) {
+                        if (offGroundTicks >= (int) diagonalTicks.getInput()) {
                             telly$noBlockPlace = false;
                         }
                     } else {
-                        if (offGroundTicks == (int) straightTicks.getInput()) {
+                        if (offGroundTicks >= (int) straightTicks.getInput()) {
                             telly$noBlockPlace = false;
                         }
                     }
@@ -510,7 +513,6 @@ public class Scaffold extends IAutoClicker {
                     Triple<BlockPos, EnumFacing, keystrokesmod.script.classes.Vec3> side = RotationUtils.getPlaceSide(placeBlock.getBlockPos().up(), Sets.newHashSet(EnumFacing.UP)).orElseThrow(RuntimeException::new);
                     placeYaw = RotationHandler.getRotationYaw();
                     placePitch = PlayerRotation.getPitch(side.getRight());
-                    forceStrict = true;
                     place(new MovingObjectPosition(
                             side.getRight().toVec3(),
                             side.getMiddle(),
