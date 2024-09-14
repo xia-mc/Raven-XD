@@ -10,4 +10,7 @@ public interface EntityPlayerSPAccessor {
 
     @Accessor("serverSprintState")
     boolean isServerSprint();
+
+    @Accessor("serverSprintState")
+    void setServerSprint(boolean serverSprint);
 }

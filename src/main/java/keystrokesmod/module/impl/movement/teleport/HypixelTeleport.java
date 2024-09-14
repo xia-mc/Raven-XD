@@ -58,9 +58,6 @@ public class HypixelTeleport extends SubMode<Teleport> {
                 for (int i = 0; i < timerTicks; i++) {
                     mc.thePlayer.onUpdate();
                 }
-                yaw = RotationHandler.getRotationYaw();
-                pitch = RotationHandler.getRotationPitch();
-                hasLag = 0;
                 state = State.LAG;
                 break;
             case LAG:
@@ -75,6 +72,20 @@ public class HypixelTeleport extends SubMode<Teleport> {
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void onSendPacket(SendPacketEvent event) {
         switch (state) {
+            case NONE:
+                if (event.getPacket() instanceof C03PacketPlayer) {
+                    if (!MoveUtil.isMoving() && event.getPacket().getClass() == C03PacketPlayer.class) {
+                        event.setCanceled(true);
+                        if (hasLag == 0) {
+                            yaw = mc.thePlayer.rotationYaw;
+                            pitch = mc.thePlayer.rotationPitch;
+                        }
+                        hasLag++;
+                    } else {
+                        hasLag = 0;
+                    }
+                }
+                break;
             case TIMER:
                 synchronized (delayedPackets) {
                     delayedPackets.add(event.getPacket());
@@ -103,11 +114,10 @@ public class HypixelTeleport extends SubMode<Teleport> {
     }
 
     @SubscribeEvent
-    public void onRotation(RotationEvent event) {
-        if (state == State.LAG) {
+    public void onPreMotion(PreMotionEvent event) {
+        if (state == State.NONE && hasLag > 0) {
             event.setYaw(yaw);
             event.setPitch(pitch);
-            event.noSmoothBack();
         }
     }
 

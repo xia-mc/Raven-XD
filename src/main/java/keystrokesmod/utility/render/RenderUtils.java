@@ -7,6 +7,8 @@ import keystrokesmod.module.impl.render.HUD;
 import keystrokesmod.script.classes.Vec3;
 import keystrokesmod.utility.Theme;
 import keystrokesmod.utility.Utils;
+import keystrokesmod.utility.font.CenterMode;
+import keystrokesmod.utility.font.FontManager;
 import keystrokesmod.utility.font.IFont;
 import keystrokesmod.utility.render.shader.GaussianFilter;
 import keystrokesmod.utility.render.shader.impl.ShaderScissor;
@@ -29,6 +31,7 @@ import net.minecraft.util.Timer;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Range;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 
@@ -1192,5 +1195,36 @@ public class RenderUtils {
      */
     public static void bindTexture(int texture) {
         glBindTexture(GL_TEXTURE_2D, texture);
+    }
+
+    public static void drawProgressBar(@Range(from = 0, to = 1) double progress, String text) {
+        if (mc.currentScreen != null) return;
+
+        final ScaledResolution sr = new ScaledResolution(mc);
+        final double width = sr.getScaledWidth_double() / 5;
+        final double height = width / 13;
+
+        // background
+        RRectUtils.drawRound(
+                sr.getScaledWidth_double() / 2.0 - width / 2.0,
+                sr.getScaledHeight_double() * 0.8 - height / 2.0,
+                width, height, height / 2.0, new Color(255, 255, 255, 30)
+        );
+
+        // progress
+        RRectUtils.drawRound(
+                sr.getScaledWidth_double() / 2.0 - width / 2.0,
+                sr.getScaledHeight_double() * 0.8 - height / 2.0,
+                width * progress, height, height / 2.0,
+                new Color(6, 112, 190, 200)
+        );
+
+        // text
+        FontManager.tenacity16.drawString(
+                text,
+                sr.getScaledWidth_double() / 2.0,
+                sr.getScaledHeight_double() * 0.8,
+                CenterMode.XY, false, new Color(240, 240, 240).getRGB()
+        );
     }
 }

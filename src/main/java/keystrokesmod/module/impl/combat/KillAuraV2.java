@@ -9,13 +9,12 @@ import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.other.RotationHandler;
 import keystrokesmod.module.impl.other.SlotHandler;
-import keystrokesmod.module.impl.other.anticheats.utils.world.PlayerRotation;
+import keystrokesmod.module.impl.player.Blink;
 import keystrokesmod.module.impl.world.AntiBot;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.ModeSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.utils.ModeOnly;
-import keystrokesmod.script.classes.Vec3;
 import keystrokesmod.utility.*;
 import keystrokesmod.utility.aim.AimSimulator;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -29,6 +28,7 @@ import net.minecraft.network.play.client.*;
 import net.minecraft.potion.Potion;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.MovingObjectPosition;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import java.util.ArrayList;
@@ -93,7 +93,12 @@ public class KillAuraV2 extends Module {
     }
 
     private void attack() {
-        if (target != null && RotationUtils.isMouseOver(RotationHandler.getRotationYaw(), RotationHandler.getRotationPitch(), target, (float) attackRange.getInput())) {
+        if (target != null && mc.currentScreen == null) {
+            if (RayCast.isToggled()) {
+                final MovingObjectPosition hitResult = RotationUtils.rayCastStrict(RotationHandler.getRotationYaw(), RotationHandler.getRotationPitch(), (float) attackRange.getInput());
+                if (hitResult.typeOfHit != MovingObjectPosition.MovingObjectType.ENTITY || hitResult.entityHit != target)
+                    return;
+            }
             this.attackEntity(target);
             if (mc.thePlayer.fallDistance > 0.0f && !mc.thePlayer.onGround && !mc.thePlayer.isOnLadder() && !mc.thePlayer.isInWater() && !mc.thePlayer.isPotionActive(Potion.blindness) && mc.thePlayer.ridingEntity == null) {
                 mc.thePlayer.onCriticalHit(target);
@@ -140,6 +145,10 @@ public class KillAuraV2 extends Module {
         }
 
         if (ModuleManager.scaffold.isEnabled()) return;
+        if (Blink.isBlinking()) return;
+        if (ModuleManager.autoGapple != null && ModuleManager.autoGapple.disableKillAura.isToggled() && ModuleManager.autoGapple.working) {
+            return;
+        }
         // Gets all entities in specified range, sorts them using your specified sort mode, and adds them to target list
 
         this.sortTargets();
@@ -179,9 +188,10 @@ public class KillAuraV2 extends Module {
             switch ((int) rotationMode.getInput()) {
                 case 0:
                     if (target != null) {
-                        Vec3 eyePos = Utils.getEyePos(target);
-                        yaw = PlayerRotation.getYaw(eyePos);
-                        pitch = PlayerRotation.getPitch(eyePos);
+                        aimSimulator.setNearest(false, 1);
+                        Pair<Float, Float> aimResult = aimSimulator.getRotation(target);
+                        yaw = aimResult.first();
+                        pitch = aimResult.second();
                     }
                     break;
                 case 1:
@@ -192,11 +202,16 @@ public class KillAuraV2 extends Module {
                         pitch = aimResult.second();
                     }
             }
-            event.setYaw(lastYaw = AimSimulator.rotMove(yaw, lastYaw, rotationSpeed));
-            event.setPitch(lastPitch = AimSimulator.rotMove(pitch, lastPitch, rotationSpeed));
+            if (rotationSpeed == this.rotationSpeed.getMax()) {
+                event.setYaw(lastYaw = yaw);
+                event.setPitch(lastPitch = pitch);
+            } else {
+                event.setYaw(lastYaw = AimSimulator.rotMove(yaw, lastYaw, rotationSpeed));
+                event.setPitch(lastPitch = AimSimulator.rotMove(pitch, lastPitch, rotationSpeed));
+            }
             event.setMoveFix(RotationHandler.MoveFix.values()[(int) moveFixMode.getInput()]);
 
-            if (RayCast.isToggled() && !RotationUtils.isMouseOver(lastYaw, lastPitch, target, (float) attackRange.getInput()))
+            if (aimSimulator.getHitPos().distanceTo(Utils.getEyePos()) > attackRange.getInput())
                 return;
 
             if (attackTimer.hasTimeElapsed(cps, true)) {
@@ -235,10 +250,10 @@ public class KillAuraV2 extends Module {
                     break;
                 case 3:  // grim 1.12
                     if (SlotHandler.getHeldItem() != null && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword) {
-                    PacketUtils.sendPacket(new C0FPacketConfirmTransaction(Utils.randomizeInt(0, 2147483647), (short) Utils.randomizeInt(0, -32767), true));
-                    PacketUtils.sendPacket(new C0APacketAnimation());
-                    mc.playerController.sendUseItem(mc.thePlayer, mc.theWorld, mc.thePlayer.getHeldItem());
-                    wasBlocking = true;
+                        PacketUtils.sendPacket(new C0FPacketConfirmTransaction(Utils.randomizeInt(0, 2147483647), (short) Utils.randomizeInt(0, -32767), true));
+                        PacketUtils.sendPacket(new C0APacketAnimation());
+                        mc.playerController.sendUseItem(mc.thePlayer, mc.theWorld, mc.thePlayer.getHeldItem());
+                        wasBlocking = true;
                     }
                     break;
             }

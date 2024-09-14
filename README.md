@@ -2,10 +2,9 @@
   
 # Raven XD
 <p align="center">
-    <a href="https://github.com/xia-mc/Raven-bS/issues">
-      <img src="https://img.shields.io/github/issues/xia-mc/Raven-bS?style=flat" alt="issues" />
-    </a>
+    <img src="https://img.shields.io/github/issues/xia-mc/Raven-bS?style=flat" alt="issues">
     <img src="https://img.shields.io/badge/license-GPLV3-green" alt="License">
+    <img src="https://tokei.rs/b1/github/xia-mc/Raven-XD?category=code&style=flat" alt="Lines of code">
 </p>
 
 [![Github Release Downloads](https://img.shields.io/github/downloads/xia-mc/Raven-bS/total?label=Github%20Release%20Downloads&style=flat-square)](https://github.com/xia-mc/Raven-bS/releases)
@@ -18,7 +17,8 @@ Raven B4, but for those who can't afford it.
 
 Raven B4, but not only for Hypixel.
 
-<a href="https://discord.gg/zSgDKArSH4"><img src="https://invidget.switchblade.xyz/zSgDKArSH4" alt="https://discord.gg/zSgDKArSH4"/></a><br>
+<a href="https://dsc.gg/ravenxd"><img src="https://invidget.switchblade.xyz/zSgDKArSH4" alt="https://dsc.gg/ravenxd"/></a><br>
+[QQ Group (645021103)](https://qm.qq.com/q/vv0xPdfc6A)
 
 ![2024-08-13_10 14 36](https://github.com/user-attachments/assets/36e8920e-336e-4b62-ae3f-6b9962920812)
 ![Screenshot 2024-08-13 084510](https://github.com/user-attachments/assets/85637f18-9d6b-47d9-9dc2-cb8594aff585)

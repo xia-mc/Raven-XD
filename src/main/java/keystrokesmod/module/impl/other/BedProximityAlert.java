@@ -20,12 +20,14 @@ public class BedProximityAlert extends Module {
     private final SliderSetting Distance;
     private final ButtonSetting shouldPing;
     private final ButtonSetting tellTheteam;
+    private final ButtonSetting ignoreTeammates;
 
     public BedProximityAlert() {
         super("BedProximityAlert", category.other);
         this.registerSetting(Distance = new SliderSetting("Distance", 40, 10, 120, 1));
         this.registerSetting(shouldPing = new ButtonSetting("Should ping", true));
         this.registerSetting(tellTheteam = new ButtonSetting("Tell the team", false));
+        this.registerSetting(ignoreTeammates = new ButtonSetting("Ignore teammates", false));
         playerAlertStatus = new HashMap<>();
     }
 
@@ -39,10 +41,14 @@ public class BedProximityAlert extends Module {
         BlockPos spawnPos = BedWars.getSpawnPos();
         if (BedWars.whitelistOwnBed.isToggled() && spawnPos != null) {
             for (EntityPlayer otherPlayer : player.worldObj.playerEntities) {
-                if (otherPlayer == player || Utils.isTeamMate(otherPlayer)) {
+                if (otherPlayer == player) {
                     continue;
                 }
-
+                if (ignoreTeammates.isToggled()) {
+                    if (Utils.isTeamMate(otherPlayer)){
+                        return;
+                    }
+                }    
                 double distance = otherPlayer.getDistance(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ());
                 String playerName = otherPlayer.getDisplayName().getFormattedText();
 

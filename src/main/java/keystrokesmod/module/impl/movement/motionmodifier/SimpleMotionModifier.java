@@ -27,6 +27,14 @@ public class SimpleMotionModifier extends SubMode<Module> {
     private final SliderSetting editMultiplyYAmount;
     private final ButtonSetting editMultiplyXZ;
     private final SliderSetting editMultiplyXZAmount;
+    private final ButtonSetting editLimitY;
+    private final SliderSetting editLimitYAmount;
+    private final ButtonSetting editLimitXZ;
+    private final SliderSetting editLimitXZAmount;
+    private final ButtonSetting editLaunchY;
+    private final SliderSetting editLaunchYAmount;
+    private final ButtonSetting editLaunchXZ;
+    private final SliderSetting editLaunchXZAmount;
     private final ButtonSetting editTimerSpeed;
     private final SliderSetting timerSpeedAmount;
     private final ButtonSetting strafe;
@@ -40,9 +48,9 @@ public class SimpleMotionModifier extends SubMode<Module> {
         this.registerSetting(onlyAtLadder = new ButtonSetting("Only at ladder", false, this::isEdit));
         this.registerSetting(jump = new ButtonSetting("Jump", false, this::isEdit));
         this.registerSetting(editStaticY = new ButtonSetting("Edit static y", false, this::isEdit));
-        this.registerSetting(editStaticYAmount = new SliderSetting("Edit static y amount", 0.42, -1, 1, 0.01, () -> editStaticY.isToggled() && isEdit()));
+        this.registerSetting(editStaticYAmount = new SliderSetting("Edit static y amount", 0.42, -1, 5, 0.01, () -> editStaticY.isToggled() && isEdit()));
         this.registerSetting(editStaticXZ = new ButtonSetting("Edit static xz", false, this::isEdit));
-        this.registerSetting(editStaticXZAmount = new SliderSetting("Edit static xz amount", 0.2, 0, 1, 0.01, () -> editStaticXZ.isToggled() && isEdit()));
+        this.registerSetting(editStaticXZAmount = new SliderSetting("Edit static xz amount", 0.2, 0, 5, 0.01, () -> editStaticXZ.isToggled() && isEdit()));
         this.registerSetting(editAddY = new ButtonSetting("Edit add y", false, this::isEdit));
         this.registerSetting(editAddYAmount = new SliderSetting("Edit add y amount", 0.02, -1, 1, 0.01, () -> editAddY.isToggled() && isEdit()));
         this.registerSetting(editAddXZ = new ButtonSetting("Edit add xz", false, this::isEdit));
@@ -51,9 +59,23 @@ public class SimpleMotionModifier extends SubMode<Module> {
         this.registerSetting(editMultiplyYAmount = new SliderSetting("Edit multiply y amount", 0.02, 0, 1, 0.01, () -> editMultiplyY.isToggled() && isEdit()));
         this.registerSetting(editMultiplyXZ = new ButtonSetting("Edit multiply xz", false, this::isEdit));
         this.registerSetting(editMultiplyXZAmount = new SliderSetting("Edit multiply xz amount", 0.02, 0, 1, 0.01, () -> editMultiplyXZ.isToggled() && isEdit()));
+        this.registerSetting(editLimitY = new ButtonSetting("Edit limit y", false, this::isEdit));
+        this.registerSetting(editLimitYAmount = new SliderSetting("Edit limit xz amount", 0.02, 0, 1, 0.01, () -> editMultiplyY.isToggled() && isEdit()));
+        this.registerSetting(editLimitXZ = new ButtonSetting("Edit limit xz", false, this::isEdit));
+        this.registerSetting(editLimitXZAmount = new SliderSetting("Edit limit xz amount", 0.02, 0, 1, 0.01, () -> editMultiplyY.isToggled() && isEdit()));
+        this.registerSetting(editLaunchY = new ButtonSetting("Edit launch y", false, this::isEdit));
+        this.registerSetting(editLaunchYAmount = new SliderSetting("Edit launch y amount", 0.42, -1, 5, 0.01, () -> editLaunchY.isToggled() && isEdit()));
+        this.registerSetting(editLaunchXZ = new ButtonSetting("Edit launch xz", false, this::isEdit));
+        this.registerSetting(editLaunchXZAmount = new SliderSetting("Edit launch xz amount", 0.2, 0, 5, 0.01, () -> editLaunchXZ.isToggled() && isEdit()));
         this.registerSetting(editTimerSpeed = new ButtonSetting("Edit timer speed", false, this::isEdit));
         this.registerSetting(timerSpeedAmount = new SliderSetting("Timer speed amount", 1, 0.1, 4, 0.0001, () -> editTimerSpeed.isToggled() && isEdit()));
-        this.registerSetting(strafe = new ButtonSetting("Strafe", false));
+        this.registerSetting(strafe = new ButtonSetting("Strafe", false, this::isEdit));
+    }
+
+    @Override
+    public void onDisable() throws Throwable {
+        if (editTimerSpeed.isToggled())
+            Utils.resetTimer();
     }
 
     public void update() {
@@ -74,6 +96,28 @@ public class SimpleMotionModifier extends SubMode<Module> {
         if (editMultiplyXZ.isToggled()) {
             mc.thePlayer.motionX *= editMultiplyXZAmount.getInput();
             mc.thePlayer.motionZ *= editMultiplyXZAmount.getInput();
+        }
+        if (editLimitY.isToggled()) {
+            if (editLimitYAmount.getInput() > 0) {
+                mc.thePlayer.motionY = Math.min(mc.thePlayer.motionY, editLimitYAmount.getInput());
+            } else {
+                mc.thePlayer.motionY = Math.max(mc.thePlayer.motionY, editLimitYAmount.getInput());
+            }
+        }
+        if (editLimitXZ.isToggled()) {
+            if (editLimitXZAmount.getInput() > 0) {
+                mc.thePlayer.motionX = Math.min(mc.thePlayer.motionX, editLimitXZAmount.getInput());
+                mc.thePlayer.motionZ = Math.min(mc.thePlayer.motionZ, editLimitXZAmount.getInput());
+            } else {
+                mc.thePlayer.motionX = Math.max(mc.thePlayer.motionX, editLimitXZAmount.getInput());
+                mc.thePlayer.motionZ = Math.max(mc.thePlayer.motionZ, editLimitXZAmount.getInput());
+            }
+        }
+        if (mc.thePlayer.onGround) {
+            if (editLaunchY.isToggled())
+                mc.thePlayer.motionY = editLaunchYAmount.getInput();
+            if (editLaunchXZ.isToggled())
+                MoveUtil.strafe(editLaunchXZAmount.getInput());
         }
         if (editTimerSpeed.isToggled())
             Utils.getTimer().timerSpeed = (float) timerSpeedAmount.getInput();

@@ -41,7 +41,7 @@ public class ClientTheme extends Module {
         this.registerSetting(background = new ButtonSetting("Background", true));
         this.registerSetting(mainMenu = new ButtonSetting("Main menu", true));
         this.registerSetting(clickGui = new ButtonSetting("ClickGui", true));
-        this.registerSetting(test = new ButtonSetting("Test", false));
+        this.registerSetting(test = new ButtonSetting("Test", false, clickGui::isToggled));
         this.registerSetting(new DescriptionSetting("Custom Theme"));
         this.registerSetting(colorType = new ModeSetting("Color type", new String[]{"Single", "Double", "Triple"}, 0));
         ModeOnly doubleColor = new ModeOnly(colorType, 1, 2);

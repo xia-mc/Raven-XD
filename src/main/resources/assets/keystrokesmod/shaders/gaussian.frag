@@ -2,7 +2,8 @@
 
 uniform sampler2D textureIn;
 uniform vec2 texelSize, direction;
-uniform float radius, weights[256];
+uniform float radius;
+uniform float weights[64];
 
 #define offset texelSize * direction
 

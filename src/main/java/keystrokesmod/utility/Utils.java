@@ -11,6 +11,7 @@ import keystrokesmod.module.impl.other.SlotHandler;
 import keystrokesmod.module.impl.render.AntiShuffle;
 import keystrokesmod.utility.i18n.I18nManager;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.boss.EntityWither;
 import net.minecraftforge.client.event.MouseEvent;
@@ -38,7 +39,6 @@ import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.ContainerPlayer;
 import net.minecraft.item.*;
-import net.minecraft.network.play.client.C03PacketPlayer.C05PacketPlayerLook;
 import net.minecraft.network.play.client.C0APacketAnimation;
 import net.minecraft.potion.Potion;
 import net.minecraft.scoreboard.*;
@@ -584,22 +584,14 @@ public class Utils {
         return mc.thePlayer.moveForward != 0.0F || mc.thePlayer.moveStrafing != 0.0F;
     }
 
-    /**
-     * it's UNFAIR if pc == true!
-     * TODO we need a rotation system.
-     */
-    public static void aim(Entity en, float ps, boolean pc) {
+    public static void aim(Entity en, float ps) {
         if (en != null) {
             float[] t = getRotation(en);
             if (t != null) {
                 float y = t[0];
                 float p = t[1] + 4.0F + ps;
-                if (pc) {
-                    mc.getNetHandler().addToSendQueue(new C05PacketPlayerLook(y, p, mc.thePlayer.onGround));
-                } else {
-                    mc.thePlayer.rotationYaw = y;
-                    mc.thePlayer.rotationPitch = p;
-                }
+                mc.thePlayer.rotationYaw = y;
+                mc.thePlayer.rotationPitch = p;
             }
 
         }
@@ -987,9 +979,7 @@ public class Utils {
     }
 
     public static boolean isTargetNearby() {
-        return mc.theWorld.playerEntities.stream()
-                .filter(target -> target != mc.thePlayer)
-                .anyMatch(target -> new keystrokesmod.script.classes.Vec3(target).distanceTo(mc.thePlayer) < 6);
+        return isTargetNearby(6);
     }
 
     public static boolean isTargetNearby(double dist) {
@@ -1060,8 +1050,10 @@ public class Utils {
     }
 
     public static void inventoryClick(@NotNull GuiScreen s) {
-        int x = Mouse.getX() * s.width / mc.displayWidth;
-        int y = s.height - Mouse.getY() * s.height / mc.displayHeight - 1;
+        final ScaledResolution sr = new ScaledResolution(mc);
+
+        int x = Mouse.getX() * s.width / sr.getScaledWidth();
+        int y = s.height - Mouse.getY() * s.height / sr.getScaledHeight() - 1;
 
         ClickEvent event = new ClickEvent();
         MinecraftForge.EVENT_BUS.post(event);

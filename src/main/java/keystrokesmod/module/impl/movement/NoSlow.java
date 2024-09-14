@@ -31,6 +31,7 @@ public class NoSlow extends Module {
                 .add(new IntaveNoSlow("Intave", this))
                 .add(new OldIntaveNoSlow("Old Intave", this))
                 .add(new OldGrimNoSlow("Old Grim", this))
+                .add(new GrimACNoSlow("GrimAC", this))
                 .add(new CustomNoSlow("Custom", this))
         );
         this.registerSetting(sword, bow, rest);

@@ -8,7 +8,6 @@ import keystrokesmod.utility.CoolDown;
 import keystrokesmod.utility.ShaderUtils;
 import keystrokesmod.utility.Utils;
 import net.minecraft.block.BlockBed;
-import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
@@ -16,7 +15,6 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
 import net.minecraft.block.Block;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
@@ -34,11 +32,11 @@ public class BedPlates extends Module {
 
     public static SliderSetting updateRate, yShift, layers;
     private final CoolDown updateCooldown = new CoolDown(0);
-    private ButtonSetting showDistance;
+    private final ButtonSetting showDistance;
     private BlockPos[] bed = null;
-    private SliderSetting range;
+    private final SliderSetting range;
     private final List<BlockPos> beds = new ArrayList<>();
-    private ButtonSetting firstBed;
+    private final ButtonSetting firstBed;
     private final List<List<Block>> bedBlocks = new ArrayList<>();
 
     public BedPlates() {
@@ -64,16 +62,16 @@ public class BedPlates extends Module {
                     for (int k = -n; k <= n; ++k) {
                         final BlockPos blockPos = new BlockPos(mc.thePlayer.posX + j, mc.thePlayer.posY + i, mc.thePlayer.posZ + k);
                         final IBlockState getBlockState = mc.theWorld.getBlockState(blockPos);
-                        if (getBlockState.getBlock() == Blocks.bed && getBlockState.getValue((IProperty) BlockBed.PART) == BlockBed.EnumPartType.FOOT) {
+                        if (getBlockState.getBlock() == Blocks.bed && getBlockState.getValue(BlockBed.PART) == BlockBed.EnumPartType.FOOT) {
                             if (firstBed.isToggled()) {
                                 if (this.bed != null && BlockUtils.isSamePos(blockPos, this.bed[0])) {
                                     return;
                                 }
-                                this.bed = new BlockPos[]{blockPos, blockPos.offset((EnumFacing) getBlockState.getValue((IProperty) BlockBed.FACING))};
+                                this.bed = new BlockPos[]{blockPos, blockPos.offset(getBlockState.getValue(BlockBed.FACING))};
                                 return;
                             } else {
-                                for (int l = 0; l < this.beds.size(); ++l) {
-                                    if (BlockUtils.isSamePos(blockPos, ((BlockPos) this.beds.get(l)))) {
+                                for (BlockPos pos : this.beds) {
+                                    if (BlockUtils.isSamePos(blockPos, pos)) {
                                         continue priorityLoop;
                                     }
                                 }
@@ -156,14 +154,14 @@ public class BedPlates extends Module {
         glPopMatrix();
     }
 
-    private boolean findBed(double x, double y, double z, int index) {
+    private void findBed(double x, double y, double z, int index) {
         BlockPos bedPos = new BlockPos(x, y, z);
         Block bedBlock = Module.mc.theWorld.getBlockState(bedPos).getBlock();
         bedBlocks.get(index).clear();
         beds.set(index, null);
 
         if (beds.contains(bedPos) || !bedBlock.equals(Blocks.bed)) {
-            return false;
+            return;
         }
 
         // Add bed to bedBlocks list
@@ -196,7 +194,6 @@ public class BedPlates extends Module {
             }
         }
 
-        return true;
     }
 
     private boolean isValidBedBlock(Block block) {

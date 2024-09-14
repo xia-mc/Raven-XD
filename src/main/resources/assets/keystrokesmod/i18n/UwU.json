@@ -1,0 +1,109 @@
+{
+  "modules": {
+    "AimAssist": {
+      "name": "Aim Assiwst"
+    },
+    "ArmedAura": {
+      "name": "Awmed Auwa"
+    },
+    "AutoClicker": {
+      "name": "Auto Cliwkew"
+    },
+    "BlockHit": {
+      "name": "Bwlock Hit"
+    },
+    "Criticals": {
+      "name": "Cwiticaws"
+    },
+    "HitBox": {
+      "name": "Hit Boxi"
+    },
+    "HitSelect": {
+      "name": "Hit Sewect"
+    },
+    "KillAura": {
+      "name": "Kiww Auwra"
+    },
+    "Reach": {
+      "name": "Weach"
+    },
+    "Velocity": {
+      "name": "Vewocity"
+    },
+    "AirStuck": {
+      "name": "Aiw Stuck"
+    },
+    "Fly": {
+      "name": "FFFLLLLYYYY"
+    },
+    "InvMove": {
+      "name": "Inv Move"
+    },
+    "Jesus": {
+      "name": "Holy Moly"
+    },
+    "KeepSprint": {
+      "name": "Keep Spwint"
+    },
+    "Phase": {
+      "name": "Phwase"
+    },
+    "Speed": {
+      "name": "Speewd"
+    },
+    "Sprint": {
+      "name": "Spwint"
+    },
+    "WallClimb": {
+      "name": "Wawl Cwlimbi"
+    },
+    "Anticheat": {
+      "name": "Anti Haxi"
+    },
+    "AntiVoid": {
+      "name": "Anti Voidi"
+    },
+    "AutoHeal": {
+      "name": "Auto Heaw"
+    },
+    "Backtrack": {
+      "name": "Back Twack"
+    },
+    "ChestStealer": {
+      "name": "Chest Swealew"
+    },
+    "FakeLag": {
+      "name": "Fake Lagi"
+    },
+    "InvManager": {
+      "name": "Inv Managew"
+    },
+    "NoFall": {
+      "name": "No Fawli"
+    },
+    "AntiBot": {
+      "name": "Anti Boti"
+    },
+    "AutoTool": {
+      "name": "Auto Toowl"
+    },
+    "BedAura": {
+      "name": "Bettenzerstörer"
+    },
+    "FastPlace": {
+      "name": "Schnelles Plazieren"
+    },
+    "Legit Scaffold": {
+      "name": "Lewgit Scaffowd"
+    },
+    "SafeWalk": {
+      "name": "Safe Walki"
+    },
+    "Scaffold": {
+      "name": "Scaffowd"
+    },
+    "NoSlow": {
+      "name": "Now Slwow"
+    }
+  }
+}

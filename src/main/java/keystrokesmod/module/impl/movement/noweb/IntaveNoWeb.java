@@ -17,6 +17,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
 public class IntaveNoWeb extends SubMode<NoWeb> {
+    private final ButtonSetting groundBoost;
     private final ButtonSetting noDown;
     private final ButtonSetting upAndDown;
 
@@ -25,6 +26,7 @@ public class IntaveNoWeb extends SubMode<NoWeb> {
 
     public IntaveNoWeb(String name, @NotNull NoWeb parent) {
         super(name, parent);
+        this.registerSetting(groundBoost = new ButtonSetting("Ground boost", false));
         this.registerSetting(noDown = new ButtonSetting("No down", false));
         this.registerSetting(upAndDown = new ButtonSetting("UpAndDown", false, noDown::isToggled));
     }
@@ -48,7 +50,7 @@ public class IntaveNoWeb extends SubMode<NoWeb> {
         if (box.intersectsWith(mc.thePlayer.getEntityBoundingBox())) {
             if (mc.thePlayer.onGround) {
                 mc.thePlayer.motionY = MoveUtil.jumpMotion();
-                MoveUtil.moveFlying(0.3);
+                MoveUtil.moveFlying(groundBoost.isToggled() ? 0.4 : 0.3);
             } else if (noDown.isToggled()) {
                 if (upAndDown.isToggled())
                     if (mc.gameSettings.keyBindSneak.isKeyDown())
@@ -61,11 +63,9 @@ public class IntaveNoWeb extends SubMode<NoWeb> {
                     mc.thePlayer.motionY = -0.01;
             }
 
-            Utils.getTimer().timerSpeed = 1.004f;
             webbing = true;
         } else {
             if (webbing) {
-                Utils.resetTimer();
                 webbing = false;
             }
             lastWeb = null;
@@ -74,8 +74,6 @@ public class IntaveNoWeb extends SubMode<NoWeb> {
 
     @Override
     public void onDisable() {
-        if (webbing)
-            Utils.resetTimer();
         webbing = false;
         lastWeb = null;
     }

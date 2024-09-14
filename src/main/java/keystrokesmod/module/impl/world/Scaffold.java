@@ -1,5 +1,6 @@
 package keystrokesmod.module.impl.world;
 
+import com.google.common.collect.Sets;
 import keystrokesmod.Raven;
 import keystrokesmod.event.*;
 import keystrokesmod.mixins.impl.client.KeyBindingAccessor;
@@ -49,8 +50,9 @@ public class Scaffold extends IAutoClicker {
     private final SliderSetting motion;
     private final ModeSetting rotation;
     private final ButtonSetting moveFix;
-    private final SliderSetting tellyStartTick;
-    private final SliderSetting tellyStopTick;
+    private final SliderSetting straightTicks;
+    private final SliderSetting diagonalTicks;
+    private final SliderSetting jumpDownTicks;
     private final SliderSetting strafe;
     private final ModeSetting sprint;
     private final ButtonSetting fast;
@@ -90,8 +92,8 @@ public class Scaffold extends IAutoClicker {
     public MovingObjectPosition placeBlock;
     private int lastSlot;
     private static final String[] rotationModes = new String[]{"None", "Backwards", "Strict", "Precise", "Telly", "Constant", "Snap"};
-    private static final String[] sprintModes = new String[]{"Disabled", "Vanilla", "Edge", "HypixelJump A", "HypixelJump B", "HypixelJump C", "Float", "Side", "Legit", "GrimAC", "Sneak", "Star"};
-    private static final String[] precisionModes = new String[]{"Very low", "Low", "Moderate", "High", "Very high"};
+    private static final String[] sprintModes = new String[]{"Disabled", "Vanilla", "Edge", "HypixelJump A", "HypixelJump B", "HypixelJump C", "Float", "Side", "Legit", "GrimAC", "Sneak", "Star", "GreatWall"};
+    private static final String[] precisionModes = new String[]{"Very low", "Low", "Moderate", "High", "Very high", "Unlimited"};
     public float placeYaw;
     public float placePitch = 85;
     public int at;
@@ -107,10 +109,11 @@ public class Scaffold extends IAutoClicker {
     private int sameY$bridged = 1;
     private int sneak$bridged = 0;
     private int jump$bridged = 0;
+    private int hypixelJumpD$bridged = 2;
     private boolean placedUp;
     private int offGroundTicks = 0;
+    private int onGroundTicks = 0;
     private boolean telly$noBlockPlace = false;
-    public boolean tower$noBlockPlace = false;
     private Float lastYaw = null, lastPitch = null;
     private boolean polar$waitingForExpand = false;
     private boolean jumpScaffold$fast$cycle = false;
@@ -126,8 +129,9 @@ public class Scaffold extends IAutoClicker {
         this.registerSetting(alwaysPlaceIfPossible = new ButtonSetting("Always place if possible", false));
         this.registerSetting(rotation = new ModeSetting("Rotation", rotationModes, 1));
         this.registerSetting(aimSpeed = new SliderSetting("Aim speed", 20, 5, 20, 0.1, new ModeOnly(rotation, 0).reserve()));
-        this.registerSetting(tellyStartTick = new SliderSetting("Telly start", 3, 0, 11, 1, "tick", new ModeOnly(rotation, 4)));
-        this.registerSetting(tellyStopTick = new SliderSetting("Telly stop", 8, 0, 11, 1, "tick", new ModeOnly(rotation, 4)));
+        this.registerSetting(straightTicks = new SliderSetting("Straight ticks", 6, 1, 8, 1, new ModeOnly(rotation, 4)));
+        this.registerSetting(diagonalTicks = new SliderSetting("Diagonal ticks", 4, 1, 8, 1, new ModeOnly(rotation, 4)));
+        this.registerSetting(jumpDownTicks = new SliderSetting("Jump down ticks", 1, 1, 8, 1, new ModeOnly(rotation, 4)));
         this.registerSetting(moveFix = new ButtonSetting("MoveFix", false, new ModeOnly(rotation, 0).reserve()));
         this.registerSetting(motion = new SliderSetting("Motion", 1.0, 0.5, 1.2, 0.01, () -> !moveFix.isToggled()));
         this.registerSetting(strafe = new SliderSetting("Strafe", 0, -45, 45, 5));
@@ -187,7 +191,6 @@ public class Scaffold extends IAutoClicker {
         sameY$bridged = 1;
         offGroundTicks = 0;
         telly$noBlockPlace = false;
-        tower$noBlockPlace = false;
         lastYaw = lastPitch = null;
         polar$waitingForExpand = false;
         Utils.resetTimer();
@@ -200,6 +203,7 @@ public class Scaffold extends IAutoClicker {
         startPos = mc.thePlayer.posY;
         sneak$bridged = 0;
         jump$bridged = 0;
+        hypixelJumpD$bridged = 2;
 
         if (hover.isToggled() && mc.thePlayer.onGround) {
             hoverState = HoverState.JUMP;
@@ -235,14 +239,12 @@ public class Scaffold extends IAutoClicker {
                 pitch = placePitch;
                 break;
             case 4:
-                if (offGroundTicks >= tellyStartTick.getInput() && offGroundTicks < tellyStopTick.getInput() && placeBlock != null && MoveUtil.isMoving() && !Utils.jumpDown()) {
-                    telly$noBlockPlace = true;
+                if (telly$noBlockPlace) {
                     yaw = event.getYaw();
                     pitch = event.getPitch();
                 } else {
                     yaw = placeYaw;
                     pitch = placePitch;
-                    telly$noBlockPlace = false;
                 }
                 break;
             case 5:
@@ -250,17 +252,17 @@ public class Scaffold extends IAutoClicker {
                 pitch = placePitch;
                 break;
             case 6:
-                if (MoveUtil.isMoving()) {
-                    mc.thePlayer.setSprinting(true);
-                }
-                if (!MoveUtil.isMoving()) {
-                    yaw = placeYaw;
-                } else if (place) {
-                    yaw = forceStrict ? placeYaw : getYaw();
-                } else {
-                    yaw = (float) (event.getYaw() + (Math.random() - 0.5) * 0.940004);
-                }
                 pitch = placePitch;
+                if (!MoveUtil.isMoving()) {
+                    yaw = getYaw();
+                    break;
+                }
+                if (place) {
+                    yaw = placeYaw;
+                } else {
+                    yaw = (float) (event.getYaw() + (Math.random() - 0.5) * 0.4);  // to bypass grimAC rotation check
+                }
+                mc.thePlayer.setSprinting(true);
                 break;
         }
         boolean instant = aimSpeed.getInput() == aimSpeed.getMax();
@@ -296,8 +298,11 @@ public class Scaffold extends IAutoClicker {
                 pitch = (float) diagonalPitch.getInput();
         }
 
-        event.setYaw(lastYaw = instant ? yaw : AimSimulator.rotMove(yaw, lastYaw, (float) aimSpeed.getInput()));
-        event.setPitch(lastPitch = instant ? pitch : AimSimulator.rotMove(pitch, lastPitch, (float) aimSpeed.getInput()));
+        float finalYaw = instant ? yaw : AimSimulator.rotMove(yaw, lastYaw, (float) aimSpeed.getInput());
+        float finalPitch = instant ? pitch : AimSimulator.rotMove(pitch, lastPitch, (float) aimSpeed.getInput());
+
+        event.setYaw(lastYaw = finalYaw);
+        event.setPitch(lastPitch = finalPitch);
         event.setMoveFix(moveFix.isToggled() ? RotationHandler.MoveFix.Silent : RotationHandler.MoveFix.None);
 
         if (clickMode.getInput() == 0)
@@ -382,8 +387,37 @@ public class Scaffold extends IAutoClicker {
     public void onPreUpdate(PreUpdateEvent e) { // place here
         if (mc.thePlayer.onGround) {
             offGroundTicks = 0;
+            onGroundTicks++;
         } else {
             offGroundTicks++;
+            onGroundTicks = 0;
+        }
+
+        if (rotation.getInput() == 4) {
+            if (offGroundTicks == 0) {
+                if (onGroundTicks == 0)
+                    telly$noBlockPlace = true;
+                else if (MoveUtil.isMoving() && !Utils.jumpDown())
+                    mc.thePlayer.jump();
+            } else if (BlockUtils.insideBlock(mc.thePlayer.getEntityBoundingBox().offset(mc.thePlayer.motionX * 0.5, mc.thePlayer.motionY + 0.1, mc.thePlayer.motionZ * 0.5))) {
+                telly$noBlockPlace = true;
+            } else {
+                if (Utils.jumpDown()) {
+                    if (offGroundTicks >= (int) jumpDownTicks.getInput()) {
+                        telly$noBlockPlace = false;
+                    }
+                } else {
+                    if (Scaffold.isDiagonal()) {
+                        if (offGroundTicks >= (int) diagonalTicks.getInput()) {
+                            telly$noBlockPlace = false;
+                        }
+                    } else {
+                        if (offGroundTicks >= (int) straightTicks.getInput()) {
+                            telly$noBlockPlace = false;
+                        }
+                    }
+                }
+            }
         }
 
         switch (hoverState) {
@@ -399,7 +433,7 @@ public class Scaffold extends IAutoClicker {
                 break;
         }
 
-        if ((rotation.getInput() == 4 || autoJump.isToggled()) && mc.thePlayer.onGround && MoveUtil.isMoving() && !Utils.jumpDown()) {
+        if ((rotation.getInput() != 4 && autoJump.isToggled()) && mc.thePlayer.onGround && MoveUtil.isMoving() && !Utils.jumpDown()) {
             mc.thePlayer.jump();
         }
 
@@ -444,9 +478,11 @@ public class Scaffold extends IAutoClicker {
             down = false;
             placedUp = false;
         }
-        if (keepYPosition() && (sprint.getInput() == 3 || sprint.getInput() == 4 || sprint.getInput() == 5)) {
+        if (keepYPosition() && (sprint.getInput() == 3 || sprint.getInput() == 4 || sprint.getInput() == 5 || sprint.getInput() == 12)) {
             if (mc.thePlayer.onGround) {
-                mc.thePlayer.jump();
+                if (!Utils.jumpDown()) {
+                    mc.thePlayer.jump();
+                }
                 add = 0;
                 if (Math.floor(mc.thePlayer.posY) == Math.floor(startPos) && sprint.getInput() == 5) {
                     placedUp = false;
@@ -471,6 +507,23 @@ public class Scaffold extends IAutoClicker {
                 original++;
             }
         }
+        else if (sprint.getInput() == 12) {
+            if (hypixelJumpD$bridged % 3 == 0 && placeBlock != null && !ModuleManager.tower.canTower()) {
+                try {
+                    Triple<BlockPos, EnumFacing, keystrokesmod.script.classes.Vec3> side = RotationUtils.getPlaceSide(placeBlock.getBlockPos().up(), Sets.newHashSet(EnumFacing.UP)).orElseThrow(RuntimeException::new);
+                    placeYaw = RotationHandler.getRotationYaw();
+                    placePitch = PlayerRotation.getPitch(side.getRight());
+                    place(new MovingObjectPosition(
+                            side.getRight().toVec3(),
+                            side.getMiddle(),
+                            side.getLeft()
+                    ), false);
+                    return;
+                } catch (RuntimeException ignored) {
+                    Utils.sendMessage("find flag possible.");
+                }
+            }
+        }
         Vec3 targetVec3 = getPlacePossibility(0, original);
         if (targetVec3 == null) {
             return;
@@ -478,17 +531,20 @@ public class Scaffold extends IAutoClicker {
         BlockPos targetPos = new BlockPos(targetVec3.xCoord, targetVec3.yCoord, targetVec3.zCoord);
 
         if (mc.thePlayer.onGround && Utils.isMoving() && motion.getInput() != 1.0 && !moveFix.isToggled()) {
-            Utils.setSpeed(Utils.getHorizontalSpeed() * motion.getInput());
+            MoveUtil.strafe(MoveUtil.speed() * motion.getInput());
         }
         if (lastSlot == -1) {
             lastSlot = SlotHandler.getCurrentSlot();
         }
         int slot = SlotHandler.getCurrentSlot();
-        if ((useBiggestStack.isToggled() && autoSwap.isToggled())
-                || SlotHandler.getHeldItem() == null
-                || !(SlotHandler.getHeldItem().getItem() instanceof ItemBlock)
-                || !ContainerUtils.canBePlaced((ItemBlock) SlotHandler.getHeldItem().getItem())) {
-            slot = getSlot();
+        if (autoSwap.isToggled()) {
+            if (useBiggestStack.isToggled()) {
+                slot = getSlot();
+            } else if (SlotHandler.getHeldItem() == null
+                    || !(SlotHandler.getHeldItem().getItem() instanceof ItemBlock)
+                    || !ContainerUtils.canBePlaced((ItemBlock) SlotHandler.getHeldItem().getItem())) {
+                slot = getSlot();
+            }
         }
         if (slot == -1) {
             return;
@@ -512,6 +568,9 @@ public class Scaffold extends IAutoClicker {
                 break;
             case 4:
                 searchYaw = 5;
+                break;
+            case 5:
+                searchYaw = 360;
                 break;
         }
 
@@ -582,9 +641,8 @@ public class Scaffold extends IAutoClicker {
                                     if (heldItem != null && heldItem.getItem() instanceof ItemBlock && ((ItemBlock) heldItem.getItem()).canPlaceBlockOnSide(mc.theWorld, raycast.getBlockPos(), raycast.sideHit, mc.thePlayer, heldItem)) {
                                         if (rayCasted == null) {
                                             forceStrict = (forceStrict(checkYaw)) && i == 1;
-                                            rayCasted = raycast;
                                             if (recycleRotation.isToggled()) {
-                                                Optional<Triple<BlockPos, EnumFacing, keystrokesmod.script.classes.Vec3>> placeSide = RotationUtils.getPlaceSide(targetPos);
+                                                Optional<Triple<BlockPos, EnumFacing, keystrokesmod.script.classes.Vec3>> placeSide = RotationUtils.getPlaceSide(raycast.getBlockPos());
                                                 if (placeSide.isPresent()) {
                                                     rayCasted = new MovingObjectPosition(placeSide.get().getRight().toVec3(), placeSide.get().getMiddle(), placeSide.get().getLeft());
                                                     placeYaw = PlayerRotation.getYaw(placeSide.get().getRight());
@@ -592,6 +650,7 @@ public class Scaffold extends IAutoClicker {
                                                     break;
                                                 }
                                             }
+                                            rayCasted = raycast;
                                             placeYaw = fixedYaw;
                                             placePitch = fixedPitch;
                                             break;
@@ -762,7 +821,6 @@ public class Scaffold extends IAutoClicker {
     public static boolean sprint() {
         if (ModuleManager.scaffold.isEnabled()
                 && ModuleManager.scaffold.sprint.getInput() > 0
-                && ModuleManager.scaffold.placeBlock != null
                 && (!ModuleManager.scaffold.fastOnRMB.isToggled() || Mouse.isButtonDown(1))) {
             switch ((int) ModuleManager.scaffold.sprint.getInput()) {
                 case 1:
@@ -777,6 +835,7 @@ public class Scaffold extends IAutoClicker {
                 case 5:
                 case 6:
                 case 11:
+                case 12:
                     return ModuleManager.scaffold.keepYPosition();
                 case 8:
                     return Math.abs(MathHelper.wrapAngleTo180_float(mc.thePlayer.rotationYaw) - MathHelper.wrapAngleTo180_float(RotationHandler.getRotationYaw())) <= 45;
@@ -790,7 +849,7 @@ public class Scaffold extends IAutoClicker {
     }
 
     private boolean keepYPosition() {
-        boolean sameYSca = sprint.getInput() == 4 || sprint.getInput() == 3 || sprint.getInput() == 5 || sprint.getInput() == 6 || sprint.getInput() == 11;
+        boolean sameYSca = sprint.getInput() == 4 || sprint.getInput() == 3 || sprint.getInput() == 5 || sprint.getInput() == 6 || sprint.getInput() == 11 || sprint.getInput() == 12;
         return this.isEnabled() && Utils.keysDown() && (sameYSca || (sameY.isToggled() && !Utils.jumpDown())) && (!Utils.jumpDown() || sprint.getInput() == 6) && (!fastOnRMB.isToggled() || Mouse.isButtonDown(1));
     }
 
@@ -876,10 +935,6 @@ public class Scaffold extends IAutoClicker {
 
     public void place(MovingObjectPosition block, boolean extra) {
         if (rotation.getInput() == 4 && telly$noBlockPlace) return;
-        if (tower$noBlockPlace) {
-            tower$noBlockPlace = false;
-            return;
-        }
 
         if (sneak.isToggled()) {
             if (sneak$bridged >= sneakEveryBlocks.getInput()) {
@@ -916,6 +971,7 @@ public class Scaffold extends IAutoClicker {
         if (mc.playerController.onPlayerRightClick(mc.thePlayer, mc.theWorld, heldItem, block.getBlockPos(), block.sideHit, block.hitVec)) {
             sneak$bridged++;
             jump$bridged++;
+            hypixelJumpD$bridged++;
             if (silentSwing.isToggled()) {
                 mc.thePlayer.sendQueue.addToSendQueue(new C0APacketAnimation());
             }

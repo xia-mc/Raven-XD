@@ -23,11 +23,10 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import org.jetbrains.annotations.NotNull;
-import silencefix.SFIRCListener;
-import silencefix.SilenceFixIRC;
 
 @Mod(
         modid = "keystrokes",
@@ -98,14 +97,33 @@ public class Raven {
                         Reflection.sendMessage = false;
                     }
                     for (Module module : getModuleManager().getModules()) {
-                        if (mc.currentScreen == null && module.canBeEnabled()) {
-                            module.keybind();
-                        } else if (mc.currentScreen instanceof ClickGui) {
+                        if (mc.currentScreen instanceof ClickGui) {
                             module.guiUpdate();
                         }
 
                         if (module.isEnabled()) {
                             module.onUpdate();
+                        }
+                    }
+                }
+
+                if (isKeyStrokeConfigGuiToggled) {
+                    isKeyStrokeConfigGuiToggled = false;
+                    mc.displayGuiScreen(new KeyStrokeConfigGui());
+                }
+            } catch (Throwable ignored) {
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public void onRenderTick(TickEvent.@NotNull RenderTickEvent event) {
+        if (event.phase == Phase.END) {
+            try {
+                if (Utils.nullCheck()) {
+                    for (Module module : getModuleManager().getModules()) {
+                        if (mc.currentScreen == null && module.canBeEnabled()) {
+                            module.keybind();
                         }
                     }
                     synchronized (Raven.profileManager.profiles) {
@@ -121,12 +139,7 @@ public class Raven {
                         }
                     }
                 }
-
-                if (isKeyStrokeConfigGuiToggled) {
-                    isKeyStrokeConfigGuiToggled = false;
-                    mc.displayGuiScreen(new KeyStrokeConfigGui());
-                }
-            } catch (Exception ignored) {
+            } catch (Throwable ignored) {
             }
         }
     }

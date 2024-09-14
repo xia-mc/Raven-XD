@@ -27,6 +27,7 @@ public class MoreKB extends IMoreKB {
                 .add(new SimpleSprintReset("Packet", this))
                 .add(new SimpleSprintReset("LegitBlock", this))
                 .add(new SimpleSprintReset("LegitInv", this))
+                .add(new SimpleSprintReset("STap", this))
                 .setDefaultValue("LegitFast")
         );
     }
@@ -75,6 +76,8 @@ public class MoreKB extends IMoreKB {
     public void stopSprint() {
         super.stopSprint();
         switch ((int) mode.getInput()) {
+            case 7:
+                ((KeyBindingAccessor) mc.gameSettings.keyBindBack).setPressed(true);
             case 0:
                 ((KeyBindingAccessor) mc.gameSettings.keyBindForward).setPressed(false);
                 break;
@@ -94,6 +97,8 @@ public class MoreKB extends IMoreKB {
     public void reSprint() {
         super.reSprint();
         switch ((int) mode.getInput()) {
+            case 7:
+                ((KeyBindingAccessor) mc.gameSettings.keyBindBack).setPressed(Keyboard.isKeyDown(mc.gameSettings.keyBindForward.getKeyCode()));
             case 0:
                 ((KeyBindingAccessor) mc.gameSettings.keyBindForward).setPressed(Keyboard.isKeyDown(mc.gameSettings.keyBindForward.getKeyCode()));
                 break;

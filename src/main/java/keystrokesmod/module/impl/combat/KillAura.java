@@ -11,12 +11,16 @@ import keystrokesmod.module.impl.combat.autoclicker.RecordAutoClicker;
 import keystrokesmod.module.impl.other.RecordClick;
 import keystrokesmod.module.impl.other.RotationHandler;
 import keystrokesmod.module.impl.other.SlotHandler;
+import keystrokesmod.module.impl.player.Blink;
+import keystrokesmod.module.impl.player.antivoid.HypixelAntiVoid;
 import keystrokesmod.module.impl.world.AntiBot;
 import keystrokesmod.module.setting.impl.*;
 import keystrokesmod.module.setting.utils.ModeOnly;
 import keystrokesmod.script.classes.Vec3;
 import keystrokesmod.utility.*;
 import keystrokesmod.utility.aim.AimSimulator;
+import keystrokesmod.utility.render.Animation;
+import keystrokesmod.utility.render.Easing;
 import keystrokesmod.utility.render.RenderUtils;
 import lombok.Getter;
 import net.minecraft.client.settings.KeyBinding;
@@ -24,6 +28,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityArmorStand;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.ItemSword;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.client.*;
 import net.minecraft.network.play.server.S2FPacketSetSlot;
@@ -35,6 +40,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.lwjgl.input.Mouse;
 
 import java.util.*;
@@ -115,6 +121,9 @@ public class KillAura extends IAutoClicker {
 
     private int blockingTime = 0;
     private final AimSimulator aimSimulator = new AimSimulator();
+    private @Nullable Animation animationX;
+    private @Nullable Animation animationY;
+    private @Nullable Animation animationZ;
 
     public KillAura() {
         super("KillAura", category.combat);
@@ -124,7 +133,7 @@ public class KillAura extends IAutoClicker {
                 .add(new RecordAutoClicker("Record", this, true, true))
                 .setDefaultValue("Normal")
         );
-        String[] autoBlockModes = new String[]{"Manual", "Vanilla", "Post", "Swap", "Interact A", "Interact B", "Fake", "Partial"};
+        String[] autoBlockModes = new String[]{"Manual", "Vanilla", "Post", "Swap", "Interact A", "Interact B", "Fake", "Partial", "QuickMacro"};
         this.registerSetting(autoBlockMode = new ModeSetting("Autoblock", autoBlockModes, 0));
         this.registerSetting(attackMode = new ModeSetting("Attack mode", new String[]{"Legit", "Packet"}, 1));
         this.registerSetting(new DescriptionSetting("Range"));
@@ -237,8 +246,24 @@ public class KillAura extends IAutoClicker {
     @SubscribeEvent
     public void onRenderWorldLast(RenderWorldLastEvent event) {
         Vec3 hitPos = aimSimulator.getHitPos();
-        if (target != null && rotations != null && dot.isToggled() && hitPos != null) {
-            RenderUtils.drawDot(hitPos, dotSize.getInput(), 0xFF0670BE);
+        if (target != null) {
+            if (rotations != null && dot.isToggled() && hitPos != null) {
+                if (animationX == null || animationY == null || animationZ == null) {
+                    animationX = new Animation(Easing.EASE_OUT_CIRC, 50);
+                    animationY = new Animation(Easing.EASE_OUT_CIRC, 50);
+                    animationZ = new Animation(Easing.EASE_OUT_CIRC, 50);
+
+                    animationX.setValue(hitPos.x);
+                    animationY.setValue(hitPos.y);
+                    animationZ.setValue(hitPos.z);
+                }
+                animationX.run(hitPos.x);
+                animationY.run(hitPos.y);
+                animationZ.run(hitPos.z);
+                RenderUtils.drawDot(new Vec3(animationX.getValue(), animationY.getValue(), animationZ.getValue()), dotSize.getInput(), 0xFF0670BE);
+            }
+        } else {
+            animationX = animationY = animationZ = null;
         }
     }
 
@@ -255,6 +280,11 @@ public class KillAura extends IAutoClicker {
             resetBlinkState(true);
             return;
         }
+        if (ModuleManager.autoGapple != null && ModuleManager.autoGapple.disableKillAura.isToggled() && ModuleManager.autoGapple.working) {
+            resetBlinkState(true);
+            return;
+        }
+
         if ((mc.thePlayer.isBlocking() || block.get()) && disableWhileBlocking.isToggled()) {
             resetBlinkState(true);
             return;
@@ -270,7 +300,7 @@ public class KillAura extends IAutoClicker {
             }
         }
         int input = (int) autoBlockMode.getInput();
-        if (block.get() && (input == 3 || input == 4 || input == 5 || input == 9) && Utils.holdingSword()) {
+        if (block.get() && (input == 3 || input == 4 || input == 5 || input == 8) && Utils.holdingSword()) {
             setBlockState(block.get(), false, false);
             if (ModuleManager.bedAura.stopAutoblock) {
                 resetBlinkState(false);
@@ -312,18 +342,17 @@ public class KillAura extends IAutoClicker {
                         lag = true;
                     }
                     break;
-                case 9:
+                case 8:
                     if (lag) {
+                        blinking = true;
                         unBlock();
                         lag = false;
                     } else {
-                        if (blocking) {
-                            unBlock();
-                        } else {
-                            attackAndInteract(target, true);// attack while blinked
-                            sendBlock();
-                            lag = true;
-                        }
+                        attack(target);
+                        PacketUtils.sendPacket(new C0FPacketConfirmTransaction(Utils.randomizeInt(0, 2147483647), (short) Utils.randomizeInt(0, -32767), true));
+                        PacketUtils.sendPacket(new C0APacketAnimation());
+                        sendBlock();
+                        lag = true;
                     }
                     break;
             }
@@ -481,6 +510,7 @@ public class KillAura extends IAutoClicker {
             case 0:  // manual
                 setBlockState(false, false, true);
                 break;
+            case 8:
             case 1: // vanilla
                 setBlockState(block.get(), true, true);
                 break;
@@ -604,7 +634,8 @@ public class KillAura extends IAutoClicker {
         if (ModuleManager.bedAura.isEnabled() && !ModuleManager.bedAura.allowAura.isToggled() && ModuleManager.bedAura.currentBlock != null) {
             return true;
         }
-        if (ModuleManager.blink.isEnabled()) return true;
+        if (Blink.isBlinking()) return true;
+        if (HypixelAntiVoid.getInstance() != null && HypixelAntiVoid.getInstance().blink.isEnabled()) return true;
         return mc.thePlayer.isDead;
     }
 
@@ -626,15 +657,7 @@ public class KillAura extends IAutoClicker {
 
     private void attackAndInteract(EntityLivingBase target, boolean sendInteractAt) {
         if (target != null && attack) {
-            attack = false;
-            if (noAimToEntity()) {
-                return;
-            }
-            if (ModuleManager.bedAura.rotate) {
-                return;
-            }
-            switchTargets = true;
-            Utils.attackEntity(target, !silentSwing.isToggled());
+            if (!attack(target)) return;
             if (sendInteractAt) {
                 Vec3 hitVec = aimSimulator.getHitPos();
                 if (hitVec != null) {
@@ -649,8 +672,21 @@ public class KillAura extends IAutoClicker {
         }
     }
 
+    private boolean attack(EntityLivingBase target) {
+        attack = false;
+        if (noAimToEntity()) {
+            return false;
+        }
+        if (ModuleManager.bedAura.rotate) {
+            return false;
+        }
+        switchTargets = true;
+        Utils.attackEntity(target, !silentSwing.isToggled());
+        return true;
+    }
+
     private void sendBlock() {
-        mc.getNetHandler().addToSendQueue(new C08PacketPlayerBlockPlacement(mc.thePlayer.getHeldItem()));
+        mc.getNetHandler().addToSendQueue(new C08PacketPlayerBlockPlacement(SlotHandler.getHeldItem()));
     }
 
     private boolean isMining() {

@@ -366,12 +366,13 @@ public class ContainerUtils {
             final ItemStack stack = getItemStack(i);
             if (stack != null && stack.getItem() instanceof ItemFood) {
                 float thisFoodLevel = ((ItemFood) stack.getItem()).getSaturationModifier(stack);
-                if (thisFoodLevel > foodLevel + 1) {
+                if (thisFoodLevel > foodLevel + 2) {
                     foodLevel = thisFoodLevel;
                     slot = i;
                 }
             }
         }
+
         return slot;
     }
 
@@ -472,9 +473,13 @@ public class ContainerUtils {
             }
         }
 
+        if (count == 64) {
+            return desiredSlot;
+        }
+
         for (int i = 9; i < 45; i++) {
             ItemStack item = getItemStack(i);
-            if (item != null && item.getItem() instanceof ItemBlock && item.stackSize > count && canBePlaced((ItemBlock) item.getItem())) {
+            if (item != null && item.getItem() instanceof ItemBlock && item.stackSize > count + 2 && canBePlaced((ItemBlock) item.getItem())) {
                 count = item.stackSize;
                 biggestSlot = i;
             }

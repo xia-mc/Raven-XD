@@ -23,7 +23,7 @@ public abstract class MixinNetHandlerPlayClient {
         if (!Utils.nullCheck()) return;
 
         if (packet.getEntityID() == Raven.mc.thePlayer.getEntityId()) {
-            if (ModuleManager.fly.isEnabled() || ModuleManager.longJump.isEnabled()) return;
+            if (ModuleManager.longJump.isEnabled()) return;
 
             PreVelocityEvent event = new PreVelocityEvent(packet.getMotionX(), packet.getMotionY(), packet.getMotionZ());
             MinecraftForge.EVENT_BUS.post(event);

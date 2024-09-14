@@ -23,7 +23,7 @@ apply plugin: 'java'
 
 group = "keystrokesmod"
 archivesBaseName = "raven-XD"
-version = "2.3-Dev"
+version = "Dev"
 
 compileJava {
     sourceCompatibility = '1.8'
@@ -87,6 +87,7 @@ dependencies {
 
     embed files('libraries/discord-rpc.jar')
     embed files('libraries/json-20220924.jar')
+//    embed files('libraries/viaforge-1.8.9-3.3.3.jar')
 //    embed files('libraries/ViaAprilFools-3.0.2-SNAPSHOT.jar')
 //    embed files('libraries/ViaBackwards-5.0.4-SNAPSHOT.jar')
 //    embed files('libraries/ViaLegacy-3.0.3-SNAPSHOT.jar')

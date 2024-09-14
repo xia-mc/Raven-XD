@@ -1,7 +1,6 @@
 package keystrokesmod.module.impl.combat.aimassist;
 
 import keystrokesmod.mixins.impl.client.PlayerControllerMPAccessor;
-import keystrokesmod.module.impl.client.Notifications;
 import keystrokesmod.module.impl.combat.AimAssist;
 import keystrokesmod.module.impl.world.AntiBot;
 import keystrokesmod.module.setting.impl.ButtonSetting;
@@ -48,7 +47,7 @@ public class TejasAssist extends SubMode<AimAssist> {
         final EntityPlayer target = getEnemy();
         if (target == null) return;
         if (blatantMode.isToggled()) {
-            Utils.aim(target, (float) pitchOffSet.getInput(), false);
+            Utils.aim(target, (float) pitchOffSet.getInput());
         } else {
             double n = Utils.fovFromEntity(target);
             if ((n > 1.0D) || (n < -1.0D)) {

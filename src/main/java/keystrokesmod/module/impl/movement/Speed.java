@@ -2,7 +2,6 @@ package keystrokesmod.module.impl.movement;
 
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.movement.speed.*;
-import keystrokesmod.module.impl.movement.speed.hypixel.RiseWatchdogSpeed;
 import keystrokesmod.module.setting.impl.*;
 import keystrokesmod.utility.*;
 

@@ -156,6 +156,7 @@ public class TimerRange extends Module {
 
     private boolean shouldStart() {
         if (!Utils.nullCheck()) return false;
+        if (ModuleManager.blink.isEnabled()) return false;
         if (onlyOnGround.isToggled() && !mc.thePlayer.onGround) return false;
         if (notWhileKB.isToggled() && mc.thePlayer.hurtTime > 0) return false;
         if (notWhileScaffold.isToggled() && ModuleManager.scaffold.isEnabled()) return false;
