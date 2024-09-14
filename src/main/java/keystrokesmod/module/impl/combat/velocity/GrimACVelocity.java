@@ -68,8 +68,6 @@ public class GrimACVelocity extends SubMode<Velocity> {
             PacketUtils.sendPacketNoEvent(new C02PacketUseEntity(mc.objectMouseOver.entityHit, C02PacketUseEntity.Action.ATTACK));
             mc.thePlayer.motionX *= 0.6;
             mc.thePlayer.motionZ *= 0.6;
-            AutoGapple.motionX *= 0.6;
-            AutoGapple.motionZ *= 0.6;
         }
     }
 

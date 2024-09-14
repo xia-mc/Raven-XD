@@ -352,6 +352,7 @@ public class KillAura extends IAutoClicker {
                         PacketUtils.sendPacket(new C0FPacketConfirmTransaction(Utils.randomizeInt(0, 2147483647), (short) Utils.randomizeInt(0, -32767), true));
                         PacketUtils.sendPacket(new C0APacketAnimation());
                         sendBlock();
+                        releasePackets();
                         lag = true;
                     }
                     break;
