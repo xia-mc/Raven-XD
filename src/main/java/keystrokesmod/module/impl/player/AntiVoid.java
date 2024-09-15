@@ -1,10 +1,7 @@
 package keystrokesmod.module.impl.player;
 
 import keystrokesmod.module.Module;
-import keystrokesmod.module.impl.player.antivoid.AirStuckAntiVoid;
-import keystrokesmod.module.impl.player.antivoid.GrimACAntiVoid;
-import keystrokesmod.module.impl.player.antivoid.HypixelAntiVoid;
-import keystrokesmod.module.impl.player.antivoid.VulcanAntiVoid;
+import keystrokesmod.module.impl.player.antivoid.*;
 import keystrokesmod.module.setting.impl.ModeValue;
 
 public class AntiVoid extends Module {
@@ -17,6 +14,8 @@ public class AntiVoid extends Module {
                 .add(new AirStuckAntiVoid("AirStuck", this))
                 .add(new VulcanAntiVoid("Vulcan", this))
                 .add(new GrimACAntiVoid("GrimAC", this))
+                .add(new BacktrackAntiVoid("Backtrack", this))
+                .add(new NCPAntiVoid("NCP", this))
         );
     }
 

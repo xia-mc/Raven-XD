@@ -30,8 +30,8 @@ public class Reach extends Module {
 
     public Reach() {
         super("Reach", Module.category.combat, 0);
-        this.registerSetting(min = new SliderSetting("Min", 3.1D, 3.0D, 6.0D, 0.05D));
-        this.registerSetting(max = new SliderSetting("Max", 3.3D, 3.0D, 6.0D, 0.05D));
+        this.registerSetting(min = new SliderSetting("Min", 3.1, 0, 6, 0.05));
+        this.registerSetting(max = new SliderSetting("Max", 3.3, 0, 6, 0.05));
         this.registerSetting(chance = new SliderSetting("Chance", 100, 0, 100, 1, "%"));
         this.registerSetting(weaponOnly = new ButtonSetting("Weapon only", false));
         this.registerSetting(movingOnly = new ButtonSetting("Moving only", false));

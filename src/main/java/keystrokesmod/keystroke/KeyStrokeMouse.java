@@ -9,6 +9,8 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static keystrokesmod.Raven.mc;
+
 public class KeyStrokeMouse {
     private static String[] a = new String[]{"LMB", "RMB"};
     private Minecraft b = Minecraft.getMinecraft();
@@ -28,7 +30,19 @@ public class KeyStrokeMouse {
     }
 
     public void n(int o, int p, int color) {
-        boolean r = Mouse.isButtonDown(this.c);
+        boolean r;
+        switch (c) {
+            case 0:
+                r = mc.gameSettings.keyBindAttack.isKeyDown();
+                break;
+            case 1:
+                r = mc.gameSettings.keyBindUseItem.isKeyDown();
+                break;
+            default:
+                r = Mouse.isButtonDown(this.c);
+                break;
+        }
+
         String s = a[this.c];
         if (r != this.g) {
             this.g = r;
