@@ -24,6 +24,7 @@ public class Speed extends Module {
                 .add(new VulcanSpeed("Vulcan", this))
                 .add(new GrimACSpeed("GrimAC", this))
                 .add(new IntaveSpeed("Intave", this))
+                .add(new StrafeSpeed("Strafe", this))
         );
         this.registerSetting(liquidDisable = new ButtonSetting("Disable in liquid", true));
         this.registerSetting(sneakDisable = new ButtonSetting("Disable while sneaking", true));

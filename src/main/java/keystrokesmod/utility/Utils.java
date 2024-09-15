@@ -1052,8 +1052,8 @@ public class Utils {
     public static void inventoryClick(@NotNull GuiScreen s) {
         final ScaledResolution sr = new ScaledResolution(mc);
 
-        int x = Mouse.getX() * s.width / sr.getScaledWidth();
-        int y = s.height - Mouse.getY() * s.height / sr.getScaledHeight() - 1;
+        int x = Mouse.getX() / sr.getScaledWidth() * s.width;
+        int y = s.height - Mouse.getY() / sr.getScaledHeight() * s.height;
 
         ClickEvent event = new ClickEvent();
         MinecraftForge.EVENT_BUS.post(event);
