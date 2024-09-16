@@ -1,0 +1,340 @@
+.A{
+	position: fixed;
+	background: #232323;
+	width: 100%;
+	line-height: 41px;
+	margin: -40px -10px 0px 0px;
+	box-shadow: 0px -50px 60px 0px #FFF;
+}
+.A span{
+	color: #5E5E5E;
+	margin: 0px 0px 0px 12px;
+	text-shadow: 0px 0px 20px #000;
+}
+.A img{
+	float: left;
+	padding: 6px;
+	box-shadow: 0px 0px 5px 0px;
+}
+.A a{
+	color: #5E5E5E;
+	text-shadow: 0px 0px 20px #000;
+	float: right;
+	box-shadow: 0px 0px 20px -10px #000;
+	background: #2A2A2A;
+	text-align: center;
+	border-radius: 10px;
+	line-height: 30px;
+	width: 100px;
+	text-decoration: none;
+	margin: 5px 20px 0px 0px;
+}
+.A a:hover{
+	animation-name: A;
+	animation-duration: 0.3s;
+  	animation-direction: alternate;
+	text-shadow: 0px 0px 40px #FFF;
+}
+.A a{
+	animation-name: Aoff;
+	animation-duration: 0.3s;
+  	animation-direction: alternate;
+	color: #727272;
+}
+.B{
+	margin: 10px auto;
+	height: 400px;
+	width: 100%;
+	background: url("../png/1.png") no-repeat center center fixed;
+}
+
+.B h1{
+	color: #C9C9C9; 
+	font-size: 60px;
+	text-align: center;
+	padding: 5% 0px 0px 0%;
+	text-shadow: 0px 0px 100px #FFF;
+	animation-name: B;
+	animation-duration: 2s;
+  	animation-direction: alternate;
+}
+.B p{
+	color: #C9C9C9; 
+	font-size: 30px;
+	text-align: center;
+	text-shadow: 0px 0px 100px #FFF;
+	margin: -40px 0px 0px 0px;
+	animation-name: B1;
+	animation-duration: 1s;
+  	animation-direction: alternate;
+}
+.C{
+	padding: 10px 0px 0px 0px;
+}
+.C h1{
+	text-align: center;
+	color: #C9C9C9; 
+	text-shadow: 0px 0px 40px #000;
+}
+.C img{
+	float: right;
+	margin: 20px 2% 0px 0px;
+}
+.C .text{
+	float: left;
+	width: 500px;
+	margin: 0px 0px 0px 20px;
+}
+.C .text h2{
+	color: #C9C9C9; 
+	text-shadow: 0px 0px 40px #FFf;
+	text-align: center;
+}
+.C p{
+	color: #C9C9C9; 
+	text-align: center;
+	text-shadow: 0px 0px 40px #FFF;
+}
+.D{
+	margin: 450px auto;
+	
+}
+.D h1{
+	color: #C9C9C9;
+	text-shadow: 0px 0px 40px #000;
+	text-align: center;
+}
+.D .BOX{
+	background: #2A2A2A;
+	box-shadow: 0px 0px 100px -20px #000;
+	border-radius: 20px;
+	height: 400px;
+	width: 350px;
+}
+.D .BOX:hover{
+	box-shadow: 0px 0px 100px -20px #FFF;
+	animation-name: C;
+	animation-duration: 1s;
+  	animation-direction: alternate;
+}
+.D .BOX{
+	animation-name: Coff;
+	animation-duration: 1s;
+  	animation-direction: alternate;
+	box-shadow: 0px 0px 100px -20px #000;
+}
+.D .BOX img{
+	margin: 30px 0px 0px 135px;
+}
+.D .BOX Div{
+	margin: 20px auto;
+	width: 300px;
+}
+.D .BOX h3{
+	color: #C9C9C9;
+	text-shadow: 0px 0px 40px #000;
+	text-align: center;
+}
+.D .BOX2{
+	background: #2A2A2A;
+	box-shadow: 0px 0px 100px -20px #000;
+	border-radius: 20px;
+	height: 400px;
+	width: 350px;
+	margin: -400px 0px 0px 430px;
+}
+.D .BOX2:hover{
+	box-shadow: 0px 0px 100px -20px #FFF;
+	animation-name: C;
+	animation-duration: 1s;
+  	animation-direction: alternate;
+}
+.D .BOX2{
+	animation-name: Coff;
+	animation-duration: 1s;
+  	animation-direction: alternate;
+	box-shadow: 0px 0px 100px -20px #000;
+}
+.D .BOX2 img{
+	margin: 30px 0px 0px 135px;
+}
+.D .BOX2 Div{
+	margin: 20px auto;
+	width: 300px;
+}
+.D .BOX2 h3{
+	color: #C9C9C9;
+	text-shadow: 0px 0px 40px #000;
+	text-align: center;
+}
+.D .BOX3{
+	background: #2A2A2A;
+	float: right;
+	box-shadow: 0px 0px 100px -20px #000;
+	border-radius: 20px;
+	height: 400px;
+	width: 350px;
+	margin: -400px 0px 0px 0px;
+}
+.D .BOX3:hover{
+	box-shadow: 0px 0px 100px -20px #FFF;
+	animation-name: C;
+	animation-duration: 1s;
+  	animation-direction: alternate;
+}
+.D .BOX3{
+	animation-name: Coff;
+	animation-duration: 1s;
+  	animation-direction: alternate;
+	box-shadow: 0px 0px 100px -20px #000;
+}
+.D .BOX3 img{
+	margin: 30px 0px 0px 135px;
+}
+.D .BOX3 Div{
+	margin: 20px auto;
+	width: 300px;
+}
+.D .BOX3 h3{
+	color: #C9C9C9;
+	text-shadow: 0px 0px 40px #000;
+	text-align: center;
+}
+.D hr{
+	box-shadow: 0px 0px 20px #000;
+}
+.D p{
+	color: #C9C9C9; 
+	text-align: center;
+	text-shadow: 0px 0px 20px #000;
+}
+.D .XYZ{
+	width: 1200px;
+	margin: 100px auto;
+}
+.E{
+	background: #2A2A2A;
+	text-align: center;
+	box-shadow: 0px 0px 100px -20px #000;
+	border-radius: 20px;
+	height: 400px;
+	width: 1000px;
+	margin: -240px Auto;
+	text-shadow: 0px 0px 60px;
+	color: #565656;
+	animation-name: E;
+	animation-duration: 1s;
+	animation-iteration-count: infinite;
+	animation-direction: alternate;
+}
+.E h1{
+	padding: 20px 0px 0px 0px;
+	color: #C9C9C9;
+	text-shadow: 0px 0px 40px #000;
+	text-align: center;
+}
+.E img{
+	float: left;
+	margin: 50px 0px 0px 0px;
+}
+.E .EA{
+	width: 320px;
+	float: right;
+	padding: 0px 50px 0px 0px;
+}
+.E h2{
+	color: #C9C9C9;
+	text-shadow: 0px 0px 40px #000;
+	text-align: center;
+}
+.E a{
+	float: right;
+	background: #272727;
+	box-shadow: 0px 0px 10px -10px #000;
+	border-radius: 10px;
+	line-height: 40px;
+	width: 100px;
+	text-decoration: none;
+	color: #C9C9C9;
+	
+}
+.E a:hover{
+	width: 200px;
+	animation-name: D;
+	animation-duration: 1s;
+  	animation-direction: alternate;
+}
+.E a{
+	animation-name: Doff;
+	animation-duration: 1s;
+  	animation-direction: alternate;
+	width: 100px;
+}
+.E h3{
+	color: #C9C9C9;
+	text-shadow: 0px 0px 40px #000;
+	text-align: center;
+}
+.anim{
+	margin: 80px auto;
+	width: 100px;
+}
+.anim:hover{
+	animation-name: D;
+	animation-duration: 1s;
+  	animation-direction: alternate;
+	line-height: 40px;
+	box-shadow: 0px 0px 100px 5px;
+	width: 200px;
+}
+.anim{
+	animation-name: Doff;
+	animation-duration: 1s;
+  	animation-direction: alternate;
+	line-height: 40px;
+	box-shadow: 0px 0px 100px 5px;
+	width: 100px;
+}
+.F {
+	padding: 400px 0px 0px 0px;
+}
+.G {
+	background: #2A2A2A;
+	width: 100%;
+	line-height: 41px;
+	box-shadow: 0px 50px 100px 0px;
+	text-align: center;
+}
+@keyframes A {
+	0%{text-shadow: 0px 0px 20px #000;}
+	100%{text-shadow: 0px 0px 40px #FFF;}
+}
+@keyframes Aoff {
+	100%{text-shadow: 0px 0px 20px #000;}
+	0%{text-shadow: 0px 0px 40px #FFF;}
+}
+@keyframes B {
+	0%{padding: 15% 0px 0px 0%; opacity: 0;}
+	100%{padding: 5% 0px 0px 0%; opacity: 1;}
+}
+@keyframes B1 {
+	0%{margin: 0px 0px 0px 0px; opacity: 0;}
+	50%{ opacity: 0.4;}
+	100%{margin: -40px 0px 0px 0px; opacity: 1;}
+}
+@keyframes C {
+	0%{box-shadow: 0px 0px 100px -20px #000;}
+	100%{box-shadow: 0px 0px 100px -20px #FFF;}
+}
+@keyframes Coff {
+	100%{box-shadow: 0px 0px 100px -20px #000;}
+	0%{box-shadow: 0px 0px 100px -20px #FFF;}
+}
+@keyframes D {
+	0%{width: 100px;}
+	100%{width: 200px;}
+}
+@keyframes Doff {
+	100%{width: 100px;}
+	0%{width: 200px;}
+}

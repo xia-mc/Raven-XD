@@ -11,17 +11,23 @@ import org.jetbrains.annotations.NotNull;
 
 public class StrafeSpeed extends SubMode<Speed> {
     private final ButtonSetting autoJump;
+    private final ButtonSetting groundStrafe;
 
     public StrafeSpeed(String name, @NotNull Speed parent) {
         super(name, parent);
         this.registerSetting(autoJump = new ButtonSetting("Auto jump", true));
+        this.registerSetting(groundStrafe = new ButtonSetting("Ground strafe", true));
     }
 
     @SubscribeEvent
     public void onPreUpdate(@NotNull PreUpdateEvent event) {
-        if (parent.noAction()) return;
+        if (parent.noAction() || MoveUtil.isMoving()) return;
 
-        MoveUtil.strafe();
+        if (mc.thePlayer.onGround && groundStrafe.isToggled()) {
+            MoveUtil.strafe(MoveUtil.getAllowedHorizontalDistance());
+        } else {
+            MoveUtil.strafe();
+        }
         if (mc.thePlayer.onGround && autoJump.isToggled() && !Utils.jumpDown()) {
             mc.thePlayer.jump();
         }

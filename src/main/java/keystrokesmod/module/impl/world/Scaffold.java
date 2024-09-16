@@ -92,7 +92,7 @@ public class Scaffold extends IAutoClicker {
     public MovingObjectPosition placeBlock;
     private int lastSlot;
     private static final String[] rotationModes = new String[]{"None", "Backwards", "Strict", "Precise", "Telly", "Constant", "Snap"};
-    private static final String[] sprintModes = new String[]{"Disabled", "Vanilla", "Edge", "HypixelJump A", "HypixelJump B", "HypixelJump C", "Float", "Side", "Legit", "GrimAC", "Sneak", "Star", "GreatWall"};
+    private static final String[] sprintModes = new String[]{"Disabled", "Vanilla", "Edge", "HypixelJump A", "HypixelJump B", "HypixelJump C", "Float", "Side", "Legit", "GrimAC", "Sneak", "Star", "GreatWall", "Old Intave"};
     private static final String[] precisionModes = new String[]{"Very low", "Low", "Moderate", "High", "Very high", "Unlimited"};
     public float placeYaw;
     public float placePitch = 85;
@@ -408,11 +408,11 @@ public class Scaffold extends IAutoClicker {
                     }
                 } else {
                     if (Scaffold.isDiagonal()) {
-                        if (offGroundTicks >= (int) diagonalTicks.getInput()) {
+                        if (offGroundTicks == (int) diagonalTicks.getInput()) {
                             telly$noBlockPlace = false;
                         }
                     } else {
-                        if (offGroundTicks >= (int) straightTicks.getInput()) {
+                        if (offGroundTicks == (int) straightTicks.getInput()) {
                             telly$noBlockPlace = false;
                         }
                     }
@@ -434,7 +434,11 @@ public class Scaffold extends IAutoClicker {
         }
 
         if ((rotation.getInput() != 4 && autoJump.isToggled()) && mc.thePlayer.onGround && MoveUtil.isMoving() && !Utils.jumpDown()) {
-            mc.thePlayer.jump();
+            if (sprint.getInput() == 13) {
+                mc.thePlayer.motionY = MoveUtil.jumpMotion();
+            } else {
+                mc.thePlayer.jump();
+            }
         }
 
         if (sprint.getInput() == 7 && !Utils.jumpDown() && sameY$bridged != 0 && sameY$bridged % 2 == 0 && placeBlock != null && !Utils.jumpDown()) {
@@ -836,6 +840,7 @@ public class Scaffold extends IAutoClicker {
                 case 6:
                 case 11:
                 case 12:
+                case 13:
                     return ModuleManager.scaffold.keepYPosition();
                 case 8:
                     return Math.abs(MathHelper.wrapAngleTo180_float(mc.thePlayer.rotationYaw) - MathHelper.wrapAngleTo180_float(RotationHandler.getRotationYaw())) <= 45;

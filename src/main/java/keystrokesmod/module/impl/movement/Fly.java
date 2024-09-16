@@ -20,6 +20,7 @@ public class Fly extends Module {
                 .add(new AirWalkFly("AirWalk", this))
                 .add(new AirPlaceFly("AirPlace", this))
                 .add(new VulcanFly("Vulcan", this))
+                .add(new MatrixFly("Matrix", this))
                 .add(new MatrixBowFly("MatrixBow", this))
                 .add(new MatrixTNTFly("MatrixTNT", this))
                 .add(new FakeFly("Fake", this))
