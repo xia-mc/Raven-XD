@@ -998,21 +998,20 @@ public class Utils {
     }
 
     public static boolean isLobby() {
-        if (mc.theWorld == null) {
-            return true;
-        }
-
-        List<Entity> entities = mc.theWorld.getLoadedEntityList();
-        for (Entity entity : entities) {
-            if (entity != null && entity.getName().equals("§e§lCLICK TO PLAY")) {
+        if (Utils.isHypixel()) {
+            if (mc.theWorld == null) {
                 return true;
             }
-        }
 
-        if (Utils.isHypixel()) {
+            List<Entity> entities = mc.theWorld.getLoadedEntityList();
+            for (Entity entity : entities) {
+                if (entity != null && entity.getName().equals("§e§lCLICK TO PLAY")) {
+                    return true;
+                }
+            }
+
             boolean hasNetherStar = false;
             boolean hasCompass = false;
-
             for (ItemStack stack : mc.thePlayer.inventory.mainInventory) {
                 if (stack != null) {
                     String itemName = stack.getItem().getUnlocalizedName();
@@ -1028,7 +1027,6 @@ public class Utils {
                 }
             }
         }
-
         return false;
     }
 
