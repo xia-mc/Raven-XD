@@ -1014,11 +1014,10 @@ public class Utils {
             boolean hasCompass = false;
             for (ItemStack stack : mc.thePlayer.inventory.mainInventory) {
                 if (stack != null) {
-                    String itemName = stack.getItem().getUnlocalizedName();
-                    if (itemName.equals("item.netherStar")) {
+                    if (stack.getItem() == Items.nether_star) {
                         hasNetherStar = true;
                     }
-                    if (itemName.equals("item.compass")) {
+                    if (stack.getItem() == Items.compass) {
                         hasCompass = true;
                     }
                     if (hasNetherStar && hasCompass) {
