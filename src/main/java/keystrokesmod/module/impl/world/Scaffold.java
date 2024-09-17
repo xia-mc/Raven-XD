@@ -1006,14 +1006,20 @@ public class Scaffold extends IAutoClicker {
     }
 
     public int totalBlocks() {
-        int totalBlocks = 0;
-        for (int i = 0; i < 9; ++i) {
-            final ItemStack stack = mc.thePlayer.inventory.mainInventory[i];
-            if (stack != null && stack.getItem() instanceof ItemBlock && ContainerUtils.canBePlaced((ItemBlock) stack.getItem()) && stack.stackSize > 0) {
-                totalBlocks += stack.stackSize;
+        if (!Utils.nullCheck()) return 0;
+
+        try {
+            int totalBlocks = 0;
+            for (int i = 0; i < 9; ++i) {
+                final ItemStack stack = mc.thePlayer.inventory.mainInventory[i];
+                if (stack != null && stack.getItem() instanceof ItemBlock && ContainerUtils.canBePlaced((ItemBlock) stack.getItem()) && stack.stackSize > 0) {
+                    totalBlocks += stack.stackSize;
+                }
             }
+            return totalBlocks;
+        } catch (Throwable e) {
+            return 0;
         }
-        return totalBlocks;
     }
 
     static class EnumFacingOffset {

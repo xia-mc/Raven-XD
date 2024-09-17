@@ -6,6 +6,7 @@ import com.mojang.realmsclient.gui.ChatFormatting;
 import keystrokesmod.Raven;
 import keystrokesmod.event.ClickEvent;
 import keystrokesmod.mixins.impl.client.GuiScreenAccessor;
+import keystrokesmod.mixins.impl.client.KeyBindingAccessor;
 import keystrokesmod.module.impl.other.NameHider;
 import keystrokesmod.module.impl.other.SlotHandler;
 import keystrokesmod.module.impl.render.AntiShuffle;
@@ -641,7 +642,15 @@ public class Utils {
     }
 
     public static boolean jumpDown() {
-        return Keyboard.isKeyDown(mc.gameSettings.keyBindJump.getKeyCode());
+        try {
+            return Keyboard.isKeyDown(mc.gameSettings.keyBindJump.getKeyCode());
+        } catch (Throwable e) {
+            try {
+                return mc.gameSettings.keyBindJump.isKeyDown();
+            } catch (Throwable e2) {
+                return false;
+            }
+        }
     }
 
     public static float gd() {
