@@ -98,7 +98,7 @@ public class MoreKB extends IMoreKB {
         super.reSprint();
         switch ((int) mode.getInput()) {
             case 7:
-                ((KeyBindingAccessor) mc.gameSettings.keyBindBack).setPressed(Keyboard.isKeyDown(mc.gameSettings.keyBindForward.getKeyCode()));
+                ((KeyBindingAccessor) mc.gameSettings.keyBindBack).setPressed(Keyboard.isKeyDown(mc.gameSettings.keyBindBack.getKeyCode()));
             case 0:
                 ((KeyBindingAccessor) mc.gameSettings.keyBindForward).setPressed(Keyboard.isKeyDown(mc.gameSettings.keyBindForward.getKeyCode()));
                 break;

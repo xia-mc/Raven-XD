@@ -27,7 +27,7 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-public class HypixelFastVerticalTower extends SubMode<Tower> {
+public class HypixelTower extends SubMode<Tower> {
     public static final HashSet<EnumFacing> LIMIT_FACING = new HashSet<>(Collections.singleton(EnumFacing.SOUTH));
     public static final double STEP_MOVE = 0.3;
     private boolean towering;
@@ -37,7 +37,7 @@ public class HypixelFastVerticalTower extends SubMode<Tower> {
     private BlockPos deltaPlace = BlockPos.ORIGIN;
     private final ButtonSetting onlyWhileMoving;
 
-    public HypixelFastVerticalTower(String name, @NotNull Tower parent) {
+    public HypixelTower(String name, @NotNull Tower parent) {
         super(name, parent);
         this.registerSetting(onlyWhileMoving = new ButtonSetting("Only while moving", true));
     }

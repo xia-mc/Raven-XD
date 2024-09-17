@@ -27,9 +27,8 @@ public class Tower extends Module {
         final ModeValue mode;
         this.registerSetting(mode = new ModeValue("Mode", this)
                 .add(new VanillaTower("Vanilla", this))
-                .add(new HypixelJumpSprintTower("HypixelJumpSprint", this))
-                .add(new HypixelFastTower("HypixelFast", this))
-                .add(new HypixelFastVerticalTower("HypixelFastVertical", this))
+                .add(new JumpSprintTower("JumpSprint", this))
+                .add(new HypixelTower("Hypixel", this))
                 .add(new BlocksMCTower("BlocksMC", this))
                 .add(new ConstantMotionTower("ConstantMotion", this))
                 .add(new VulcanTower("Vulcan", this))

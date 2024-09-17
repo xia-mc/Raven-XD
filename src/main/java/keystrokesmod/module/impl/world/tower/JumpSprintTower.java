@@ -14,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
 
 import static keystrokesmod.module.ModuleManager.tower;
 
-public class HypixelJumpSprintTower extends SubMode<Tower> {
+public class JumpSprintTower extends SubMode<Tower> {
     private final SliderSetting speed;
     private final ButtonSetting noStrafe;
     private final SliderSetting offGroundSpeed;
@@ -23,7 +23,7 @@ public class HypixelJumpSprintTower extends SubMode<Tower> {
     private int onGroundTicks = 0;
     private boolean lowHopTest1$watchdog = false;
 
-    public HypixelJumpSprintTower(String name, @NotNull Tower parent) {
+    public JumpSprintTower(String name, @NotNull Tower parent) {
         super(name, parent);
         this.registerSetting(speed = new SliderSetting("Speed", 0.95, 0.5, 1, 0.01));
         this.registerSetting(offGroundSpeed = new SliderSetting("Hypixel off ground speed", 0.5, 0.0, 1.0, 0.01));

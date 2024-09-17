@@ -8,6 +8,7 @@ import keystrokesmod.utility.ContainerUtils;
 import keystrokesmod.utility.MoveUtil;
 import keystrokesmod.utility.PacketUtils;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemPotion;
 import net.minecraft.item.ItemSword;
 import net.minecraft.network.play.client.C07PacketPlayerDigging;
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
@@ -33,7 +34,7 @@ public class IntaveNoSlow extends INoSlow {
         Item item = SlotHandler.getHeldItem().getItem();
 
         if (!MoveUtil.isMoving()) return;
-        if (ContainerUtils.isRest(item)) {
+        if (ContainerUtils.isRest(item) || item instanceof ItemPotion) {
             if (!lastUsingItem) {
                 PacketUtils.sendPacket(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.UP));
             }
