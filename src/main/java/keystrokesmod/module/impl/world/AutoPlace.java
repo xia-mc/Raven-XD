@@ -1,5 +1,6 @@
 package keystrokesmod.module.impl.world;
 
+import keystrokesmod.event.PostUpdateEvent;
 import keystrokesmod.event.PreUpdateEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
@@ -24,13 +25,14 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.lwjgl.input.Mouse;
 
 public class AutoPlace extends Module {
-    private DescriptionSetting description;
-    private SliderSetting frameDelay;
-    private SliderSetting minPlaceDelay;
-    private ButtonSetting disableLeft;
-    private ButtonSetting holdRight;
-    private ButtonSetting fastPlaceJump;
-    private ButtonSetting pitchCheck;
+    private final SliderSetting frameDelay;
+    private final SliderSetting minPlaceDelay;
+    private final ButtonSetting disableLeft;
+    private final ButtonSetting holdRight;
+    private final ButtonSetting fastPlaceJump;
+    private final ButtonSetting pitchCheck;
+    private final ButtonSetting postPlace;
+
     private double fDelay = 0.0D;
     private long l = 0L;
     private int f = 0;
@@ -39,13 +41,14 @@ public class AutoPlace extends Module {
 
     public AutoPlace() {
         super("AutoPlace", category.world, 0);
-        this.registerSetting(description = new DescriptionSetting("Best with safewalk."));
+        this.registerSetting(new DescriptionSetting("Best with safewalk."));
         this.registerSetting(frameDelay = new SliderSetting("Frame delay", 8.0D, 0.0D, 30.0D, 1.0D));
-        this.registerSetting(minPlaceDelay = new SliderSetting("Min place delay", 60.0, 25.0, 500.0, 5.0));
+        this.registerSetting(minPlaceDelay = new SliderSetting("Min place delay", 60.0, 1.0, 500.0, 5.0));
         this.registerSetting(disableLeft = new ButtonSetting("Disable left", false));
         this.registerSetting(holdRight = new ButtonSetting("Hold right", true));
         this.registerSetting(fastPlaceJump = new ButtonSetting("Fast place on jump", true));
         this.registerSetting(pitchCheck = new ButtonSetting("Pitch check", false));
+        this.registerSetting(postPlace = new ButtonSetting("Post place", false, "Place block on PostUpdate event, to bypass Hypixel."));
     }
 
     public void guiUpdate() {
@@ -66,6 +69,17 @@ public class AutoPlace extends Module {
 
     @SubscribeEvent
     public void onPreUpdate(PreUpdateEvent event) {
+        if (!postPlace.isToggled())
+            action();
+    }
+
+    @SubscribeEvent
+    public void onPostUpdate(PostUpdateEvent event) {
+        if (postPlace.isToggled())
+            action();
+    }
+
+    private void action() {
         if (mc.currentScreen != null || mc.thePlayer.capabilities.isFlying) {
             return;
         }
@@ -131,7 +145,7 @@ public class AutoPlace extends Module {
             if (Reflection.rightClickDelayTimerField != null) {
                 Reflection.rightClickDelayTimerField.set(mc, i);
             }
-        } catch (IllegalAccessException | IndexOutOfBoundsException var3) {
+        } catch (IllegalAccessException | IndexOutOfBoundsException ignored) {
         }
     }
 
