@@ -6,7 +6,6 @@ import keystrokesmod.module.setting.Setting;
 import keystrokesmod.utility.i18n.I18nModule;
 import keystrokesmod.utility.i18n.settings.I18nButtonSetting;
 import keystrokesmod.utility.i18n.settings.I18nSetting;
-import keystrokesmod.utility.i18n.settings.I18nSliderSetting;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

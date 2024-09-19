@@ -17,7 +17,7 @@ public class PacketUtils {
     public static List<Packet<?>> skipReceiveEvent = new ArrayList<>();
 
     public static void sendPacketNoEvent(Packet<?> packet) {
-        if (packet == null || packet.getClass().getSimpleName().startsWith("S")) {
+        if (packet == null) {
             return;
         }
         skipSendEvent.add(packet);
@@ -25,7 +25,7 @@ public class PacketUtils {
     }
 
     public static void sendPacket(Packet<?> packet) {
-        if (packet == null || packet.getClass().getSimpleName().startsWith("S")) {
+        if (packet == null) {
             return;
         }
         Raven.mc.thePlayer.sendQueue.addToSendQueue(packet);

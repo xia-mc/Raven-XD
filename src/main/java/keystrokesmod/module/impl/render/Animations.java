@@ -64,7 +64,7 @@ public class Animations extends Module {
         ) {
             final S0BPacketAnimation packet = (S0BPacketAnimation) event.getPacket();
             if (packet.getAnimationType() == 1 && packet.getEntityID() == KillAura.target.getEntityId()) {
-                PacketUtils.receivePacketNoEvent(new S09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
+                mc.getItemRenderer().resetEquippedProgress();
             }
         }
     }

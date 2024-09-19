@@ -12,6 +12,7 @@ import keystrokesmod.utility.MoveUtil;
 import keystrokesmod.utility.Reflection;
 import keystrokesmod.utility.RotationUtils;
 import keystrokesmod.utility.Utils;
+import keystrokesmod.utility.movement.MoveCorrect;
 import net.minecraft.block.BlockAir;
 import net.minecraft.potion.Potion;
 import net.minecraft.util.BlockPos;
@@ -25,11 +26,12 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 public class HypixelTower extends SubMode<Tower> {
-    public static final HashSet<EnumFacing> LIMIT_FACING = new HashSet<>(Collections.singleton(EnumFacing.SOUTH));
-    public static final double STEP_MOVE = 0.3;
+    public static final Set<EnumFacing> LIMIT_FACING = new HashSet<>(Collections.singleton(EnumFacing.SOUTH));
+    public static final MoveCorrect moveCorrect = new MoveCorrect(0.3, MoveCorrect.Mode.POSITION);
     private boolean towering;
     private int towerTicks;
     private boolean blockPlaceRequest = false;
@@ -50,16 +52,11 @@ public class HypixelTower extends SubMode<Tower> {
         if (!MoveUtil.isMoving() && parent.canTower()) {
             if (onlyWhileMoving.isToggled()) return;
 
-            final double targetZPos = Math.floor(mc.thePlayer.posZ) + 0.99999999999998;
-            if (mc.thePlayer.posZ != targetZPos) {
+            if (!moveCorrect.isDoneZ()) {
                 if (mc.thePlayer.posY - lastOnGroundY < 1) return;
-                MoveUtil.stop();
-                if (targetZPos > mc.thePlayer.posZ) {
-                    mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY, Math.min(mc.thePlayer.posZ + STEP_MOVE, targetZPos));
-                } else {
-                    mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY, Math.max(mc.thePlayer.posZ - STEP_MOVE, targetZPos));
-                }
-                return;
+
+                if (!moveCorrect.moveZ(true))
+                    return;
             }
 
             blockPlaceRequest = true;
@@ -104,7 +101,6 @@ public class HypixelTower extends SubMode<Tower> {
         if (mc.thePlayer.onGround) {
             lastOnGroundY = (int) mc.thePlayer.posY;
             deltaPlace = new BlockPos(0, 1, 1);
-        } else {
         }
 
         if (blockPlaceRequest && !Utils.isMoving() && !onlyWhileMoving.isToggled()) {

@@ -404,10 +404,12 @@ public class RotationUtils {
 
     private static final Set<EnumFacing> FACINGS = new HashSet<>(Arrays.asList(EnumFacing.VALUES));
 
+    @Contract(pure = true)
     public static @NotNull Optional<Triple<BlockPos, EnumFacing, keystrokesmod.script.classes.Vec3>> getPlaceSide(@NotNull BlockPos blockPos) {
         return getPlaceSide(blockPos, FACINGS);
     }
 
+    @Contract(pure = true)
     public static @NotNull Optional<Triple<BlockPos, EnumFacing, keystrokesmod.script.classes.Vec3>> getPlaceSide(@NotNull BlockPos blockPos, Set<EnumFacing> limitFacing) {
         final List<BlockPos> possible = Arrays.asList(
                 blockPos.down(), blockPos.east(), blockPos.west(),

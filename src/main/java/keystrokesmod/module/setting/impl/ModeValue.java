@@ -6,7 +6,9 @@ import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.Setting;
 import keystrokesmod.module.setting.interfaces.InputSetting;
 import lombok.Getter;
+import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +23,11 @@ public class ModeValue extends Setting implements InputSetting {
     private final Module parent;
     private final List<SubMode<?>> subModes = new ArrayList<>();
     private int selected = 0;
+
+    @Getter
+    @Setter
+    private @Nullable Integer indexInSetting = null;
+
     public ModeValue(String settingName, Module parent) {
         this(settingName, parent, () -> true);
     }

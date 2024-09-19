@@ -72,7 +72,7 @@ public class InvMove extends Module {
                     MoveUtil.stop();
                     break;
                 case 4:
-                    break;
+                    return;
             }
 
 

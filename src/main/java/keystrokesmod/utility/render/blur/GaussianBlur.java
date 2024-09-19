@@ -40,6 +40,7 @@ public class GaussianBlur {
     }
 
     public static void startBlur(){
+        mc.mcProfiler.startSection("Pre-blur");
         mc.getFramebuffer().bindFramebuffer(false);
         checkSetupFBO(mc.getFramebuffer());
         glClear(GL_STENCIL_BUFFER_BIT);
@@ -48,9 +49,11 @@ public class GaussianBlur {
         glStencilFunc(GL_ALWAYS, 1, 1);
         glStencilOp(GL_REPLACE, GL_REPLACE, GL_REPLACE);
         glColorMask(false, false, false, false);
+        mc.mcProfiler.endSection();
     }
 
     public static void endBlur(@Range(from = 0, to = 64) int radius, float compression) {
+        mc.mcProfiler.startSection("Post-blur");
         StencilUtil.readStencilBuffer(1);
 
         framebuffer = RenderUtils.createFrameBuffer(framebuffer);
@@ -76,7 +79,7 @@ public class GaussianBlur {
         StencilUtil.uninitStencilBuffer();
         ColorUtils.resetColor();
         GlStateManager.bindTexture(0);
-
+        mc.mcProfiler.endSection();
     }
 
 }

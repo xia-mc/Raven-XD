@@ -1,7 +1,8 @@
 package keystrokesmod.utility.movement;
 
-import org.jetbrains.annotations.Range;
+import lombok.Getter;
 
+@Getter
 public enum Move {
     FORWARD(0, 0.98f, 0f),
     FORWARD_RIGHT(45, 0.98f, -0.98f),
@@ -68,15 +69,4 @@ public enum Move {
         return bestMove;
     }
 
-    public float getDeltaYaw() {
-        return deltaYaw;
-    }
-
-    public float getForward() {
-        return forward;
-    }
-
-    public float getStrafing() {
-        return strafing;
-    }
 }

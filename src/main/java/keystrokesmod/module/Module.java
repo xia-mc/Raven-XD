@@ -19,6 +19,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
+import scala.reflect.internal.util.WeakHashSet;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -31,6 +32,7 @@ public class Module {
 
     @Getter
     protected final ArrayList<Setting> settings;
+    private final WeakHashSet<Setting> settingsWeak;
     private final String moduleName;
     private String prettyName;
     private String prettyInfo = "";
@@ -63,6 +65,7 @@ public class Module {
         this.enabled = false;
         mc = Minecraft.getMinecraft();
         this.settings = new ArrayList<>();
+        this.settingsWeak = new WeakHashSet<>();
         if (!(this instanceof SubMode))
             Raven.moduleCounter++;
     }
@@ -208,13 +211,19 @@ public class Module {
 
     public void registerSetting(Setting setting) {
         synchronized (settings) {
-            if (settings.contains(setting))
+            if (settingsWeak.contains(setting))
                 throw new RuntimeException("Setting '" + setting.getName() + "' is already registered in module '" + this.getName() + "'!");
 
             setting.setParent(this);
             if (setting instanceof ModeValue) {
-                this.settings.add(0, setting);
+                final ModeValue set = (ModeValue) setting;
+
+                this.settingsWeak.add(set);
+                if (set.getIndexInSetting() == null)
+                    set.setIndexInSetting(this.settings.size());
+                this.settings.add(set.getIndexInSetting(), set);
             } else {
+                this.settingsWeak.add(setting);
                 this.settings.add(setting);
             }
         }
@@ -235,6 +244,7 @@ public class Module {
     public void unregisterSetting(@NotNull Setting setting) {
         synchronized (settings) {
             this.settings.remove(setting);
+            this.settingsWeak.remove(setting);
         }
     }
 
