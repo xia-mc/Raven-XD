@@ -393,7 +393,7 @@ public class Utils {
     public static boolean isHypixel() {
         return !mc.isSingleplayer() && mc.getCurrentServerData() != null
                 && mc.getCurrentServerData().serverIP.contains("hypixel.net");
-    }
+    } // I'm not sure how to handle it, such as Proxy IP.
 
     public static boolean isCraftiGames() {
         return !mc.isSingleplayer() && mc.getCurrentServerData() != null
@@ -1008,9 +1008,32 @@ public class Utils {
 
     public static boolean isLobby() {
         if (Utils.isHypixel()) {
-            return mc.theWorld.loadedEntityList.parallelStream()
-                    .filter(e -> e instanceof EntityWither)
-                    .anyMatch(Entity::isInvisible);
+            if (mc.theWorld == null) {
+                return true;
+            }
+
+            List<Entity> entities = mc.theWorld.getLoadedEntityList();
+            for (Entity entity : entities) {
+                if (entity != null && entity.getName().equals("§e§lCLICK TO PLAY")) {
+                    return true;
+                }
+            }
+
+            boolean hasNetherStar = false;
+            boolean hasCompass = false;
+            for (ItemStack stack : mc.thePlayer.inventory.mainInventory) {
+                if (stack != null) {
+                    if (stack.getItem() == Items.nether_star) {
+                        hasNetherStar = true;
+                    }
+                    if (stack.getItem() == Items.compass) {
+                        hasCompass = true;
+                    }
+                    if (hasNetherStar && hasCompass) {
+                        return true;
+                    }
+                }
+            }
         }
         return false;
     }
