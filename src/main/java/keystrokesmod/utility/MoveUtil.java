@@ -165,6 +165,15 @@ public class MoveUtil {
      * @return allowed horizontal distance in one tick
      */
     public static double getAllowedHorizontalDistance() {
+        return getAllowedHorizontalDistance(true);
+    }
+
+    /**
+     * Basically calculates allowed horizontal distance just like NCP does
+     *
+     * @return allowed horizontal distance in one tick
+     */
+    public static double getAllowedHorizontalDistance(boolean allowSprint) {
         double horizontalDistance;
         boolean useBaseModifiers = false;
 
@@ -187,7 +196,7 @@ public class MoveUtil {
         }
 
         if (useBaseModifiers) {
-            if (canSprint(false)) {
+            if (canSprint(false) && allowSprint) {
                 horizontalDistance *= MOD_SPRINTING;
             }
 

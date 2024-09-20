@@ -10,10 +10,8 @@ import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.Supplier;
 
 public class ModeValue extends Setting implements InputSetting {
@@ -27,6 +25,8 @@ public class ModeValue extends Setting implements InputSetting {
     @Getter
     @Setter
     private @Nullable Integer indexInSetting = null;
+
+    private final Queue<Setting> subSettings = new ConcurrentLinkedQueue<>();
 
     public ModeValue(String settingName, Module parent) {
         this(settingName, parent, () -> true);
@@ -46,6 +46,17 @@ public class ModeValue extends Setting implements InputSetting {
         this.parent = parent;
     }
 
+    @Override
+    public void setParent(@Nullable Module parent) {
+        super.setParent(parent);
+
+        // after register
+        for (Setting set : subSettings) {
+            this.parent.registerSetting(set);
+        }
+        subSettings.clear();
+    }
+
     public ModeValue add(final SubMode<?> subMode) {
         if (subMode == null)
             return this;
@@ -56,7 +67,7 @@ public class ModeValue extends Setting implements InputSetting {
             final Supplier<Boolean> fromVisibleCheck = setting.visibleCheck;
             setting.visibleCheck = () -> subModes.get((int) this.getInput()) == subMode && fromVisibleCheck.get();
             setting.viewOnly = true;
-            parent.registerSetting(setting);
+            subSettings.add(setting);
         }
         return this;
     }

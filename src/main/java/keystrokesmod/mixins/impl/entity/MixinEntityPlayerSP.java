@@ -8,6 +8,7 @@ import keystrokesmod.module.impl.movement.Sprint;
 import keystrokesmod.module.impl.movement.fly.FakeFly;
 import keystrokesmod.module.impl.other.RotationHandler;
 import keystrokesmod.utility.RotationUtils;
+import keystrokesmod.utility.movement.Direction;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.entity.AbstractClientPlayer;
@@ -27,7 +28,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import static keystrokesmod.event.PushOutOfBlockEvent.Direction.*;
+import static keystrokesmod.utility.movement.Direction.*;
 
 @Mixin(value = EntityPlayerSP.class, priority = 999)
 public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
@@ -398,7 +399,7 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
             double d1 = p_pushOutOfBlocks_5_ - (double) blockpos.getZ();
             int entHeight = Math.max((int) Math.ceil(this.height), 1);
             if (!this.raven_bS$isHeadspaceFree(blockpos, entHeight)) {
-                PushOutOfBlockEvent.Direction direction = null;
+                Direction direction = null;
                 double d2 = 9999.0;
                 if (this.raven_bS$isHeadspaceFree(blockpos.west(), entHeight) && d0 < d2) {
                     d2 = d0;

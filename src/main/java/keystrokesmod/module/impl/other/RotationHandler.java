@@ -33,7 +33,8 @@ public final class RotationHandler extends Module {
     private static @Nullable Float rotationPitch = null;
     @Getter
     private static float prevRotationPitch;
-    private boolean isSet = false;
+    @Getter
+    private static boolean isSet = false;
     private static MoveFix moveFix = MoveFix.None;
 
     private static final ModeSetting defaultMoveFix = new ModeSetting("Default MoveFix", new String[]{"None", "Silent", "Strict"}, 0);

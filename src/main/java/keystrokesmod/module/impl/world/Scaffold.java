@@ -51,7 +51,7 @@ public class Scaffold extends IAutoClicker {
     private final ModeValue clickMode;
     private final ButtonSetting alwaysPlaceIfPossible;
     private final SliderSetting aimSpeed;
-    private final SliderSetting motion;
+    public final SliderSetting motion;
     private final ModeValue rotation;
     private final ButtonSetting moveFix;
     public final SliderSetting strafe;
@@ -90,6 +90,7 @@ public class Scaffold extends IAutoClicker {
     private final ButtonSetting expand;
     private final SliderSetting expandDistance;
     private final ButtonSetting polar;
+    private final ButtonSetting postPlace;
 
     public @Nullable MovingObjectPosition rayCasted = null;
     public MovingObjectPosition placeBlock;
@@ -148,7 +149,8 @@ public class Scaffold extends IAutoClicker {
                 .add(new JumpSprint("JumpA", this))
                 .add(new JumpSprint("JumpB", this))
                 .add(new JumpSprint("JumpC", this))
-                .add(new SideSprint("Hypixel", this))
+                .add(new HypixelSprint("Hypixel", this))
+                .add(new HypixelJumpSprint("HypixelJump", this))
                 .add(new LegitSprint("Legit", this))
                 .add(new SneakSprint("Sneak", this))
                 .add(new OldIntaveSprint("OldIntave", this))
@@ -187,6 +189,7 @@ public class Scaffold extends IAutoClicker {
         this.registerSetting(expand = new ButtonSetting("Expand", false));
         this.registerSetting(expandDistance = new SliderSetting("Expand distance", 4.5, 0, 10, 0.1, expand::isToggled));
         this.registerSetting(polar = new ButtonSetting("Polar", false, expand::isToggled));
+        this.registerSetting(postPlace = new ButtonSetting("Post place", false, "Place on PostUpdate."));
     }
 
     public void onDisable() {
@@ -217,8 +220,8 @@ public class Scaffold extends IAutoClicker {
 
     public void onEnable() {
         clickMode.enable();
-        rotation.disable();
-        sprint.disable();
+        rotation.enable();
+        sprint.enable();
 
         lastSlot = -1;
         startPos = mc.thePlayer.posY;
@@ -351,7 +354,18 @@ public class Scaffold extends IAutoClicker {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
-    public void onPreUpdate(PreUpdateEvent e) { // place here
+    public void onPreUpdate(PreUpdateEvent event) {
+        if (!postPlace.isToggled())
+            action();
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    public void onPostUpdate(PostUpdateEvent event) {
+        if (postPlace.isToggled())
+            action();
+    }
+
+    private void action() { // place here
         if (mc.thePlayer.onGround) {
             offGroundTicks = 0;
             onGroundTicks++;
@@ -373,7 +387,7 @@ public class Scaffold extends IAutoClicker {
                 break;
         }
 
-        if ((rotation.getInput() != 4 && autoJump.isToggled()) && mc.thePlayer.onGround && MoveUtil.isMoving() && !Utils.jumpDown()) {
+        if ((rotation.getInput() != 5 && autoJump.isToggled()) && mc.thePlayer.onGround && MoveUtil.isMoving() && !Utils.jumpDown()) {
             mc.thePlayer.jump();
         }
 
@@ -492,7 +506,7 @@ public class Scaffold extends IAutoClicker {
                     final keystrokesmod.script.classes.Vec3 eyePos = Utils.getEyePos();
                     final BlockPos groundPos = new BlockPos(mc.thePlayer).down();
                     long expDist = Math.round(expandDistance.getInput());
-                    for (int j = 0; j < expDist; j++) {
+                    for (double j = 0; j < expDist; j += 0.1) {
                         targetPos = RotationUtils.getExtendedPos(groundPos, mc.thePlayer.rotationYaw, j);
 
                         if (sameY.isToggled() || hoverState != HoverState.DONE) {
@@ -728,7 +742,7 @@ public class Scaffold extends IAutoClicker {
 
     public boolean keepYPosition() {
         boolean sameYSca = sprint.getInput() == 4 || sprint.getInput() == 3 || sprint.getInput() == 5;
-        return this.isEnabled() && Utils.keysDown() && (sameYSca || (sameY.isToggled() && !Utils.jumpDown()) || hoverState != HoverState.DONE) && !Utils.jumpDown() && (!fastOnRMB.isToggled() || Mouse.isButtonDown(1));
+        return this.isEnabled() && Utils.keysDown() && (sameYSca || sameY.isToggled()) && !Utils.jumpDown() && (!fastOnRMB.isToggled() || Mouse.isButtonDown(1)) || hoverState != HoverState.DONE;
     }
 
     public boolean safewalk() {

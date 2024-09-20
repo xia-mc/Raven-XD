@@ -1,7 +1,9 @@
 package keystrokesmod.utility.movement;
 
+import keystrokesmod.utility.BlockUtils;
 import keystrokesmod.utility.MoveUtil;
 import lombok.Setter;
+import net.minecraft.util.MathHelper;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Range;
 
@@ -47,11 +49,11 @@ public class MoveCorrect {
         return mc.thePlayer.posZ == Math.floor(mc.thePlayer.posZ) + delta;
     }
 
-    public boolean moveX(@Range(from = 0, to = 1) double pos, boolean stopMotion) {
+    public boolean moveX(@Range(from = -1, to = 1) double pos, boolean stopMotion) {
         if (stopMotion)
-            MoveUtil.stop();
+            mc.thePlayer.motionX = 0;
 
-        final double targetPos = Math.floor(mc.thePlayer.posX) + pos;
+        final double targetPos = (pos > 0 ? MathHelper.floor_double(mc.thePlayer.posX) : Math.round(mc.thePlayer.posX)) + pos;
         if (mc.thePlayer.posX != targetPos) {
             if (targetPos > mc.thePlayer.posX) {
                 doMove(Math.min(mc.thePlayer.posX + moveStep, targetPos), mc.thePlayer.posZ);
@@ -62,11 +64,11 @@ public class MoveCorrect {
         return isDoneX(pos);
     }
 
-    public boolean moveZ(@Range(from = 0, to = 1) double pos, boolean stopMotion) {
+    public boolean moveZ(@Range(from = -1, to = 1) double pos, boolean stopMotion) {
         if (stopMotion)
-            MoveUtil.stop();
+            mc.thePlayer.motionZ = 0;
 
-        final double targetPos = Math.floor(mc.thePlayer.posZ) + pos;
+        final double targetPos = (pos > 0 ? MathHelper.floor_double(mc.thePlayer.posZ) : Math.round(mc.thePlayer.posZ)) + pos;
         if (mc.thePlayer.posZ != targetPos) {
             if (targetPos > mc.thePlayer.posZ) {
                 doMove(mc.thePlayer.posX, Math.min(mc.thePlayer.posZ + moveStep, targetPos));
@@ -86,6 +88,9 @@ public class MoveCorrect {
                     mc.thePlayer.motionZ = posZ - mc.thePlayer.posZ;
                 break;
             case POSITION:
+                if (BlockUtils.insideBlock(mc.thePlayer.getEntityBoundingBox().offset(posX - mc.thePlayer.posX, 0, posZ - mc.thePlayer.posZ))) {
+                    break;
+                }
                 mc.thePlayer.setPosition(posX, mc.thePlayer.posY, posZ);
                 break;
         }

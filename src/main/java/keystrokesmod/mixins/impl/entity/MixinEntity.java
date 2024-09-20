@@ -4,6 +4,7 @@ import keystrokesmod.event.PrePlayerInputEvent;
 import keystrokesmod.event.SafeWalkEvent;
 import keystrokesmod.event.StepEvent;
 import keystrokesmod.module.impl.other.RotationHandler;
+import keystrokesmod.utility.Utils;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.*;
@@ -29,9 +30,12 @@ public abstract class MixinEntity {
 
     @Redirect(method = "moveEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;isSneaking()Z"))
     public boolean onSafeWalk(@NotNull Entity instance) {
-        SafeWalkEvent event = new SafeWalkEvent(instance.isSneaking());
-        MinecraftForge.EVENT_BUS.post(event);
-        return event.isSafeWalk();
+        if (instance instanceof EntityPlayerSP) {
+            SafeWalkEvent event = new SafeWalkEvent(instance.isSneaking());
+            MinecraftForge.EVENT_BUS.post(event);
+            return event.isSafeWalk();
+        }
+        return instance.isSneaking();
     }
 
     @Inject(method = "moveEntity(DDD)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;setEntityBoundingBox(Lnet/minecraft/util/AxisAlignedBB;)V", ordinal = 8, shift = At.Shift.BY, by = 2))

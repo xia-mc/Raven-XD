@@ -94,7 +94,7 @@ public class AdvancedConfig {
     public static int noFallAAlertBuffer = 3;
 
     public static boolean aimCCheck = true;
-    public static int aimCAlertBuffer = 10;
+    public static int aimCAlertBuffer = 1;
     public static double aimCMinDeltaYaw = 25;
     public static double aimCMinDeltaPitch = 25;
 

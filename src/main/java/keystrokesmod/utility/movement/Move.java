@@ -1,28 +1,33 @@
 package keystrokesmod.utility.movement;
 
+import keystrokesmod.utility.RotationUtils;
 import lombok.Getter;
+import org.jetbrains.annotations.Contract;
 
 @Getter
 public enum Move {
-    FORWARD(0, 0.98f, 0f),
-    FORWARD_RIGHT(45, 0.98f, -0.98f),
-    RIGHT(90, 0f, -0.98f),
-    BACKWARD_RIGHT(135, -0.98f, -0.98f),
-    BACKWARD(180, -0.98f, 0f),
-    BACKWARD_LEFT(225, -0.98f, 0.98f),
-    LEFT(270, 0f, 0.98f),
-    FORWARD_LEFT(315, 0.98f, 0.98f);
+    FORWARD(0, 0.98f, 0f, Direction.POSITIVE_Z),
+    FORWARD_RIGHT(45, 0.98f, -0.98f, Direction.POSITIVE_Z),
+    RIGHT(90, 0f, -0.98f, Direction.NEGATIVE_X),
+    BACKWARD_RIGHT(135, -0.98f, -0.98f, Direction.NEGATIVE_X),
+    BACKWARD(180, -0.98f, 0f, Direction.NEGATIVE_Z),
+    BACKWARD_LEFT(225, -0.98f, 0.98f, Direction.NEGATIVE_Z),
+    LEFT(270, 0f, 0.98f, Direction.POSITIVE_X),
+    FORWARD_LEFT(315, 0.98f, 0.98f, Direction.POSITIVE_X);
 
     private final float deltaYaw;
     private final float forward;
     private final float strafing;
+    private final Direction direction;
 
-    Move(float deltaYaw, float forward, float strafing) {
+    Move(float deltaYaw, float forward, float strafing, Direction direction) {
         this.deltaYaw = deltaYaw;
         this.forward = forward;
         this.strafing = strafing;
+        this.direction = direction;
     }
 
+    @Contract(pure = true)
     public static Move fromMovement(float forward, float strafing) {
         if (forward > 0)
             if (strafing > 0)
@@ -52,7 +57,10 @@ public enum Move {
      * @param yaw >=0, <360.
      * @return 最接近的在实际视角的移动
      */
-    public static Move fromDeltaYaw(final float yaw) {
+    @Contract(pure = true)
+    public static Move fromDeltaYaw(float yaw) {
+        yaw = RotationUtils.normalize(yaw, 0, 360);
+
         Move bestMove = FORWARD;
         float bestDeltaYaw = Math.abs(yaw - bestMove.getDeltaYaw());
 
@@ -69,4 +77,25 @@ public enum Move {
         return bestMove;
     }
 
+    public Move reserve() {
+        switch (this) {
+            case FORWARD:
+                return BACKWARD;
+            case FORWARD_RIGHT:
+                return BACKWARD_LEFT;
+            case RIGHT:
+                return LEFT;
+            case BACKWARD_RIGHT:
+                return FORWARD_LEFT;
+            default:
+            case BACKWARD:
+                return FORWARD;
+            case BACKWARD_LEFT:
+                return FORWARD_RIGHT;
+            case LEFT:
+                return RIGHT;
+            case FORWARD_LEFT:
+                return BACKWARD_RIGHT;
+        }
+    }
 }

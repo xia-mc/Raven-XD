@@ -1,19 +1,23 @@
 package keystrokesmod.module.impl.world.scaffold.rotation;
 
 import keystrokesmod.event.RotationEvent;
+import keystrokesmod.event.ScaffoldPlaceEvent;
 import keystrokesmod.module.impl.world.Scaffold;
 import keystrokesmod.module.impl.world.scaffold.IScaffoldRotation;
+import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.utility.BlockUtils;
 import keystrokesmod.utility.MoveUtil;
 import keystrokesmod.utility.Utils;
 import keystrokesmod.utility.aim.RotationData;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
 public class TellyRotation extends IScaffoldRotation {
     private final SliderSetting straightTicks;
     private final SliderSetting diagonalTicks;
     private final SliderSetting jumpDownTicks;
+    private final ButtonSetting extraSnap;
 
     private boolean noPlace = false;
 
@@ -22,6 +26,7 @@ public class TellyRotation extends IScaffoldRotation {
         this.registerSetting(straightTicks = new SliderSetting("Straight ticks", 6, 1, 8, 1));
         this.registerSetting(diagonalTicks = new SliderSetting("Diagonal ticks", 4, 1, 8, 1));
         this.registerSetting(jumpDownTicks = new SliderSetting("Jump down ticks", 1, 1, 8, 1));
+        this.registerSetting(extraSnap = new ButtonSetting("Extra snap", false));
     }
 
     @Override
@@ -31,11 +36,17 @@ public class TellyRotation extends IScaffoldRotation {
 
     @Override
     public @NotNull RotationData onRotation(float placeYaw, float placePitch, boolean forceStrict, @NotNull RotationEvent event) {
-        if (noPlace) {
+        if (noPlace || (extraSnap.isToggled() && !parent.place)) {
             return new RotationData(event.getYaw(), event.getPitch());
         } else {
             return new RotationData(placeYaw, placePitch);
         }
+    }
+
+    @SubscribeEvent
+    public void onScaffoldPlace(ScaffoldPlaceEvent event) {
+        if (noPlace)
+            event.setCanceled(true);
     }
 
     @Override
@@ -45,7 +56,7 @@ public class TellyRotation extends IScaffoldRotation {
                 noPlace = true;
             else if (MoveUtil.isMoving() && !Utils.jumpDown())
                 mc.thePlayer.jump();
-        } else if (BlockUtils.insideBlock(mc.thePlayer.getEntityBoundingBox().offset(mc.thePlayer.motionX * 0.5, mc.thePlayer.motionY + 0.1, mc.thePlayer.motionZ * 0.5))) {
+        } else if (BlockUtils.insideBlock(mc.thePlayer.getEntityBoundingBox().offset(mc.thePlayer.motionX, mc.thePlayer.motionY + 0.1, mc.thePlayer.motionZ))) {
             noPlace = true;
         } else {
             if (Utils.jumpDown()) {
@@ -65,6 +76,6 @@ public class TellyRotation extends IScaffoldRotation {
             }
         }
 
-        return !noPlace;
+        return true;
     }
 }

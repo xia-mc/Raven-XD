@@ -260,11 +260,19 @@ public class RotationUtils {
     }
 
     public static float normalize(float yaw) {
+        return normalize(yaw, -180, 180);
+    }
+
+    /**
+     * normalize the yaw from min to max.
+     * @return min <= yaw < max
+     */
+    public static float normalize(float yaw, float min, float max) {
         yaw %= 360.0F;
-        if (yaw >= 180.0F) {
+        if (yaw >= max) {
             yaw -= 360.0F;
         }
-        if (yaw < -180.0F) {
+        if (yaw < min) {
             yaw += 360.0F;
         }
 
@@ -448,7 +456,7 @@ public class RotationUtils {
         return Optional.empty();
     }
 
-    public static BlockPos getExtendedPos(@NotNull BlockPos startPos, float yaw, int distance) {
+    public static BlockPos getExtendedPos(@NotNull BlockPos startPos, float yaw, double distance) {
         // Convert yaw to radians
         double radians = Math.toRadians(yaw);
 

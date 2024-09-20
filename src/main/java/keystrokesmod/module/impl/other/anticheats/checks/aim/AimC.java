@@ -12,9 +12,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * so this is what Raven Bs scaffold do.
- * <p>
- * "自相矛盾" said like this
  * @see Scaffold#getYaw()
  * @see Scaffold#onPreMotion(PreMotionEvent)
  */
@@ -34,6 +31,8 @@ public class AimC extends Check {
 
     @Override
     public void _onTick() {
+        if (player.fabricPlayer.ticksExisted < 20) return;
+
         float deltaYaw = player.currentRot.y - player.lastRot.y;
         float deltaPitch = player.currentRot.x - player.lastRot.x;
         if (equals(player.currentRot.y, player.lastRot.y)) return;

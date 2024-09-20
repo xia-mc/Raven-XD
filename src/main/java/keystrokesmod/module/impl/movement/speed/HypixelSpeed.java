@@ -13,9 +13,8 @@ public class HypixelSpeed extends SubMode<Speed> {
         super(name, parent);
         this.registerSetting(mode = new ModeValue("Hypixel mode", this)
                 .add(new GroundStrafeSpeed("GroundStrafe", this))
-                .add(new RiseWatchdogSpeed("Rise", this))
                 .add(new HypixelGroundSpeed("Ground", this))
-                .add(new HypixelLowHopSpeed("Disabler", this))
+                .add(new HypixelLowHopSpeed("LowHop", this))
         );
     }
 

@@ -214,18 +214,9 @@ public class Module {
             if (settingsWeak.contains(setting))
                 throw new RuntimeException("Setting '" + setting.getName() + "' is already registered in module '" + this.getName() + "'!");
 
+            this.settingsWeak.add(setting);
+            this.settings.add(setting);
             setting.setParent(this);
-            if (setting instanceof ModeValue) {
-                final ModeValue set = (ModeValue) setting;
-
-                this.settingsWeak.add(set);
-                if (set.getIndexInSetting() == null)
-                    set.setIndexInSetting(this.settings.size());
-                this.settings.add(set.getIndexInSetting(), set);
-            } else {
-                this.settingsWeak.add(setting);
-                this.settings.add(setting);
-            }
         }
     }
 

@@ -6,13 +6,12 @@ import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.MoveUtil;
 import keystrokesmod.utility.Utils;
+import keystrokesmod.utility.movement.MoveCorrect;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
 public class HypixelGroundSpeed extends SubMode<HypixelSpeed> {
     private final ButtonSetting fast;
-
-    private boolean timed = false;
 
     public HypixelGroundSpeed(String name, @NotNull HypixelSpeed parent) {
         super(name, parent);
@@ -23,22 +22,7 @@ public class HypixelGroundSpeed extends SubMode<HypixelSpeed> {
     public void onPrePlayerInput(PrePlayerInputEvent event) {
         if (!Utils.nullCheck() || parent.parent.noAction()) return;
         if (mc.thePlayer.onGround && MoveUtil.isMoving() && mc.currentScreen == null) {
-            if (!fast.isToggled()) {
-                Utils.getTimer().timerSpeed = (float) ((mc.thePlayer.ticksExisted % 2 == 0 ? 0.9095f : 1.11f) + (Math.random() - 0.5) / 1000.0);
-                timed = true;
-            }
-
-            event.setSpeed(MoveUtil.getAllowedHorizontalDistance() - (fast.isToggled() ? 0 : Math.random() / 100.0));
-        } else if (timed) {
-            Utils.resetTimer();
-            timed = false;
+            event.setSpeed(MoveUtil.getAllowedHorizontalDistance() * (fast.isToggled() ? (mc.thePlayer.ticksExisted % 3 == 0 ? 0.95 : 1.2) : 1));
         }
-    }
-
-    @Override
-    public void onDisable() {
-        if (timed)
-            Utils.resetTimer();
-        timed = false;
     }
 }

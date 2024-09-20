@@ -48,7 +48,7 @@ public class AutoPlace extends Module {
         this.registerSetting(holdRight = new ButtonSetting("Hold right", true));
         this.registerSetting(fastPlaceJump = new ButtonSetting("Fast place on jump", true));
         this.registerSetting(pitchCheck = new ButtonSetting("Pitch check", false));
-        this.registerSetting(postPlace = new ButtonSetting("Post place", false, "Place block on PostUpdate event, to bypass Hypixel."));
+        this.registerSetting(postPlace = new ButtonSetting("Post place", false, "Place block on PostUpdate event"));
     }
 
     public void guiUpdate() {

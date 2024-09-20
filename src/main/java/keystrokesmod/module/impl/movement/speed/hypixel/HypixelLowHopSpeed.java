@@ -1,49 +1,43 @@
 package keystrokesmod.module.impl.movement.speed.hypixel;
 
-import keystrokesmod.event.PrePlayerInputEvent;
 import keystrokesmod.module.impl.exploit.disabler.hypixel.HypixelMotionDisabler;
 import keystrokesmod.module.impl.movement.speed.HypixelSpeed;
+import keystrokesmod.module.impl.movement.speed.hypixel.lowhop.HypixelLowHop7TickSpeed;
+import keystrokesmod.module.impl.movement.speed.hypixel.lowhop.HypixelLowHop9TickSpeed;
+import keystrokesmod.module.impl.movement.speed.hypixel.lowhop.HypixelLowHopPredictSpeed;
 import keystrokesmod.module.setting.impl.*;
-import keystrokesmod.utility.MoveUtil;
-import keystrokesmod.utility.Utils;
-import net.minecraft.potion.Potion;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * Vulcan speed lol
  */
 public class HypixelLowHopSpeed extends SubMode<HypixelSpeed> {
-    private final ButtonSetting fast;
-    private final SliderSetting tick;
+    private final ModeValue mode;
+    private final ButtonSetting stopOnHurt;
 
     public HypixelLowHopSpeed(String name, @NotNull HypixelSpeed parent) {
         super(name, parent);
         this.registerSetting(new DescriptionSetting("Motion disabler only."));
-        this.registerSetting(fast = new ButtonSetting("Fast", false));
-        this.registerSetting(tick = new SliderSetting("Tick", 5, 1, 11, 1));
+        this.registerSetting(mode = new ModeValue("Mode", this)
+                .add(new HypixelLowHopPredictSpeed("Predict", this))
+                .add(new HypixelLowHop9TickSpeed("9Tick", this))
+                .add(new HypixelLowHop7TickSpeed("7Tick", this))
+        );
+        this.registerSetting(stopOnHurt = new ButtonSetting("Stop on hurt", true));
     }
 
-    @SubscribeEvent
-    public void onPrePlayerInput(PrePlayerInputEvent event) {
-        if (!MoveUtil.isMoving() || !HypixelMotionDisabler.isDisabled() || parent.parent.noAction()) return;
-        if (parent.parent.offGroundTicks == 0) {
-            if (!Utils.jumpDown()) {
-                if (fast.isToggled()) {
-                    mc.thePlayer.jump();
-                    if (mc.thePlayer.isPotionActive(Potion.moveSpeed)) {
-                        MoveUtil.strafe(0.6);
-                    } else {
-                        MoveUtil.strafe(0.485);
-                    }
-                } else {
-                    MoveUtil.strafe(MoveUtil.getAllowedHorizontalDistance() - Math.random() / 100f);
-                    mc.thePlayer.jump();
-                }
-            }
-        } else if (parent.parent.offGroundTicks == (int) tick.getInput()) {
-            mc.thePlayer.motionY = MoveUtil.predictedMotion(mc.thePlayer.motionY, 2);
-        }
+    @Override
+    public void onEnable() throws Throwable {
+        mode.enable();
     }
 
+    @Override
+    public void onDisable() throws Throwable {
+        mode.disable();
+    }
+
+    public boolean noLowHop() {
+        if (!HypixelMotionDisabler.isDisabled()) return true;
+        return stopOnHurt.isToggled() && mc.thePlayer.hurtTime > 0;
+    }
 }
