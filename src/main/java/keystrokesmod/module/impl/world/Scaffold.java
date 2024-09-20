@@ -150,7 +150,7 @@ public class Scaffold extends IAutoClicker {
                 .add(new JumpSprint("JumpB", this))
                 .add(new JumpSprint("JumpC", this))
                 .add(new HypixelSprint("Hypixel", this))
-                .add(new HypixelJumpSprint("HypixelJump", this))
+//                .add(new HypixelJumpSprint("HypixelJump", this))
                 .add(new LegitSprint("Legit", this))
                 .add(new SneakSprint("Sneak", this))
                 .add(new OldIntaveSprint("OldIntave", this))
