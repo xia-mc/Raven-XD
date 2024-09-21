@@ -19,14 +19,18 @@ public class HypixelSprint extends IScaffoldSprint {
 
     @SubscribeEvent
     public void onScaffold(ScaffoldPlaceEvent event) {
-        if (MoveUtil.isMoving() && !ModuleManager.tower.canTower()) {
+        if (isNormalScaffolding()) {
             mc.thePlayer.motionX *= slowDown.getInput();
             mc.thePlayer.motionZ *= slowDown.getInput();
         }
     }
 
+    private static boolean isNormalScaffolding() {
+        return MoveUtil.isMoving() && !ModuleManager.tower.canTower();
+    }
+
     @Override
     public boolean isSprint() {
-        return true;
+        return !Scaffold.isDiagonal();
     }
 }
