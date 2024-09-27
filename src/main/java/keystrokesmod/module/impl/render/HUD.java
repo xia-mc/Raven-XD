@@ -123,7 +123,7 @@ public class HUD extends Module {
                     RenderUtils.drawRect(n3 - 1, n - 1, n3 + width, n + Math.round(getFontRenderer().height() + 1), new Color(0, 0, 0, 100).getRGB());
                 }
                 if (sidebar.isToggled()) {
-                    RenderUtils.drawRect(alignRight.isToggled() ? n3 + width : n3 - 2, n - 1, alignRight.isToggled() ? n3 + width + 1 : n3 - 1, n + Math.round(getFontRenderer().height() + 1), new Color(255, 255, 255, 200).getRGB());
+                    RenderUtils.drawRect(alignRight.isToggled() ? n3 + width : n3 - 2, n - 1, alignRight.isToggled() ? n3 + width + 1 : n3 - 1, n + Math.round(getFontRenderer().height() + 1), e);
                 }
                 getFontRenderer().drawString(text, n3, n, e, dropShadow.isToggled());
                 n += Math.round(getFontRenderer().height() + 2);

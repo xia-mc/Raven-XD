@@ -44,7 +44,7 @@ public class InvManager extends Module {
     private final SliderSetting bowSlot = new SliderSetting("Bow slot", 4, 0, 9, 1, sort::isToggled);
     private final SliderSetting foodSlot = new SliderSetting("Food slot", 5, 0, 9, 1, sort::isToggled);
     private final SliderSetting throwableSlot = new SliderSetting("Throwable slot", 6, 0, 9, 1, sort::isToggled);
-    private final SliderSetting rodSlot = new SliderSetting("Rod slot", 8, 0, 9, 1, sort::isToggled);
+    private final SliderSetting rodSlot = new SliderSetting("Rod slot", 7, 0, 9, 1, sort::isToggled);
     private final ButtonSetting shuffle = new ButtonSetting("Shuffle", false, () -> armor.isToggled() || clean.isToggled() || sort.isToggled());
 
     private State state = State.NONE;
