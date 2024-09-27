@@ -28,7 +28,6 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityArmorStand;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
-import net.minecraft.item.ItemSword;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.client.*;
 import net.minecraft.network.play.server.S2FPacketSetSlot;
@@ -133,7 +132,7 @@ public class KillAura extends IAutoClicker {
                 .add(new RecordAutoClicker("Record", this, true, true))
                 .setDefaultValue("Normal")
         );
-        String[] autoBlockModes = new String[]{"Manual", "Vanilla", "Post", "Swap", "Interact A", "Interact B", "Fake", "Partial", "QuickMacro"};
+        String[] autoBlockModes = new String[]{"Manual", "Vanilla", "Post", "Swap", "Interact A", "Interact B", "Fake", "Partial", "QuickMacro", "Interact C"};
         this.registerSetting(autoBlockMode = new ModeSetting("Autoblock", autoBlockModes, 0));
         this.registerSetting(attackMode = new ModeSetting("Attack mode", new String[]{"Legit", "Packet"}, 1));
         this.registerSetting(new DescriptionSetting("Range"));
@@ -300,7 +299,7 @@ public class KillAura extends IAutoClicker {
             }
         }
         int input = (int) autoBlockMode.getInput();
-        if (block.get() && (input == 3 || input == 4 || input == 5 || input == 8) && Utils.holdingSword()) {
+        if (block.get() && (input == 3 || input == 4 || input == 5 || input == 8 || input == 9) && Utils.holdingSword()) {
             setBlockState(block.get(), false, false);
             if (ModuleManager.bedAura.stopAutoblock) {
                 resetBlinkState(false);
@@ -343,18 +342,18 @@ public class KillAura extends IAutoClicker {
                     }
                     break;
                 case 8:
-                    if (lag) {
-                        blinking = true;
-                        unBlock();
-                        lag = false;
-                    } else {
-                        attack(target);
-                        PacketUtils.sendPacket(new C0FPacketConfirmTransaction(Utils.randomizeInt(0, 2147483647), (short) Utils.randomizeInt(0, -32767), true));
-                        PacketUtils.sendPacket(new C0APacketAnimation());
-                        sendBlock();
-                        releasePackets();
-                        lag = true;
-                    }
+                    lag = false;
+                    releasePackets();
+                    attack(target);
+                    PacketUtils.sendPacket(new C0FPacketConfirmTransaction(Utils.randomizeInt(0, 2147483647), (short) Utils.randomizeInt(0, -32767), true));
+                    PacketUtils.sendPacket(new C0APacketAnimation());
+                    sendBlock();
+                    break;
+                case 9:
+                    attackAndInteract(target, autoBlockMode.getInput() == 5); // attack while blinked
+                    releasePackets();
+                    sendBlock(); // block after releasing unblock
+                    lag = false;
                     break;
             }
             return;

@@ -14,7 +14,7 @@ public class Criticals extends Module {
                 .add(new TimerCriticals("Timer", this))
                 .add(new JumpCriticals("Jump", this))
                 .add(new LagCriticals("Lag", this))
-                .add(new HypixelCriticals("Hypixel", this))
+                .add(new AirStuckCriticals("AirStuck", this))
         );
     }
 
