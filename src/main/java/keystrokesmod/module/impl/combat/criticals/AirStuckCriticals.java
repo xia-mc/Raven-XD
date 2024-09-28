@@ -50,12 +50,12 @@ public class AirStuckCriticals extends SubMode<Criticals> {
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onPreMotion(PreMotionEvent event) {
         if (mc.thePlayer.onGround) {
-            if (!Utils.jumpDown() && autoJump.isToggled())
+            if (!Utils.jumpDown() && autoJump.isToggled() && canActive(true))
                 mc.thePlayer.jump();
         }
 
         lastActive = active;
-        active = canActive();
+        active = canActive(false);
 
         if (active) {
             stuckTicks++;
@@ -72,10 +72,12 @@ public class AirStuckCriticals extends SubMode<Criticals> {
             disableTicks--;
     }
 
-    private boolean canActive() {
-        if (disableTicks > 0) return false;
-        if (mc.thePlayer.fallDistance <= 0) return false;
-        if (mc.thePlayer.onGround) return false;
+    private boolean canActive(boolean jump) {
+        if (!jump) {
+            if (disableTicks > 0) return false;
+            if (mc.thePlayer.fallDistance <= 0) return false;
+            if (mc.thePlayer.onGround) return false;
+        }
         if (limitStuckTime.isToggled()) {
             if (stuckTicks > maxStuckTime.getInput())
                 return false;
