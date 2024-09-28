@@ -994,6 +994,7 @@ public class Utils {
     public static boolean isTargetNearby(double dist) {
         return mc.theWorld.playerEntities.stream()
                 .filter(target -> target != mc.thePlayer)
+                .filter(target -> target instanceof EntityPlayer)
                 .anyMatch(target -> new keystrokesmod.script.classes.Vec3(target).distanceTo(mc.thePlayer) < dist);
     }
 

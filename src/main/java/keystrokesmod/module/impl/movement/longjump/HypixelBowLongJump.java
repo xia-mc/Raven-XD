@@ -99,7 +99,7 @@ public class HypixelBowLongJump extends SubMode<LongJump> {
                     mc.thePlayer.motionZ = cacheMotionZ;
                     synchronized (delayedPackets) {
                         for (S32PacketConfirmTransaction p : delayedPackets) {
-                            PacketUtils.receivePacketNoEvent(p);
+                            PacketUtils.receivePacket(p);
                         }
                         delayedPackets.clear();
                     }

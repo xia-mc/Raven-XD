@@ -31,7 +31,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
-public class ArmedAura extends IAutoClicker {
+public class RageBot extends IAutoClicker {
     private final ModeValue clickMode;
     private final ModeSetting mode;
     private final SliderSetting switchDelay;
@@ -66,8 +66,8 @@ public class ArmedAura extends IAutoClicker {
     private final Set<EntityLivingBase> switchedTarget = new HashSet<>();
     private long lastSwitched = -1;
 
-    public ArmedAura() {
-        super("ArmedAura", category.combat, "Auto-aim and fire like CS2 cheats");
+    public RageBot() {
+        super("RageBot", category.combat, "Auto-aim and fire like CS2 cheats");
         this.registerSetting(clickMode = new ModeValue("Click mode", this)
                 .add(new LowCPSAutoClicker("Normal", this, false, true))
                 .add(new NormalAutoClicker("NormalFast", this, false, true))
