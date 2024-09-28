@@ -50,14 +50,13 @@ public class InvMove extends Module {
 
     @SubscribeEvent
     public void onMoveInput(MoveInputEvent event) {
-        if (mode.getInput() == 3)
+        if (mode.getInput() == 3 && canInvMove())
             event.setJump(false);
     }
 
     @SubscribeEvent
     public void onPreUpdate(PreUpdateEvent event) {
-        if ((mc.currentScreen instanceof GuiContainer || (clickGui.isToggled() && mc.currentScreen instanceof ClickGui))
-                && nameCheck() && targetNearbyCheck() && !scaffold.isEnabled()) {
+        if (canInvMove()) {
             if (mc.currentScreen instanceof ClickGui && clickGui.isToggled()) {
                 doInvMove();
                 return;
@@ -99,6 +98,11 @@ public class InvMove extends Module {
                     break;
             }
         }
+    }
+
+    private boolean canInvMove() {
+        return (mc.currentScreen instanceof GuiContainer || (clickGui.isToggled() && mc.currentScreen instanceof ClickGui))
+                && nameCheck() && targetNearbyCheck() && !scaffold.isEnabled();
     }
 
     @SubscribeEvent

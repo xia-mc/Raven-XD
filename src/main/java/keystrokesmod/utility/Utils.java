@@ -1008,31 +1008,29 @@ public class Utils {
     }
 
     public static boolean isLobby() {
-        if (Utils.isHypixel()) {
-            if (mc.theWorld == null) {
+        if (mc.theWorld == null) {
+            return true;
+        }
+
+        List<Entity> entities = mc.theWorld.getLoadedEntityList();
+        for (Entity entity : entities) {
+            if (entity != null && entity.getName().equals("§e§lCLICK TO PLAY")) {
                 return true;
             }
+        }
 
-            List<Entity> entities = mc.theWorld.getLoadedEntityList();
-            for (Entity entity : entities) {
-                if (entity != null && entity.getName().equals("§e§lCLICK TO PLAY")) {
-                    return true;
+        boolean hasNetherStar = false;
+        boolean hasCompass = false;
+        for (ItemStack stack : mc.thePlayer.inventory.mainInventory) {
+            if (stack != null) {
+                if (stack.getItem() == Items.nether_star) {
+                    hasNetherStar = true;
                 }
-            }
-
-            boolean hasNetherStar = false;
-            boolean hasCompass = false;
-            for (ItemStack stack : mc.thePlayer.inventory.mainInventory) {
-                if (stack != null) {
-                    if (stack.getItem() == Items.nether_star) {
-                        hasNetherStar = true;
-                    }
-                    if (stack.getItem() == Items.compass) {
-                        hasCompass = true;
-                    }
-                    if (hasNetherStar && hasCompass) {
-                        return true;
-                    }
+                if (stack.getItem() == Items.compass) {
+                    hasCompass = true;
+                }
+                if (hasNetherStar && hasCompass) {
+                    return true;
                 }
             }
         }
