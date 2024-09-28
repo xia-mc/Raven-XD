@@ -24,6 +24,23 @@ Raven B4, but not only for Hypixel.
 ![Screenshot 2024-08-13 084510](https://github.com/user-attachments/assets/85637f18-9d6b-47d9-9dc2-cb8594aff585)
 </div>
 
+## How do I install this client?
+
+### Steps:
+
+1. **Download the latest .jar file from the releases**:
+   - Download from https://xia-mc/Raven-XD/releases
+   - This client requires Forge 1.8.9.
+
+2. **Put in mods folder of your .minecraft directory**:
+   - If you don't already have this, please install Forge 1.8.9 by clicking installer, and clicking skip after 5 seconds (https://files.minecraftforge.net/net/minecraftforge/forge/index_1.8.9.html).
+   - Once you've done that, open file explorer, and in the search bar type %Appdata%. Once you're there navigate to .minecraft, then finally the folder called "mods".
+   - After you're there, all you have to do is drag the file that you just downloaded there.
+
+3. **Launch Minecraft**:
+   - Once your on this step, you are pretty much done. When it's done loading, if you have done it properly, it should have a background with a train and the string "Raven XD" in big white letters.
+   - For more help, join the discord server and ask in #public-support.
+
 ## How do I build this client?
 
 ### Steps:
