@@ -50,7 +50,7 @@ public class InvMove extends Module {
 
     @SubscribeEvent
     public void onMoveInput(MoveInputEvent event) {
-        if (mode.getInput() == 3 && canInvMove())
+        if (mode.getInput() == 3 && canInvMove() && !(mc.currentScreen instanceof ClickGui))
             event.setJump(false);
     }
 
