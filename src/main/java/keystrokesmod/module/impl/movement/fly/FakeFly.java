@@ -1,6 +1,7 @@
 package keystrokesmod.module.impl.movement.fly;
 
 import keystrokesmod.event.ScaffoldPlaceEvent;
+import keystrokesmod.event.WorldChangeEvent;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.movement.Fly;
 import keystrokesmod.module.setting.impl.ButtonSetting;
@@ -28,10 +29,8 @@ public class FakeFly extends SubMode<Fly> {
 
         FMLCommonHandler.instance().bus().register(new Object() {
             @SubscribeEvent
-            public void onWorldChange(@NotNull EntityJoinWorldEvent event) {
-                if (event.entity == mc.thePlayer) {
-                    hiddenPos.clear();
-                }
+            public void onWorldChange(@NotNull WorldChangeEvent event) {
+                hiddenPos.clear();
             }
         });
     }

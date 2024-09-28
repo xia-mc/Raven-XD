@@ -47,7 +47,7 @@ public class HypixelBowLongJump extends SubMode<LongJump> {
 
     @SubscribeEvent
     public void onMoveInput(MoveInputEvent event) {
-        if (state != State.NONE) {
+        if (state == State.SELF_DAMAGE) {
             event.setCanceled(true);
         }
     }

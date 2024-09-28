@@ -1,6 +1,7 @@
 package keystrokesmod.module.impl.movement;
 
 import keystrokesmod.clickgui.ClickGui;
+import keystrokesmod.event.MoveInputEvent;
 import keystrokesmod.event.PreUpdateEvent;
 import keystrokesmod.event.SendPacketEvent;
 import keystrokesmod.module.Module;
@@ -45,6 +46,12 @@ public class InvMove extends Module {
         this.registerSetting(chestNameCheck = new ButtonSetting("Chest name check", true));
         this.registerSetting(targetNearbyCheck = new ButtonSetting("Target nearby check", true));
         this.registerSetting(clickGui = new ButtonSetting("Click gui", true));
+    }
+
+    @SubscribeEvent
+    public void onMoveInput(MoveInputEvent event) {
+        if (mode.getInput() == 3)
+            event.setJump(false);
     }
 
     @SubscribeEvent
