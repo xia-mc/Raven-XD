@@ -132,7 +132,7 @@ public class KillAura extends IAutoClicker {
                 .add(new RecordAutoClicker("Record", this, true, true))
                 .setDefaultValue("Normal")
         );
-        String[] autoBlockModes = new String[]{"Manual", "Vanilla", "Post", "Swap", "Interact A", "Interact B", "Fake", "Partial", "QuickMacro", "Interact C"};
+        String[] autoBlockModes = new String[]{"Manual", "Vanilla", "Post", "Swap", "Interact A", "Interact B", "Fake", "Partial", "QuickMacro"};
         this.registerSetting(autoBlockMode = new ModeSetting("Autoblock", autoBlockModes, 0));
         this.registerSetting(attackMode = new ModeSetting("Attack mode", new String[]{"Legit", "Packet"}, 1));
         this.registerSetting(new DescriptionSetting("Range"));
@@ -349,12 +349,6 @@ public class KillAura extends IAutoClicker {
                     PacketUtils.sendPacket(new C0APacketAnimation());
                     sendBlock();
                     break;
-                case 9:
-                    attackAndInteract(target, autoBlockMode.getInput() == 5); // attack while blinked
-                    releasePackets();
-                    sendBlock(); // block after releasing unblock
-                    lag = false;
-                    break;
             }
             return;
         }
@@ -469,7 +463,8 @@ public class KillAura extends IAutoClicker {
         switch ((int) rayCastMode.getInput()) {
             default:
             case 2:
-                noAim = !RotationUtils.isMouseOver(RotationHandler.getRotationYaw(), RotationHandler.getRotationPitch(), target, (float) attackRange.getInput());
+                MovingObjectPosition hitResult = RotationUtils.rayCastStrict(RotationHandler.getRotationYaw(), RotationHandler.getRotationPitch(), attackRange.getInput());
+                noAim = hitResult.typeOfHit != MovingObjectPosition.MovingObjectType.ENTITY || hitResult.entityHit != target;
             case 1:
                 if (noAim) break;
                 Object[] rayCasted = Reach.getEntity(attackRange.getInput(), -0.05, rotationMode.getInput() == 1 ? rotations : null);
