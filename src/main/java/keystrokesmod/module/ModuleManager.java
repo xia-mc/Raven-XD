@@ -103,7 +103,7 @@ public class ModuleManager {
     public static AutoRegister autoRegister;
     public static NoteBot noteBot;
     public static ViewPackets viewPackets;
-    public static ArmedAura armedAura;
+    public static RageBot rageBot;
     public static HitLog hitLog;
     public static LagRange lagRange;
     public static FakePotion fakePotion;
@@ -155,7 +155,7 @@ public class ModuleManager {
         this.addModule(hitSelect = new HitSelect());
         this.addModule(killAura = new KillAura());
         this.addModule(killAuraV2 = new KillAuraV2());
-        this.addModule(armedAura = new ArmedAura());
+        this.addModule(rageBot = new RageBot());
         this.addModule(lagRange = new LagRange());
         this.addModule(moreKB = new MoreKB());
         this.addModule(reach = new Reach());

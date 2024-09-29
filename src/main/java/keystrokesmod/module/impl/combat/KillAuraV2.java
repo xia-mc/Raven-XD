@@ -79,6 +79,7 @@ public class KillAuraV2 extends Module {
     public KillAuraV2() {
         super("KillAuraV2", category.experimental);
         this.registerSetting(mode, switchDelay, minCPS, maxCPS, rotationMode, moveFixMode, rotationSpeed, autoBlock, autoBlockMode, fixNoSlowFlag, preAimRange, attackRange, sortMode, ThroughWalls, RayCast, targetPlayer, targetAnimals, targetMobs, targetInvisible);
+        canBeEnabled = false;
     }
 
     @Override

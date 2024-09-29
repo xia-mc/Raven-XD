@@ -217,6 +217,7 @@ public class MoveUtil {
      *
      * @return player moving
      */
+    @Contract(pure = true)
     public static boolean isMoving() {
         return isMoving(mc.thePlayer);
     }
@@ -224,6 +225,11 @@ public class MoveUtil {
     @Contract(pure = true)
     public static boolean isMoving(@NotNull EntityLivingBase entity) {
         return entity.moveForward != 0 || entity.moveStrafing != 0;
+    }
+
+    @Contract(pure = true)
+    public static boolean isRealMoving() {
+        return mc.thePlayer.motionX != 0 || (mc.thePlayer.motionY != 0 && !mc.thePlayer.onGround) || mc.thePlayer.motionZ != 0;
     }
 
     public static void moveFlying(double increase) {

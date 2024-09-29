@@ -154,6 +154,8 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
         );
 
         net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(preMotionEvent);
+        if (preMotionEvent.isCanceled())
+            return;
 
         boolean flag = preMotionEvent.isSprinting();
         if (flag != this.serverSprintState) {

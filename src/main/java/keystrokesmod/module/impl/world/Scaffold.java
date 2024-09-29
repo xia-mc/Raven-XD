@@ -105,7 +105,7 @@ public class Scaffold extends IAutoClicker {
     private final Map<BlockPos, Timer> highlight = new HashMap<>();
     private boolean forceStrict;
     private boolean down;
-    private boolean delay;
+    public boolean delay;
     public boolean place;
     private int add = 0;
     private int sneak$bridged = 0;
@@ -149,13 +149,13 @@ public class Scaffold extends IAutoClicker {
                 .add(new JumpSprint("JumpA", this))
                 .add(new JumpSprint("JumpB", this))
                 .add(new JumpSprint("JumpC", this))
+                .add(new JumpDSprint("JumpD", this))
                 .add(new HypixelSprint("Hypixel", this))
-//                .add(new HypixelJumpSprint("HypixelJump", this))
                 .add(new LegitSprint("Legit", this))
                 .add(new SneakSprint("Sneak", this))
                 .add(new OldIntaveSprint("OldIntave", this))
         );
-        this.registerSetting(fast = new ButtonSetting("Fast", false, new ModeOnly(sprint, 3, 4, 5, 11)));
+        this.registerSetting(fast = new ButtonSetting("Fast", false, new ModeOnly(sprint, 3, 4, 5, 6)));
         this.registerSetting(precision = new ModeSetting("Precision", precisionModes, 4));
         this.registerSetting(cancelSprint = new ButtonSetting("Cancel sprint", false, new ModeOnly(sprint, 0).reserve()));
         this.registerSetting(legit = new ButtonSetting("Legit", false));
@@ -280,11 +280,13 @@ public class Scaffold extends IAutoClicker {
                 pitch = (float) diagonalPitch.getInput();
         }
 
-        float finalYaw = instant ? yaw : AimSimulator.rotMove(yaw, lastYaw, (float) aimSpeed.getInput());
-        float finalPitch = instant ? pitch : AimSimulator.rotMove(pitch, lastPitch, (float) aimSpeed.getInput());
+        final float finalYaw = instant ? yaw : AimSimulator.rotMove(yaw, lastYaw, (float) aimSpeed.getInput());
+        final float finalPitch = instant ? pitch : AimSimulator.rotMove(pitch, lastPitch, (float) aimSpeed.getInput());
 
-        event.setYaw(lastYaw = finalYaw);
-        event.setPitch(lastPitch = finalPitch);
+        final RotationData result = ((IScaffoldSprint) sprint.getSelected()).onFinalRotation(new RotationData(finalYaw, finalPitch));
+
+        event.setYaw(lastYaw = result.getYaw());
+        event.setPitch(lastPitch = result.getPitch());
         event.setMoveFix(moveFix.isToggled() ? RotationHandler.MoveFix.Silent : RotationHandler.MoveFix.None);
 
         if (clickMode.getInput() == 0)
@@ -422,7 +424,7 @@ public class Scaffold extends IAutoClicker {
             down = false;
             placedUp = false;
         }
-        if (keepYPosition() && (sprint.getInput() == 3 || sprint.getInput() == 4 || sprint.getInput() == 5 || sprint.getInput() == 12)) {
+        if (keepYPosition() && (sprint.getInput() == 3 || sprint.getInput() == 4 || sprint.getInput() == 5 || sprint.getInput() == 6 || sprint.getInput() == 12)) {
             if (mc.thePlayer.onGround) {
                 if (!Utils.jumpDown()) {
                     mc.thePlayer.jump();
@@ -451,8 +453,8 @@ public class Scaffold extends IAutoClicker {
                 original++;
                 add++;
             }
-        } else if (sprint.getInput() == 4 || sprint.getInput() == 5) {
-            if (groundDistance() > 0 && mc.thePlayer.posY >= Math.floor(mc.thePlayer.posY) && mc.thePlayer.fallDistance > 0 && ((!placedUp || isDiagonal()) || sprint.getInput() == 4)) {
+        } else if (sprint.getInput() == 4 || sprint.getInput() == 5 || sprint.getInput() == 6) {
+            if (groundDistance() > 0 && mc.thePlayer.posY >= Math.floor(mc.thePlayer.posY) && mc.thePlayer.fallDistance > 0 && ((!placedUp || isDiagonal()) || sprint.getInput() == 4 || sprint.getInput() == 6)) {
                 original++;
             }
         }
@@ -741,7 +743,7 @@ public class Scaffold extends IAutoClicker {
     }
 
     public boolean keepYPosition() {
-        boolean sameYSca = sprint.getInput() == 4 || sprint.getInput() == 3 || sprint.getInput() == 5;
+        boolean sameYSca = sprint.getInput() == 4 || sprint.getInput() == 3 || sprint.getInput() == 5 || sprint.getInput() == 6;
         return this.isEnabled() && Utils.keysDown() && (sameYSca || sameY.isToggled()) && !Utils.jumpDown() && (!fastOnRMB.isToggled() || Mouse.isButtonDown(1)) || hoverState != HoverState.DONE;
     }
 
@@ -757,7 +759,7 @@ public class Scaffold extends IAutoClicker {
         return value >= min && value <= max;
     }
 
-    private double getRandom() {
+    public double getRandom() {
         return Utils.randomizeInt(-90, 90) / 100.0;
     }
 

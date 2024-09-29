@@ -1,5 +1,7 @@
 package keystrokesmod.module.impl.world.scaffold.rotation;
 
+import keystrokesmod.event.JumpEvent;
+import keystrokesmod.event.PreUpdateEvent;
 import keystrokesmod.event.RotationEvent;
 import keystrokesmod.event.ScaffoldPlaceEvent;
 import keystrokesmod.module.impl.world.Scaffold;
@@ -10,6 +12,7 @@ import keystrokesmod.utility.BlockUtils;
 import keystrokesmod.utility.MoveUtil;
 import keystrokesmod.utility.Utils;
 import keystrokesmod.utility.aim.RotationData;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
@@ -49,8 +52,8 @@ public class TellyRotation extends IScaffoldRotation {
             event.setCanceled(true);
     }
 
-    @Override
-    public boolean onPreSchedulePlace() {
+    @SubscribeEvent(priority = EventPriority.LOW)
+    public boolean onPreUpdate(PreUpdateEvent event) {
         if (parent.offGroundTicks == 0) {
             if (parent.onGroundTicks == 0)
                 noPlace = true;
@@ -77,5 +80,11 @@ public class TellyRotation extends IScaffoldRotation {
         }
 
         return true;
+    }
+
+    @SubscribeEvent
+    public void onJump(JumpEvent event) {
+        if (parent.offGroundTicks == 0 && parent.onGroundTicks == 0)
+            event.setCanceled(true);
     }
 }

@@ -145,12 +145,14 @@ public class TimerRange extends Module {
             delayedPackets.clear();
         }
 
-        if (clearMotion.isToggled()) {
-            mc.thePlayer.motionX = mc.thePlayer.motionY = mc.thePlayer.motionZ = 0;
-        } else {
-            mc.thePlayer.motionX = motionX;
-            mc.thePlayer.motionY = motionY;
-            mc.thePlayer.motionZ = motionZ;
+        if (state != State.NONE) {
+            if (clearMotion.isToggled()) {
+                mc.thePlayer.motionX = mc.thePlayer.motionY = mc.thePlayer.motionZ = 0;
+            } else {
+                mc.thePlayer.motionX = motionX;
+                mc.thePlayer.motionY = motionY;
+                mc.thePlayer.motionZ = motionZ;
+            }
         }
     }
 

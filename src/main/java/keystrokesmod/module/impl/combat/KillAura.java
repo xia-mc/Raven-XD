@@ -28,7 +28,6 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityArmorStand;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
-import net.minecraft.item.ItemSword;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.client.*;
 import net.minecraft.network.play.server.S2FPacketSetSlot;
@@ -300,7 +299,7 @@ public class KillAura extends IAutoClicker {
             }
         }
         int input = (int) autoBlockMode.getInput();
-        if (block.get() && (input == 3 || input == 4 || input == 5 || input == 8) && Utils.holdingSword()) {
+        if (block.get() && (input == 3 || input == 4 || input == 5 || input == 8 || input == 9) && Utils.holdingSword()) {
             setBlockState(block.get(), false, false);
             if (ModuleManager.bedAura.stopAutoblock) {
                 resetBlinkState(false);
@@ -343,18 +342,12 @@ public class KillAura extends IAutoClicker {
                     }
                     break;
                 case 8:
-                    if (lag) {
-                        blinking = true;
-                        unBlock();
-                        lag = false;
-                    } else {
-                        attack(target);
-                        PacketUtils.sendPacket(new C0FPacketConfirmTransaction(Utils.randomizeInt(0, 2147483647), (short) Utils.randomizeInt(0, -32767), true));
-                        PacketUtils.sendPacket(new C0APacketAnimation());
-                        sendBlock();
-                        releasePackets();
-                        lag = true;
-                    }
+                    lag = false;
+                    releasePackets();
+                    attack(target);
+                    PacketUtils.sendPacket(new C0FPacketConfirmTransaction(Utils.randomizeInt(0, 2147483647), (short) Utils.randomizeInt(0, -32767), true));
+                    PacketUtils.sendPacket(new C0APacketAnimation());
+                    sendBlock();
                     break;
             }
             return;
@@ -470,11 +463,12 @@ public class KillAura extends IAutoClicker {
         switch ((int) rayCastMode.getInput()) {
             default:
             case 2:
-                noAim = !RotationUtils.isMouseOver(RotationHandler.getRotationYaw(), RotationHandler.getRotationPitch(), target, (float) attackRange.getInput());
+                MovingObjectPosition hitResult = RotationUtils.rayCastStrict(RotationHandler.getRotationYaw(), RotationHandler.getRotationPitch(), attackRange.getInput());
+                noAim = hitResult.typeOfHit != MovingObjectPosition.MovingObjectType.ENTITY || hitResult.entityHit != target;
             case 1:
                 if (noAim) break;
                 Object[] rayCasted = Reach.getEntity(attackRange.getInput(), -0.05, rotationMode.getInput() == 1 ? rotations : null);
-                noAim = rayCasted == null || rayCasted[0] != target;
+                noAim = rayCasted == null || Arrays.stream(rayCasted).noneMatch(o -> o == target);
                 break;
             case 0:
                 return false;

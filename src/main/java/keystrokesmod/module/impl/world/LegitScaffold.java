@@ -32,7 +32,7 @@ public class LegitScaffold extends Module {
 
     public LegitScaffold() {
         super("Legit scaffold", category.world);
-        this.registerSetting(minDelay, maxDelay, pitchCheck, pitch, onlySPressed, onlySneak, showBlockCount);
+        this.registerSetting(minDelay, maxDelay, straightEveryBlock, diagonalEveryBlock, pitchCheck, pitch, onlySPressed, onlySneak, showBlockCount);
     }
 
     @Override

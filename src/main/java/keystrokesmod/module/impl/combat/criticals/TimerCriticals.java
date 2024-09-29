@@ -21,7 +21,7 @@ public class TimerCriticals extends SubMode<Criticals> {
 
     public TimerCriticals(String name, @NotNull Criticals parent) {
         super(name, parent);
-        this.registerSetting(timer = new SliderSetting("Timer", 0.5, 0, 1, 0.1));
+        this.registerSetting(timer = new SliderSetting("Timer", 0.1, 0, 1, 0.1));
         this.registerSetting(maxTimerTime = new SliderSetting("Max timer time", 2000, 100, 3000, 100, "ms"));
         this.registerSetting(chance = new SliderSetting("Chance", 90, 0, 100, 1, "%"));
         this.registerSetting(stopOnHurt = new ButtonSetting("Stop on hurt", true));

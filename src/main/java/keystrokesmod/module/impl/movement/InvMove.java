@@ -1,6 +1,7 @@
 package keystrokesmod.module.impl.movement;
 
 import keystrokesmod.clickgui.ClickGui;
+import keystrokesmod.event.MoveInputEvent;
 import keystrokesmod.event.PreUpdateEvent;
 import keystrokesmod.event.SendPacketEvent;
 import keystrokesmod.module.Module;
@@ -48,9 +49,14 @@ public class InvMove extends Module {
     }
 
     @SubscribeEvent
+    public void onMoveInput(MoveInputEvent event) {
+        if (mode.getInput() == 3 && canInvMove() && !(mc.currentScreen instanceof ClickGui))
+            event.setJump(false);
+    }
+
+    @SubscribeEvent
     public void onPreUpdate(PreUpdateEvent event) {
-        if ((mc.currentScreen instanceof GuiContainer || (clickGui.isToggled() && mc.currentScreen instanceof ClickGui))
-                && nameCheck() && targetNearbyCheck() && !scaffold.isEnabled()) {
+        if (canInvMove()) {
             if (mc.currentScreen instanceof ClickGui && clickGui.isToggled()) {
                 doInvMove();
                 return;
@@ -92,6 +98,11 @@ public class InvMove extends Module {
                     break;
             }
         }
+    }
+
+    private boolean canInvMove() {
+        return (mc.currentScreen instanceof GuiContainer || (clickGui.isToggled() && mc.currentScreen instanceof ClickGui))
+                && nameCheck() && targetNearbyCheck() && !scaffold.isEnabled();
     }
 
     @SubscribeEvent
