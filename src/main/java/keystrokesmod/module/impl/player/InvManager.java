@@ -12,6 +12,7 @@ import keystrokesmod.utility.ContainerUtils;
 import keystrokesmod.utility.MoveUtil;
 import keystrokesmod.utility.PacketUtils;
 import keystrokesmod.utility.Utils;
+import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.IInventory;
@@ -83,13 +84,13 @@ public class InvManager extends Module {
     public void onUpdate() {
         switch ((int) mode.getInput()) {
             case 0:
-                invOpen = !(notWhileMoving.isToggled() && MoveUtil.isMoving());
+                invOpen = !(notWhileMoving.isToggled() && MoveUtil.isMoving()) && !(mc.currentScreen instanceof GuiChest);
                 break;
             case 1:
                 invOpen = mc.currentScreen instanceof GuiInventory;
                 break;
             case 2:
-                invOpen = true;
+                invOpen = !(mc.currentScreen instanceof GuiChest);
                 break;
         }
 
@@ -116,10 +117,11 @@ public class InvManager extends Module {
     @SubscribeEvent
     public void onPreMotion(PreMotionEvent event) {
         if (state != State.TASKING) return;
+        int antiFreeze = 100;
 
         armor:
-        while (armor.isToggled() && System.currentTimeMillis() >= nextTaskTime) {
-            final IInventory inventory = mc.thePlayer.inventory;
+        while (armor.isToggled() && System.currentTimeMillis() >= nextTaskTime && antiFreeze > 0) {
+            antiFreeze--;
 
             List<Integer> armorTypes = new ArrayList<>(ContainerUtils.ARMOR_TYPES);
 
@@ -145,7 +147,8 @@ public class InvManager extends Module {
         }
 
         clean:
-        while (clean.isToggled() && System.currentTimeMillis() >= nextTaskTime) {
+        while (clean.isToggled() && System.currentTimeMillis() >= nextTaskTime && antiFreeze > 0) {
+            antiFreeze--;
             final IInventory inventory = mc.thePlayer.inventory;
 
             final List<Pair<Integer, ItemStack>> slots = getDropSlots(inventory);
@@ -164,8 +167,10 @@ public class InvManager extends Module {
 
         // sort
         if (sort.isToggled()) {
+            if (antiFreeze <= 0) return;
             for (Runnable task : getSortTasks()) {
                 task.run();
+                antiFreeze--;
                 if (System.currentTimeMillis() < nextTaskTime) break;
             }
         }
