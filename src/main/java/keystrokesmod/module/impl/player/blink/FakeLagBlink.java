@@ -12,7 +12,8 @@ import keystrokesmod.utility.Utils;
 import keystrokesmod.utility.backtrack.TimedPacket;
 import keystrokesmod.utility.render.Animation;
 import keystrokesmod.utility.render.Easing;
-import keystrokesmod.utility.render.RenderUtils;
+import keystrokesmod.utility.render.progress.Progress;
+import keystrokesmod.utility.render.progress.ProgressManager;
 import net.minecraft.network.Packet;
 import net.minecraft.network.handshake.client.C00Handshake;
 import net.minecraft.network.login.client.C00PacketLoginStart;
@@ -45,6 +46,7 @@ public class FakeLagBlink extends SubMode<Blink> {
     private final Animation animationX = new Animation(Easing.EASE_OUT_CIRC, 200);
     private final Animation animationY = new Animation(Easing.EASE_OUT_CIRC, 200);
     private final Animation animationZ = new Animation(Easing.EASE_OUT_CIRC, 200);
+    private final Progress progress = new Progress("Blink");
 
     public FakeLagBlink(String name, @NotNull Blink parent) {
         super(name, parent);
@@ -64,6 +66,7 @@ public class FakeLagBlink extends SubMode<Blink> {
         animationZ.setValue(vec3.z());
         startTime = System.currentTimeMillis();
         blinkedTime = 0;
+        ProgressManager.add(progress);
     }
 
     @Override
@@ -73,6 +76,7 @@ public class FakeLagBlink extends SubMode<Blink> {
             stopTime = System.currentTimeMillis();
             needToDisable = true;
         }
+        ProgressManager.remove(progress);
     }
 
     @Override
@@ -92,14 +96,12 @@ public class FakeLagBlink extends SubMode<Blink> {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onRenderTick(TickEvent.RenderTickEvent ev) {
-        final double progress;
         if (needToDisable) {
-            progress = (blinkedTime / maxBlinkTime.getInput()) - Math.min((System.currentTimeMillis() - stopTime) / (maxBlinkTime.getInput() / releaseSpeed.getInput()), 1);
+            progress.setProgress((blinkedTime / maxBlinkTime.getInput()) - Math.min((System.currentTimeMillis() - stopTime) / (maxBlinkTime.getInput() / releaseSpeed.getInput()), 1));
         } else {
             blinkedTime = Math.min(System.currentTimeMillis() - startTime, (long) maxBlinkTime.getInput());
-            progress = blinkedTime / maxBlinkTime.getInput();
+            progress.setProgress(blinkedTime / maxBlinkTime.getInput());
         }
-        RenderUtils.drawProgressBar(progress, "Blink");
 
         if (!Utils.nullCheck()) {
             sendPacket(false);

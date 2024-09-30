@@ -3,7 +3,6 @@ package keystrokesmod.module.impl.combat;
 import keystrokesmod.event.*;
 import keystrokesmod.mixins.impl.network.S14PacketEntityAccessor;
 import keystrokesmod.module.Module;
-import keystrokesmod.module.impl.other.RotationHandler;
 import keystrokesmod.module.impl.other.SlotHandler;
 import keystrokesmod.module.impl.player.Blink;
 import keystrokesmod.module.setting.impl.ButtonSetting;
@@ -13,7 +12,8 @@ import keystrokesmod.utility.PacketUtils;
 import keystrokesmod.utility.Utils;
 import keystrokesmod.utility.render.Animation;
 import keystrokesmod.utility.render.Easing;
-import keystrokesmod.utility.render.RenderUtils;
+import keystrokesmod.utility.render.progress.Progress;
+import keystrokesmod.utility.render.progress.ProgressManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
@@ -46,11 +46,12 @@ public class AutoGapple extends Module {
     private int releaseLeft = 0;
     private int foodSlot;
 
-    private float yaw, pitch;
-    private final Animation progress = new Animation(Easing.EASE_OUT_CIRC, 500);
     private final Queue<Packet<?>> delayedSend = new ConcurrentLinkedQueue<>();
     private final Queue<Packet<INetHandlerPlayClient>> delayedReceive = new ConcurrentLinkedQueue<>();
     private final HashMap<Integer, RealPositionData> realPositions = new HashMap<>();
+
+    private final Animation animation = new Animation(Easing.EASE_OUT_CIRC, 500);
+    private final Progress progress = new Progress("AutoGapple");
 
     public AutoGapple() {
         super("AutoGapple", category.combat, "Made for QuickMacro.");
@@ -70,6 +71,7 @@ public class AutoGapple extends Module {
         releaseLeft = 0;
         release();
         realPositions.clear();
+        ProgressManager.remove(progress);
     }
 
     @SubscribeEvent
@@ -122,9 +124,9 @@ public class AutoGapple extends Module {
 
         foodSlot = eat();
         if (foodSlot != -1) {
-            progress.reset();
+            animation.reset();
             eatingTicksLeft = 36;
-            progress.setValue(eatingTicksLeft);
+            animation.setValue(eatingTicksLeft);
             if (airStuck.isToggled()) {
                 mc.theWorld.playerEntities.parallelStream()
                         .filter(p -> p != mc.thePlayer)
@@ -226,9 +228,6 @@ public class AutoGapple extends Module {
     public void onMove(PreMoveEvent event) {
         if (working && airStuck.isToggled()) {
             event.setCanceled(true);
-        } else {
-            yaw = RotationHandler.getRotationYaw();
-            pitch = RotationHandler.getRotationPitch();
         }
     }
 
@@ -244,22 +243,6 @@ public class AutoGapple extends Module {
         return slot;
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    public void onRotation(RotationEvent event) {
-        if (working && airStuck.isToggled()) {
-            event.setYaw(yaw);
-            event.setPitch(pitch);
-        }
-    }
-
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    public void onPreMotion(PreMotionEvent event) {
-        if (working && airStuck.isToggled()) {
-            event.setYaw(yaw);
-            event.setPitch(pitch);
-        }
-    }
-
     @SubscribeEvent
     public void onRender2D(TickEvent.RenderTickEvent event) {
         if (!Utils.nullCheck() || mc.thePlayer.isDead) {
@@ -270,9 +253,12 @@ public class AutoGapple extends Module {
             foodSlot = -1;
         }
 
+        animation.run(eatingTicksLeft);
         if (working && visual.isToggled()) {
-            progress.run(eatingTicksLeft);
-            RenderUtils.drawProgressBar((32 - progress.getValue()) / 32, "AutoGapple");
+            progress.setProgress((32 - animation.getValue()) / 32);
+            ProgressManager.add(progress);
+        } else {
+            ProgressManager.remove(progress);
         }
     }
 
