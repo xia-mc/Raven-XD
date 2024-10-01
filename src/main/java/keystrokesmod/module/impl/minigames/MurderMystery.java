@@ -63,7 +63,11 @@ public class MurderMystery extends Module {
             Items.boat,
             Items.speckled_melon,
             Items.book,
-            Item.getItemById(19)
+            Items.prismarine_shard,
+            Item.getItemById(19),
+            Item.getItemById(32),
+            Item.getItemById(175),
+            Item.getItemById(6),
     ));
 
     public MurderMystery() {
