@@ -64,7 +64,7 @@ public class MurderMystery extends Module {
             Items.boat,
             Items.speckled_melon,
             Items.book,
-            Item.getItemById(19);
+            Item.getItemById(19)
     ));
 
     public MurderMystery() {
