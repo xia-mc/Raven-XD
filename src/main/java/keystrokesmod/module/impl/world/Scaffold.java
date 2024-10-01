@@ -82,6 +82,7 @@ public class Scaffold extends IAutoClicker {
     public final ButtonSetting safeWalk;
     private final ButtonSetting showBlockCount;
     private final ButtonSetting delayOnJump;
+    private final ButtonSetting stopAtStart;
     private final ButtonSetting silentSwing;
     private final ButtonSetting noSwing;
     public final ButtonSetting tower;
@@ -118,6 +119,7 @@ public class Scaffold extends IAutoClicker {
     private boolean polar$waitingForExpand = false;
     private boolean jumpScaffold$fast$cycle = false;
     private HoverState hoverState = HoverState.DONE;
+    private boolean stopMoving = false;
 
     public Scaffold() {
         super("Scaffold", category.world);
@@ -181,6 +183,7 @@ public class Scaffold extends IAutoClicker {
         this.registerSetting(multiPlace = new ButtonSetting("Multi-place", false));
         this.registerSetting(safeWalk = new ButtonSetting("Safewalk", true));
         this.registerSetting(showBlockCount = new ButtonSetting("Show block count", true));
+        this.registerSetting(stopAtStart = new ButtonSetting("Stop at start", false));
         this.registerSetting(silentSwing = new ButtonSetting("Silent swing", false));
         this.registerSetting(noSwing = new ButtonSetting("No swing", false, silentSwing::isToggled));
         this.registerSetting(tower = new ButtonSetting("Tower", false));
@@ -233,6 +236,9 @@ public class Scaffold extends IAutoClicker {
         } else {
             hoverState = HoverState.DONE;
         }
+
+        if (stopAtStart.isToggled())
+            stopMoving = true;
     }
 
     @SubscribeEvent
@@ -324,7 +330,8 @@ public class Scaffold extends IAutoClicker {
 
     @SubscribeEvent
     public void onJump(JumpEvent e) {
-        delay = true;
+        if (delayOnJump.isToggled())
+            delay = true;
     }
 
     @SubscribeEvent
@@ -337,6 +344,11 @@ public class Scaffold extends IAutoClicker {
             } else {
                 event.setSneak(false);
             }
+        }
+
+        if (stopMoving) {
+            event.setCanceled(true);
+            stopMoving = false;
         }
     }
 
@@ -393,7 +405,7 @@ public class Scaffold extends IAutoClicker {
             mc.thePlayer.jump();
         }
 
-        if (delay && delayOnJump.isToggled()) {
+        if (delay) {
             delay = false;
             return;
         }
