@@ -47,15 +47,12 @@ public class MurderMystery extends Module {
             Items.golden_pickaxe,
             Items.apple,
             Items.name_tag,
-            Items.sponge,
             Items.carrot_on_a_stick,
             Items.bone,
             Items.carrot,
             Items.golden_carrot,
             Items.cookie,
             Items.diamond_axe,
-            Items.double_plant,
-            Items.prismarine,
             Items.cooked_beef,
             Items.netherbrick,
             Items.cooked_chicken,
@@ -67,7 +64,7 @@ public class MurderMystery extends Module {
             Items.boat,
             Items.speckled_melon,
             Items.book,
-            Items.sapling
+            Item.getItemById(19);
     ));
 
     public MurderMystery() {
