@@ -99,8 +99,6 @@ public class AutoGapple extends Module {
 
         if (releaseLeft > 0) {
             releaseLeft--;
-            working = false;
-            return;
         }
 
         if (!Utils.nullCheck() || mc.thePlayer.getHealth() >= minHealth.getInput() || (onlyWhileKillAura.isToggled() && KillAura.target == null)) {
@@ -121,6 +119,9 @@ public class AutoGapple extends Module {
             }
             return;
         }
+
+        if (releaseLeft > 0)
+            return;
 
         foodSlot = eat();
         if (foodSlot != -1) {
@@ -212,10 +213,9 @@ public class AutoGapple extends Module {
                 S12PacketEntityVelocity velo = (S12PacketEntityVelocity) p;
                 if (velo.getEntityID() == mc.thePlayer.getEntityId()) {
                     if (releaseTicksAfterVelocity.getInput() > 0) {
-                        working = false;
                         releaseLeft = (int) releaseTicksAfterVelocity.getInput();
-                        release();
                     }
+                    return;
                 }
             }
 
@@ -226,7 +226,7 @@ public class AutoGapple extends Module {
 
     @SubscribeEvent
     public void onMove(PreMoveEvent event) {
-        if (working && airStuck.isToggled()) {
+        if (working && airStuck.isToggled() && releaseLeft == 0) {
             event.setCanceled(true);
         }
     }

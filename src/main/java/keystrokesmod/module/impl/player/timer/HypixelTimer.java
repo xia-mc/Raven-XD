@@ -45,7 +45,7 @@ public class HypixelTimer extends SubMode<Timer> {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onPreMotion(PreMotionEvent event) {
         if (active) {
             event.setCanceled(true);

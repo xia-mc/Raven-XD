@@ -14,7 +14,7 @@ public class HypixelSprint extends IScaffoldSprint {
 
     public HypixelSprint(String name, @NotNull Scaffold parent) {
         super(name, parent);
-        this.registerSetting(slowDown = new SliderSetting("SlowDown", 0.5, 0, 0.8, 0.1));
+        this.registerSetting(slowDown = new SliderSetting("SlowDown", 0.8, 0.8, 1, 0.01));
     }
 
     @SubscribeEvent
