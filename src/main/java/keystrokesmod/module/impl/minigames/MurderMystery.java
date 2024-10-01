@@ -67,7 +67,7 @@ public class MurderMystery extends Module {
             Item.getItemById(19),
             Item.getItemById(32),
             Item.getItemById(175),
-            Item.getItemById(6),
+            Item.getItemById(6)
     ));
 
     public MurderMystery() {
