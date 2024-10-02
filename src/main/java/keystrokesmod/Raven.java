@@ -15,6 +15,7 @@ import keystrokesmod.utility.clicks.CPSCalculator;
 import keystrokesmod.utility.i18n.I18nManager;
 import keystrokesmod.utility.profile.Profile;
 import keystrokesmod.utility.profile.ProfileManager;
+import keystrokesmod.utility.render.progress.ProgressManager;
 import lombok.Getter;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.client.ClientCommandHandler;
@@ -47,6 +48,8 @@ public class Raven {
     public static ScriptManager scriptManager;
     public static Profile currentProfile;
     public static BadPacketsHandler badPacketsHandler;
+    public static ProgressManager progressManager;
+    @SuppressWarnings({"unused", "FieldMayBeFinal"})
     private boolean loaded = false;
 
     public static int moduleCounter;
@@ -66,6 +69,7 @@ public class Raven {
         FMLCommonHandler.instance().bus().register(new KeySrokeRenderer());
         FMLCommonHandler.instance().bus().register(new Ping());
         FMLCommonHandler.instance().bus().register(badPacketsHandler = new BadPacketsHandler());
+        FMLCommonHandler.instance().bus().register(progressManager = new ProgressManager());
         Reflection.getFields();
         Reflection.getMethods();
         moduleManager.register();

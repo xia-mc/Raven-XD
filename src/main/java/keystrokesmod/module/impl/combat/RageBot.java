@@ -77,7 +77,7 @@ public class RageBot extends IAutoClicker {
         this.registerSetting(mode = new ModeSetting("Mode", new String[]{"Single", "Switch"}, 0));
         this.registerSetting(switchDelay = new SliderSetting("Switch delay", 200, 50, 1000, 50, "ms", new ModeOnly(mode, 1)));
         this.registerSetting(sortMode = new ModeSetting("Sort mode", new String[]{"Distance", "Health", "Hurt time", "Yaw", "Hypixel Zombie"}, 0));
-        this.registerSetting(weaponMode = new ModeSetting("Weapon mode", new String[]{"Hypixel BedWars", "Hypixel Zombie", "CubeCraft"}, 0));
+        this.registerSetting(weaponMode = new ModeSetting("Weapon mode", new String[]{"Hypixel BedWars", "Hypixel Zombie", "CubeCraft", "CS:GO"}, 0));
         this.registerSetting(priorityHitBox = new ModeSetting("Priority hit box", Arrays.stream(HitLog.HitPos.values()).map(HitLog.HitPos::getEnglish).toArray(String[]::new), 0));
         this.registerSetting(range = new SliderSetting("Range", 50, 0, 100, 5));
         this.registerSetting(fov = new SliderSetting("FOV", 360, 40, 360, 5));
@@ -229,6 +229,9 @@ public class RageBot extends IAutoClicker {
             case 2:
                 arm = ArmedAuraUtils.getArmCubeCraft(ignoreSlots);
                 break;
+            case 3:
+                arm = ArmedAuraUtils.getArmCSGO(ignoreSlots);
+                break;
         }
 
         if (arm == -1 && !firedSlots.isEmpty()) {
@@ -299,6 +302,7 @@ public class RageBot extends IAutoClicker {
     @Override
     public void onDisable() {
         clickMode.disable();
+        Utils.sendClick(1, false);
     }
 
     @Override
@@ -309,13 +313,15 @@ public class RageBot extends IAutoClicker {
                 for (int i = 0; i < (int) rapidFireAmount.getInput(); i++) {
                     int bestArm = getBestArm();
                     SlotHandler.setCurrentSlot(bestArm);
-                    mc.playerController.sendUseItem(mc.thePlayer, mc.theWorld, SlotHandler.getHeldItem());
+                    Utils.sendClick(1, true);
                 }
             }
             if (target != null)
                 HitLog.onAttack(predTicks, target.first().first(), Utils.getEyePos(target.first().first()), new Vec3(mc.thePlayer), RotationHandler.getRotationYaw(), RotationHandler.getRotationPitch());
             targeted = false;
             return true;
+        } else {
+            Utils.sendClick(1, false);
         }
         return false;
     }

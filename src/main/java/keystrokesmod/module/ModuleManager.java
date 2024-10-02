@@ -128,6 +128,7 @@ public class ModuleManager {
     public static ViaVersionFix viaVersionFix;
     public static AutoGapple autoGapple;
     public static RemoteShop remoteShop;
+    public static Regen regen;
 
     public void register() {
 
@@ -312,6 +313,7 @@ public class ModuleManager {
         this.addModule(antiFalseFlag = new AntiFalseFlag());
         this.addModule(viaVersionFix = new ViaVersionFix());
         this.addModule(remoteShop = new RemoteShop());
+        this.addModule(regen = new Regen());
 
         // enable
         antiBot.enable();

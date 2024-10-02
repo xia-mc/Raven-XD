@@ -1,6 +1,7 @@
 package keystrokesmod.module.impl.other;
 
 import keystrokesmod.event.MoveInputEvent;
+import keystrokesmod.event.PreMotionEvent;
 import keystrokesmod.event.RotationEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.movement.TargetStrafe;
@@ -198,6 +199,7 @@ public final class RotationHandler extends Module {
             moveFix = null;
         }
     }
+
 
     public enum MoveFix {
         None,

@@ -88,4 +88,21 @@ public class ArmedAuraUtils {
     public static boolean isArmCubeCraft(Item item) {
         return item instanceof ItemFirework;
     }
+
+    public static int getArmCSGO(Set<Integer> ignoreSlots) {
+        for (int i = 0; i < 9; i++) {
+            ItemStack stack = mc.thePlayer.inventory.mainInventory[i];
+            if (stack != null && isArmCSGO(stack.getItem())) {
+                if (ignoreSlots.contains(i))
+                    continue;
+
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public static boolean isArmCSGO(Item item) {
+        return item instanceof ItemTool;
+    }
 }

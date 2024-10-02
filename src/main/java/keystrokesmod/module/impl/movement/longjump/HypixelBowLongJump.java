@@ -15,6 +15,8 @@ import keystrokesmod.utility.PacketUtils;
 import keystrokesmod.utility.Utils;
 import net.minecraft.item.ItemBow;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.Packet;
+import net.minecraft.network.play.INetHandlerPlayClient;
 import net.minecraft.network.play.server.S12PacketEntityVelocity;
 import net.minecraft.network.play.server.S32PacketConfirmTransaction;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -28,10 +30,7 @@ public class HypixelBowLongJump extends SubMode<LongJump> {
     private final ButtonSetting autoDisable;
 
     private State state = State.SELF_DAMAGE;
-    private double cacheMotionX;
-    private double cacheMotionY;
-    private double cacheMotionZ;
-    private final Queue<S32PacketConfirmTransaction> delayedPackets = new ConcurrentLinkedQueue<>();
+    private final Queue<Packet<INetHandlerPlayClient>> delayedPackets = new ConcurrentLinkedQueue<>();
 
     public HypixelBowLongJump(String name, @NotNull LongJump parent) {
         super(name, parent);
@@ -54,17 +53,14 @@ public class HypixelBowLongJump extends SubMode<LongJump> {
 
     @SubscribeEvent
     public void onReceivePacket(@NotNull ReceivePacketEvent event) {
-        if (event.getPacket() instanceof S12PacketEntityVelocity && state == State.SELF_DAMAGE) {
+        if (event.getPacket() instanceof S12PacketEntityVelocity && (state == State.SELF_DAMAGE || state == State.JUMP)) {
             S12PacketEntityVelocity packet = (S12PacketEntityVelocity) event.getPacket();
             if (packet.getEntityID() != mc.thePlayer.getEntityId()) return;
 
-            cacheMotionX = packet.getMotionX() / 8000.0;
-            cacheMotionY = packet.getMotionY() / 8000.0;
-            cacheMotionZ = packet.getMotionZ() / 8000.0;
-            event.setCanceled(true);
+            delayedPackets.add(event.getPacket());
             state = State.JUMP;
-        } else if (event.getPacket() instanceof S32PacketConfirmTransaction && state == State.JUMP) {
-            delayedPackets.add((S32PacketConfirmTransaction) event.getPacket());
+        } else if (event.getPacket() instanceof S32PacketConfirmTransaction && (state == State.SELF_DAMAGE || state == State.JUMP)) {
+            delayedPackets.add(event.getPacket());
         }
     }
 
@@ -94,11 +90,8 @@ public class HypixelBowLongJump extends SubMode<LongJump> {
                 break;
             case APPLY:
                 if (parent.offGroundTicks >= 7) {
-                    mc.thePlayer.motionX = cacheMotionX;
-                    mc.thePlayer.motionY = cacheMotionY;
-                    mc.thePlayer.motionZ = cacheMotionZ;
                     synchronized (delayedPackets) {
-                        for (S32PacketConfirmTransaction p : delayedPackets) {
+                        for (Packet<INetHandlerPlayClient> p : delayedPackets) {
                             PacketUtils.receivePacket(p);
                         }
                         delayedPackets.clear();

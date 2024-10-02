@@ -13,7 +13,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
 public class KillMessage extends Module {
-    public static final String[] BIPAS_MESSAGE = new String[]{
+    public static final String[] BIPAS_MESSAGE = {
             "Mit Icarus wäre das nicht passiert",
             "POV: Icarus",
             "Nova is 'THE BEST CLIENT 2024', trust, no auto ban",
