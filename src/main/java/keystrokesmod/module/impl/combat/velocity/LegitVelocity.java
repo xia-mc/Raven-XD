@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
 
 public class LegitVelocity extends SubMode<Velocity> {
     private final ButtonSetting jumpInInv;
-    private final ModeSetting jumpDelayMode;
+    private final ModeSetting jumpResetMode;
     private final SliderSetting minDelay;
     private final SliderSetting maxDelay;
     private final SliderSetting chance;
@@ -25,10 +25,10 @@ public class LegitVelocity extends SubMode<Velocity> {
     public LegitVelocity(String name, Velocity parent) {
         super(name, parent);
         this.registerSetting(jumpInInv = new ButtonSetting("Jump in inv", false));
-        this.registerSetting(jumpDelayMode = new ModeSetting("Jump delay mode", new String[]{"Delay", "Chance"}, 1));
-        this.registerSetting(minDelay = new SliderSetting("Min delay", 0, 0, 150, 1, "ms", new ModeOnly(jumpDelayMode, 0)));
-        this.registerSetting(maxDelay = new SliderSetting("Max delay", 0, 0, 150, 1, "ms", new ModeOnly(jumpDelayMode, 0)));
-        this.registerSetting(chance = new SliderSetting("Chance", 80, 0, 100, 1, "%", new ModeOnly(jumpDelayMode, 1)));
+        this.registerSetting(jumpResetMode = new ModeSetting("Jump reset mode", new String[]{"Jump Reset"}, 0));
+        this.registerSetting(minDelay = new SliderSetting("Min delay", 0, 0, 150, 1, "ms", new ModeOnly(jumpResetMode, 0)));
+        this.registerSetting(maxDelay = new SliderSetting("Max delay", 0, 0, 150, 1, "ms", new ModeOnly(jumpResetMode, 0)));
+        this.registerSetting(chance = new SliderSetting("Chance", 80, 0, 100, 1, "%", new ModeOnly(jumpResetMode, 0)));
         this.registerSetting(targetNearbyCheck = new ButtonSetting("Target nearby check", false));
         this.registerSetting(ignoreLiquid = new ButtonSetting("Ignore liquid", true));
     }
@@ -48,25 +48,22 @@ public class LegitVelocity extends SubMode<Velocity> {
             if (targetNearbyCheck.isToggled() && !Utils.isTargetNearby())
                 return;
 
-            switch ((int) jumpDelayMode.getInput()) {
-                case 0:
-                    long delay = (long) (Math.random() * (maxDelay.getInput() - minDelay.getInput()) + minDelay.getInput());
-                    if (maxDelay.getInput() == 0 || delay == 0) {
+            if (Math.random() * 100 >= chance.getInput()) {
+                // Chance is met, apply delay
+                long delay = (long) (Math.random() * (maxDelay.getInput() - minDelay.getInput()) + minDelay.getInput());
+                if (maxDelay.getInput() == 0 || delay == 0) {
+                    if (canJump())
+                        mc.thePlayer.jump();
+                } else {
+                    Raven.getExecutor().schedule(() -> {
                         if (canJump())
                             mc.thePlayer.jump();
-                    } else {
-                        Raven.getExecutor().schedule(() -> {
-                            if (canJump())
-                                mc.thePlayer.jump();
-                        }, delay, TimeUnit.MILLISECONDS);
-                    }
-                    break;
-                case 1:
-                    if (chance.getInput() == 100 || Math.random() * 100 >= chance.getInput()) {
-                        if (canJump())
-                            mc.thePlayer.jump();
-                    }
-                    break;
+                    }, delay, TimeUnit.MILLISECONDS);
+                }
+            } else {
+                // Chance is not met, do not apply delay
+                if (canJump())
+                    mc.thePlayer.jump();
             }
         }
     }
