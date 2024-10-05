@@ -106,8 +106,8 @@ public class RavenNewTargetHUD extends SubMode<TargetHUD> implements ITargetVisu
         }
 
         RenderUtils.drawRoundedGradientRect((float) current$minX + 6, (float) current$maxY - 9, displayHealthBar, (float) (current$maxY - 4), 4.0f,
-                Utils.merge(Theme.getGradients((int) theme.getInput())[0], 210), Utils.merge(Theme.getGradients((int) theme.getInput())[0], Math.min(255, 210)),
-                Utils.merge(Theme.getGradients((int) theme.getInput())[1], 210), Utils.merge(Theme.getGradients((int) theme.getInput())[1], Math.min(255, 210)));
+                Utils.merge(Theme.getGradients((int) theme.getInput())[0], Math.min(255, 210)), Utils.merge(Theme.getGradients((int) theme.getInput())[0], Math.min(255, 210)),
+                Utils.merge(Theme.getGradients((int) theme.getInput())[1], Math.min(255, 210)), Utils.merge(Theme.getGradients((int) theme.getInput())[1], Math.min(255, 210)));
         if (healthColor.isToggled()) {
             RenderUtils.drawRoundedRectangle((float) current$minX + 6, (float) current$maxY - 9, displayHealthBar, (float) (current$maxY - 4), 4.0f, healthTextColor);
         }
