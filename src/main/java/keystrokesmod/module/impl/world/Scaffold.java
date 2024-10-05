@@ -92,6 +92,7 @@ public class Scaffold extends IAutoClicker {
     private final SliderSetting expandDistance;
     private final ButtonSetting polar;
     private final ButtonSetting postPlace;
+    private final ButtonSetting lookView;
 
     public @Nullable MovingObjectPosition rayCasted = null;
     public MovingObjectPosition placeBlock;
@@ -193,6 +194,7 @@ public class Scaffold extends IAutoClicker {
         this.registerSetting(expandDistance = new SliderSetting("Expand distance", 4.5, 0, 10, 0.1, expand::isToggled));
         this.registerSetting(polar = new ButtonSetting("Polar", false, expand::isToggled));
         this.registerSetting(postPlace = new ButtonSetting("Post place", false, "Place on PostUpdate."));
+        this.registerSetting(lookView = new ButtonSetting("Look view", false));
     }
 
     public void onDisable() {
@@ -294,6 +296,11 @@ public class Scaffold extends IAutoClicker {
         event.setYaw(lastYaw = result.getYaw());
         event.setPitch(lastPitch = result.getPitch());
         event.setMoveFix(moveFix.isToggled() ? RotationHandler.MoveFix.Silent : RotationHandler.MoveFix.None);
+
+        if (lookView.isToggled()) {
+            mc.thePlayer.rotationYaw = event.getYaw();
+            mc.thePlayer.rotationPitch = event.getPitch();
+        }
 
         if (clickMode.getInput() == 0)
             place = true;

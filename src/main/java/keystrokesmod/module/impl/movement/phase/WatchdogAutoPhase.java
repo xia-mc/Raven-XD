@@ -4,6 +4,7 @@ import keystrokesmod.event.BlockAABBEvent;
 import keystrokesmod.event.PreUpdateEvent;
 import keystrokesmod.event.ReceivePacketEvent;
 import keystrokesmod.module.impl.movement.Phase;
+import keystrokesmod.module.impl.player.blink.NormalBlink;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.CoolDown;
 import net.minecraft.block.BlockGlass;
@@ -12,11 +13,10 @@ import net.minecraft.network.play.server.S02PacketChat;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
-import static keystrokesmod.module.ModuleManager.blink;
-
 public class WatchdogAutoPhase extends SubMode<Phase> {
     private boolean phase;
     private final CoolDown stopWatch = new CoolDown(4000);
+    private final NormalBlink blink = new NormalBlink("Blink", this);
 
     public WatchdogAutoPhase(String name, Phase parent) {
         super(name, parent);

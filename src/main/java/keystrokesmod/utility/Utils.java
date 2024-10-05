@@ -143,6 +143,10 @@ public class Utils {
         return num == Math.floor(num);
     }
 
+    public static boolean randomizeBoolean() {
+        return Math.random() >= 0.5;
+    }
+
     public static int randomizeInt(double min, double max) {
         return (int) randomizeDouble(min, max);
     }

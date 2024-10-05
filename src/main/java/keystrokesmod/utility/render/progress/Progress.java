@@ -12,6 +12,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.function.Supplier;
 
 import static keystrokesmod.Raven.mc;
@@ -24,6 +27,8 @@ public class Progress {
     private @Range(from = 0, to = 1) double progress = 0;
     @Setter
     private String text;
+
+    private final List<Runnable> preRender = new ArrayList<>();
 
     public Progress(int posY, @NotNull String text) {
         this.posY = posY;
@@ -43,7 +48,13 @@ public class Progress {
         setProgress(progress.get());
     }
 
+    public void registerPreRender(Runnable... actions) {
+        Collections.addAll(preRender, actions);
+    }
+
     public void render() {
+        preRender.forEach(Runnable::run);
+
         posYAnimation.run(posY);
 
         if (mc.currentScreen != null) return;

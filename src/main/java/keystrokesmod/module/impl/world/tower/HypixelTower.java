@@ -60,6 +60,7 @@ public class HypixelTower extends SubMode<Tower> {
             if (!moveCorrect.isDoneZ()) {
                 if (mc.thePlayer.posY - lastOnGroundY < 1) return;
 
+                MoveUtil.stop();
                 if (!moveCorrect.moveZ(true))
                     return;
             }
@@ -109,7 +110,7 @@ public class HypixelTower extends SubMode<Tower> {
         }
 
         if (blockPlaceRequest && !Utils.isMoving() && !onlyWhileMoving.isToggled()) {
-            if (verticalPlaced >= verticalBlocks.getInput()) {
+            if (verticalPlaced >= verticalBlocks.getInput() || mc.thePlayer.onGround) {
                 towering = false;
                 blockPlaceRequest = false;
                 verticalPlaced = 0;

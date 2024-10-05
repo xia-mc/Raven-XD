@@ -10,7 +10,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
 
-public class Spin extends SubMode<AntiAim> {
+public class SpinAntiAim extends SubMode<AntiAim> {
     private final SliderSetting speed = new SliderSetting("Speed", 25, -30, 30, 1);
     private final ButtonSetting constantPitch = new ButtonSetting("Constant pitch", true);
     private final SliderSetting pitch = new SliderSetting("Pitch", 90, -90, 90, 5, constantPitch::isToggled);
@@ -19,13 +19,18 @@ public class Spin extends SubMode<AntiAim> {
     private Float lastPitch = null;
     public boolean pitchReserve = false;
 
-    public Spin(String name, AntiAim parent) {
+    public SpinAntiAim(String name, AntiAim parent) {
         super(name, parent);
         this.registerSetting(speed, constantPitch, pitch);
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void onRotation(@NotNull RotationEvent event) {
+        if (!parent.canAntiAim()) {
+            onDisable();
+            return;
+        }
+
         if (lastYaw == null) {
             lastYaw = event.getYaw();
         }

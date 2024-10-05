@@ -9,12 +9,12 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
-public class Backward extends SubMode<AntiAim> {
+public class BackwardAntiAim extends SubMode<AntiAim> {
     private final SliderSetting pitch;
     private final ButtonSetting random;
     private final SliderSetting randomValue;
 
-    public Backward(String name, @NotNull AntiAim parent) {
+    public BackwardAntiAim(String name, @NotNull AntiAim parent) {
         super(name, parent);
         this.registerSetting(pitch = new SliderSetting("Pitch", 90, -90, 90, 5));
         this.registerSetting(random = new ButtonSetting("Random", false));
@@ -23,6 +23,10 @@ public class Backward extends SubMode<AntiAim> {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void onRotation(@NotNull RotationEvent event) {
+        if (!parent.canAntiAim()) {
+            return;
+        }
+
         float yaw = mc.thePlayer.rotationYaw + 180;
 
         if (random.isToggled()) {

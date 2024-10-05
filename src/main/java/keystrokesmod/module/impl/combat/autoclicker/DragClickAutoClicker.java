@@ -1,8 +1,10 @@
 package keystrokesmod.module.impl.combat.autoclicker;
 
+import keystrokesmod.event.PreMotionEvent;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.Utils;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.input.Mouse;
 
@@ -31,8 +33,8 @@ public class DragClickAutoClicker extends SubMode<IAutoClicker> {
         Utils.correctValue(minDelay, maxDelay);
     }
 
-    @Override
-    public void onUpdate() {
+    @SubscribeEvent
+    public void onPreMotion(PreMotionEvent event) {
         if (!always && left ? !Mouse.isButtonDown(0) : !Mouse.isButtonDown(1))
             return;
 

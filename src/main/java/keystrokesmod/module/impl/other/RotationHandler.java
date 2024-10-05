@@ -1,7 +1,6 @@
 package keystrokesmod.module.impl.other;
 
 import keystrokesmod.event.MoveInputEvent;
-import keystrokesmod.event.PreMotionEvent;
 import keystrokesmod.event.RotationEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.movement.TargetStrafe;
@@ -95,7 +94,7 @@ public final class RotationHandler extends Module {
 
     public static float getRotationYaw(float yaw) {
         if (rotationYaw != null)
-            return RotationUtils.normalize(rotationYaw);
+            return rotationYaw;
         return yaw;
     }
 

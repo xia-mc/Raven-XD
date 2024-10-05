@@ -492,8 +492,10 @@ public class KillAura extends IAutoClicker {
                 noAim = hitResult.typeOfHit != MovingObjectPosition.MovingObjectType.ENTITY || hitResult.entityHit != target;
             case 1:
                 if (noAim) break;
-                Object[] rayCasted = Reach.getEntity(attackRange.getInput(), -0.05, rotationMode.getInput() == 1 ? rotations : null);
-                noAim = rayCasted == null || Arrays.stream(rayCasted).noneMatch(o -> o == target);
+                noAim = RotationUtils.rayCast(
+                        Utils.getEyePos().distanceTo(RotationUtils.getNearestPoint(target.getEntityBoundingBox(), Utils.getEyePos())),
+                        rotations[0], rotations[1]
+                ) != null;
                 break;
             case 0:
                 return false;

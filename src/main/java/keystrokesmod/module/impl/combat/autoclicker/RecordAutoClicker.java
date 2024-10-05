@@ -1,7 +1,9 @@
 package keystrokesmod.module.impl.combat.autoclicker;
 
+import keystrokesmod.event.PreMotionEvent;
 import keystrokesmod.module.impl.other.RecordClick;
 import keystrokesmod.module.setting.impl.SubMode;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.input.Mouse;
 
@@ -15,8 +17,8 @@ public class RecordAutoClicker extends SubMode<IAutoClicker> {
         this.always = always;
     }
 
-    @Override
-    public void onUpdate() {
+    @SubscribeEvent
+    public void onPreMotion(PreMotionEvent event) {
         if (!always && left ? !Mouse.isButtonDown(0) : !Mouse.isButtonDown(1))
             return;
         if (System.currentTimeMillis() < RecordClick.getNextClickTime())

@@ -68,10 +68,8 @@ public class BlockIn extends Module {
             currentRot = null;
             return;
         }
-        if (!lookView.isToggled()) {
-            event.setYaw(currentRot.x);
-            event.setPitch(currentRot.y);
-        }
+        event.setYaw(currentRot.x);
+        event.setPitch(currentRot.y);
     }
 
     @SubscribeEvent
