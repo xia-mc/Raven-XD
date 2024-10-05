@@ -682,4 +682,7 @@ public class ScriptDefaults {
             setSlider(moduleName, name, value);
         }
     }
+
+    public static class reflection extends Reflection {
+    }
 }

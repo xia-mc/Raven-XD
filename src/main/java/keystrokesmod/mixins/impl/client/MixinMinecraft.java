@@ -10,13 +10,16 @@ import keystrokesmod.module.impl.combat.Reach;
 import keystrokesmod.module.impl.exploit.ExploitFixer;
 import keystrokesmod.module.impl.render.Animations;
 import keystrokesmod.module.impl.render.FreeLook;
+import keystrokesmod.module.impl.render.Watermark;
 import keystrokesmod.utility.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraftforge.common.MinecraftForge;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.lwjgl.opengl.Display;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -93,5 +96,10 @@ public abstract class MixinMinecraft {
             }
         } catch (Throwable ignored) {
         }
+    }
+
+    @Inject(method = "createDisplay", at = @At(value = "RETURN"))
+    private void onSetTitle(@NotNull CallbackInfo ci) {
+        Display.setTitle("Raven XD " + Watermark.VERSION);
     }
 }
