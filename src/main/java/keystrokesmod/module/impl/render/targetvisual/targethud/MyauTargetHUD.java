@@ -27,7 +27,7 @@ public class MyauTargetHUD extends SubMode<TargetHUD> implements ITargetVisual {
     private final ButtonSetting healthColor;
     private final ButtonSetting animation;
     private final ButtonSetting hurtRender;
-    private final Animation healthBarAnimation = new Animation(Easing.LINEAR, 300);
+    private final Animation healthBarAnimation = new Animation(Easing.LINEAR, 250);
     private EntityLivingBase lastTarget;
 
     public MyauTargetHUD(String name, @NotNull TargetHUD parent) {
