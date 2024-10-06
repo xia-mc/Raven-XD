@@ -294,8 +294,9 @@ public class Commands {
                 }
 
                 Module targetModule = null;
+                String moduleNameInput = args.get(1).toLowerCase();
                 for (Module module : Raven.getModuleManager().getModules()) {
-                    if (Objects.equals(module.getName(), args.get(1))) {
+                    if (module.getName().equalsIgnoreCase(moduleNameInput)) {
                         targetModule = module;
                         break;
                     }
@@ -305,7 +306,7 @@ public class Commands {
                     return;
                 }
 
-                int keyCode = Utils.getKeyCode(args.get(2));
+                int keyCode = Utils.getKeyCode(args.get(2).toUpperCase());
                 if (keyCode == Keyboard.KEY_NONE) {
                     print(ChatFormatting.RED + "Key '" + ChatFormatting.RESET + args.get(2) + ChatFormatting.RED + "' is invalid.", 1);
                     return;
