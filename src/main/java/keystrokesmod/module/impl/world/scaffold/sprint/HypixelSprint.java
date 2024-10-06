@@ -31,6 +31,6 @@ public class HypixelSprint extends IScaffoldSprint {
 
     @Override
     public boolean isSprint() {
-        return true;
+        return !Scaffold.isDiagonal() || ModuleManager.tower.canTower();
     }
 }

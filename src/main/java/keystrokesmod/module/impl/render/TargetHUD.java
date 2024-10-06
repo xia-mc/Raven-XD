@@ -36,6 +36,7 @@ public class TargetHUD extends Module {
                 .add(new WurstTargetHUD("Wurst", this))
                 .add(new TestTargetHUD("Test", this))
                 .add(new RavenNewTargetHUD("RavenNew", this))
+                .add(new MyauTargetHUD("Myau", this))
         );
         this.registerSetting(onlyKillAura = new ButtonSetting("Only killAura", true));
     }
