@@ -13,7 +13,6 @@ import keystrokesmod.module.impl.minigames.DuelsStats;
 import keystrokesmod.module.impl.other.FakeChat;
 import keystrokesmod.module.impl.other.KillMessage;
 import keystrokesmod.module.impl.other.NameHider;
-import keystrokesmod.module.impl.other.SilenceIRC;
 import keystrokesmod.module.impl.render.Watermark;
 import keystrokesmod.utility.font.IFont;
 import keystrokesmod.utility.profile.Profile;
@@ -25,7 +24,6 @@ import net.minecraft.network.play.client.C01PacketChatMessage;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
-import silencefix.SilenceFixIRC;
 
 import java.awt.*;
 import java.awt.datatransfer.*;
@@ -499,19 +497,6 @@ public class Commands {
                     }
                     print("&cInvalid profile.", 1);
                 }
-            } else if (firstArg.equals("silenceirc")) {
-                if (!hasArgs) {
-                    print(invSyn, 1);
-                    return;
-                }
-
-                if (args.size() != 2) {
-                    print(invSyn, 1);
-                    return;
-                }
-
-                SilenceIRC.qqId = args.get(1);
-                print("Set qqId to " + SilenceIRC.qqId, 1);
             } else if (!firstArg.equals("help") && !firstArg.equals("?")) {
                 if (firstArg.equals("shoutout")) {
                     print("&eCelebrities:", 1);
@@ -535,7 +520,6 @@ public class Commands {
                 print("9 panic", 0);
                 print("10 resetGUI", 0);
                 print("11 folder", 0);
-                print("12 silenceirc [qqId]", 0);
                 print("&eProfiles:", 0);
                 print("1 profiles", 0);
                 print("2 profiles save [profile]", 0);

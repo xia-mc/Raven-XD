@@ -1,5 +1,7 @@
 package keystrokesmod.utility.render;
 
+import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import keystrokesmod.clickgui.ClickGui;
 import keystrokesmod.mixins.impl.render.RenderManagerAccessor;
 import keystrokesmod.module.impl.render.Freecam;
@@ -7,8 +9,6 @@ import keystrokesmod.module.impl.render.HUD;
 import keystrokesmod.script.classes.Vec3;
 import keystrokesmod.utility.Theme;
 import keystrokesmod.utility.Utils;
-import keystrokesmod.utility.font.CenterMode;
-import keystrokesmod.utility.font.FontManager;
 import keystrokesmod.utility.font.IFont;
 import keystrokesmod.utility.render.shader.GaussianFilter;
 import keystrokesmod.utility.render.shader.impl.ShaderScissor;
@@ -31,7 +31,6 @@ import net.minecraft.util.Timer;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.annotations.Range;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 
@@ -39,18 +38,16 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 
+import static keystrokesmod.Raven.mc;
 import static org.lwjgl.opengl.GL11.*;
 
 public class RenderUtils {
     public static final int WHITE = new Color(255, 255, 255).getRGB();
-    private static Minecraft mc = Minecraft.getMinecraft();
     public static boolean ring_c = false;
     private static final float renderPartialTicks = 0.0f;
 
-    private static final Map<Integer, Integer> shadowCache = new HashMap<>(5);
+    private static final Int2IntOpenHashMap shadowCache = new Int2IntOpenHashMap(5);
 
     public static void renderBlock(BlockPos blockPos, int color, boolean outline, boolean shade) {
         renderBox(blockPos.getX(), blockPos.getY(), blockPos.getZ(), 1, 1, 1, color, outline, shade);
@@ -1086,9 +1083,9 @@ public class RenderUtils {
         y -= blurRadius - 0.5f;
 
         int identifier = Arrays.deepHashCode(new Object[]{width, height, blurRadius, roundRadius});
-        @Nullable Integer image = shadowCache.get(identifier);
+        int image = shadowCache.getOrDefault(identifier, -1);
 
-        if (image == null) {
+        if (image == -1) {
             if (width <= 0) width = 1;
             if (height <= 0) height = 1;
             BufferedImage original = new BufferedImage((int) width, (int) height, BufferedImage.TYPE_INT_ARGB_PRE);
