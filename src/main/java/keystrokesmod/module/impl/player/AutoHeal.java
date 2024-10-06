@@ -27,10 +27,10 @@ public class AutoHeal extends Module {
 
     public AutoHeal() {
         super("AutoHeal", category.player);
-        this.registerSetting(new DescriptionSetting("Helps you win by auto using healing items."));
+        this.registerSetting(new DescriptionSetting("Automatically uses healing items."));
         this.registerSetting(goldenHead = new ButtonSetting("Golden Head", false));
         this.registerSetting(soup = new ButtonSetting("Soup", false));
-        this.registerSetting(autoThrow = new ButtonSetting("Soup auto throw", false));
+        this.registerSetting(autoThrow = new ButtonSetting("Auto throw", false));
         this.registerSetting(minHealth = new SliderSetting("Min health", 10, 0, 20, 1));
         this.registerSetting(healDelay = new SliderSetting("Heal delay", 500, 0, 1500, 1));
         this.registerSetting(startDelay = new SliderSetting("Start delay", 0, 0, 300, 1));
@@ -69,8 +69,9 @@ public class AutoHeal extends Module {
                 mc.playerController.sendUseItem(mc.thePlayer, mc.theWorld, stack);
                 lastDoneUse = System.currentTimeMillis();
             } else {
-                if (autoThrow.isToggled()) {
-                    mc.playerController.sendPacketDropItem(stack);
+                if (autoThrow.isToggled() && stack.getItem() instanceof ItemSoup) {
+                    // Drop the entire soup stack
+                    mc.thePlayer.dropOneItem(true);
                 }
 
                 if (originalSlot != -1) {
