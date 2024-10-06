@@ -85,9 +85,9 @@ public class MyauTargetHUD extends SubMode<TargetHUD> implements ITargetVisual {
 
         RenderUtils.drawRect(n13, n15, n14, n15 + 4, Utils.merge(Color.black.getRGB(), n11));
 
-        float healthBar = (float) (int) (n14 + (n13 - n14) * (1.0 - ((health < 0.05)? 0.05 : health)));
-        if (healthBar - n13 < 3) {
-            healthBar = n13 + 3;
+        float healthBar = (float) (int) (n14 + (n13 - n14) * (1.0 - ((health < 0.01)? 0 : health)));
+        if (healthBar - n13 < 1) {
+            healthBar = n13;
         }
 
         if (target != lastTarget) {
