@@ -53,6 +53,7 @@ public class CheckManager {
         normal.put(ScaffoldA.class, new ScaffoldA(player));
         normal.put(ScaffoldB.class, new ScaffoldB(player));
         normal.put(NoFallA.class, new NoFallA(player));
+        normal.put(AutoClickerA.class, new AutoClickerA(player));
 
         return new CheckManager(pre, normal, post, player);
     }
