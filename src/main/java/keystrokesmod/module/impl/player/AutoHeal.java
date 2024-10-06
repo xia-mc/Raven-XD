@@ -4,9 +4,7 @@ import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.other.SlotHandler;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.DescriptionSetting;
-import keystrokesmod.module.setting.impl.ModeSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
-import keystrokesmod.module.setting.utils.ModeOnly;
 import keystrokesmod.utility.ContainerUtils;
 import keystrokesmod.utility.Utils;
 import net.minecraft.item.ItemSkull;
@@ -16,20 +14,23 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 public class AutoHeal extends Module {
-    private final ModeSetting item;
     private final ButtonSetting autoThrow;
     private final SliderSetting minHealth;
     private final SliderSetting healDelay;
     private final SliderSetting startDelay;
+    private final ButtonSetting goldenHead;
+    private final ButtonSetting soup;
     private long lastHeal = -1;
     private long lastSwitchTo = -1;
     private long lastDoneUse = -1;
     private int originalSlot = -1;
+
     public AutoHeal() {
         super("AutoHeal", category.player);
-        this.registerSetting(new DescriptionSetting("help you win by auto use healing item."));
-        this.registerSetting(item = new ModeSetting("Item", new String[]{"Golden head", "Soup"}, 0));
-        this.registerSetting(autoThrow = new ButtonSetting("Auto throw", false, new ModeOnly(item, 1)));
+        this.registerSetting(new DescriptionSetting("Helps you win by auto using healing items."));
+        this.registerSetting(goldenHead = new ButtonSetting("Golden Head", false));
+        this.registerSetting(soup = new ButtonSetting("Soup", false));
+        this.registerSetting(autoThrow = new ButtonSetting("Soup auto throw", false));
         this.registerSetting(minHealth = new SliderSetting("Min health", 10, 0, 20, 1));
         this.registerSetting(healDelay = new SliderSetting("Heal delay", 500, 0, 1500, 1));
         this.registerSetting(startDelay = new SliderSetting("Start delay", 0, 0, 300, 1));
@@ -42,15 +43,13 @@ public class AutoHeal extends Module {
 
         if (mc.thePlayer.getHealth() <= minHealth.getInput()) {
             if (lastSwitchTo == -1) {
-                int toSlot;
-                switch ((int) item.getInput()) {
-                    default:
-                    case 0:
-                        toSlot = ContainerUtils.getSlot(ItemSkull.class);
-                        break;
-                    case 1:
-                        toSlot = ContainerUtils.getSlot(ItemSoup.class);
-                        break;
+                int toSlot = -1;
+
+                if (goldenHead.isToggled()) {
+                    toSlot = ContainerUtils.getSlot(ItemSkull.class);
+                }
+                if (toSlot == -1 && soup.isToggled()) {
+                    toSlot = ContainerUtils.getSlot(ItemSoup.class);
                 }
 
                 if (toSlot == -1) return;
@@ -70,7 +69,7 @@ public class AutoHeal extends Module {
                 mc.playerController.sendUseItem(mc.thePlayer, mc.theWorld, stack);
                 lastDoneUse = System.currentTimeMillis();
             } else {
-                if (item.getInput() == 1 && autoThrow.isToggled()) {
+                if (autoThrow.isToggled()) {
                     mc.playerController.sendPacketDropItem(stack);
                 }
 
@@ -82,6 +81,10 @@ public class AutoHeal extends Module {
                 lastSwitchTo = -1;
                 lastDoneUse = -1;
                 lastHeal = System.currentTimeMillis();
+
+                if (mc.thePlayer.getHealth() <= minHealth.getInput()) {
+                    lastSwitchTo = -1;
+                }
             }
         }
     }
