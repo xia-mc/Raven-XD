@@ -122,7 +122,6 @@ public class ModuleManager {
 //    public static AbilitiesBedWars abilitiesBedWars;
     public static ClientTheme clientTheme;
     public static AutoChest autoChest;
-    public static SilenceIRC silenceIRC;
     public static Teleport teleport;
     public static AntiFalseFlag antiFalseFlag;
     public static ViaVersionFix viaVersionFix;
@@ -225,7 +224,6 @@ public class ModuleManager {
         this.addModule(autoRegister = new AutoRegister());
         this.addModule(viewPackets = new ViewPackets());
         this.addModule(new FlagDetector());
-        this.addModule(silenceIRC = new SilenceIRC());
 
         // player
         this.addModule(new AntiAFK());

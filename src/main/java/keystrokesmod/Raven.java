@@ -19,7 +19,7 @@ import keystrokesmod.utility.render.progress.ProgressManager;
 import lombok.Getter;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.client.ClientCommandHandler;
-import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -63,13 +63,13 @@ public class Raven {
     public void init(FMLInitializationEvent ignored) {
         Runtime.getRuntime().addShutdownHook(new Thread(ex::shutdown));
         ClientCommandHandler.instance.registerCommand(new keystrokeCommand());
-        FMLCommonHandler.instance().bus().register(this);
-        FMLCommonHandler.instance().bus().register(new DebugInfoRenderer());
-        FMLCommonHandler.instance().bus().register(new CPSCalculator());
-        FMLCommonHandler.instance().bus().register(new KeySrokeRenderer());
-        FMLCommonHandler.instance().bus().register(new Ping());
-        FMLCommonHandler.instance().bus().register(badPacketsHandler = new BadPacketsHandler());
-        FMLCommonHandler.instance().bus().register(progressManager = new ProgressManager());
+        MinecraftForge.EVENT_BUS.register(this);
+        MinecraftForge.EVENT_BUS.register(new DebugInfoRenderer());
+        MinecraftForge.EVENT_BUS.register(new CPSCalculator());
+        MinecraftForge.EVENT_BUS.register(new KeySrokeRenderer());
+        MinecraftForge.EVENT_BUS.register(new Ping());
+        MinecraftForge.EVENT_BUS.register(badPacketsHandler = new BadPacketsHandler());
+        MinecraftForge.EVENT_BUS.register(progressManager = new ProgressManager());
         Reflection.getFields();
         Reflection.getMethods();
         moduleManager.register();
@@ -82,10 +82,10 @@ public class Raven {
         Reflection.setKeyBindings();
         scriptManager.loadScripts();
         scriptManager.loadScripts();
-        FMLCommonHandler.instance().bus().register(ModuleManager.tower);
-        FMLCommonHandler.instance().bus().register(ModuleManager.rotationHandler);
-        FMLCommonHandler.instance().bus().register(ModuleManager.slotHandler);
-        FMLCommonHandler.instance().bus().register(ModuleManager.dynamicManager);
+        MinecraftForge.EVENT_BUS.register(ModuleManager.tower);
+        MinecraftForge.EVENT_BUS.register(ModuleManager.rotationHandler);
+        MinecraftForge.EVENT_BUS.register(ModuleManager.slotHandler);
+        MinecraftForge.EVENT_BUS.register(ModuleManager.dynamicManager);
 
         I18nManager.init();
         AutoUpdate.init();

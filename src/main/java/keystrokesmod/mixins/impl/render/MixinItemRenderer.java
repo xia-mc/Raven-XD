@@ -49,6 +49,7 @@ public abstract class MixinItemRenderer {
 
     @Shadow protected abstract void func_178098_a(float p_178098_1_, AbstractClientPlayer p_178098_2_);
 
+    @SuppressWarnings("deprecation")
     @Shadow public abstract void renderItem(EntityLivingBase p_renderItem_1_, ItemStack p_renderItem_2_, ItemCameraTransforms.TransformType p_renderItem_3_);
 
     @Shadow protected abstract void func_178095_a(AbstractClientPlayer p_178095_1_, float p_178095_2_, float p_178095_3_);
@@ -62,6 +63,7 @@ public abstract class MixinItemRenderer {
      * @author xia__mc
      * @reason for Animations module.
      */
+    @SuppressWarnings("deprecation")
     @Inject(method = "renderItemInFirstPerson", at = @At("HEAD"), cancellable = true)
     public void renderItemInFirstPerson(final float partialTicks, @NotNull CallbackInfo ci) {
         if (!Utils.nullCheck() || !ModuleManager.animations.isEnabled()) {

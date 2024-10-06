@@ -1,10 +1,11 @@
 package keystrokesmod.script;
 
+import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import keystrokesmod.Raven;
 import keystrokesmod.clickgui.ClickGui;
 import keystrokesmod.module.Module;
 import keystrokesmod.script.classes.Entity;
-import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.common.MinecraftForge;
 
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
@@ -21,7 +22,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class ScriptManager {
     protected static Entity localPlayer;
-    public HashMap<Script, Module> scripts = new LinkedHashMap<>();
+    public Object2ObjectArrayMap<Script, Module> scripts = new Object2ObjectArrayMap<>();
     public JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
     public boolean d = true;
     public File directory;
@@ -36,7 +37,7 @@ public class ScriptManager {
     public void onEnable(Script dv) {
         if (dv.event == null) {
             dv.event = new ScriptEvents(getModule(dv));
-            FMLCommonHandler.instance().bus().register(dv.event);
+            MinecraftForge.EVENT_BUS.register(dv.event);
         }
         dv.invokeMethod("onEnable");
     }
@@ -129,7 +130,7 @@ public class ScriptManager {
 
     public void onDisable(Script script) {
         if (script.event != null) {
-            FMLCommonHandler.instance().bus().unregister(script.event);
+            MinecraftForge.EVENT_BUS.unregister(script.event);
             script.event = null;
         }
         script.invokeMethod("onDisable");
