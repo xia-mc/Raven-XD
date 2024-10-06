@@ -14,8 +14,8 @@ import keystrokesmod.utility.Theme;
 import keystrokesmod.utility.Utils;
 import net.minecraft.client.gui.*;
 import net.minecraft.client.gui.inventory.GuiChest;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.config.GuiButtonExt;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent;
@@ -61,7 +61,7 @@ public class HUD extends Module {
         this.registerSetting(font = new ModeSetting("Font", new String[]{"Minecraft", "Product Sans", "Regular", "Tenacity"}, 0));
         this.registerSetting(new ButtonSetting("Edit position", () -> {
             final EditScreen screen = new EditScreen();
-            FMLCommonHandler.instance().bus().register(screen);
+            MinecraftForge.EVENT_BUS.register(screen);
             mc.displayGuiScreen(screen);
         }));
         this.registerSetting(alignRight = new ButtonSetting("Align right", false));
@@ -203,7 +203,7 @@ public class HUD extends Module {
 
         @Override
         public void onGuiClosed() {
-            FMLCommonHandler.instance().bus().unregister(this);
+            MinecraftForge.EVENT_BUS.unregister(this);
         }
 
         public void drawScreen(int mX, int mY, float pt) {

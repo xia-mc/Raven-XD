@@ -6,7 +6,6 @@ import keystrokesmod.module.impl.client.Notifications;
 import keystrokesmod.module.impl.client.Settings;
 import keystrokesmod.module.setting.Setting;
 import keystrokesmod.module.setting.impl.ButtonSetting;
-import keystrokesmod.module.setting.impl.ModeValue;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.script.Script;
 import keystrokesmod.utility.Utils;
@@ -14,7 +13,7 @@ import keystrokesmod.utility.i18n.I18nModule;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.client.Minecraft;
-import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.common.MinecraftForge;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.input.Keyboard;
@@ -22,7 +21,6 @@ import org.lwjgl.input.Mouse;
 import scala.reflect.internal.util.WeakHashSet;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 
 public class Module {
@@ -138,7 +136,7 @@ public class Module {
         }
         else {
             try {
-                FMLCommonHandler.instance().bus().register(this);
+                MinecraftForge.EVENT_BUS.register(this);
                 this.onEnable();
             } catch (Throwable ignored) {
             }
@@ -156,7 +154,7 @@ public class Module {
         }
         else {
             try {
-                FMLCommonHandler.instance().bus().unregister(this);
+                MinecraftForge.EVENT_BUS.unregister(this);
                 this.onDisable();
             } catch (Throwable ignored) {
             }

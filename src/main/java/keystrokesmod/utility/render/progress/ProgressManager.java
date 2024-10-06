@@ -1,14 +1,15 @@
 package keystrokesmod.utility.render.progress;
 
-import cn.hutool.core.collection.ConcurrentHashSet;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collections;
 import java.util.Set;
 
 public class ProgressManager {
-    private static final Set<Progress> progresses = new ConcurrentHashSet<>();
+    private static final Set<Progress> progresses = Collections.synchronizedSet(new ObjectOpenHashSet<>());
 
     public static void add(@NotNull Progress progress) {
         if (progresses.add(progress)) {
@@ -30,6 +31,8 @@ public class ProgressManager {
 
     @SubscribeEvent
     public void onRender(TickEvent.RenderTickEvent event) {
-        progresses.forEach(Progress::render);
+        synchronized (progresses) {
+            progresses.forEach(Progress::render);
+        }
     }
 }
