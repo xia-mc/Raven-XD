@@ -405,6 +405,10 @@ public class Reflection {
         }
     }
 
+    public static <T> T get(@NotNull Object object, @NotNull String field, @NotNull Class<T> type) {
+        return type.cast(get(object, field));
+    }
+
     public static void set(@NotNull Object object, @NotNull String field, Object value) {
         final FieldData data = new FieldData(object.getClass(), field);
 

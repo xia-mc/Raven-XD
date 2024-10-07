@@ -6,6 +6,7 @@
   "mixins": [
     "client.MixinInventoryPlayer",
     "entity.EntityAccessor",
+    "entity.EntityLivingBaseAccessor",
     "entity.MixinEntity",
     "entity.MixinEntityLivingBase",
     "entity.MixinEntityPlayer",

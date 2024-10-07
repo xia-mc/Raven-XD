@@ -270,7 +270,15 @@ public class KillAura extends IAutoClicker {
     }
 
     @SubscribeEvent
-    public void onPreUpdate(PreUpdateEvent e) {
+    public void onPreMotion(PreMotionEvent event) {
+        if (fixHypixelSwitch.isToggled() && moveFixMode.getInput() == 0) {
+            RotationData data = doRotationAction(new RotationData(event.getYaw(), event.getPitch()));
+            if (data != null) {
+                event.setYaw(data.getYaw());
+                event.setPitch(data.getPitch());
+            }
+        }
+
         if (gameNoAction() || playerNoAction()) {
             resetVariables();
             return;
@@ -383,18 +391,6 @@ public class KillAura extends IAutoClicker {
             }
         }
     }
-
-    @SubscribeEvent
-    public void onPreMotion(PreMotionEvent event) {
-        if (fixHypixelSwitch.isToggled() && moveFixMode.getInput() == 0) {
-            RotationData data = doRotationAction(new RotationData(event.getYaw(), event.getPitch()));
-            if (data != null) {
-                event.setYaw(data.getYaw());
-                event.setPitch(data.getPitch());
-            }
-        }
-    }
-
 
     private @Nullable RotationData doRotationAction(RotationData e) {
         if (gameNoAction() || playerNoAction()) {

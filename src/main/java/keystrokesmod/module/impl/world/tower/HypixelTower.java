@@ -27,7 +27,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 public class HypixelTower extends SubMode<Tower> {
-    private final ButtonSetting onlyWhileMoving;
+    private final ButtonSetting notWhileMoving;
     private final SliderSetting verticalBlocks;
 
     public static final Set<EnumFacing> LIMIT_FACING = new HashSet<>(Collections.singleton(EnumFacing.SOUTH));
@@ -41,7 +41,7 @@ public class HypixelTower extends SubMode<Tower> {
 
     public HypixelTower(String name, @NotNull Tower parent) {
         super(name, parent);
-        this.registerSetting(onlyWhileMoving = new ButtonSetting("Only while moving", true));
+        this.registerSetting(notWhileMoving = new ButtonSetting("Not while moving", true));
         this.registerSetting(verticalBlocks = new SliderSetting("Vertical blocks", 6, 6, 10, 1));
     }
 
@@ -55,8 +55,6 @@ public class HypixelTower extends SubMode<Tower> {
         );
 
         if (!MoveUtil.isMoving() && parent.canTower()) {
-            if (onlyWhileMoving.isToggled()) return;
-
             if (!moveCorrect.isDoneZ()) {
                 if (mc.thePlayer.posY - lastOnGroundY < 1) return;
 
@@ -68,14 +66,14 @@ public class HypixelTower extends SubMode<Tower> {
             blockPlaceRequest = true;
         }
 
-        if (MoveUtil.speed() > 0.1 || (!MoveUtil.isMoving() && !onlyWhileMoving.isToggled())) {
+        if ((MoveUtil.speed() > 0.1 && !notWhileMoving.isToggled()) || !MoveUtil.isMoving()) {
             double towerSpeed = isGoingDiagonally(0.1) ? 0.22 : 0.29888888;
             if (!mc.thePlayer.onGround) {
                 if (this.towering) {
                     if (this.towerTicks == 2) {
                         event.setY(Math.floor(mc.thePlayer.posY + 1.0) - mc.thePlayer.posY);
                     } else if (this.towerTicks == 3) {
-                        if (parent.canTower()) {
+                        if (parent.canTower() && !airUnder) {
                             event.setY(mc.thePlayer.motionY = 0.4198499917984009);
                             if (MoveUtil.isMoving())
                                 MoveUtil.strafe((float) towerSpeed - randomAmount());
@@ -109,7 +107,7 @@ public class HypixelTower extends SubMode<Tower> {
             deltaPlace = new BlockPos(0, 1, 1);
         }
 
-        if (blockPlaceRequest && !Utils.isMoving() && !onlyWhileMoving.isToggled()) {
+        if (blockPlaceRequest && !Utils.isMoving()) {
             if (verticalPlaced >= verticalBlocks.getInput() || mc.thePlayer.onGround) {
                 towering = false;
                 blockPlaceRequest = false;

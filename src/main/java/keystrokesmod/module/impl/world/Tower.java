@@ -6,6 +6,7 @@ import keystrokesmod.module.impl.world.tower.*;
 import keystrokesmod.module.setting.impl.*;
 import keystrokesmod.utility.MoveUtil;
 import keystrokesmod.utility.Utils;
+import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;

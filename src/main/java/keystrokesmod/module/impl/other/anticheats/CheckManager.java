@@ -37,7 +37,6 @@ public class CheckManager {
         pre.put(GroundSpoofA.class, new GroundSpoofA(player));
         pre.put(GroundSpoofB.class, new GroundSpoofB(player));
         normal.put(FlyA.class, new FlyA(player));
-        normal.put(FlyB.class, new FlyB(player));
         normal.put(BlinkA.class, new BlinkA(player));
         normal.put(SpeedA.class, new SpeedA(player));
         normal.put(SpeedB.class, new SpeedB(player));
@@ -45,8 +44,6 @@ public class CheckManager {
         normal.put(AutoBlockA.class, new AutoBlockA(player));
         normal.put(MotionA.class, new MotionA(player));
         normal.put(ReachA.class, new ReachA(player));
-        normal.put(HitBoxA.class, new HitBoxA(player));
-        normal.put(StrafeA.class, new StrafeA(player));
         normal.put(AimA.class, new AimA(player));
         normal.put(AimB.class, new AimB(player));
         normal.put(AimC.class, new AimC(player));
