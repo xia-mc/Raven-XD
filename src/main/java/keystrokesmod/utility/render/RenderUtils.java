@@ -154,7 +154,7 @@ public class RenderUtils {
         GL11.glBlendFunc(770, 771);
         GL11.glEnable(3042);
         GL11.glLineWidth(2.0f);
-        GL11.glDisable(3553);
+        GL11.glDisable(GL_TEXTURE_2D);
         GL11.glDisable(2929);
         GL11.glDepthMask(false);
         float n8 = (color >> 24 & 0xFF) / 255.0f;
@@ -170,10 +170,10 @@ public class RenderUtils {
             drawBoundingBox(axisAlignedBB, n9, n10, n11);
         }
         GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-        GL11.glEnable(3553);
+        GL11.glEnable(GL_TEXTURE_2D);
         GL11.glEnable(2929);
         GL11.glDepthMask(true);
-        GL11.glDisable(3042);
+        GL11.glDisable(GL_BLEND);
         GL11.glPopMatrix();
     }
 
@@ -303,7 +303,7 @@ public class RenderUtils {
                     AxisAlignedBB axis = new AxisAlignedBB(bbox.minX - e.posX + x, bbox.minY - e.posY + y, bbox.minZ - e.posZ + z, bbox.maxX - e.posX + x, bbox.maxY - e.posY + y, bbox.maxZ - e.posZ + z);
                     GL11.glBlendFunc(770, 771);
                     GL11.glEnable(3042);
-                    GL11.glDisable(3553);
+                    GL11.glDisable(GL_TEXTURE_2D);
                     GL11.glDisable(2929);
                     GL11.glDepthMask(false);
                     GL11.glLineWidth(2.0F);
@@ -313,10 +313,10 @@ public class RenderUtils {
                     } else if (type == 2) {
                         drawBoundingBox(axis, r, g, b);
                     }
-                    GL11.glEnable(3553);
+                    GL11.glEnable(GL_TEXTURE_2D);
                     GL11.glEnable(2929);
                     GL11.glDepthMask(true);
-                    GL11.glDisable(3042);
+                    GL11.glDisable(GL_BLEND);
                 }
             }
             GlStateManager.popMatrix();
@@ -389,16 +389,16 @@ public class RenderUtils {
         float b = (float) (color & 255) / 255.0F;
         GL11.glBlendFunc(770, 771);
         GL11.glEnable(3042);
-        GL11.glDisable(3553);
+        GL11.glDisable(GL_TEXTURE_2D);
         GL11.glDisable(2929);
         GL11.glDepthMask(false);
         GL11.glLineWidth(2.0F);
         GL11.glColor4f(r, g, b, a);
         RenderUtils.drawBoundingBox(axis, r, g, b, a);
-        GL11.glEnable(3553);
+        GL11.glEnable(GL_TEXTURE_2D);
         GL11.glEnable(2929);
         GL11.glDepthMask(true);
-        GL11.glDisable(3042);
+        GL11.glDisable(GL_BLEND);
         GlStateManager.popMatrix();
     }
 
@@ -478,9 +478,9 @@ public class RenderUtils {
             float b = (float) (color & 255) / 255.0F;
             GL11.glPushMatrix();
             GL11.glEnable(3042);
-            GL11.glEnable(2848);
+            GL11.glEnable(GL_LINE_SMOOTH);
             GL11.glDisable(2929);
-            GL11.glDisable(3553);
+            GL11.glDisable(GL_TEXTURE_2D);
             GL11.glBlendFunc(770, 771);
             GL11.glEnable(3042);
             GL11.glLineWidth(lw);
@@ -489,11 +489,11 @@ public class RenderUtils {
             GL11.glVertex3d(0.0D, (double) mc.thePlayer.getEyeHeight(), 0.0D);
             GL11.glVertex3d(x, y, z);
             GL11.glEnd();
-            GL11.glDisable(3042);
-            GL11.glEnable(3553);
+            GL11.glDisable(GL_BLEND);
+            GL11.glEnable(GL_TEXTURE_2D);
             GL11.glEnable(2929);
-            GL11.glDisable(2848);
-            GL11.glDisable(3042);
+            GL11.glDisable(GL_LINE_SMOOTH);
+            GL11.glDisable(GL_BLEND);
             GL11.glPopMatrix();
         }
     }
@@ -596,11 +596,11 @@ public class RenderUtils {
         float g = (float) (color >> 8 & 255) / 255.0F;
         float b = (float) (color & 255) / 255.0F;
         mc.entityRenderer.disableLightmap();
-        GL11.glDisable(3553);
+        GL11.glDisable(GL_TEXTURE_2D);
         GL11.glEnable(3042);
         GL11.glBlendFunc(770, 771);
         GL11.glDisable(2929);
-        GL11.glEnable(2848);
+        GL11.glEnable(GL_LINE_SMOOTH);
         GL11.glDepthMask(false);
         GL11.glLineWidth(lineWidth);
         if (!chroma) {
@@ -636,10 +636,10 @@ public class RenderUtils {
         GL11.glEnd();
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
         GL11.glDepthMask(true);
-        GL11.glDisable(2848);
+        GL11.glDisable(GL_LINE_SMOOTH);
         GL11.glEnable(2929);
-        GL11.glDisable(3042);
-        GL11.glEnable(3553);
+        GL11.glDisable(GL_BLEND);
+        GL11.glEnable(GL_TEXTURE_2D);
         mc.entityRenderer.enableLightmap();
     }
 
@@ -675,8 +675,8 @@ public class RenderUtils {
         GL11.glPushAttrib(1);
         GL11.glScaled(0.5, 0.5, 0.5);
         GL11.glEnable(3042);
-        GL11.glDisable(3553);
-        GL11.glEnable(2848);
+        GL11.glDisable(GL_TEXTURE_2D);
+        GL11.glEnable(GL_LINE_SMOOTH);
         GL11.glBegin(9);
         glColor(n6);
         for (int i = 0; i <= 90; i += 3) {
@@ -724,10 +724,10 @@ public class RenderUtils {
         }
         GL11.glEnd();
         GL11.glPopMatrix();
-        GL11.glEnable(3553);
-        GL11.glDisable(3042);
-        GL11.glDisable(2848);
-        GL11.glEnable(3553);
+        GL11.glEnable(GL_TEXTURE_2D);
+        GL11.glDisable(GL_BLEND);
+        GL11.glDisable(GL_LINE_SMOOTH);
+        GL11.glEnable(GL_TEXTURE_2D);
         GL11.glScaled(2.0, 2.0, 2.0);
         GL11.glPopAttrib();
         GL11.glLineWidth(1.0f);
@@ -735,49 +735,66 @@ public class RenderUtils {
         GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
     }
 
-    public static void drawRoundedRectangle(float n, float n2, float n3, float n4, final float n5, final int n6) {
-        n *= 2.0;
-        n2 *= 2.0;
-        n3 *= 2.0;
-        n4 *= 2.0;
+    public static void drawRoundedRectangle(float x, float y, float x2, float y2, float radius, final int color) {
+        if (x2 <= x) {
+            return;
+        }
+
+        float width = x2 - x;
+        float height = y2 - y;
+
+        if (width < radius * 2) {
+            radius = Math.max(width / 2.0f, 1.0f);
+        }
+
+        if (height < radius * 2) {
+            radius = Math.max(height / 2.0f, 1.0f);
+        }
+
+        x *= 2.0;
+        y *= 2.0;
+        x2 *= 2.0;
+        y2 *= 2.0;
+        radius *= 2.0;
+
         GL11.glPushAttrib(0);
         GL11.glScaled(0.5, 0.5, 0.5);
-        GL11.glEnable(3042);
-        GL11.glDisable(3553);
-        GL11.glEnable(2848);
+        glEnable(GL_BLEND);
+        GL11.glDisable(GL_TEXTURE_2D);
+        glEnable(GL_LINE_SMOOTH);
         GL11.glBegin(9);
-        glColor(n6);
+        glColor(color);
         for (int i = 0; i <= 90; i += 3) {
             final double n7 = (double) (i * 0.017453292f);
-            GL11.glVertex2d((double) (n + n5) + Math.sin(n7) * n5 * -1.0, (double) (n2 + n5) + Math.cos(n7) * n5 * -1.0);
+            GL11.glVertex2d((double) (x + radius) + Math.sin(n7) * radius * -1.0, (double) (y + radius) + Math.cos(n7) * radius * -1.0);
         }
         for (int j = 90; j <= 180; j += 3) {
             final double n8 = (double) (j * 0.017453292f);
-            GL11.glVertex2d((double) (n + n5) + Math.sin(n8) * n5 * -1.0, (double) (n4 - n5) + Math.cos(n8) * n5 * -1.0);
+            GL11.glVertex2d((double) (x + radius) + Math.sin(n8) * radius * -1.0, (double) (y2 - radius) + Math.cos(n8) * radius * -1.0);
         }
         for (int k = 0; k <= 90; k += 3) {
             final double n9 = (double) (k * 0.017453292f);
-            GL11.glVertex2d((double) (n3 - n5) + Math.sin(n9) * n5, (double) (n4 - n5) + Math.cos(n9) * n5);
+            GL11.glVertex2d((double) (x2 - radius) + Math.sin(n9) * radius, (double) (y2 - radius) + Math.cos(n9) * radius);
         }
         for (int l = 90; l <= 180; l += 3) {
             final double n10 = (double) (l * 0.017453292f);
-            GL11.glVertex2d((double) (n3 - n5) + Math.sin(n10) * n5, (double) (n2 + n5) + Math.cos(n10) * n5);
+            GL11.glVertex2d((double) (x2 - radius) + Math.sin(n10) * radius, (double) (y + radius) + Math.cos(n10) * radius);
         }
         GL11.glEnd();
-        GL11.glEnable(3553);
-        GL11.glDisable(3042);
-        GL11.glDisable(2848);
-        GL11.glEnable(3553);
+        glEnable(GL_TEXTURE_2D);
+        GL11.glDisable(GL_BLEND);
+        GL11.glDisable(GL_LINE_SMOOTH);
+        glEnable(GL_TEXTURE_2D);
         GL11.glScaled(2.0, 2.0, 2.0);
         GL11.glPopAttrib();
         GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
     }
 
     public static void drawRoundedGradientRect(float x, float y, float x2, float y2, final float n5, final int n6, final int n7, final int n8, final int n9) {
-        GL11.glEnable(3042);
-        GL11.glDisable(3553);
+        GL11.glEnable(GL_BLEND);
+        GL11.glDisable(GL_TEXTURE_2D);
         GL11.glBlendFunc(770, 771);
-        GL11.glEnable(2848);
+        GL11.glEnable(GL_LINE_SMOOTH);
         GL11.glShadeModel(7425);
         GL11.glPushAttrib(0);
         GL11.glScaled(0.5, 0.5, 0.5);
@@ -785,10 +802,10 @@ public class RenderUtils {
         y *= 2.0;
         x2 *= 2.0;
         y2 *= 2.0;
-        GL11.glEnable(3042);
-        GL11.glDisable(3553);
+        GL11.glEnable(GL_BLEND);
+        GL11.glDisable(GL_TEXTURE_2D);
         glColor(n6);
-        GL11.glEnable(2848);
+        GL11.glEnable(GL_LINE_SMOOTH);
         GL11.glShadeModel(7425);
         GL11.glBegin(9);
         for (int i = 0; i <= 90; i += 3) {
@@ -811,16 +828,16 @@ public class RenderUtils {
             GL11.glVertex2d((double) (x2 - n5) + Math.sin(n13) * n5, (double) (y + n5) + Math.cos(n13) * n5);
         }
         GL11.glEnd();
-        GL11.glEnable(3553);
-        GL11.glDisable(3042);
-        GL11.glDisable(2848);
-        GL11.glDisable(3042);
-        GL11.glEnable(3553);
+        GL11.glEnable(GL_TEXTURE_2D);
+        GL11.glDisable(GL_BLEND);
+        GL11.glDisable(GL_LINE_SMOOTH);
+        GL11.glDisable(GL_BLEND);
+        GL11.glEnable(GL_TEXTURE_2D);
         GL11.glScaled(2.0, 2.0, 2.0);
         GL11.glPopAttrib();
-        GL11.glEnable(3553);
-        GL11.glDisable(3042);
-        GL11.glDisable(2848);
+        GL11.glEnable(GL_TEXTURE_2D);
+        GL11.glDisable(GL_BLEND);
+        GL11.glDisable(GL_LINE_SMOOTH);
         GL11.glShadeModel(7424);
     }
 
@@ -979,7 +996,7 @@ public class RenderUtils {
         mc.getTextureManager().bindTexture(res);
         RenderUtils.drawModalRectWithCustomSizedTexture(x, y, 0.0f, 0.0f, width, height, width, height);
         GL11.glDepthMask(true);
-        GL11.glDisable(3042);
+        GL11.glDisable(GL_BLEND);
         GL11.glEnable(2929);
     }
 
@@ -1150,19 +1167,19 @@ public class RenderUtils {
     public static void enableGL2D() {
         GL11.glDisable(2929);
         GL11.glEnable(3042);
-        GL11.glDisable(3553);
+        GL11.glDisable(GL_TEXTURE_2D);
         GL11.glBlendFunc(770, 771);
         GL11.glDepthMask(true);
-        GL11.glEnable(2848);
+        GL11.glEnable(GL_LINE_SMOOTH);
         GL11.glHint(3154, 4354);
         GL11.glHint(3155, 4354);
     }
 
     public static void disableGL2D() {
-        GL11.glEnable(3553);
-        GL11.glDisable(3042);
+        GL11.glEnable(GL_TEXTURE_2D);
+        GL11.glDisable(GL_BLEND);
         GL11.glEnable(2929);
-        GL11.glDisable(2848);
+        GL11.glDisable(GL_LINE_SMOOTH);
         GL11.glHint(3154, 4352);
         GL11.glHint(3155, 4352);
     }

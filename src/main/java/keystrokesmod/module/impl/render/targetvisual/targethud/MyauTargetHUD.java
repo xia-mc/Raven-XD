@@ -56,7 +56,7 @@ public class MyauTargetHUD extends SubMode<TargetHUD> implements ITargetVisual {
     public void render(@NotNull EntityLivingBase target) {
         String TargetName = target.getDisplayName().getFormattedText();
         float health = Utils.limit(target.getHealth() / target.getMaxHealth(), 0, 1);
-        String TargetHealth = "§a" + String.format("%.1f", target.getHealth()) + "§c❤ ";
+        String TargetHealth = String.format("%.1f", target.getHealth()) + "§c❤ ";
 
         if (showStatus.isToggled() && mc.thePlayer != null) {
             String status = (health <= Utils.getCompleteHealth(mc.thePlayer) / mc.thePlayer.getMaxHealth())? " §aW" : " §cL";
@@ -85,9 +85,9 @@ public class MyauTargetHUD extends SubMode<TargetHUD> implements ITargetVisual {
 
         RenderUtils.drawRect(n13, n15, n14, n15 + 4, Utils.merge(Color.black.getRGB(), n11));
 
-        float healthBar = (float) (int) (n14 + (n13 - n14) * (1.0 - ((health < 0.05)? 0.05 : health)));
-        if (healthBar - n13 < 3) {
-            healthBar = n13 + 3;
+        float healthBar = (float) (int) (n14 + (n13 - n14) * (1.0 - ((health < 0.01)? 0 : health)));
+        if (healthBar - n13 < 1) {
+            healthBar = n13;
         }
 
         if (target != lastTarget) {
