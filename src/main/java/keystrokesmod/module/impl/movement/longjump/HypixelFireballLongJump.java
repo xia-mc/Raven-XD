@@ -20,7 +20,7 @@ public class HypixelFireballLongJump extends SubMode<LongJump> {
     public HypixelFireballLongJump(String name, @NotNull LongJump parent) {
         super(name, parent);
         this.registerSetting(speed = new SliderSetting("Speed", 1.5, 0, 2, 0.01));
-        this.registerSetting(mode = new ModeValue("Mode", this)
+        this.registerSetting(mode = new ModeValue("Sub-Mode", this)
                 .add(new NormalHypixelFireballLongJump("Normal", this))
                 .add(new SameYHypixelFireballLongJump("SameY", this))
         );

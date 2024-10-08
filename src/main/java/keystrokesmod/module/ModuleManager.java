@@ -128,6 +128,7 @@ public class ModuleManager {
     public static AutoGapple autoGapple;
     public static RemoteShop remoteShop;
     public static Regen regen;
+    public static ChatAI chatAI;
 
     public void register() {
 
@@ -224,6 +225,7 @@ public class ModuleManager {
         this.addModule(autoRegister = new AutoRegister());
         this.addModule(viewPackets = new ViewPackets());
         this.addModule(new FlagDetector());
+        this.addModule(chatAI = new ChatAI());
 
         // player
         this.addModule(new AntiAFK());

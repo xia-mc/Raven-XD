@@ -5,6 +5,7 @@ import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.world.Scaffold;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.utility.MoveUtil;
+import keystrokesmod.utility.Utils;
 import keystrokesmod.utility.aim.RotationData;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
@@ -23,9 +24,11 @@ public class JumpDSprint extends JumpSprint {
 
     @Override
     public RotationData onFinalRotation(RotationData data) {
-        if (mc.thePlayer.onGround && MoveUtil.isMoving() && parent.placeBlock != null && !ModuleManager.tower.canTower()) {
+        if (mc.thePlayer.onGround && MoveUtil.isMoving() && parent.placeBlock != null && !ModuleManager.tower.canTower() && !Utils.jumpDown()) {
             delay = (int) delayTicks.getInput();
-            return new RotationData(mc.thePlayer.rotationYaw, (float) (0 + parent.getRandom()));
+        }
+        if (delay > 0) {
+            return new RotationData((float) (data.getYaw() - 180 - parent.getRandom()), (float) Utils.limit(data.getPitch() + parent.getRandom(), -90, 90));
         }
         return super.onFinalRotation(data);
     }

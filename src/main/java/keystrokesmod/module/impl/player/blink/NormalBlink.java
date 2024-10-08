@@ -38,7 +38,7 @@ public class NormalBlink extends SubMode<Module> {
         super(name, parent);
         this.registerSetting(pulse = new ButtonSetting("Pulse", false, () -> parent instanceof Blink));
         this.registerSetting(pulseDelay = new SliderSetting("Pulse delay", 1000, 0, 10000, 100, pulse::isToggled));
-        this.registerSetting(initialPosition = new ButtonSetting("Show initial position", true));
+        this.registerSetting(initialPosition = new ButtonSetting("Show initial position", false));
         this.registerSetting(overlay = new ButtonSetting("Overlay", false));
     }
 

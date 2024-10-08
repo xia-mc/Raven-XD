@@ -10,6 +10,7 @@ import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.client.Settings;
 import keystrokesmod.module.impl.fun.NoteBot;
 import keystrokesmod.module.impl.minigames.DuelsStats;
+import keystrokesmod.module.impl.other.ChatAI;
 import keystrokesmod.module.impl.other.FakeChat;
 import keystrokesmod.module.impl.other.KillMessage;
 import keystrokesmod.module.impl.other.NameHider;
@@ -497,6 +498,13 @@ public class Commands {
                     }
                     print("&cInvalid profile.", 1);
                 }
+            } else if (firstArg.equals("chat")) {
+                if (!hasArgs) {
+                    print(invSyn, 1);
+                    return;
+                }
+
+                ModuleManager.chatAI.onChat(c.substring(5));
             } else if (!firstArg.equals("help") && !firstArg.equals("?")) {
                 if (firstArg.equals("shoutout")) {
                     print("&eCelebrities:", 1);
@@ -534,6 +542,7 @@ public class Commands {
                 print("2 " + FakeChat.command + " [msg]", 0);
                 print("4 killmessage [message]", 0);
                 print(String.format("5 clientname [name (current is '%s')]", Watermark.customName), 0);
+                print("6 chat <args>", 0);
             }
 
         }
