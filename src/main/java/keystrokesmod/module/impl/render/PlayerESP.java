@@ -1,5 +1,6 @@
 package keystrokesmod.module.impl.render;
 
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import keystrokesmod.Raven;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
@@ -16,8 +17,6 @@ import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import java.awt.*;
-import java.util.HashMap;
-import java.util.Map;
 
 public class PlayerESP extends Module {
     public SliderSetting red;
@@ -38,7 +37,7 @@ public class PlayerESP extends Module {
     private final ButtonSetting showInvis;
     private int rgb = 0;
 
-    private final Map<EntityLivingBase, Integer> targets = new HashMap<>(10);
+    private final Object2IntOpenHashMap<EntityLivingBase> targets = new Object2IntOpenHashMap<>(5);
 
     public PlayerESP() {
         super("PlayerESP", category.render, 0);
@@ -76,7 +75,7 @@ public class PlayerESP extends Module {
         targets.clear();
         if (Utils.nullCheck()) {
             if (Raven.debugger) {
-                mc.theWorld.loadedEntityList.stream()
+                mc.theWorld.loadedEntityList.parallelStream()
                         .filter(entity -> entity instanceof EntityLivingBase && entity != mc.thePlayer)
                         .forEach(entity -> {
                             if (colorByName.isToggled()) {
@@ -86,7 +85,7 @@ public class PlayerESP extends Module {
                         });
                 return;
             }
-            mc.theWorld.playerEntities.stream()
+            mc.theWorld.playerEntities.parallelStream()
                     .filter(player -> player != mc.thePlayer)
                     .filter(player -> player.deathTime == 0)
                     .filter(player -> showInvis.isToggled() || !player.isInvisible())
@@ -102,12 +101,12 @@ public class PlayerESP extends Module {
 
     @SubscribeEvent
     public void onRenderWorld(RenderWorldLastEvent e) {
-        for (Map.Entry<EntityLivingBase, Integer> target : targets.entrySet()) {
+        targets.forEach((target, color) -> {
             try {
-                render(target.getKey(), target.getValue());
+                render(target, color);
             } catch (Exception ignored) {
             }
-        }
+        });
     }
 
     private void render(Entity en, int rgb) {

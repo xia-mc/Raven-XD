@@ -1,10 +1,12 @@
 package keystrokesmod.module.impl.combat.autoclicker;
 
+import keystrokesmod.event.PreMotionEvent;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.CoolDown;
 import keystrokesmod.utility.Utils;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.input.Mouse;
 
@@ -37,8 +39,8 @@ public class NormalAutoClicker extends SubMode<IAutoClicker> {
         Utils.correctValue(minCPS, maxCPS);
     }
 
-    @Override
-    public void onUpdate() {
+    @SubscribeEvent
+    public void onPreMotion(PreMotionEvent event) {
         clickStopWatch.setCooldown(nextSwing);
         if (clickStopWatch.hasFinished()) {
             final long clicks = (long) (Utils.randomizeDouble(minCPS.getInput(), maxCPS.getInput()));

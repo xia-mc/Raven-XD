@@ -6,14 +6,11 @@ import keystrokesmod.event.PreUpdateEvent;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.world.Tower;
 import keystrokesmod.module.setting.impl.ButtonSetting;
+import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.script.classes.Vec3;
-import keystrokesmod.utility.MoveUtil;
-import keystrokesmod.utility.Reflection;
-import keystrokesmod.utility.RotationUtils;
-import keystrokesmod.utility.Utils;
+import keystrokesmod.utility.*;
 import keystrokesmod.utility.movement.MoveCorrect;
-import net.minecraft.block.BlockAir;
 import net.minecraft.potion.Potion;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
@@ -30,6 +27,9 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 public class HypixelTower extends SubMode<Tower> {
+    private final ButtonSetting notWhileMoving;
+    private final SliderSetting verticalBlocks;
+
     public static final Set<EnumFacing> LIMIT_FACING = new HashSet<>(Collections.singleton(EnumFacing.SOUTH));
     public static final MoveCorrect moveCorrect = new MoveCorrect(0.3, MoveCorrect.Mode.POSITION);
     private boolean towering;
@@ -37,24 +37,28 @@ public class HypixelTower extends SubMode<Tower> {
     private boolean blockPlaceRequest = false;
     private int lastOnGroundY;
     private BlockPos deltaPlace = BlockPos.ORIGIN;
-    private final ButtonSetting onlyWhileMoving;
+    private int verticalPlaced = 0;
 
     public HypixelTower(String name, @NotNull Tower parent) {
         super(name, parent);
-        this.registerSetting(onlyWhileMoving = new ButtonSetting("Only while moving", true));
+        this.registerSetting(notWhileMoving = new ButtonSetting("Not while moving", true));
+        this.registerSetting(verticalBlocks = new SliderSetting("Vertical blocks", 6, 6, 10, 1));
     }
 
     @SubscribeEvent
     public void onMove(MoveEvent event) throws IllegalAccessException {
         if (mc.thePlayer.isPotionActive(Potion.jump)) return;
-        final boolean airUnder = negativeExpand(0.239);
+        final boolean airUnder = !BlockUtils.insideBlock(
+                mc.thePlayer.getEntityBoundingBox()
+                        .offset(0, -1, 0)
+                        .expand(0.3, 0, 0.3)
+        );
 
         if (!MoveUtil.isMoving() && parent.canTower()) {
-            if (onlyWhileMoving.isToggled()) return;
-
             if (!moveCorrect.isDoneZ()) {
                 if (mc.thePlayer.posY - lastOnGroundY < 1) return;
 
+                MoveUtil.stop();
                 if (!moveCorrect.moveZ(true))
                     return;
             }
@@ -62,7 +66,7 @@ public class HypixelTower extends SubMode<Tower> {
             blockPlaceRequest = true;
         }
 
-        if (MoveUtil.speed() > 0.1 || (!MoveUtil.isMoving() && !onlyWhileMoving.isToggled())) {
+        if ((MoveUtil.speed() > 0.1 && !notWhileMoving.isToggled()) || !MoveUtil.isMoving()) {
             double towerSpeed = isGoingDiagonally(0.1) ? 0.22 : 0.29888888;
             if (!mc.thePlayer.onGround) {
                 if (this.towering) {
@@ -72,7 +76,7 @@ public class HypixelTower extends SubMode<Tower> {
                         if (parent.canTower() && !airUnder) {
                             event.setY(mc.thePlayer.motionY = 0.4198499917984009);
                             if (MoveUtil.isMoving())
-                                MoveUtil.strafe((float) towerSpeed - this.randomAmount());
+                                MoveUtil.strafe((float) towerSpeed - randomAmount());
                             this.towerTicks = 0;
                         } else {
                             this.towering = false;
@@ -87,7 +91,7 @@ public class HypixelTower extends SubMode<Tower> {
                     if (event.getY() > 0.0) {
                         event.setY(mc.thePlayer.motionY = 0.4198479950428009);
                         if (MoveUtil.isMoving())
-                            MoveUtil.strafe((float) towerSpeed - this.randomAmount());
+                            MoveUtil.strafe((float) towerSpeed - randomAmount());
                     }
                 }
             }
@@ -103,7 +107,14 @@ public class HypixelTower extends SubMode<Tower> {
             deltaPlace = new BlockPos(0, 1, 1);
         }
 
-        if (blockPlaceRequest && !Utils.isMoving() && !onlyWhileMoving.isToggled()) {
+        if (blockPlaceRequest && !Utils.isMoving()) {
+            if (verticalPlaced >= verticalBlocks.getInput() || mc.thePlayer.onGround) {
+                towering = false;
+                blockPlaceRequest = false;
+                verticalPlaced = 0;
+                return;
+            }
+
             MovingObjectPosition lastScaffoldPlace = ModuleManager.scaffold.placeBlock;
             if (lastScaffoldPlace == null)
                 return;
@@ -116,12 +127,18 @@ public class HypixelTower extends SubMode<Tower> {
 
             Triple<BlockPos, EnumFacing, Vec3> placeSide = optionalPlaceSide.get();
 
-            Raven.getExecutor().schedule(() -> ModuleManager.scaffold.place(
-                    new MovingObjectPosition(placeSide.getRight().toVec3(), placeSide.getMiddle(), placeSide.getLeft()),
-                    false
-            ), 50, TimeUnit.MILLISECONDS);
+            Raven.getExecutor().schedule(() -> {
+                if (ModuleManager.scaffold.place(
+                        new MovingObjectPosition(placeSide.getRight().toVec3(), placeSide.getMiddle(), placeSide.getLeft()),
+                        false
+                )) {
+                    verticalPlaced++;
+                }
+            }, 50, TimeUnit.MILLISECONDS);
 //            ModuleManager.scaffold.tower$noBlockPlace = true;
             blockPlaceRequest = false;
+        } else {
+            verticalPlaced = 0;
         }
     }
 
@@ -129,11 +146,12 @@ public class HypixelTower extends SubMode<Tower> {
         return Math.abs(mc.thePlayer.motionX) > amount && Math.abs(mc.thePlayer.motionZ) > amount;
     }
 
-    public static boolean negativeExpand(double negativeExpandValue) {
-        return mc.theWorld.getBlockState(new BlockPos(mc.thePlayer.posX + negativeExpandValue, mc.thePlayer.posY - 1.0, mc.thePlayer.posZ + negativeExpandValue)).getBlock() instanceof BlockAir && mc.theWorld.getBlockState(new BlockPos(mc.thePlayer.posX - negativeExpandValue, mc.thePlayer.posY - 1.0, mc.thePlayer.posZ - negativeExpandValue)).getBlock() instanceof BlockAir && mc.theWorld.getBlockState(new BlockPos(mc.thePlayer.posX - negativeExpandValue, mc.thePlayer.posY - 1.0, mc.thePlayer.posZ)).getBlock() instanceof BlockAir && mc.theWorld.getBlockState(new BlockPos(mc.thePlayer.posX + negativeExpandValue, mc.thePlayer.posY - 1.0, mc.thePlayer.posZ)).getBlock() instanceof BlockAir && mc.theWorld.getBlockState(new BlockPos(mc.thePlayer.posX, mc.thePlayer.posY - 1.0, mc.thePlayer.posZ + negativeExpandValue)).getBlock() instanceof BlockAir && mc.theWorld.getBlockState(new BlockPos(mc.thePlayer.posX, mc.thePlayer.posY - 1.0, mc.thePlayer.posZ - negativeExpandValue)).getBlock() instanceof BlockAir;
+    public static double randomAmount() {
+        return 8.0E-4 + Math.random() * 0.008;
     }
 
-    private double randomAmount() {
-        return 8.0E-4 + Math.random() * 0.008;
+    @Override
+    public void onEnable() throws Throwable {
+        verticalPlaced = 0;
     }
 }

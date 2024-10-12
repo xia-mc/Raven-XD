@@ -75,7 +75,7 @@ dependencies {
     }
     implementation 'org.projectlombok:lombok:1.18.22'
     implementation 'org.jetbrains:annotations:24.1.0'
-    implementation 'cn.hutool:hutool-all:5.8.26'
+    implementation files('libraries/fastutil-core-8.5.14-javadoc.jar')
     implementation files('libraries/json-20220924.jar')
     implementation files('libraries/discord-rpc.jar')
 //    implementation files('libraries/ViaAprilFools-3.0.2-SNAPSHOT.jar')
@@ -85,7 +85,7 @@ dependencies {
 //    implementation files('libraries/ViaRewind-4.0.3-SNAPSHOT.jar')
 //    implementation files('libraries/ViaVersion-5.0.4-SNAPSHOT.jar')
 
-    embed 'cn.hutool:hutool-all:5.8.26'
+    embed files('libraries/fastutil-core-8.5.14.jar')
     embed files('libraries/discord-rpc.jar')
     embed files('libraries/json-20220924.jar')
 //    embed files('libraries/viaforge-1.8.9-3.3.3.jar')

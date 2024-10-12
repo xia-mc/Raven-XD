@@ -18,7 +18,7 @@ public class SneakSprint extends IScaffoldSprint {
     @SubscribeEvent
     public void onMoveInput(@NotNull MoveInputEvent event) {
         event.setSneak(true);
-        event.setSneakSlowDownMultiplier(slowDown.getInput());
+        event.setSneakSlowDown(slowDown.getInput());
     }
 
     @Override

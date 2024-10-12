@@ -275,10 +275,9 @@ public class NoteBot extends Module {
             int hitsNumber = entry.getValue();
 
             if (rotation.getInput() != 0)
-                if (!lookView.isToggled()) {
-                    RotationHandler.setRotationYaw(PlayerRotation.getYaw(pos));
-                    RotationHandler.setRotationPitch(PlayerRotation.getPitch(pos));
-                } else {
+                RotationHandler.setRotationYaw(PlayerRotation.getYaw(pos));
+                RotationHandler.setRotationPitch(PlayerRotation.getPitch(pos));
+                if (lookView.isToggled()) {
                     mc.thePlayer.rotationYaw = PlayerRotation.getYaw(pos);
                     mc.thePlayer.rotationPitch = PlayerRotation.getPitch(pos);
                 }

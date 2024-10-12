@@ -8,8 +8,7 @@ import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SubMode;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.MovingObjectPosition;
-import net.minecraftforge.event.entity.EntityJoinWorldEvent;
-import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
@@ -27,7 +26,7 @@ public class FakeFly extends SubMode<Fly> {
         super(name, parent);
         this.registerSetting(keep = new ButtonSetting("Keep", true));
 
-        FMLCommonHandler.instance().bus().register(new Object() {
+        MinecraftForge.EVENT_BUS.register(new Object() {
             @SubscribeEvent
             public void onWorldChange(@NotNull WorldChangeEvent event) {
                 hiddenPos.clear();

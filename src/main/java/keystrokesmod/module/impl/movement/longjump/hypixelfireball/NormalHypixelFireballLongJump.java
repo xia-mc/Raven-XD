@@ -20,6 +20,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class NormalHypixelFireballLongJump extends SubMode<HypixelFireballLongJump> {
     private final ButtonSetting vertical;
+    private final SliderSetting verticalSpeed;
     private final ButtonSetting doFloat;
     private final ButtonSetting groundSpoof;
     private final SliderSetting floatTick;
@@ -36,6 +37,7 @@ public class NormalHypixelFireballLongJump extends SubMode<HypixelFireballLongJu
     public NormalHypixelFireballLongJump(String name, @NotNull HypixelFireballLongJump parent) {
         super(name, parent);
         this.registerSetting(vertical = new ButtonSetting("Vertical", false));
+        this.registerSetting(verticalSpeed = new SliderSetting("Vertical speed", 1.3, 0.5, 2, 0.01, vertical::isToggled));
         this.registerSetting(doFloat = new ButtonSetting("Float", true));
         this.registerSetting(groundSpoof = new ButtonSetting("Ground spoof", false, doFloat::isToggled));
         this.registerSetting(floatTick = new SliderSetting("Float tick", 20, 10, 33, 1, doFloat::isToggled));
@@ -155,9 +157,8 @@ public class NormalHypixelFireballLongJump extends SubMode<HypixelFireballLongJu
 
     private void setSpeed() {
         if (vertical.isToggled()) {
-            mc.thePlayer.motionY = parent.speed.getInput();
-        } else {
-            MoveUtil.strafe((float) parent.speed.getInput());
+            mc.thePlayer.motionY = verticalSpeed.getInput();
         }
+        MoveUtil.strafe((float) parent.speed.getInput());
     }
 }

@@ -73,7 +73,7 @@ public class BedProximityAlert extends Module {
     }
     public void informTeam(String playerName, int distance) {
         if (tellTheteam.isToggled()) {
-            mc.thePlayer.sendChatMessage(playerName + " is " + distance + " blocks away from the bed!");
+            mc.thePlayer.sendChatMessage(Utils.getUnformatedString(playerName + " is " + distance + " blocks away from the bed!"));
         }
     }
 }

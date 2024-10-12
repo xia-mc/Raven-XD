@@ -92,6 +92,7 @@ public class Scaffold extends IAutoClicker {
     private final SliderSetting expandDistance;
     private final ButtonSetting polar;
     private final ButtonSetting postPlace;
+    private final ButtonSetting lookView;
 
     public @Nullable MovingObjectPosition rayCasted = null;
     public MovingObjectPosition placeBlock;
@@ -193,6 +194,7 @@ public class Scaffold extends IAutoClicker {
         this.registerSetting(expandDistance = new SliderSetting("Expand distance", 4.5, 0, 10, 0.1, expand::isToggled));
         this.registerSetting(polar = new ButtonSetting("Polar", false, expand::isToggled));
         this.registerSetting(postPlace = new ButtonSetting("Post place", false, "Place on PostUpdate."));
+        this.registerSetting(lookView = new ButtonSetting("Look view", false));
     }
 
     public void onDisable() {
@@ -294,6 +296,11 @@ public class Scaffold extends IAutoClicker {
         event.setYaw(lastYaw = result.getYaw());
         event.setPitch(lastPitch = result.getPitch());
         event.setMoveFix(moveFix.isToggled() ? RotationHandler.MoveFix.Silent : RotationHandler.MoveFix.None);
+
+        if (lookView.isToggled()) {
+            mc.thePlayer.rotationYaw = event.getYaw();
+            mc.thePlayer.rotationPitch = event.getPitch();
+        }
 
         if (clickMode.getInput() == 0)
             place = true;
@@ -839,8 +846,8 @@ public class Scaffold extends IAutoClicker {
         return null;
     }
 
-    public void place(MovingObjectPosition block, boolean extra) {
-        if (rotation.getInput() == 4 && telly$noBlockPlace) return;
+    public boolean place(MovingObjectPosition block, boolean extra) {
+        if (rotation.getInput() == 4 && telly$noBlockPlace) return false;
 
         if (sneak.isToggled()) {
             if (sneak$bridged >= sneakEveryBlocks.getInput()) {
@@ -860,16 +867,16 @@ public class Scaffold extends IAutoClicker {
 
         ItemStack heldItem = SlotHandler.getHeldItem();
         if (heldItem == null || !(heldItem.getItem() instanceof ItemBlock)) {
-            return;
+            return false;
         }
 
         if (legit.isToggled()) {
-            return;
+            return false;
         }
 
         ScaffoldPlaceEvent event = new ScaffoldPlaceEvent(block, extra);
         MinecraftForge.EVENT_BUS.post(event);
-        if (event.isCanceled()) return;
+        if (event.isCanceled()) return false;
 
         block = event.getHitResult();
         extra = event.isExtra();
@@ -886,7 +893,9 @@ public class Scaffold extends IAutoClicker {
             if (!extra) {
                 highlight.put(block.getBlockPos().offset(block.sideHit), null);
             }
+            return true;
         }
+        return false;
     }
 
     public static int getSlot() {

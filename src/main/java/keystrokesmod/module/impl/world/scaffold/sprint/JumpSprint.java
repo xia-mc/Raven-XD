@@ -11,6 +11,6 @@ public class JumpSprint extends IScaffoldSprint {
 
     @Override
     public boolean isSprint() {
-        return parent.keepYPosition();
+        return parent.keepYPosition() && parent.placeBlock != null;
     }
 }

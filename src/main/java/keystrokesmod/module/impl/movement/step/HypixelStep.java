@@ -1,17 +1,22 @@
 package keystrokesmod.module.impl.movement.step;
 
+import keystrokesmod.event.MoveEvent;
 import keystrokesmod.event.PreMotionEvent;
-import keystrokesmod.event.PreUpdateEvent;
 import keystrokesmod.event.SprintEvent;
 import keystrokesmod.module.impl.movement.Step;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.impl.SubMode;
+import keystrokesmod.utility.BlockUtils;
 import keystrokesmod.utility.MoveUtil;
 import keystrokesmod.utility.Utils;
+import net.minecraft.potion.Potion;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
+import static keystrokesmod.module.impl.world.tower.HypixelTower.isGoingDiagonally;
+import static keystrokesmod.module.impl.world.tower.HypixelTower.randomAmount;
+
 public class HypixelStep extends SubMode<Step> {
-    private final SliderSetting test = new SliderSetting("Test", 0, 0, 0.4, 0.1);
+    private final SliderSetting boost = new SliderSetting("Boost", 0, 0, 0.4, 0.1);
     private final SliderSetting delay = new SliderSetting("Delay", 0, 0, 5000, 250, "ms");
 
     private int offGroundTicks = -1;
@@ -20,7 +25,7 @@ public class HypixelStep extends SubMode<Step> {
 
     public HypixelStep(String name, Step parent) {
         super(name, parent);
-        this.registerSetting(test, delay);
+        this.registerSetting(boost, delay);
     }
 
     @Override
@@ -39,7 +44,7 @@ public class HypixelStep extends SubMode<Step> {
     }
 
     @SubscribeEvent
-    public void onPreUpdate(PreUpdateEvent event) {
+    public void onMove(MoveEvent event) {
         if (mc.thePlayer.onGround) {
             offGroundTicks = 0;
         } else if (offGroundTicks != -1) {
@@ -52,14 +57,26 @@ public class HypixelStep extends SubMode<Step> {
                 return;
             }
 
+            if (mc.thePlayer.isPotionActive(Potion.jump)) return;
+            final boolean airUnder = !BlockUtils.insideBlock(
+                    mc.thePlayer.getEntityBoundingBox()
+                            .offset(0, -1, 0)
+                            .expand(0.239, 0, 0.239)
+            );;
+            final float speed = isGoingDiagonally(0.1) ? 0.22F : 0.29888888F;
+
             switch (offGroundTicks) {
                 case 0:
-                    MoveUtil.stop();
-                    MoveUtil.strafe();
-                    mc.thePlayer.jump();
+                    event.setY(mc.thePlayer.motionY = 0.4198479950428009);
+                    MoveUtil.strafe(speed - randomAmount());
+                    break;
+                case 1:
+                    event.setY(Math.floor(mc.thePlayer.posY + 1.0) - mc.thePlayer.posY);
                     break;
                 case 5:
-                    MoveUtil.moveFlying(test.getInput());
+                    if (mc.thePlayer.isCollidedHorizontally || !BlockUtils.blockRelativeToPlayer(0, -1, 0).isFullCube())
+                        return;
+                    MoveUtil.moveFlying(boost.getInput());
                     mc.thePlayer.motionY = MoveUtil.predictedMotion(mc.thePlayer.motionY, 2);
                     break;
             }

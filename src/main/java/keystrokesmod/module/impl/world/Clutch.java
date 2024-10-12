@@ -115,12 +115,11 @@ public class Clutch extends Module {
                     rot.x = AimSimulator.rotMove(yaw, rot.x, (float) aimSpeed.getInput());
                     rot.y = AimSimulator.rotMove(pitch, rot.y, (float) aimSpeed.getInput());
                 }
+                RotationHandler.setRotationYaw(rot.x);
+                RotationHandler.setRotationPitch(rot.y);
                 if (lookView.isToggled()) {
                     mc.thePlayer.rotationYaw = rot.x;
                     mc.thePlayer.rotationPitch = rot.y;
-                } else {
-                    RotationHandler.setRotationYaw(rot.x);
-                    RotationHandler.setRotationPitch(rot.y);
                 }
 
                 switch ((int) mode.getInput()) {

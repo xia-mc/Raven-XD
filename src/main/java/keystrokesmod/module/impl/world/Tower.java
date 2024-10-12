@@ -6,7 +6,8 @@ import keystrokesmod.module.impl.world.tower.*;
 import keystrokesmod.module.setting.impl.*;
 import keystrokesmod.utility.MoveUtil;
 import keystrokesmod.utility.Utils;
-import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.client.event.GuiScreenEvent;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.lwjgl.input.Keyboard;
@@ -41,7 +42,7 @@ public class Tower extends Module {
         this.canBeEnabled = false;
 
         mode.enable();
-        FMLCommonHandler.instance().bus().register(new Object(){
+        MinecraftForge.EVENT_BUS.register(new Object(){
             @SubscribeEvent
             public void onUpdate(TickEvent.ClientTickEvent event) {
                 final boolean curCanTower = canTower();

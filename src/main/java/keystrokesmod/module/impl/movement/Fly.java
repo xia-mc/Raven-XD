@@ -24,7 +24,7 @@ public class Fly extends Module {
                 .add(new MatrixBowFly("MatrixBow", this))
                 .add(new MatrixTNTFly("MatrixTNT", this))
                 .add(new FakeFly("Fake", this))
-                .add(new TestFly("Test", this))
+                .add(new HypixelTestFly("Test", this))
                 .add(new CustomFly("Custom", this))
         );
         this.registerSetting(showBPS = new ButtonSetting("Show BPS", false));

@@ -19,6 +19,7 @@ import keystrokesmod.module.setting.utils.ModeOnly;
 import keystrokesmod.script.classes.Vec3;
 import keystrokesmod.utility.*;
 import keystrokesmod.utility.aim.AimSimulator;
+import keystrokesmod.utility.aim.RotationData;
 import keystrokesmod.utility.render.Animation;
 import keystrokesmod.utility.render.Easing;
 import keystrokesmod.utility.render.RenderUtils;
@@ -90,6 +91,7 @@ public class KillAura extends IAutoClicker {
     private final ButtonSetting disableWhileMining;
     private final ButtonSetting fixSlotReset;
     private final ButtonSetting fixNoSlowFlag;
+    private final ButtonSetting fixHypixelSwitch;
     private final SliderSetting postDelay;
     private final ButtonSetting hitThroughBlocks;
     private final ButtonSetting ignoreTeammates;
@@ -175,6 +177,7 @@ public class KillAura extends IAutoClicker {
         this.registerSetting(fixSlotReset = new ButtonSetting("Fix slot reset", false));
         this.registerSetting(fixNoSlowFlag = new ButtonSetting("Fix NoSlow flag", false));
         this.registerSetting(postDelay = new SliderSetting("Post delay", 10, 1, 20, 1, fixNoSlowFlag::isToggled));
+        this.registerSetting(fixHypixelSwitch = new ButtonSetting("Fix hypixel switch (beta)", false, () -> moveFixMode.getInput() == 0));
         this.registerSetting(hitThroughBlocks = new ButtonSetting("Hit through blocks", true));
         this.registerSetting(ignoreTeammates = new ButtonSetting("Ignore teammates", true));
         this.registerSetting(manualBlock = new ButtonSetting("Manual block", false));
@@ -267,7 +270,15 @@ public class KillAura extends IAutoClicker {
     }
 
     @SubscribeEvent
-    public void onPreUpdate(PreUpdateEvent e) {
+    public void onPreMotion(PreMotionEvent event) {
+        if (fixHypixelSwitch.isToggled() && moveFixMode.getInput() == 0) {
+            RotationData data = doRotationAction(new RotationData(event.getYaw(), event.getPitch()));
+            if (data != null) {
+                event.setYaw(data.getYaw());
+                event.setPitch(data.getPitch());
+            }
+        }
+
         if (gameNoAction() || playerNoAction()) {
             resetVariables();
             return;
@@ -370,15 +381,24 @@ public class KillAura extends IAutoClicker {
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)
-    public void onPreMotion(RotationEvent e) {
+    public void onRotation(RotationEvent event) {
+        if (!fixHypixelSwitch.isToggled() || moveFixMode.getInput() != 0) {
+            RotationData data = doRotationAction(new RotationData(event.getYaw(), event.getPitch()));
+            if (data != null) {
+                event.setYaw(data.getYaw());
+                event.setPitch(data.getPitch());
+                event.setMoveFix(RotationHandler.MoveFix.values()[(int) moveFixMode.getInput()]);
+            }
+        }
+    }
+
+    private @Nullable RotationData doRotationAction(RotationData e) {
         if (gameNoAction() || playerNoAction()) {
-            return;
+            return null;
         }
         setTarget(new float[]{e.getYaw(), e.getPitch()});
         if (target != null && rotationMode.getInput() == 1) {
-            e.setYaw(rotations[0]);
-            e.setPitch(rotations[1]);
-            e.setMoveFix(RotationHandler.MoveFix.values()[(int) moveFixMode.getInput()]);
+            return new RotationData(rotations[0], rotations[1]);
         } else {
             this.rotations = new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch};
         }
@@ -386,6 +406,7 @@ public class KillAura extends IAutoClicker {
             mc.thePlayer.sendQueue.addToSendQueue(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem % 8 + 1));
             mc.thePlayer.sendQueue.addToSendQueue(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
         }
+        return null;
     }
 
     @SubscribeEvent
@@ -467,8 +488,10 @@ public class KillAura extends IAutoClicker {
                 noAim = hitResult.typeOfHit != MovingObjectPosition.MovingObjectType.ENTITY || hitResult.entityHit != target;
             case 1:
                 if (noAim) break;
-                Object[] rayCasted = Reach.getEntity(attackRange.getInput(), -0.05, rotationMode.getInput() == 1 ? rotations : null);
-                noAim = rayCasted == null || Arrays.stream(rayCasted).noneMatch(o -> o == target);
+                noAim = RotationUtils.rayCast(
+                        Utils.getEyePos().distanceTo(RotationUtils.getNearestPoint(target.getEntityBoundingBox(), Utils.getEyePos())),
+                        rotations[0], rotations[1]
+                ) != null;
                 break;
             case 0:
                 return false;

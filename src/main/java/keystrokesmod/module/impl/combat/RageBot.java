@@ -1,19 +1,20 @@
 package keystrokesmod.module.impl.combat;
 
 import akka.japi.Pair;
+import keystrokesmod.Raven;
 import keystrokesmod.event.PreUpdateEvent;
 import keystrokesmod.event.RotationEvent;
 import keystrokesmod.module.impl.combat.autoclicker.*;
+import keystrokesmod.module.impl.combat.ragebot.IRageBotFeature;
+import keystrokesmod.module.impl.combat.ragebot.nospread.LegitNoSpread;
+import keystrokesmod.module.impl.combat.ragebot.nospread.SwitchNoSpread;
+import keystrokesmod.module.impl.combat.ragebot.rapidfire.*;
 import keystrokesmod.module.impl.fun.HitLog;
 import keystrokesmod.module.impl.other.RotationHandler;
 import keystrokesmod.module.impl.other.SlotHandler;
 import keystrokesmod.module.impl.other.anticheats.utils.world.PlayerRotation;
-import keystrokesmod.module.impl.player.Blink;
 import keystrokesmod.module.impl.world.AntiBot;
-import keystrokesmod.module.setting.impl.ButtonSetting;
-import keystrokesmod.module.setting.impl.ModeSetting;
-import keystrokesmod.module.setting.impl.ModeValue;
-import keystrokesmod.module.setting.impl.SliderSetting;
+import keystrokesmod.module.setting.impl.*;
 import keystrokesmod.module.setting.utils.ModeOnly;
 import keystrokesmod.script.classes.Vec3;
 import keystrokesmod.utility.*;
@@ -23,11 +24,13 @@ import net.minecraft.entity.monster.EntityGiantZombie;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.MovingObjectPosition;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.apache.commons.lang3.tuple.Triple;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
@@ -36,8 +39,8 @@ public class RageBot extends IAutoClicker {
     private final ModeSetting mode;
     private final SliderSetting switchDelay;
     private final ModeSetting sortMode;
-    private final ModeSetting weaponMode;
-    private final ModeSetting priorityHitBox;
+    public final ModeSetting weaponMode;
+    public final ModeSetting priorityHitBox;
     private final SliderSetting range;
     private final SliderSetting fov;
     private final ButtonSetting perfect;
@@ -45,24 +48,21 @@ public class RageBot extends IAutoClicker {
     private final ButtonSetting prediction;
     private final ButtonSetting smart;
     private final SliderSetting predictionTicks;
-    private final ButtonSetting drawPos;
     private final ButtonSetting autoSwitch;
     private final ButtonSetting lookView;
-    private final ButtonSetting rapidFire;
-    private final ButtonSetting rapidFireLegit;
-    private final SliderSetting rapidFireAmount;
+    private final ModeValue rapidFire;
+    private final ModeValue noSpread;
     private final ButtonSetting targetPlayers;
     private final ButtonSetting targetEntities;
     private final ButtonSetting targetInvisible;
     private final ButtonSetting ignoreTeammates;
+    private final ButtonSetting ignoreTeammatesCSGO;
     private final ButtonSetting notWhileKillAura;
 
-    private boolean targeted = false;
+    public boolean targeted = false;
     private boolean armed = false;
-    private Pair<Pair<EntityLivingBase, Vec3>, Triple<Double, Float, Float>> target = null;
+    public Pair<Pair<EntityLivingBase, Vec3>, Triple<Double, Float, Float>> target = null;
     private int predTicks = 0;
-    private net.minecraft.util.Vec3 pos = null;
-    private final Set<Integer> firedSlots = new HashSet<>();
     private final Set<EntityLivingBase> switchedTarget = new HashSet<>();
     private long lastSwitched = -1;
 
@@ -77,7 +77,7 @@ public class RageBot extends IAutoClicker {
         this.registerSetting(mode = new ModeSetting("Mode", new String[]{"Single", "Switch"}, 0));
         this.registerSetting(switchDelay = new SliderSetting("Switch delay", 200, 50, 1000, 50, "ms", new ModeOnly(mode, 1)));
         this.registerSetting(sortMode = new ModeSetting("Sort mode", new String[]{"Distance", "Health", "Hurt time", "Yaw", "Hypixel Zombie"}, 0));
-        this.registerSetting(weaponMode = new ModeSetting("Weapon mode", new String[]{"Hypixel BedWars", "Hypixel Zombie", "CubeCraft"}, 0));
+        this.registerSetting(weaponMode = new ModeSetting("Weapon mode", new String[]{"Hypixel BedWars", "Hypixel Zombie", "CubeCraft", "CS:GO"}, 0));
         this.registerSetting(priorityHitBox = new ModeSetting("Priority hit box", Arrays.stream(HitLog.HitPos.values()).map(HitLog.HitPos::getEnglish).toArray(String[]::new), 0));
         this.registerSetting(range = new SliderSetting("Range", 50, 0, 100, 5));
         this.registerSetting(fov = new SliderSetting("FOV", 360, 40, 360, 5));
@@ -86,17 +86,34 @@ public class RageBot extends IAutoClicker {
         this.registerSetting(prediction = new ButtonSetting("Prediction", false));
         this.registerSetting(smart = new ButtonSetting("Smart", true, prediction::isToggled));
         this.registerSetting(predictionTicks = new SliderSetting("Prediction ticks", 2, 0, 10, 1, "ticks", () -> prediction.isToggled() && !smart.isToggled()));
-        this.registerSetting(drawPos = new ButtonSetting("Draw pos", false, prediction::isToggled));
         this.registerSetting(autoSwitch = new ButtonSetting("Auto switch", true));
         this.registerSetting(lookView = new ButtonSetting("Look view", false));
-        this.registerSetting(rapidFire = new ButtonSetting("Rapid fire", false, autoSwitch::isToggled));
-        this.registerSetting(rapidFireLegit = new ButtonSetting("Rapid fire Legit", false, () -> autoSwitch.isToggled() && rapidFire.isToggled()));
-        this.registerSetting(rapidFireAmount = new SliderSetting("Rapid fire amount", 1, 1, 4, 1, () -> autoSwitch.isToggled() && rapidFire.isToggled() && !rapidFireLegit.isToggled()));
+        this.registerSetting(rapidFire = new ModeValue("Rapid fire", this)
+                .add(new IRapidFire("Disabled", this))
+                .add(new LegitRapidFire("Legit", this))
+                .add(new PacketRapidFire("Packet", this))
+                .add(new StoreRapidFire("Store", this))
+                .add(new TimerRapidFire("Timer", this))
+        );
+        this.registerSetting(noSpread = new ModeValue("No spread", this)
+                .add(new IRageBotFeature("Disabled", this))
+                .add(new LegitNoSpread("Legit", this))
+                .add(new SwitchNoSpread("Switch", this))
+        );
         this.registerSetting(targetPlayers = new ButtonSetting("Target players", true));
         this.registerSetting(targetEntities = new ButtonSetting("Target entities", false));
         this.registerSetting(targetInvisible = new ButtonSetting("Target invisible", false));
         this.registerSetting(ignoreTeammates = new ButtonSetting("Ignore teammates", true));
+        this.registerSetting(ignoreTeammatesCSGO = new ButtonSetting("Ignore teammates CSGO", false, ignoreTeammates::isToggled));
         this.registerSetting(notWhileKillAura = new ButtonSetting("Not while killAura", true));
+    }
+
+    @SubscribeEvent
+    public void onRender(TickEvent.RenderTickEvent event) {
+        if (Raven.debugger) {
+            ItemStack stack = mc.thePlayer.inventory.armorInventory[3];
+            Utils.sendMessage(String.valueOf(((ItemArmor) stack.getItem()).getColor(stack)));
+        }
     }
 
     @SubscribeEvent
@@ -118,27 +135,37 @@ public class RageBot extends IAutoClicker {
                             if (entity.deathTime != 0) {
                                 return false;
                             }
-                            return !AntiBot.isBot(entity) && !(ignoreTeammates.isToggled() && Utils.isTeamMate(entity));
+                            if (ignoreTeammates.isToggled()) {
+                                if (ignoreTeammatesCSGO.isToggled()) {
+                                    if (RageBotUtils.isTeammateCSGO((EntityPlayer) entity))
+                                        return false;
+                                } else {
+                                    if (Utils.isTeamMate(entity))
+                                        return false;
+                                }
+                            }
+                            AxisAlignedBB box = entity.getCollisionBoundingBox();
+                            if (box == null || box.maxY - box.minY < 1)
+                                return false;
+                            return !AntiBot.isBot(entity);
                         } else return targetEntities.isToggled();
                     })
                     .filter(entity -> targetInvisible.isToggled() || !entity.isInvisible())
                     .filter(p -> p.getDistanceToEntity(mc.thePlayer) < range.getInput())
                     .filter(p -> fov.getInput() == 360 || Utils.inFov((float) fov.getInput(), p))
-                    .map(p -> new Pair<>(p, getHitPos(p, new Vec3(p.motionX, p.motionY, p.motionZ))))
+                    .map(p -> new Pair<>(p, RageBotUtils.getHitPos(p, predTicks)))
+                    .filter(p -> p.second() != null)
                     .map(pair -> new Pair<>(pair, Triple.of(pair.second().distanceTo(eyePos), PlayerRotation.getYaw(pair.second()), PlayerRotation.getPitch(pair.second()))))
-                    .filter(pair -> RotationUtils.rayCast(eyePos.toVec3(), pair.second().getLeft(), pair.second().getMiddle(), pair.second().getRight()) == null)
                     .min(fromSortMode());
             if (target.isPresent()) {
                 if (armed) {
+                    event.setYaw(target.get().second().getMiddle());
+                    event.setPitch(target.get().second().getRight());
+                    event.setMoveFix(RotationHandler.MoveFix.values()[(int) moveFix.getInput()]);
                     if (lookView.isToggled()) {
                         mc.thePlayer.rotationYaw = target.get().second().getMiddle();
                         mc.thePlayer.rotationPitch = target.get().second().getRight();
-                    } else {
-                        event.setYaw(target.get().second().getMiddle());
-                        event.setPitch(target.get().second().getRight());
-                        event.setMoveFix(RotationHandler.MoveFix.values()[(int) moveFix.getInput()]);
                     }
-                    pos = target.get().first().second().add(0, -getYOffSetForHitPos(target.get().first().first()), 0).toVec3();
                     this.target = target.get();
                     long time = System.currentTimeMillis();
                     if (time - lastSwitched > switchDelay.getInput()) {
@@ -153,7 +180,6 @@ public class RageBot extends IAutoClicker {
                     onRotation(event);
                 }
                 targeted = false;
-                pos = null;
             }
         }
     }
@@ -193,16 +219,9 @@ public class RageBot extends IAutoClicker {
     }
 
     @SubscribeEvent
-    public void onRenderWorldLast(RenderWorldLastEvent event) {
-        if (drawPos.isToggled() && prediction.isToggled() && pos != null) {
-            Blink.drawBox(pos);
-        }
-    }
-
-    @SubscribeEvent
     public void onPreUpdate(PreUpdateEvent event) {
         if (targeted && autoSwitch.isToggled()) {
-            int bestArm = getBestArm();
+            int bestArm = ((IRapidFire) rapidFire.getSelected()).getBestArm();
             SlotHandler.setCurrentSlot(bestArm);
         }
 
@@ -214,31 +233,6 @@ public class RageBot extends IAutoClicker {
         }
     }
 
-    private int getBestArm() {
-        int arm;
-        Set<Integer> ignoreSlots = rapidFire.isToggled() ? firedSlots : Collections.emptySet();
-
-        switch ((int) weaponMode.getInput()) {
-            default:
-            case 0:
-                arm = ArmedAuraUtils.getArmHypixelBedWars(ignoreSlots);
-                break;
-            case 1:
-                arm = ArmedAuraUtils.getArmHypixelZombie(ignoreSlots);
-                break;
-            case 2:
-                arm = ArmedAuraUtils.getArmCubeCraft(ignoreSlots);
-                break;
-        }
-
-        if (arm == -1 && !firedSlots.isEmpty()) {
-            firedSlots.clear();
-            return getBestArm();
-        }
-        firedSlots.add(arm);
-        return arm;
-    }
-
     private boolean isArmed() {
         ItemStack stack = SlotHandler.getHeldItem();
         if (stack == null) return false;
@@ -248,11 +242,13 @@ public class RageBot extends IAutoClicker {
         switch ((int) weaponMode.getInput()) {
             default:
             case 0:
-                return ArmedAuraUtils.isArmHypixelBedWars(item);
+                return RageBotUtils.isArmHypixelBedWars(item);
             case 1:
-                return ArmedAuraUtils.isArmHypixelZombie(item);
+                return RageBotUtils.isArmHypixelZombie(item);
             case 2:
-                return ArmedAuraUtils.isArmCubeCraft(item);
+                return RageBotUtils.isArmCubeCraft(item);
+            case 3:
+                return RageBotUtils.isArmCSGO(item);
         }
     }
 
@@ -269,53 +265,35 @@ public class RageBot extends IAutoClicker {
         }
     }
 
-    private @NotNull Vec3 getHitPos(@NotNull EntityLivingBase entity, Vec3 motion) {
-        Vec3 result = new Vec3(entity).add(0, getYOffSetForHitPos(entity), 0);
-
-        return MoveUtil.predictedPos(entity, motion, result, predTicks);
-    }
-
-    private double getYOffSetForHitPos(EntityLivingBase entity) {
-        switch ((int) priorityHitBox.getInput()) {
-            default:
-            case 0:
-                return entity.getEyeHeight();
-            case 1:
-                return entity.getEyeHeight() - 1;
-            case 2:
-                return 0.5;
-        }
-    }
-
     @Override
     public void onEnable() {
         clickMode.enable();
+        rapidFire.enable();
+        noSpread.enable();
         targeted = false;
         predTicks = 0;
-        firedSlots.clear();
-        pos = null;
     }
 
     @Override
     public void onDisable() {
         clickMode.disable();
+        rapidFire.disable();
+        noSpread.disable();
+        Utils.sendClick(1, false);
     }
 
     @Override
     public boolean click() {
         if (targeted && armed) {
             mc.playerController.sendUseItem(mc.thePlayer, mc.theWorld, SlotHandler.getHeldItem());
-            if (rapidFire.isToggled() && autoSwitch.isToggled() && !rapidFireLegit.isToggled()) {
-                for (int i = 0; i < (int) rapidFireAmount.getInput(); i++) {
-                    int bestArm = getBestArm();
-                    SlotHandler.setCurrentSlot(bestArm);
-                    mc.playerController.sendUseItem(mc.thePlayer, mc.theWorld, SlotHandler.getHeldItem());
-                }
-            }
+            ((IRapidFire) rapidFire.getSelected()).onFire();
+            ((IRageBotFeature) noSpread.getSelected()).onFire();
             if (target != null)
                 HitLog.onAttack(predTicks, target.first().first(), Utils.getEyePos(target.first().first()), new Vec3(mc.thePlayer), RotationHandler.getRotationYaw(), RotationHandler.getRotationPitch());
             targeted = false;
             return true;
+        } else {
+            Utils.sendClick(1, false);
         }
         return false;
     }

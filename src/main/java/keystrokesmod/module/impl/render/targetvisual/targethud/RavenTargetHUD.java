@@ -22,6 +22,7 @@ import static keystrokesmod.module.impl.render.TargetHUD.*;
 public class RavenTargetHUD extends SubMode<TargetHUD> implements ITargetVisual {
     private final ModeSetting theme;
     private final ModeSetting font;
+    private final ButtonSetting animation;
     private final ButtonSetting showStatus;
     private final ButtonSetting healthColor;
     private final Animation healthBarAnimation = new Animation(Easing.EASE_OUT_CIRC, 150);
@@ -30,6 +31,7 @@ public class RavenTargetHUD extends SubMode<TargetHUD> implements ITargetVisual 
         super(name, parent);
         this.registerSetting(theme = new ModeSetting("Theme", Theme.themes, 0));
         this.registerSetting(font = new ModeSetting("Font", new String[]{"Minecraft", "ProductSans", "Regular"}, 0));
+        this.registerSetting(animation = new ButtonSetting("Animation", true));
         this.registerSetting(showStatus = new ButtonSetting("Show win or loss", true));
         this.registerSetting(healthColor = new ButtonSetting("Traditional health color", false));
     }
@@ -49,7 +51,12 @@ public class RavenTargetHUD extends SubMode<TargetHUD> implements ITargetVisual 
     @Override
     public void render(@NotNull EntityLivingBase target) {
         String name = target.getDisplayName().getFormattedText();
-        String healthText = " " + (int) target.getHealth();
+        String healthText;
+        if (target.getHealth() == (int) target.getHealth()) {
+            healthText = " " + (int) target.getHealth();
+        } else {
+            healthText = " " + String.format("%.1f", target.getHealth());
+        }
         float health = Utils.limit(target.getHealth() / target.getMaxHealth(), 0, 1);
         if (Float.isInfinite(health) || Float.isNaN(health)) {
             health = 0;
@@ -81,8 +88,13 @@ public class RavenTargetHUD extends SubMode<TargetHUD> implements ITargetVisual 
             healthBar = n13 + 3;
         }
 
-        healthBarAnimation.run(healthBar);
         float lastHealthBar = (float) healthBarAnimation.getValue();
+        if (animation.isToggled()) {
+        healthBarAnimation.run(healthBar);
+        } else {
+            lastHealthBar = healthBar;
+        }
+
         RenderUtils.drawRoundedGradientRect((float) n13, (float) current$maxY, lastHealthBar, (float) (current$maxY + 5), 4.0f,
                 Utils.merge(array[0], n12), Utils.merge(array[0], n12),
                 Utils.merge(array[1], n12), Utils.merge(array[1], n12));

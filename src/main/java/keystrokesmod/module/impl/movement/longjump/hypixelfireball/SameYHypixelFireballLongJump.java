@@ -4,6 +4,7 @@ import keystrokesmod.event.*;
 import keystrokesmod.module.impl.movement.longjump.HypixelFireballLongJump;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.MoveUtil;
+import net.minecraft.network.play.server.S12PacketEntityVelocity;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
@@ -15,9 +16,21 @@ public class SameYHypixelFireballLongJump extends SubMode<HypixelFireballLongJum
     public static boolean stopModules;
     private boolean waitForDamage = false;
     private int aimedTicks = Integer.MAX_VALUE;
+    private boolean setSpeed;
 
     public SameYHypixelFireballLongJump(String name, @NotNull HypixelFireballLongJump parent) {
         super(name, parent);
+    }
+
+    @SubscribeEvent
+    public void onReceivePacket(@NotNull ReceivePacketEvent event) {
+        if (event.getPacket() instanceof S12PacketEntityVelocity) {
+            if (((S12PacketEntityVelocity) event.getPacket()).getEntityID() == mc.thePlayer.getEntityId()) {
+                if (waitForDamage) {
+                    setSpeed = true;
+                }
+            }
+        }
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
@@ -42,11 +55,15 @@ public class SameYHypixelFireballLongJump extends SubMode<HypixelFireballLongJum
 
         if (mc.thePlayer.hurtTime >= 3) {
             start = true;
-            MoveUtil.strafe(parent.speed.getInput());
         }
 
         if (start) {
             ticks++;
+        }
+
+        if (setSpeed) {
+            MoveUtil.strafe(parent.speed.getInput());
+            setSpeed = false;
         }
 
         if (ticks > 0 && ticks < 30) {
@@ -76,6 +93,7 @@ public class SameYHypixelFireballLongJump extends SubMode<HypixelFireballLongJum
         aimedTicks = Integer.MAX_VALUE;
         ticks = 0;
         stopModules = false;
+        setSpeed = false;
     }
 
     public void onEnable() {

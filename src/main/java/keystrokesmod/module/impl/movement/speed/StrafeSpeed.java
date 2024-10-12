@@ -21,7 +21,7 @@ public class StrafeSpeed extends SubMode<Speed> {
 
     @SubscribeEvent
     public void onPreUpdate(@NotNull PreUpdateEvent event) {
-        if (parent.noAction() || MoveUtil.isMoving()) return;
+        if (parent.noAction() || !MoveUtil.isMoving()) return;
 
         if (mc.thePlayer.onGround && groundStrafe.isToggled()) {
             MoveUtil.strafe(MoveUtil.getAllowedHorizontalDistance());

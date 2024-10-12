@@ -143,6 +143,10 @@ public class Utils {
         return num == Math.floor(num);
     }
 
+    public static boolean randomizeBoolean() {
+        return Math.random() >= 0.5;
+    }
+
     public static int randomizeInt(double min, double max) {
         return (int) randomizeDouble(min, max);
     }
@@ -1081,8 +1085,8 @@ public class Utils {
     }
 
     public static void inventoryClick(@NotNull GuiScreen s) {
-        int x = Mouse.getX() / mc.displayWidth * s.width;
-        int y = s.height - Mouse.getY() / mc.displayHeight * s.height;
+        int x = Mouse.getX() * s.width / mc.displayWidth;
+        int y = s.height - Mouse.getY() * s.height / mc.displayHeight - 1;
 
         ClickEvent event = new ClickEvent();
         MinecraftForge.EVENT_BUS.post(event);

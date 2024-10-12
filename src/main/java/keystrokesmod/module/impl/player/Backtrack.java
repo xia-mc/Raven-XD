@@ -21,7 +21,6 @@ import keystrokesmod.utility.render.Animation;
 import keystrokesmod.utility.render.Easing;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.Packet;
-import net.minecraft.network.play.INetHandlerPlayClient;
 import net.minecraft.network.play.server.*;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.event.entity.player.AttackEntityEvent;
@@ -83,9 +82,6 @@ public class Backtrack extends Module {
 
     @Override
     public void onDisable() {
-        if (mc.thePlayer == null)
-            return;
-
         releaseAll();
     }
 
@@ -108,7 +104,7 @@ public class Backtrack extends Module {
         while (!packetQueue.isEmpty()) {
             try {
                 if (packetQueue.element().getCold().getCum(currentLatency)) {
-                    Packet<INetHandlerPlayClient> packet = (Packet<INetHandlerPlayClient>) packetQueue.remove().getPacket();
+                    Packet<?> packet = packetQueue.remove().getPacket();
                     skipPackets.add(packet);
                     PacketUtils.receivePacket(packet);
                 } else {
@@ -257,7 +253,7 @@ public class Backtrack extends Module {
     private void releaseAll() {
         if (!packetQueue.isEmpty()) {
             for (TimedPacket timedPacket : packetQueue) {
-                Packet<INetHandlerPlayClient> packet = (Packet<INetHandlerPlayClient>) timedPacket.getPacket();
+                Packet<?> packet = timedPacket.getPacket();
                 skipPackets.add(packet);
                 PacketUtils.receivePacket(packet);
             }

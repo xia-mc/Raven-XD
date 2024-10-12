@@ -22,6 +22,7 @@ public class RavenNewTargetHUD extends SubMode<TargetHUD> implements ITargetVisu
     public static final int RECT_COLOR = new Color(255, 255, 255, 30).getRGB();
     public static final int TEXT_DIST_TO_RECT = 6;
     public static final int RECT_SHADOW_DIST = 6;
+    private final ButtonSetting animation;
     private final ModeSetting theme;
     private final ModeSetting font;
     private final ButtonSetting showStatus;
@@ -32,6 +33,7 @@ public class RavenNewTargetHUD extends SubMode<TargetHUD> implements ITargetVisu
         super(name, parent);
         this.registerSetting(theme = new ModeSetting("Theme", Theme.themes, 0));
         this.registerSetting(font = new ModeSetting("Font", new String[]{"Minecraft", "ProductSans", "Regular"}, 0));
+        this.registerSetting(animation = new ButtonSetting("Animation", true));
         this.registerSetting(showStatus = new ButtonSetting("Show win or loss", true));
         this.registerSetting(healthColor = new ButtonSetting("Traditional health color", false));
     }
@@ -93,8 +95,13 @@ public class RavenNewTargetHUD extends SubMode<TargetHUD> implements ITargetVisu
         if (healthBar - current$minX + 3 < 0) { // if goes below, the rounded health bar glitches out
             healthBar = current$minX + 3;
         }
-        healthBarAnimation.run(healthBar);
+
         float lastHealthBar = (float) healthBarAnimation.getValue();
+        if (animation.isToggled()) {
+        healthBarAnimation.run(healthBar);
+        } else {
+            lastHealthBar = healthBar;
+        }
 
         RenderUtils.drawRoundedGradientRect((float) current$minX + 6, (float) current$maxY - 9, lastHealthBar, (float) (current$maxY - 4), 4.0f,
                 Utils.merge(Theme.getGradients((int) theme.getInput())[0], Math.min(255, 210)), Utils.merge(Theme.getGradients((int) theme.getInput())[0], Math.min(255, 210)),

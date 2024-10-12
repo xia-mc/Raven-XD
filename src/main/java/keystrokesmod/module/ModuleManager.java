@@ -122,13 +122,13 @@ public class ModuleManager {
 //    public static AbilitiesBedWars abilitiesBedWars;
     public static ClientTheme clientTheme;
     public static AutoChest autoChest;
-    public static SilenceIRC silenceIRC;
     public static Teleport teleport;
     public static AntiFalseFlag antiFalseFlag;
     public static ViaVersionFix viaVersionFix;
     public static AutoGapple autoGapple;
     public static RemoteShop remoteShop;
     public static Regen regen;
+    public static ChatAI chatAI;
 
     public void register() {
 
@@ -225,7 +225,7 @@ public class ModuleManager {
         this.addModule(autoRegister = new AutoRegister());
         this.addModule(viewPackets = new ViewPackets());
         this.addModule(new FlagDetector());
-        this.addModule(silenceIRC = new SilenceIRC());
+        this.addModule(chatAI = new ChatAI());
 
         // player
         this.addModule(new AntiAFK());

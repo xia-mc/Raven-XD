@@ -37,53 +37,26 @@ public class CheckManager {
         pre.put(GroundSpoofA.class, new GroundSpoofA(player));
         pre.put(GroundSpoofB.class, new GroundSpoofB(player));
         normal.put(FlyA.class, new FlyA(player));
-        normal.put(FlyB.class, new FlyB(player));
         normal.put(BlinkA.class, new BlinkA(player));
         normal.put(SpeedA.class, new SpeedA(player));
         normal.put(SpeedB.class, new SpeedB(player));
-//        normal.put(SpeedC.class, new SpeedC(player));
         normal.put(NoSlowA.class, new NoSlowA(player));
         normal.put(AutoBlockA.class, new AutoBlockA(player));
         normal.put(MotionA.class, new MotionA(player));
         normal.put(ReachA.class, new ReachA(player));
-        normal.put(HitBoxA.class, new HitBoxA(player));
-        normal.put(StrafeA.class, new StrafeA(player));
         normal.put(AimA.class, new AimA(player));
         normal.put(AimB.class, new AimB(player));
         normal.put(AimC.class, new AimC(player));
         normal.put(ScaffoldA.class, new ScaffoldA(player));
         normal.put(ScaffoldB.class, new ScaffoldB(player));
         normal.put(NoFallA.class, new NoFallA(player));
+        normal.put(AutoClickerA.class, new AutoClickerA(player));
 
         return new CheckManager(pre, normal, post, player);
     }
 
     public static @NotNull CheckManager createSelf(@NotNull TRSelf player) {
-        final Map<Class<? extends Check>, Check> pre = new HashMap<>();
-        final Map<Class<? extends Check>, Check> normal = new HashMap<>();
-        final Map<Class<? extends Check>, Check> post = new HashMap<>();
-        pre.put(GroundSpoofA.class, new GroundSpoofA(player));
-        pre.put(GroundSpoofB.class, new GroundSpoofB(player));
-        normal.put(FlyA.class, new FlyA(player));
-        normal.put(FlyB.class, new FlyB(player));
-        normal.put(BlinkA.class, new BlinkA(player));
-        normal.put(SpeedA.class, new SpeedA(player));
-        normal.put(SpeedB.class, new SpeedB(player));
-//        normal.put(SpeedC.class, new SpeedC(player));
-        normal.put(NoSlowA.class, new NoSlowA(player));
-        normal.put(AutoBlockA.class, new AutoBlockA(player));
-        normal.put(MotionA.class, new MotionA(player));
-        normal.put(ReachA.class, new ReachA(player));
-        normal.put(HitBoxA.class, new HitBoxA(player));
-        normal.put(StrafeA.class, new StrafeA(player));
-        normal.put(AimA.class, new AimA(player));
-        normal.put(AimB.class, new AimB(player));
-        normal.put(AimC.class, new AimC(player));
-        normal.put(ScaffoldA.class, new ScaffoldA(player));
-        normal.put(ScaffoldB.class, new ScaffoldB(player));
-        normal.put(NoFallA.class, new NoFallA(player));
-
-        return new CheckManager(pre, normal, post, player);
+        return create(player);
     }
 
     public void update() {

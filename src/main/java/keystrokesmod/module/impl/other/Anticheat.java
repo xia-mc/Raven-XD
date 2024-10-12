@@ -1,6 +1,7 @@
 package keystrokesmod.module.impl.other;
 
 import keystrokesmod.Raven;
+import keystrokesmod.event.WorldChangeEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.other.anticheats.PlayerManager;
 import keystrokesmod.module.setting.impl.ButtonSetting;
@@ -8,6 +9,7 @@ import keystrokesmod.module.setting.impl.DescriptionSetting;
 import keystrokesmod.module.setting.impl.ModeSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import lombok.Getter;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
@@ -78,15 +80,19 @@ public class Anticheat extends Module {
     }
 
     @SubscribeEvent
-    public void onEntityJoin(@NotNull EntityJoinWorldEvent e) {
-        if (e.entity == mc.thePlayer) {
-            manager = null;
-            manager = new PlayerManager();
-        }
+    public void onEntityJoin(@NotNull WorldChangeEvent e) {
+        manager = null;
+        manager = new PlayerManager();
     }
 
-    public void onDisable() {
+    @Override
+    public void onDisable() throws Throwable {
+        manager.dataMap.values().forEach(trPlayer -> trPlayer.manager.onCustomAction(MinecraftForge.EVENT_BUS::unregister));
         manager = null;
+    }
+
+    @Override
+    public void onEnable() throws Throwable {
         manager = new PlayerManager();
     }
 }

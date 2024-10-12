@@ -1,5 +1,7 @@
 package keystrokesmod.utility;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.gui.GuiEnchantment;
@@ -24,6 +26,8 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.MouseEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import org.lwjgl.input.Mouse;
 
 import java.lang.reflect.Field;
@@ -327,5 +331,115 @@ public class Reflection {
             return false;
         }
         return blocking;
+    }
+
+    @Data
+    @AllArgsConstructor
+    private static final class MethodData {
+        private final Class<?> aClass;
+        private final String method;
+        private final Class<?>[] params;
+
+        public MethodData(@NotNull Class<?> aClass, @NotNull String method, Object... params) {
+            this(aClass, method, Arrays.stream(params).map(Object::getClass).toArray(Class[]::new));
+        }
+    }
+
+    @Data
+    @AllArgsConstructor
+    private static final class FieldData {
+        private final Class<?> aClass;
+        private final String field;
+    }
+
+    private static final HashMap<MethodData, Method> methodMap = new HashMap<>();
+    private static final HashMap<FieldData, Field> fieldMap = new HashMap<>();
+
+    @Contract(pure = true)
+    private static @NotNull Method getMethod(@NotNull MethodData data) {
+        if (!methodMap.containsKey(data)) {
+            try {
+                final Method target = data.getAClass().getDeclaredMethod(data.getMethod(), data.getParams());
+                target.setAccessible(true);
+                methodMap.put(data, target);
+                return target;
+            } catch (NoSuchMethodException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return methodMap.get(data);
+    }
+
+    @Contract(pure = true)
+    private static @NotNull Field getField(@NotNull FieldData data) {
+        if (!fieldMap.containsKey(data)) {
+            try {
+                final Field target = data.getAClass().getDeclaredField(data.getField());
+                target.setAccessible(true);
+                fieldMap.put(data, target);
+                return target;
+            } catch (NoSuchFieldException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return fieldMap.get(data);
+    }
+
+    public static Object call(@NotNull Object object, @NotNull String method, Object... params) {
+        final MethodData data = new MethodData(object.getClass(), method, params);
+
+        try {
+            return getMethod(data).invoke(object, params);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static Object get(@NotNull Object object, @NotNull String field) {
+        final FieldData data = new FieldData(object.getClass(), field);
+
+        try {
+            return getField(data).get(object);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static Object getDeclared(@NotNull Class<?> aClass, @NotNull String field) {
+        final FieldData data = new FieldData(aClass, field);
+
+        try {
+            return getField(data).get(null);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static <T> T get(@NotNull Object object, @NotNull String field, @NotNull Class<T> type) {
+        return type.cast(get(object, field));
+    }
+
+    public static <T> T getDeclared(@NotNull Class<?> aClass, @NotNull String field, @NotNull Class<T> type) {
+        return type.cast(getDeclared(aClass, field));
+    }
+
+    public static void set(@NotNull Object object, @NotNull String field, Object value) {
+        final FieldData data = new FieldData(object.getClass(), field);
+
+        try {
+            getField(data).set(object, value);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void set(@NotNull Class<?> aClass, @NotNull String field, Object value) {
+        final FieldData data = new FieldData(aClass, field);
+
+        try {
+            getField(data).set(null, value);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
