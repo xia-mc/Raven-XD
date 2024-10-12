@@ -385,11 +385,11 @@ public class Reflection {
         return fieldMap.get(data);
     }
 
-    public static void call(@NotNull Object object, @NotNull String method, Object... params) {
+    public static Object call(@NotNull Object object, @NotNull String method, Object... params) {
         final MethodData data = new MethodData(object.getClass(), method, params);
 
         try {
-            getMethod(data).invoke(object, params);
+            return getMethod(data).invoke(object, params);
         } catch (IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException(e);
         }
@@ -405,8 +405,22 @@ public class Reflection {
         }
     }
 
+    public static Object getDeclared(@NotNull Class<?> aClass, @NotNull String field) {
+        final FieldData data = new FieldData(aClass, field);
+
+        try {
+            return getField(data).get(null);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static <T> T get(@NotNull Object object, @NotNull String field, @NotNull Class<T> type) {
         return type.cast(get(object, field));
+    }
+
+    public static <T> T getDeclared(@NotNull Class<?> aClass, @NotNull String field, @NotNull Class<T> type) {
+        return type.cast(getDeclared(aClass, field));
     }
 
     public static void set(@NotNull Object object, @NotNull String field, Object value) {
@@ -414,6 +428,16 @@ public class Reflection {
 
         try {
             getField(data).set(object, value);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void set(@NotNull Class<?> aClass, @NotNull String field, Object value) {
+        final FieldData data = new FieldData(aClass, field);
+
+        try {
+            getField(data).set(null, value);
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }

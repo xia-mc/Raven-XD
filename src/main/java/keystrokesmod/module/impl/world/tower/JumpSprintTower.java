@@ -25,9 +25,9 @@ public class JumpSprintTower extends SubMode<Tower> {
 
     public JumpSprintTower(String name, @NotNull Tower parent) {
         super(name, parent);
-        this.registerSetting(speed = new SliderSetting("Speed", 0.95, 0.5, 1, 0.01));
-        this.registerSetting(offGroundSpeed = new SliderSetting("Hypixel off ground speed", 0.5, 0.0, 1.0, 0.01));
-        this.registerSetting(noStrafe = new ButtonSetting("Hypixel no strafe", false));
+        this.registerSetting(speed = new SliderSetting("Speed", 1, 0.5, 1, 0.01));
+        this.registerSetting(offGroundSpeed = new SliderSetting("Off ground speed", 1, 0.0, 1.0, 0.01));
+        this.registerSetting(noStrafe = new ButtonSetting("No strafe", false));
         this.registerSetting(lowHop = new ModeSetting("Low hop", new String[]{"None", "Default", "Test1", "Test2"}, 0));
     }
 

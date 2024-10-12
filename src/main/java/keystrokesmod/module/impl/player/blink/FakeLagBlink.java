@@ -76,7 +76,6 @@ public class FakeLagBlink extends SubMode<Blink> {
             stopTime = System.currentTimeMillis();
             needToDisable = true;
         }
-        ProgressManager.remove(progress);
     }
 
     @Override
@@ -112,6 +111,7 @@ public class FakeLagBlink extends SubMode<Blink> {
                 if (packetQueue.isEmpty()) {
                     MinecraftForge.EVENT_BUS.unregister(this);
                     needToDisable = false;
+                    ProgressManager.remove(progress);
                     return;
                 }
             }

@@ -64,6 +64,7 @@ public class ChatGPTChatAI extends IChatAI {
 
         Raven.getExecutor().execute(() -> {
             try {
+                Utils.sendMessage(ChatFormatting.GRAY + "Waiting for response...");
                 context = client.sendMessage(message, context, GPTModel.values()[(int) model.getInput()]);
                 Utils.sendMessage(ChatFormatting.GREEN + "ChatGPT: " + ChatFormatting.RESET + context.getLatestResponse());
             } catch (Exception e) {

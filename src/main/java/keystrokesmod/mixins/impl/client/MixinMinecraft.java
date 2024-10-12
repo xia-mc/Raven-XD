@@ -12,19 +12,24 @@ import keystrokesmod.module.impl.render.Animations;
 import keystrokesmod.module.impl.render.FreeLook;
 import keystrokesmod.module.impl.render.Watermark;
 import keystrokesmod.utility.Utils;
+import keystrokesmod.utility.render.BackgroundUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
+import net.minecraft.client.resources.DefaultResourcePack;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.Display;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 import static keystrokesmod.Raven.mc;
 
@@ -101,5 +106,12 @@ public abstract class MixinMinecraft {
     @Inject(method = "createDisplay", at = @At(value = "RETURN"))
     private void onSetTitle(@NotNull CallbackInfo ci) {
         Display.setTitle("Raven XD " + Watermark.VERSION);
+    }
+
+
+
+    @Redirect(method = "drawSplashScreen", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/resources/DefaultResourcePack;getInputStream(Lnet/minecraft/util/ResourceLocation;)Ljava/io/InputStream;"))
+    private InputStream modifyConstant(@NotNull DefaultResourcePack instance, ResourceLocation location) throws IOException {
+        return instance.getInputStream(BackgroundUtils.getLogoPng());
     }
 }
