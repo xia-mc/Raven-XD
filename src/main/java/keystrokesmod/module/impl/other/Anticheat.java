@@ -10,7 +10,6 @@ import keystrokesmod.module.setting.impl.ModeSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import lombok.Getter;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
@@ -49,6 +48,8 @@ public class Anticheat extends Module {
     private static ButtonSetting movementCheck;
     @Getter
     private static ButtonSetting scaffoldingCheck;
+    @Getter
+    private static ButtonSetting simulationCheck;
 
     private PlayerManager manager = new PlayerManager();
     public Anticheat() {
@@ -64,18 +65,15 @@ public class Anticheat extends Module {
         this.registerSetting(shouldPing = new ButtonSetting("Should ping", true));
         this.registerSetting(pingSound = new ModeSetting("Ping sound", new String[]{"Note", "Augustus"}, 0, shouldPing::isToggled));
         this.registerSetting(autoReport = new ModeSetting("Auto report", new String[]{"None", "/wdr", "/report"}, 0));
-        this.registerSetting(experimentalMode = new ButtonSetting("Experimental mode", true));
+        this.registerSetting(experimentalMode = new ButtonSetting("Experimental mode", false));
         this.registerSetting(aimCheck = new ButtonSetting("Aim checks", true));
         this.registerSetting(combatCheck = new ButtonSetting("Combat checks", true));
         this.registerSetting(movementCheck = new ButtonSetting("Movement checks", true));
         this.registerSetting(scaffoldingCheck = new ButtonSetting("Scaffolding checks", true));
+        this.registerSetting(simulationCheck = new ButtonSetting("Simulation checks", false));
     }
 
     public void onUpdate() {
-        if (mc.isSingleplayer()) {
-            return;
-        }
-
         manager.update(Raven.mc);
     }
 
@@ -87,8 +85,11 @@ public class Anticheat extends Module {
 
     @Override
     public void onDisable() throws Throwable {
-        manager.dataMap.values().forEach(trPlayer -> trPlayer.manager.onCustomAction(MinecraftForge.EVENT_BUS::unregister));
-        manager = null;
+        //noinspection SynchronizeOnNonFinalField
+        synchronized (manager) {
+            manager.dataMap.values().forEach(trPlayer -> trPlayer.manager.onCustomAction(MinecraftForge.EVENT_BUS::unregister));
+            manager = null;
+        }
     }
 
     @Override

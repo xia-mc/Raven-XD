@@ -6,6 +6,8 @@ import keystrokesmod.module.impl.other.anticheats.utils.alert.LogUtils;
 import net.minecraftforge.common.MinecraftForge;
 import org.jetbrains.annotations.NotNull;
 
+import java.lang.ref.WeakReference;
+
 public abstract class Check {
     protected final @NotNull TRPlayer player;
     public String checkName;
@@ -18,7 +20,7 @@ public abstract class Check {
     }
 
     @Override
-    protected void finalize() throws Throwable {
+    protected void finalize() {
         MinecraftForge.EVENT_BUS.unregister(this);
     }
 
