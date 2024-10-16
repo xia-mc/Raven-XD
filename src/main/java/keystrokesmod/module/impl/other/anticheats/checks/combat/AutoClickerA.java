@@ -27,10 +27,11 @@ public class AutoClickerA extends Check {
 
     private void onClick() {
         final long time = System.currentTimeMillis();
-        if (clicks.size() == 15) {
+        if (clicks.size() >= 15) {
             final long lastClick = clicks.dequeueLong();
-            if (time - lastClick < 1000) {
-                flag(String.format("High cps: %.1f", (time - lastClick) / 1000.0 * 15));
+            final double lastCPS = (time - lastClick) / 1000.0 * 15;
+            if (time - lastClick < 1000 && lastCPS >= 15) {
+                flag(String.format("High cps: %.1f", lastCPS));
                 clicks.clear();
             }
         }

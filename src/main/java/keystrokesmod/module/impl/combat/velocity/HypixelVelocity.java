@@ -24,6 +24,7 @@ public class HypixelVelocity extends SubMode<Velocity> {
     private final SliderSetting chance;
     private final ButtonSetting cancelAir;
     private final ButtonSetting damageBoost;
+    private final ButtonSetting damageBoostOnlyOnGround;
     private final ButtonSetting onlyFirstHit;
     private final SliderSetting resetTime;
 
@@ -38,6 +39,7 @@ public class HypixelVelocity extends SubMode<Velocity> {
         this.registerSetting(chance = new SliderSetting("Chance", 100, 0, 100, 1, "%"));
         this.registerSetting(cancelAir = new ButtonSetting("Cancel air", false));
         this.registerSetting(damageBoost = new ButtonSetting("Damage boost", false));
+        this.registerSetting(damageBoostOnlyOnGround = new ButtonSetting("Damage boost only on ground", false, damageBoost::isToggled));
         this.registerSetting(onlyFirstHit = new ButtonSetting("Only first hit", false));
         this.registerSetting(resetTime = new SliderSetting("Reset time", 5000, 500, 10000, 500, "ms", onlyFirstHit::isToggled));
     }
@@ -71,7 +73,7 @@ public class HypixelVelocity extends SubMode<Velocity> {
 
         mc.thePlayer.motionY = choose(mc.thePlayer.motionY, motionY);
 
-        if (damageBoost.isToggled()) {
+        if (damageBoost.isToggled() && !(!mc.thePlayer.onGround && damageBoostOnlyOnGround.isToggled())) {
             MoveUtil.moveFlying(0.2);
         }
 

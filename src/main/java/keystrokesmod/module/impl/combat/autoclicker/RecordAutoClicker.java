@@ -19,7 +19,7 @@ public class RecordAutoClicker extends SubMode<IAutoClicker> {
 
     @SubscribeEvent
     public void onPreMotion(PreMotionEvent event) {
-        if (!always && left ? !Mouse.isButtonDown(0) : !Mouse.isButtonDown(1))
+        if (!always && (left ? !Mouse.isButtonDown(0) : !Mouse.isButtonDown(1)))
             return;
         if (System.currentTimeMillis() < RecordClick.getNextClickTime())
             return;

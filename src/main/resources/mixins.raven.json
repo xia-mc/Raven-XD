@@ -7,6 +7,7 @@
     "client.MixinInventoryPlayer",
     "entity.EntityAccessor",
     "entity.EntityLivingBaseAccessor",
+    "entity.EntityPlayerAccessor",
     "entity.MixinEntity",
     "entity.MixinEntityLivingBase",
     "entity.MixinEntityPlayer",

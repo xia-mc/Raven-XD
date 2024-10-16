@@ -63,7 +63,7 @@ public class TRPlayer {
 
     public PlayerData compatPlayerData = new PlayerData();
 
-    public @NotNull ScheduledExecutorService timeTask = Executors.newScheduledThreadPool(4);
+    public @NotNull ScheduledExecutorService timeTask = Executors.newScheduledThreadPool(1);
     @Contract("_ -> new")
     public static @NotNull TRPlayer create(@NotNull AbstractClientPlayer player) {
         return new TRPlayer(player, false);

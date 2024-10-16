@@ -42,6 +42,15 @@ public class AimSimulator {
     private boolean delay = false;
     private int delayTicks = 1;
 
+    private boolean scale = false;
+    private double scaleX = 1;
+    private double scaleY = 1;
+
+    private boolean offset = false;
+    private double offsetX = 0;
+    private double offsetY = 0;
+    private boolean offsetPre = true;
+
     @Getter
     private Vec3 hitPos = Vec3.ZERO;
 
@@ -67,8 +76,25 @@ public class AimSimulator {
         this.delay = value;
     }
 
+    public void setScale(boolean value, double scaleX, double scaleY) {
+        this.scale = value;
+        this.scaleX = scaleX;
+        this.scaleY = scaleY;
+    }
+
+    public void setOffset(boolean value, double offsetX, double offsetY, boolean offsetPre) {
+        this.offset = value;
+        this.offsetX = offsetX;
+        this.offsetY = offsetY;
+        this.offsetPre = offsetPre;
+    }
+
     public @NotNull Pair<Float, Float> getRotation(@NotNull EntityLivingBase target) {
         AxisAlignedBB targetBox = target.getEntityBoundingBox();
+        if (scale) {
+            targetBox = targetBox.expand(scaleX, scaleY, scaleX);
+        }
+
         if (boxHistory.size() >= 101) {
             boxHistory.remove(boxHistory.size() - 1);
         }
@@ -90,6 +116,9 @@ public class AimSimulator {
             targetPosition = new Vec3((aimBox.maxX + aimBox.minX) / 2, aimBox.minY + target.getEyeHeight() - 0.15, (aimBox.maxZ + aimBox.minZ) / 2);
         }
 
+        if (offset && offsetPre) {
+            targetPosition = targetPosition.add(offsetX, offsetY, offsetX);
+        }
 
         if (yDiff >= 0 && lazy) {
             if (targetPosition.y() - yDiff > target.posY) {
@@ -116,6 +145,10 @@ public class AimSimulator {
             targetPosition.x = normal(targetBox.maxX, targetBox.minX, targetPosition.x + lastNoiseDeltaX);
             targetPosition.y = normal(targetBox.maxY, targetBox.minY, targetPosition.y + lastNoiseDeltaY);
             targetPosition.z = normal(targetBox.maxZ, targetBox.minZ, targetPosition.z + lastNoiseDeltaZ);
+        }
+
+        if (offset && !offsetPre) {
+            targetPosition = targetPosition.add(offsetX, offsetY, offsetX);
         }
 
         yaw = PlayerRotation.getYaw(targetPosition);

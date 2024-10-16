@@ -1,5 +1,6 @@
 package keystrokesmod.module.impl.other.anticheats;
 
+import keystrokesmod.module.impl.other.anticheats.checks.simulation.Simulation;
 import keystrokesmod.module.impl.other.anticheats.utils.world.EntityUtils;
 import keystrokesmod.module.impl.other.anticheats.checks.aim.*;
 import keystrokesmod.module.impl.other.anticheats.checks.combat.*;
@@ -51,6 +52,7 @@ public class CheckManager {
         normal.put(ScaffoldB.class, new ScaffoldB(player));
         normal.put(NoFallA.class, new NoFallA(player));
         normal.put(AutoClickerA.class, new AutoClickerA(player));
+//        post.put(Simulation.class, new Simulation(player)); buggy
 
         return new CheckManager(pre, normal, post, player);
     }
@@ -89,7 +91,6 @@ public class CheckManager {
     }
 
     public void onCustomAction(Consumer<Check> action) {
-        if (player == null) return;
         for (Check check : preChecks.values()) action.accept(check);
         for (Check check : normalChecks.values()) action.accept(check);
         for (Check check : postChecks.values()) action.accept(check);

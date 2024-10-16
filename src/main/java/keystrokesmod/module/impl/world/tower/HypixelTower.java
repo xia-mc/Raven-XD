@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
 
 public class HypixelTower extends SubMode<Tower> {
     private final ButtonSetting notWhileMoving;
-    private final SliderSetting verticalBlocks;
+    private final SliderSetting stopOnBlocks;
 
     public static final Set<EnumFacing> LIMIT_FACING = new HashSet<>(Collections.singleton(EnumFacing.SOUTH));
     public static final MoveCorrect moveCorrect = new MoveCorrect(0.3, MoveCorrect.Mode.POSITION);
@@ -42,7 +42,7 @@ public class HypixelTower extends SubMode<Tower> {
     public HypixelTower(String name, @NotNull Tower parent) {
         super(name, parent);
         this.registerSetting(notWhileMoving = new ButtonSetting("Not while moving", true));
-        this.registerSetting(verticalBlocks = new SliderSetting("Vertical blocks", 6, 6, 10, 1));
+        this.registerSetting(stopOnBlocks = new SliderSetting("Stop on blocks", 6, 6, 10, 1));
     }
 
     @SubscribeEvent
@@ -73,7 +73,7 @@ public class HypixelTower extends SubMode<Tower> {
                     if (this.towerTicks == 2) {
                         event.setY(Math.floor(mc.thePlayer.posY + 1.0) - mc.thePlayer.posY);
                     } else if (this.towerTicks == 3) {
-                        if (parent.canTower() && !airUnder) {
+                        if (parent.canTower()) {
                             event.setY(mc.thePlayer.motionY = 0.4198499917984009);
                             if (MoveUtil.isMoving())
                                 MoveUtil.strafe((float) towerSpeed - randomAmount());
@@ -108,7 +108,7 @@ public class HypixelTower extends SubMode<Tower> {
         }
 
         if (blockPlaceRequest && !Utils.isMoving()) {
-            if (verticalPlaced >= verticalBlocks.getInput() || mc.thePlayer.onGround) {
+            if (verticalPlaced >= stopOnBlocks.getInput() || mc.thePlayer.onGround) {
                 towering = false;
                 blockPlaceRequest = false;
                 verticalPlaced = 0;

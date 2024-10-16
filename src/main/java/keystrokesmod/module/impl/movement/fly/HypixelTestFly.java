@@ -25,7 +25,7 @@ public class HypixelTestFly extends SubMode<Fly> {
 
     public HypixelTestFly(String name, @NotNull Fly parent) {
         super(name, parent);
-        this.registerSetting(speed = new SliderSetting("Speed", 1, 0.1, 2, 0.01));
+        this.registerSetting(speed = new SliderSetting("Speed", 0.1, 0.01, 0.5, 0.01));
         this.registerSetting(packet = new ButtonSetting("Packet", false));
     }
 
@@ -41,6 +41,7 @@ public class HypixelTestFly extends SubMode<Fly> {
                     PacketUtils.sendPacket(new C03PacketPlayer(true));
                 event.setPosZ(event.getPosZ() + Utils.randomizeDouble(0.09, 0.12));  // 0.095
             }
+            event.setPosY(event.getPosY() + speed.getInput());
 
             mc.thePlayer.motionY = 0.0;
             MoveUtil.strafe(MoveUtil.isMoving() && active ? speed.getInput() / 10 : 0);
