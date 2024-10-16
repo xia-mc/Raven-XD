@@ -92,7 +92,11 @@ public class AimSimulator {
     public @NotNull Pair<Float, Float> getRotation(@NotNull EntityLivingBase target) {
         AxisAlignedBB targetBox = target.getEntityBoundingBox();
         if (scale) {
-            targetBox = targetBox.expand(scaleX, scaleY, scaleX);
+            targetBox = targetBox.expand(
+                    (targetBox.maxX - targetBox.minX) * (scaleX - 1),
+                    (targetBox.maxY - targetBox.minY) * (scaleY - 1),
+                    (targetBox.maxZ - targetBox.minZ) * (scaleX - 1)
+            );
         }
 
         if (boxHistory.size() >= 101) {

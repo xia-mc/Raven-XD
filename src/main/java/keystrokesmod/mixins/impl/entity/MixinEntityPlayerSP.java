@@ -142,9 +142,6 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
      */
     @Overwrite
     public void onUpdateWalkingPlayer() {
-        if (ModuleManager.rotationHandler != null)
-            ModuleManager.rotationHandler.onPrePreMotion();
-
         PreMotionEvent preMotionEvent = new PreMotionEvent(
                 this.posX,
                 this.getEntityBoundingBox().minY,

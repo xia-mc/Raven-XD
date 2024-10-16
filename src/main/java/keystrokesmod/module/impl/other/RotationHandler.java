@@ -119,7 +119,12 @@ public final class RotationHandler extends Module {
         }
     }
 
-    public void onPrePreMotion() {
+    /**
+     * Fix movement
+     * @param event before update living entity (move)
+     */
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public void onMoveInput(MoveInputEvent event) {
         prevRotationYaw = getRotationYaw();
         prevRotationPitch = getRotationPitch();
         if (isSet && mc.currentScreen == null) {
@@ -151,14 +156,7 @@ public final class RotationHandler extends Module {
             movementYaw = null;
             moveFix = null;
         }
-    }
 
-    /**
-     * Fix movement
-     * @param event before update living entity (move)
-     */
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public void onMoveInput(MoveInputEvent event) {
         if (isSet) {
             switch (moveFix) {
                 case None:
