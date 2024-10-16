@@ -70,9 +70,6 @@ public class HypixelStep extends SubMode<Step> {
                     event.setY(mc.thePlayer.motionY = 0.4198479950428009);
                     MoveUtil.strafe(speed - randomAmount());
                     break;
-                case 1:
-                    event.setY(Math.floor(mc.thePlayer.posY + 1.0) - mc.thePlayer.posY);
-                    break;
                 case 5:
                     if (mc.thePlayer.isCollidedHorizontally || !BlockUtils.blockRelativeToPlayer(0, -1, 0).isFullCube())
                         return;

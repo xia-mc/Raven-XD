@@ -35,7 +35,7 @@ public class DragClickAutoClicker extends SubMode<IAutoClicker> {
 
     @SubscribeEvent
     public void onPreMotion(PreMotionEvent event) {
-        if (!always && left ? !Mouse.isButtonDown(0) : !Mouse.isButtonDown(1))
+        if (!always && (left ? !Mouse.isButtonDown(0) : !Mouse.isButtonDown(1)))
             return;
 
         if (nextLength < 0) {
