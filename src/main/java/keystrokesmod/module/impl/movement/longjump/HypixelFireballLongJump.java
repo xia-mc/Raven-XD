@@ -2,8 +2,8 @@ package keystrokesmod.module.impl.movement.longjump;
 
 import keystrokesmod.module.impl.client.Notifications;
 import keystrokesmod.module.impl.movement.LongJump;
+import keystrokesmod.module.impl.movement.longjump.hypixelfireball.MotionHypixelFireballLongJump;
 import keystrokesmod.module.impl.movement.longjump.hypixelfireball.NormalHypixelFireballLongJump;
-import keystrokesmod.module.impl.movement.longjump.hypixelfireball.SameYHypixelFireballLongJump;
 import keystrokesmod.module.impl.other.SlotHandler;
 import keystrokesmod.module.setting.impl.*;
 import net.minecraft.init.Items;
@@ -22,7 +22,7 @@ public class HypixelFireballLongJump extends SubMode<LongJump> {
         this.registerSetting(speed = new SliderSetting("Speed", 1.5, 0, 2, 0.01));
         this.registerSetting(mode = new ModeValue("Sub-Mode", this)
                 .add(new NormalHypixelFireballLongJump("Normal", this))
-                .add(new SameYHypixelFireballLongJump("SameY", this))
+                .add(new MotionHypixelFireballLongJump("Motion", this))
         );
         this.registerSetting(autoDisable = new ButtonSetting("Auto disable", true));
     }
