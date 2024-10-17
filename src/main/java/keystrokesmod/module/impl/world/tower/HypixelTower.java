@@ -64,12 +64,6 @@ public class HypixelTower extends SubMode<Tower> {
             }
 
             blockPlaceRequest = true;
-            if (verticalPlaced >= stopOnBlocks.getInput() || mc.thePlayer.onGround) {
-                towering = false;
-                blockPlaceRequest = false;
-                verticalPlaced = 0;
-                return;
-            }
         }
 
         if ((MoveUtil.speed() > 0.1 && !notWhileMoving.isToggled()) || !MoveUtil.isMoving()) {
@@ -114,6 +108,13 @@ public class HypixelTower extends SubMode<Tower> {
         }
 
         if (blockPlaceRequest && !Utils.isMoving()) {
+            if (verticalPlaced >= stopOnBlocks.getInput() || mc.thePlayer.onGround) {
+                towering = false;
+                blockPlaceRequest = false;
+                verticalPlaced = 0;
+                return;
+            }
+
             MovingObjectPosition lastScaffoldPlace = ModuleManager.scaffold.placeBlock;
             if (lastScaffoldPlace == null)
                 return;
