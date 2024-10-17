@@ -500,6 +500,23 @@ public class Utils {
         return (mc.currentScreen != null) && (mc.thePlayer.inventoryContainer != null) && (mc.thePlayer.inventoryContainer instanceof ContainerPlayer) && (mc.currentScreen instanceof GuiInventory);
     }
 
+    public static boolean isSkyWars() {
+        if (!Utils.nullCheck()) {
+            return false;
+        }
+        final Scoreboard scoreboard = mc.theWorld.getScoreboard();
+        if (scoreboard == null) {
+            return false;
+        }
+        final ScoreObjective objective = scoreboard.getObjectiveInDisplaySlot(1);
+        if (objective == null) {
+            return false;
+        }
+        String displayName = stripString(objective.getDisplayName()).toLowerCase();
+
+        return displayName.contains("sky wars") || displayName.contains("skywars");
+    }
+
     public static int getBedwarsStatus() {
         if (!Utils.nullCheck()) {
             return -1;
