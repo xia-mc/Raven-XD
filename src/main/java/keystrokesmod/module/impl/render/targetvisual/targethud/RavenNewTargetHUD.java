@@ -22,18 +22,22 @@ public class RavenNewTargetHUD extends SubMode<TargetHUD> implements ITargetVisu
     public static final int RECT_COLOR = new Color(255, 255, 255, 30).getRGB();
     public static final int TEXT_DIST_TO_RECT = 6;
     public static final int RECT_SHADOW_DIST = 6;
-    private final ButtonSetting animation;
+
     private final ModeSetting theme;
     private final ModeSetting font;
+    private final ButtonSetting animation;
+    private final ButtonSetting background;
     private final ButtonSetting showStatus;
     private final ButtonSetting healthColor;
     private final Animation healthBarAnimation = new Animation(Easing.EASE_OUT_CIRC, 150);
+    private final Animation healthBarAnimation2 = new Animation(Easing.EASE_OUT_SINE, 400);
 
     public RavenNewTargetHUD(String name, @NotNull TargetHUD parent) {
         super(name, parent);
         this.registerSetting(theme = new ModeSetting("Theme", Theme.themes, 0));
         this.registerSetting(font = new ModeSetting("Font", new String[]{"Minecraft", "ProductSans", "Regular"}, 0));
         this.registerSetting(animation = new ButtonSetting("Animation", true));
+        this.registerSetting(background = new ButtonSetting("Background", true));
         this.registerSetting(showStatus = new ButtonSetting("Show win or loss", true));
         this.registerSetting(healthColor = new ButtonSetting("Traditional health color", false));
     }
@@ -70,22 +74,24 @@ public class RavenNewTargetHUD extends SubMode<TargetHUD> implements ITargetVisu
         current$maxX = current$minX + (int) Math.round(getFont().width(renderText)) + 12;
         current$maxY = current$minY + 16 + 12;
 
-        RenderUtils.drawBloomShadow(
-                (float) (current$minX - RECT_SHADOW_DIST), (float) (current$minY - RECT_SHADOW_DIST),
-                (float) (current$maxX - current$minX + RECT_SHADOW_DIST * 2.0), (float) (current$maxY - current$minY + RECT_SHADOW_DIST * 2.0),
-                6, 8, SHADOW_COLOR, false);
+        if (background.isToggled()) {
+            RenderUtils.drawBloomShadow(
+                    (float) (current$minX - RECT_SHADOW_DIST), (float) (current$minY - RECT_SHADOW_DIST),
+                    (float) (current$maxX - current$minX + RECT_SHADOW_DIST * 2.0), (float) (current$maxY - current$minY + RECT_SHADOW_DIST * 2.0),
+                    6, 8, SHADOW_COLOR, false);
 
-        RenderUtils.drawBloomShadow(
-                current$minX, current$minY,
-                current$maxX - current$minX, current$maxY - current$minY,
-                6, 8, RECT_COLOR, false);
+            RenderUtils.drawBloomShadow(
+                    current$minX, current$minY,
+                    current$maxX - current$minX, current$maxY - current$minY,
+                    6, 8, RECT_COLOR, false);
 
-        GaussianBlur.startBlur();
-        RenderUtils.drawBloomShadow(
-                current$minX, current$minY,
-                current$maxX - current$minX, current$maxY - current$minY,
-                6, 8, -1, false);
-        GaussianBlur.endBlur(8, 2);
+            GaussianBlur.startBlur();
+            RenderUtils.drawBloomShadow(
+                    current$minX, current$minY,
+                    current$maxX - current$minX, current$maxY - current$minY,
+                    6, 8, -1, false);
+            GaussianBlur.endBlur(8, 2);
+        }
 
         int healthTextColor = Utils.getColorForHealth(health);
         getFont().drawString(name, current$minX + TEXT_DIST_TO_RECT, current$minY + TEXT_DIST_TO_RECT, -1);
@@ -96,16 +102,22 @@ public class RavenNewTargetHUD extends SubMode<TargetHUD> implements ITargetVisu
             healthBar = current$minX + 3;
         }
 
-        float lastHealthBar = (float) healthBarAnimation.getValue();
+        float lastHealthBar;
         if (animation.isToggled()) {
-        healthBarAnimation.run(healthBar);
+            lastHealthBar = (float) healthBarAnimation.getValue();
+            healthBarAnimation.run(healthBar);
+            healthBarAnimation2.run(healthBar);
         } else {
             lastHealthBar = healthBar;
         }
 
+        RenderUtils.drawRoundedGradientRect((float) current$minX + 6, (float) current$maxY - 9, (float) healthBarAnimation2.getValue(), (float) (current$maxY - 4), 4.0f,
+                Utils.merge(Theme.getGradients((int) theme.getInput())[0], 100), Utils.merge(Theme.getGradients((int) theme.getInput())[0], 100),
+                Utils.merge(Theme.getGradients((int) theme.getInput())[1], 100), Utils.merge(Theme.getGradients((int) theme.getInput())[1], 100));
+
         RenderUtils.drawRoundedGradientRect((float) current$minX + 6, (float) current$maxY - 9, lastHealthBar, (float) (current$maxY - 4), 4.0f,
-                Utils.merge(Theme.getGradients((int) theme.getInput())[0], Math.min(255, 210)), Utils.merge(Theme.getGradients((int) theme.getInput())[0], Math.min(255, 210)),
-                Utils.merge(Theme.getGradients((int) theme.getInput())[1], Math.min(255, 210)), Utils.merge(Theme.getGradients((int) theme.getInput())[1], Math.min(255, 210)));
+                Utils.merge(Theme.getGradients((int) theme.getInput())[0], 210), Utils.merge(Theme.getGradients((int) theme.getInput())[0], 210),
+                Utils.merge(Theme.getGradients((int) theme.getInput())[1], 210), Utils.merge(Theme.getGradients((int) theme.getInput())[1], 210));
 
         if (healthColor.isToggled()) {
             RenderUtils.drawRoundedRectangle((float) current$minX + 6, (float) current$maxY - 9, lastHealthBar, (float) (current$maxY - 4), 4.0f, healthTextColor);

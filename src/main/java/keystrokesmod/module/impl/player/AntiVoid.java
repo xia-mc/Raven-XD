@@ -28,4 +28,9 @@ public class AntiVoid extends Module {
     public void onDisable() throws Throwable {
         mode.disable();
     }
+
+    @Override
+    public String getInfo() {
+        return mode.getSelected().getPrettyName();
+    }
 }
