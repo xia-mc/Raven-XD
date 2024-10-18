@@ -9,7 +9,6 @@ import net.minecraft.util.MovementInputFromOptions;
 import net.minecraftforge.common.MinecraftForge;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -52,7 +51,7 @@ public abstract class MixinMovementInputFromOptions extends MovementInput {
 
         MinecraftForge.EVENT_BUS.post(moveInputEvent);
 
-        final double sneakMultiplier = moveInputEvent.getSneakSlowDownMultiplier();
+        final double sneakMultiplier = moveInputEvent.getSneakSlowDown();
         this.moveForward = moveInputEvent.getForward();
         this.moveStrafe = moveInputEvent.getStrafe();
         this.jump = moveInputEvent.isJump();

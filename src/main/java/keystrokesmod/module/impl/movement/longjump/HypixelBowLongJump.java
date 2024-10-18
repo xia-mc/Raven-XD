@@ -34,7 +34,7 @@ public class HypixelBowLongJump extends SubMode<LongJump> {
 
     public HypixelBowLongJump(String name, @NotNull LongJump parent) {
         super(name, parent);
-        this.registerSetting(speed = new SliderSetting("Speed", 1, 0.5, 1.5, 0.1));
+        this.registerSetting(speed = new SliderSetting("Speed", 1, 0, 1.5, 0.1));
         this.registerSetting(autoDisable = new ButtonSetting("Auto disable", true));
     }
 
@@ -100,7 +100,8 @@ public class HypixelBowLongJump extends SubMode<LongJump> {
                 }
                 break;
             case BOOST:
-                MoveUtil.strafe(speed.getInput());
+                if (speed.getInput() > 0)
+                    MoveUtil.strafe(speed.getInput());
                 state = State.NONE;
                 break;
             case NONE:

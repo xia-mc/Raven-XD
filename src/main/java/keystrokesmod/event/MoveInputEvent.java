@@ -9,14 +9,14 @@ import net.minecraftforge.fml.common.eventhandler.Event;
 public class MoveInputEvent extends Event {
     private float forward, strafe;
     private boolean jump, sneak;
-    private double sneakSlowDownMultiplier;
+    private double sneakSlowDown;
 
-    public MoveInputEvent(float forward, float strafe, boolean jump, boolean sneak, double sneakSlowDownMultiplier) {
+    public MoveInputEvent(float forward, float strafe, boolean jump, boolean sneak, double sneakSlowDown) {
         this.forward = forward;
         this.strafe = strafe;
         this.jump = jump;
         this.sneak = sneak;
-        this.sneakSlowDownMultiplier = sneakSlowDownMultiplier;
+        this.sneakSlowDown = sneakSlowDown;
     }
 
     @Override

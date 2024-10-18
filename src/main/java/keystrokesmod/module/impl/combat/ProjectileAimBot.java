@@ -47,12 +47,9 @@ public class ProjectileAimBot extends IAutoClicker {
     @SubscribeEvent
     public void onPreUpdate(PreUpdateEvent event) {
         Vec3 eyePos = Utils.getEyePos();
-        if ((KillAura.target != null && !ModuleManager.killAura.isAttack()
+        if (KillAura.target != null && !ModuleManager.killAura.isAttack()
                 && Utils.inFov((float) maxTargetLookFovDiff.getInput(), KillAura.target)
-                && Utils.getEyePos(KillAura.target).distanceTo(eyePos) >= minDistance.getInput())
-                || (KillAuraV2.target != null
-                && Utils.inFov((float) maxTargetLookFovDiff.getInput(), KillAuraV2.target))
-                && Utils.getEyePos(KillAuraV2.target).distanceTo(eyePos) >= minDistance.getInput()) {
+                && Utils.getEyePos(KillAura.target).distanceTo(eyePos) >= minDistance.getInput()) {
             int slot = ContainerUtils.getMostProjectiles(-1);
             if (slot == -1) return;
             if (slot >= 9)

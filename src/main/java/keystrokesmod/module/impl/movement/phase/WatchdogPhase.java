@@ -33,7 +33,7 @@ public class WatchdogPhase extends SubMode<Phase> {
         this.registerSetting(autoBlink = new ButtonSetting("Blink", true));
         this.registerSetting(waitingBreakBlock = new ButtonSetting("waiting break block", false));
         this.registerSetting(autoDisable = new ButtonSetting("Auto disable", false));
-        this.registerSetting(autoDisableTicks = new SliderSetting("Auto disable", 6, 1, 40, 1, "ticks"));
+        this.registerSetting(autoDisableTicks = new SliderSetting("Auto disable", 6, 1, 100, 1, "ticks"));
         this.registerSetting(exceptGround = new ButtonSetting("Except ground", false));
     }
 

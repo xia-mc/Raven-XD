@@ -1,22 +1,14 @@
 package keystrokesmod.module.impl.combat.velocity;
 
 import keystrokesmod.event.PreVelocityEvent;
-import keystrokesmod.event.SendPacketEvent;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.combat.Velocity;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.impl.SubMode;
-import keystrokesmod.utility.CoolDown;
 import keystrokesmod.utility.MoveUtil;
-import keystrokesmod.utility.PacketUtils;
-import net.minecraft.network.Packet;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class HypixelVelocity extends SubMode<Velocity> {
     private final SliderSetting horizontal;
@@ -24,12 +16,11 @@ public class HypixelVelocity extends SubMode<Velocity> {
     private final SliderSetting chance;
     private final ButtonSetting cancelAir;
     private final ButtonSetting damageBoost;
+    private final ButtonSetting damageBoostOnlyOnGround;
     private final ButtonSetting onlyFirstHit;
     private final SliderSetting resetTime;
 
     private long lastVelocityTime = 0;
-    private final CoolDown coolDown = new CoolDown(500);
-    private final Queue<Packet<?>> delayedPackets = new ConcurrentLinkedQueue<>();
 
     public HypixelVelocity(String name, @NotNull Velocity parent) {
         super(name, parent);
@@ -38,6 +29,7 @@ public class HypixelVelocity extends SubMode<Velocity> {
         this.registerSetting(chance = new SliderSetting("Chance", 100, 0, 100, 1, "%"));
         this.registerSetting(cancelAir = new ButtonSetting("Cancel air", false));
         this.registerSetting(damageBoost = new ButtonSetting("Damage boost", false));
+        this.registerSetting(damageBoostOnlyOnGround = new ButtonSetting("Damage boost only on ground", false, damageBoost::isToggled));
         this.registerSetting(onlyFirstHit = new ButtonSetting("Only first hit", false));
         this.registerSetting(resetTime = new SliderSetting("Reset time", 5000, 500, 10000, 500, "ms", onlyFirstHit::isToggled));
     }
@@ -55,7 +47,6 @@ public class HypixelVelocity extends SubMode<Velocity> {
         event.setCanceled(true);
 
         if (!mc.thePlayer.onGround && cancelAir.isToggled()) {
-            coolDown.start();
             return;
         }
 
@@ -71,7 +62,7 @@ public class HypixelVelocity extends SubMode<Velocity> {
 
         mc.thePlayer.motionY = choose(mc.thePlayer.motionY, motionY);
 
-        if (damageBoost.isToggled()) {
+        if (damageBoost.isToggled() && !(!mc.thePlayer.onGround && damageBoostOnlyOnGround.isToggled())) {
             MoveUtil.moveFlying(0.2);
         }
 
@@ -83,35 +74,5 @@ public class HypixelVelocity extends SubMode<Velocity> {
         if (packetMotion == 0)
             return curMotion;
         return packetMotion;
-    }
-
-    @Override
-    public void onDisable() {
-        dispatch();
-    }
-
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    public void onSendPacket(@NotNull SendPacketEvent event) {
-        if (event.isCanceled()) return;
-        if (!coolDown.hasFinished() && cancelAir.isToggled()) {
-            event.setCanceled(true);
-            delayedPackets.add(event.getPacket());
-        } else {
-            dispatch();
-        }
-
-        if (mc.thePlayer.onGround) {
-            coolDown.finish();
-        }
-    }
-
-    private void dispatch() {
-        if (delayedPackets.isEmpty()) return;
-        synchronized (delayedPackets) {
-            for (Packet<?> p : delayedPackets) {
-                PacketUtils.sendPacketNoEvent(p);
-            }
-            delayedPackets.clear();
-        }
     }
 }

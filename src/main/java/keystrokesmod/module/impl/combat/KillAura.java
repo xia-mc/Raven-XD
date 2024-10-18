@@ -64,6 +64,7 @@ public class KillAura extends IAutoClicker {
     private final ModeSetting rotationMode;
     private final ModeSetting moveFixMode;
     private final ModeSetting rayCastMode;
+    private final SliderSetting rotationSpeed;
     private final ButtonSetting nearest;
     private final SliderSetting nearestAccuracy;
     private final ButtonSetting lazy;
@@ -77,7 +78,14 @@ public class KillAura extends IAutoClicker {
     private final SliderSetting noiseDelay;
     private final ButtonSetting delayAim;
     private final SliderSetting delayAimAmount;
-    private final SliderSetting rotationSpeed;
+    private final ButtonSetting scale;
+    private final SliderSetting scaleHorizontal;
+    private final SliderSetting scaleVertical;
+    private final SliderSetting scaleChance;
+    private final ButtonSetting offset;
+    private final SliderSetting offsetHorizontal;
+    private final SliderSetting offsetVertical;
+    private final ModeSetting offsetTiming;
 
     private final ModeSetting sortMode;
     private final SliderSetting switchDelay;
@@ -157,11 +165,19 @@ public class KillAura extends IAutoClicker {
         this.registerSetting(constantOnlyIfNotMoving = new ButtonSetting("Constant only if not moving", false, doRotation.extend(constant::isToggled)));
         this.registerSetting(noise = new ButtonSetting("Noise", false, doRotation));
         this.registerSetting(noiseHorizontal = new SliderSetting("Noise horizontal", 0.35, 0.01, 1, 0.01, doRotation.extend(noise::isToggled)));
-        this.registerSetting(noiseVertical = new SliderSetting("Noise vertical", 0.5, 0.01, 1, 0.01, doRotation.extend(noise::isToggled)));
+        this.registerSetting(noiseVertical = new SliderSetting("Noise vertical", 0.5, 0.01, 1.5, 0.01, doRotation.extend(noise::isToggled)));
         this.registerSetting(noiseAimSpeed = new SliderSetting("Noise aim speed", 0.35, 0.01, 1, 0.01, doRotation.extend(noise::isToggled)));
         this.registerSetting(noiseDelay = new SliderSetting("Noise delay", 100, 50, 500, 10, doRotation.extend(noise::isToggled)));
         this.registerSetting(delayAim = new ButtonSetting("Delay aim", false, doRotation));
-        this.registerSetting(delayAimAmount = new SliderSetting("Delay aim amount", 5, 5, 100, 1, doRotation.extend(delayAim::isToggled)));
+        this.registerSetting(delayAimAmount = new SliderSetting("Delay aim amount", 5, 5, 150, 1, doRotation.extend(delayAim::isToggled)));
+        this.registerSetting(scale = new ButtonSetting("Scale", false, doRotation));
+        this.registerSetting(scaleHorizontal = new SliderSetting("Scale horizontal", 1, 0.5, 1.5, 0.1, doRotation.extend(scale::isToggled)));
+        this.registerSetting(scaleVertical = new SliderSetting("Scale vertical", 1, 0.5, 1.5, 0.1, doRotation.extend(scale::isToggled)));
+        this.registerSetting(scaleChance = new SliderSetting("Scale chance", 100, 0, 100, 1, "%", doRotation.extend(scale::isToggled)));
+        this.registerSetting(offset = new ButtonSetting("Offset", false, doRotation));
+        this.registerSetting(offsetHorizontal = new SliderSetting("Offset horizontal", 0, -1, 1, 0.05, doRotation.extend(offset::isToggled)));
+        this.registerSetting(offsetVertical = new SliderSetting("Offset vertical", -0.5, -1.5, 1, 0.05, doRotation.extend(offset::isToggled)));
+        this.registerSetting(offsetTiming = new ModeSetting("Offset timing", new String[]{"Pre", "Post"}, 0, doRotation.extend(offset::isToggled)));
         this.registerSetting(new DescriptionSetting("Targets"));
         String[] sortModes = new String[]{"Health", "HurtTime", "Distance", "Yaw"};
         this.registerSetting(sortMode = new ModeSetting("Sort mode", sortModes, 0));
@@ -213,6 +229,12 @@ public class KillAura extends IAutoClicker {
                 new Pair<>((float) noiseHorizontal.getInput(), (float) noiseVertical.getInput()),
                 noiseAimSpeed.getInput(), (long) noiseDelay.getInput());
         aimSimulator.setDelay(delayAim.isToggled(), (int) delayAimAmount.getInput());
+        if (scale.isToggled() && Math.random() > scaleChance.getInput()) {
+            aimSimulator.setScale(scale.isToggled(), scaleHorizontal.getInput(), scaleVertical.getInput());
+        } else {
+            aimSimulator.setScale(scale.isToggled(), 1, 1);
+        }
+        aimSimulator.setOffset(offset.isToggled(), offsetHorizontal.getInput(), offsetVertical.getInput(), offsetTiming.getInput() == 0);
 
         if (constant.isToggled() && !noAimToEntity() && !(constantOnlyIfNotMoving.isToggled() && (MoveUtil.isMoving() || MoveUtil.isMoving(target))))
             return rotations;
@@ -270,7 +292,15 @@ public class KillAura extends IAutoClicker {
     }
 
     @SubscribeEvent
-    public void onPreUpdate(PreUpdateEvent e) {
+    public void onPreMotion(PreMotionEvent event) {
+        if (fixHypixelSwitch.isToggled() && moveFixMode.getInput() == 0) {
+            RotationData data = doRotationAction(new RotationData(event.getYaw(), event.getPitch()));
+            if (data != null) {
+                event.setYaw(data.getYaw());
+                event.setPitch(data.getPitch());
+            }
+        }
+
         if (gameNoAction() || playerNoAction()) {
             resetVariables();
             return;
@@ -383,18 +413,6 @@ public class KillAura extends IAutoClicker {
             }
         }
     }
-
-    @SubscribeEvent
-    public void onPreMotion(PreMotionEvent event) {
-        if (fixHypixelSwitch.isToggled() && moveFixMode.getInput() == 0) {
-            RotationData data = doRotationAction(new RotationData(event.getYaw(), event.getPitch()));
-            if (data != null) {
-                event.setYaw(data.getYaw());
-                event.setPitch(data.getPitch());
-            }
-        }
-    }
-
 
     private @Nullable RotationData doRotationAction(RotationData e) {
         if (gameNoAction() || playerNoAction()) {

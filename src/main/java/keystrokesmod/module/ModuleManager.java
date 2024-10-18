@@ -90,7 +90,6 @@ public class ModuleManager {
     public static AutoRespawn autoRespawn;
     public static Clutch clutch;
     public static Ambience ambience;
-    public static KillAuraV2 killAuraV2;
     public static DynamicManager dynamicManager;
     public static Disabler disabler;
     public static BridgeAssist bridgeAssist;
@@ -128,6 +127,7 @@ public class ModuleManager {
     public static AutoGapple autoGapple;
     public static RemoteShop remoteShop;
     public static Regen regen;
+    public static ChatAI chatAI;
 
     public void register() {
 
@@ -154,7 +154,6 @@ public class ModuleManager {
         this.addModule(hitBox = new HitBox());
         this.addModule(hitSelect = new HitSelect());
         this.addModule(killAura = new KillAura());
-        this.addModule(killAuraV2 = new KillAuraV2());
         this.addModule(rageBot = new RageBot());
         this.addModule(lagRange = new LagRange());
         this.addModule(moreKB = new MoreKB());
@@ -224,6 +223,7 @@ public class ModuleManager {
         this.addModule(autoRegister = new AutoRegister());
         this.addModule(viewPackets = new ViewPackets());
         this.addModule(new FlagDetector());
+        this.addModule(chatAI = new ChatAI());
 
         // player
         this.addModule(new AntiAFK());

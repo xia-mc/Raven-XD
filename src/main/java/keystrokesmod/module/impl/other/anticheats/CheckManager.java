@@ -1,7 +1,7 @@
 package keystrokesmod.module.impl.other.anticheats;
 
+import keystrokesmod.module.impl.other.anticheats.checks.simulation.Simulation;
 import keystrokesmod.module.impl.other.anticheats.utils.world.EntityUtils;
-import keystrokesmod.module.impl.other.anticheats.checks.aim.*;
 import keystrokesmod.module.impl.other.anticheats.checks.combat.*;
 import keystrokesmod.module.impl.other.anticheats.checks.movement.*;
 import keystrokesmod.module.impl.other.anticheats.checks.scaffolding.*;
@@ -37,7 +37,6 @@ public class CheckManager {
         pre.put(GroundSpoofA.class, new GroundSpoofA(player));
         pre.put(GroundSpoofB.class, new GroundSpoofB(player));
         normal.put(FlyA.class, new FlyA(player));
-        normal.put(FlyB.class, new FlyB(player));
         normal.put(BlinkA.class, new BlinkA(player));
         normal.put(SpeedA.class, new SpeedA(player));
         normal.put(SpeedB.class, new SpeedB(player));
@@ -45,14 +44,12 @@ public class CheckManager {
         normal.put(AutoBlockA.class, new AutoBlockA(player));
         normal.put(MotionA.class, new MotionA(player));
         normal.put(ReachA.class, new ReachA(player));
-        normal.put(HitBoxA.class, new HitBoxA(player));
-        normal.put(StrafeA.class, new StrafeA(player));
-        normal.put(AimA.class, new AimA(player));
-        normal.put(AimB.class, new AimB(player));
-        normal.put(AimC.class, new AimC(player));
         normal.put(ScaffoldA.class, new ScaffoldA(player));
         normal.put(ScaffoldB.class, new ScaffoldB(player));
+        normal.put(ScaffoldC.class, new ScaffoldC(player));
         normal.put(NoFallA.class, new NoFallA(player));
+        normal.put(AutoClickerA.class, new AutoClickerA(player));
+//        post.put(Simulation.class, new Simulation(player)); buggy
 
         return new CheckManager(pre, normal, post, player);
     }
@@ -91,7 +88,6 @@ public class CheckManager {
     }
 
     public void onCustomAction(Consumer<Check> action) {
-        if (player == null) return;
         for (Check check : preChecks.values()) action.accept(check);
         for (Check check : normalChecks.values()) action.accept(check);
         for (Check check : postChecks.values()) action.accept(check);

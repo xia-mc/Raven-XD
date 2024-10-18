@@ -1,11 +1,26 @@
 package keystrokesmod.utility.render;
 
-import keystrokesmod.utility.render.blur.GaussianBlur;
+import keystrokesmod.Raven;
+import lombok.Getter;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.texture.DynamicTexture;
+import net.minecraft.client.renderer.texture.TextureManager;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.shader.Framebuffer;
 import net.minecraft.util.ResourceLocation;
+import org.apache.commons.io.IOUtils;
 import org.jetbrains.annotations.NotNull;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Objects;
 
 public class BackgroundUtils {
     private static final int BLOOM_COLOR = new Color(255, 255, 255, 50).getRGB();
@@ -31,4 +46,7 @@ public class BackgroundUtils {
         }
         huoCheX++;
     }
+
+    @Getter
+    private static final ResourceLocation logoPng = new ResourceLocation("keystrokesmod:textures/backgrounds/bluearacive.png");
 }

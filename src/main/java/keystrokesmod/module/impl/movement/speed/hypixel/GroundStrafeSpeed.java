@@ -18,7 +18,7 @@ public class GroundStrafeSpeed extends SubMode<HypixelSpeed> {
         if (parent.parent.noAction()) return;
 
         if (!Utils.jumpDown() && Utils.isMoving() && mc.currentScreen == null && mc.thePlayer.onGround) {
-            MoveUtil.strafe(MoveUtil.getAllowedHorizontalDistance());
+            MoveUtil.strafe(MoveUtil.getAllowedHorizontalDistance() - Math.random() / 100f);
             mc.thePlayer.jump();
         }
     }

@@ -27,8 +27,8 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 public class HypixelTower extends SubMode<Tower> {
-    private final ButtonSetting onlyWhileMoving;
-    private final SliderSetting verticalBlocks;
+    private final ButtonSetting notWhileMoving;
+    private final SliderSetting stopOnBlocks;
 
     public static final Set<EnumFacing> LIMIT_FACING = new HashSet<>(Collections.singleton(EnumFacing.SOUTH));
     public static final MoveCorrect moveCorrect = new MoveCorrect(0.3, MoveCorrect.Mode.POSITION);
@@ -41,8 +41,8 @@ public class HypixelTower extends SubMode<Tower> {
 
     public HypixelTower(String name, @NotNull Tower parent) {
         super(name, parent);
-        this.registerSetting(onlyWhileMoving = new ButtonSetting("Only while moving", true));
-        this.registerSetting(verticalBlocks = new SliderSetting("Vertical blocks", 6, 6, 10, 1));
+        this.registerSetting(notWhileMoving = new ButtonSetting("Not while moving", true));
+        this.registerSetting(stopOnBlocks = new SliderSetting("Stop on blocks", 6, 6, 10, 1));
     }
 
     @SubscribeEvent
@@ -55,8 +55,6 @@ public class HypixelTower extends SubMode<Tower> {
         );
 
         if (!MoveUtil.isMoving() && parent.canTower()) {
-            if (onlyWhileMoving.isToggled()) return;
-
             if (!moveCorrect.isDoneZ()) {
                 if (mc.thePlayer.posY - lastOnGroundY < 1) return;
 
@@ -68,7 +66,7 @@ public class HypixelTower extends SubMode<Tower> {
             blockPlaceRequest = true;
         }
 
-        if (MoveUtil.speed() > 0.1 || (!MoveUtil.isMoving() && !onlyWhileMoving.isToggled())) {
+        if ((MoveUtil.speed() > 0.1 && !notWhileMoving.isToggled()) || !MoveUtil.isMoving()) {
             double towerSpeed = isGoingDiagonally(0.1) ? 0.22 : 0.29888888;
             if (!mc.thePlayer.onGround) {
                 if (this.towering) {
@@ -109,8 +107,8 @@ public class HypixelTower extends SubMode<Tower> {
             deltaPlace = new BlockPos(0, 1, 1);
         }
 
-        if (blockPlaceRequest && !Utils.isMoving() && !onlyWhileMoving.isToggled()) {
-            if (verticalPlaced >= verticalBlocks.getInput() || mc.thePlayer.onGround) {
+        if (blockPlaceRequest && !Utils.isMoving()) {
+            if (verticalPlaced >= stopOnBlocks.getInput() || mc.thePlayer.onGround) {
                 towering = false;
                 blockPlaceRequest = false;
                 verticalPlaced = 0;
@@ -130,11 +128,12 @@ public class HypixelTower extends SubMode<Tower> {
             Triple<BlockPos, EnumFacing, Vec3> placeSide = optionalPlaceSide.get();
 
             Raven.getExecutor().schedule(() -> {
-                ModuleManager.scaffold.place(
+                if (ModuleManager.scaffold.place(
                         new MovingObjectPosition(placeSide.getRight().toVec3(), placeSide.getMiddle(), placeSide.getLeft()),
                         false
-                );
-                verticalPlaced++;
+                )) {
+                    verticalPlaced++;
+                }
             }, 50, TimeUnit.MILLISECONDS);
 //            ModuleManager.scaffold.tower$noBlockPlace = true;
             blockPlaceRequest = false;
