@@ -1,9 +1,12 @@
 package keystrokesmod.module.impl.movement;
 
+import keystrokesmod.event.PreUpdateEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.movement.speed.*;
 import keystrokesmod.module.setting.impl.*;
 import keystrokesmod.utility.*;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import static keystrokesmod.module.ModuleManager.scaffold;
 
@@ -41,7 +44,8 @@ public class Speed extends Module {
         mode.enable();
     }
 
-    public void onUpdate() {
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    public void onPreUpdate(PreUpdateEvent event) {
         if (mc.thePlayer.onGround) {
             offGroundTicks = 0;
         } else {
