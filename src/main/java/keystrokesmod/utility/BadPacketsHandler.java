@@ -12,6 +12,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
+@Deprecated
 public class BadPacketsHandler { // ensures you don't get banned
     public boolean C08;
     public boolean C07;

@@ -23,10 +23,12 @@ import static keystrokesmod.module.impl.render.TargetHUD.*;
 public class MyauTargetHUD extends SubMode<TargetHUD> implements ITargetVisual {
     private final ModeSetting theme;
     private final ModeSetting font;
+    private final ButtonSetting animation;
+    private final ButtonSetting background;
+    private final ButtonSetting hurtRender;
     private final ButtonSetting showStatus;
     private final ButtonSetting healthColor;
-    private final ButtonSetting animation;
-    private final ButtonSetting hurtRender;
+
     private final Animation healthBarAnimation = new Animation(Easing.LINEAR, 250);
     private EntityLivingBase lastTarget;
 
@@ -34,7 +36,8 @@ public class MyauTargetHUD extends SubMode<TargetHUD> implements ITargetVisual {
         super(name, parent);
         this.registerSetting(theme = new ModeSetting("Theme", Theme.themes, 0));
         this.registerSetting(font = new ModeSetting("Font", new String[]{"Minecraft", "ProductSans", "Regular"}, 0));
-        this.registerSetting(animation = new ButtonSetting("Animation", true));
+        this.registerSetting(animation = new ButtonSetting("Animation", false));
+        this.registerSetting(background = new ButtonSetting("Background", false));
         this.registerSetting(hurtRender = new ButtonSetting("HurtRender", true));
         this.registerSetting(showStatus = new ButtonSetting("Show win or loss", true));
         this.registerSetting(healthColor = new ButtonSetting("Traditional health color", true));
@@ -77,7 +80,8 @@ public class MyauTargetHUD extends SubMode<TargetHUD> implements ITargetVisual {
         final int n11 = Math.min(n10, 110);
         final int n12 = Math.min(n10, 210);
 
-        RenderUtils.drawRect(current$minX, current$minY, current$maxX, current$maxY + 7, Utils.merge(Color.black.getRGB(), Math.min(n10, 60)));
+        if (background.isToggled())
+            RenderUtils.drawRect(current$minX, current$minY, current$maxX, current$maxY + 7, Utils.merge(Color.black.getRGB(), Math.min(n10, 60)));
 
         final int n13 = current$minX + 6 + 27;
         final int n14 = current$maxX - 2;
@@ -125,10 +129,10 @@ public class MyauTargetHUD extends SubMode<TargetHUD> implements ITargetVisual {
             GlStateManager.color(1, 1, 1, 1);
             RenderUtils.renderPlayer2D((float) targetX, (float) targetY, 25, 25, player);
             if (hurtRender.isToggled()) {
-            Color dynamicColor = new Color(255, 255 - (player.hurtTime * 10), 255 - (player.hurtTime * 10));
-            GlStateManager.color(dynamicColor.getRed() / 255F, dynamicColor.getGreen() / 255F, dynamicColor.getBlue() / 255F, dynamicColor.getAlpha() / 255F);
-            RenderUtils.renderPlayer2D((float) targetX, (float) targetY, 25, 25, player);
-            GlStateManager.color(1, 1, 1, 1);
+                Color dynamicColor = new Color(255, 255 - (player.hurtTime * 10), 255 - (player.hurtTime * 10));
+                GlStateManager.color(dynamicColor.getRed() / 255F, dynamicColor.getGreen() / 255F, dynamicColor.getBlue() / 255F, dynamicColor.getAlpha() / 255F);
+                RenderUtils.renderPlayer2D((float) targetX, (float) targetY, 25, 25, player);
+                GlStateManager.color(1, 1, 1, 1);
             }
         }
     }

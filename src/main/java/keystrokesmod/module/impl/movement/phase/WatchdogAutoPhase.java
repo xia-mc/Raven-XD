@@ -3,10 +3,12 @@ package keystrokesmod.module.impl.movement.phase;
 import keystrokesmod.event.BlockAABBEvent;
 import keystrokesmod.event.PreUpdateEvent;
 import keystrokesmod.event.ReceivePacketEvent;
+import keystrokesmod.event.WorldChangeEvent;
 import keystrokesmod.module.impl.movement.Phase;
 import keystrokesmod.module.impl.player.blink.NormalBlink;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.CoolDown;
+import keystrokesmod.utility.Utils;
 import net.minecraft.block.BlockGlass;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S02PacketChat;
@@ -34,6 +36,11 @@ public class WatchdogAutoPhase extends SubMode<Phase> {
     }
 
     @SubscribeEvent
+    public void onWorldChange(WorldChangeEvent event) {
+        onDisable();
+    }
+
+    @SubscribeEvent
     public void onPacketReceiveEvent(@NotNull ReceivePacketEvent event) {
         Packet<?> packet = event.getPacket();
 
@@ -45,15 +52,16 @@ public class WatchdogAutoPhase extends SubMode<Phase> {
                 case "Cages opened! FIGHT!":
                 case "§r§r§r                               §r§f§lSkyWars Duel§r":
                 case "§r§eCages opened! §r§cFIGHT!§r":
-                    phase = false;
-                    blink.disable();
+                    onDisable();
                     break;
 
                 case "The game starts in 3 seconds!":
                 case "§r§e§r§eThe game starts in §r§a§r§c3§r§e seconds!§r§e§r":
                 case "§r§eCages open in: §r§c3 §r§eseconds!§r":
-                    phase = true;
-                    stopWatch.start();
+                    if (Utils.isSkyWars()) {
+                        phase = true;
+                        stopWatch.start();
+                    }
                     break;
             }
         }
@@ -61,6 +69,7 @@ public class WatchdogAutoPhase extends SubMode<Phase> {
 
     @Override
     public void onDisable() {
+        phase = false;
         blink.disable();
     }
 }

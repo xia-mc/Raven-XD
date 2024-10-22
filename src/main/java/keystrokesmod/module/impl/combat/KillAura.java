@@ -29,6 +29,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityArmorStand;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.ItemSword;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.client.*;
 import net.minecraft.network.play.server.S2FPacketSetSlot;
@@ -378,9 +379,11 @@ public class KillAura extends IAutoClicker {
                     lag = false;
                     releasePackets();
                     attack(target);
-                    PacketUtils.sendPacket(new C0FPacketConfirmTransaction(Utils.randomizeInt(0, 2147483647), (short) Utils.randomizeInt(0, -32767), true));
-                    PacketUtils.sendPacket(new C0APacketAnimation());
-                    sendBlock();
+                    if (SlotHandler.getHeldItem() != null && SlotHandler.getHeldItem().getItem() instanceof ItemSword) {
+                        PacketUtils.sendPacket(new C0FPacketConfirmTransaction(Utils.randomizeInt(0, 2147483647), (short) Utils.randomizeInt(0, -32767), true));
+                        PacketUtils.sendPacket(new C0APacketAnimation());
+                        sendBlock();
+                    }
                     break;
             }
             return;

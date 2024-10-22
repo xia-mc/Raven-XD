@@ -61,11 +61,8 @@ public class GrimACVelocity extends SubMode<Velocity> {
 
     private void doReduce() {
         for (int i = 0; i < (int) reduceCountEveryTime.getInput(); i++) {
-            if (ViaVersionFixHelper.is122()) {
-                PacketUtils.sendPacketNoEvent(new C0APacketAnimation());
-            }
-            PacketUtils.sendPacketNoEvent(new C0APacketAnimation());
-            PacketUtils.sendPacketNoEvent(new C02PacketUseEntity(mc.objectMouseOver.entityHit, C02PacketUseEntity.Action.ATTACK));
+            Utils.attackEntity(mc.objectMouseOver.entityHit, false);
+
             mc.thePlayer.motionX *= 0.6;
             mc.thePlayer.motionZ *= 0.6;
         }

@@ -12,9 +12,6 @@ import org.jetbrains.annotations.NotNull;
 
 public class JumpDSprint extends JumpSprint {
     private final SliderSetting delayTicks;
-
-    private boolean lastOnGround = false;
-
     private int delay = 0;
     public JumpDSprint(String name, @NotNull Scaffold parent) {
         super(name, parent);
@@ -23,11 +20,9 @@ public class JumpDSprint extends JumpSprint {
 
     @Override
     public RotationData onFinalRotation(RotationData data) {
-        if (!mc.thePlayer.onGround && lastOnGround && MoveUtil.isMoving() && parent.placeBlock != null && !ModuleManager.tower.canTower() && !Utils.jumpDown()) {
+        if (mc.thePlayer.onGround && MoveUtil.isMoving() && parent.placeBlock != null && !ModuleManager.tower.canTower() && !Utils.jumpDown()) {
             delay = (int) delayTicks.getInput();
         }
-
-        lastOnGround = mc.thePlayer.onGround;
 
         if (delay > 0) {
             return new RotationData(

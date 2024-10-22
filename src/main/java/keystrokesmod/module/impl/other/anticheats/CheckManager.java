@@ -2,7 +2,6 @@ package keystrokesmod.module.impl.other.anticheats;
 
 import keystrokesmod.module.impl.other.anticheats.checks.simulation.Simulation;
 import keystrokesmod.module.impl.other.anticheats.utils.world.EntityUtils;
-import keystrokesmod.module.impl.other.anticheats.checks.aim.*;
 import keystrokesmod.module.impl.other.anticheats.checks.combat.*;
 import keystrokesmod.module.impl.other.anticheats.checks.movement.*;
 import keystrokesmod.module.impl.other.anticheats.checks.scaffolding.*;
@@ -45,11 +44,9 @@ public class CheckManager {
         normal.put(AutoBlockA.class, new AutoBlockA(player));
         normal.put(MotionA.class, new MotionA(player));
         normal.put(ReachA.class, new ReachA(player));
-        normal.put(AimA.class, new AimA(player));
-        normal.put(AimB.class, new AimB(player));
-        normal.put(AimC.class, new AimC(player));
         normal.put(ScaffoldA.class, new ScaffoldA(player));
         normal.put(ScaffoldB.class, new ScaffoldB(player));
+        normal.put(ScaffoldC.class, new ScaffoldC(player));
         normal.put(NoFallA.class, new NoFallA(player));
         normal.put(AutoClickerA.class, new AutoClickerA(player));
 //        post.put(Simulation.class, new Simulation(player)); buggy

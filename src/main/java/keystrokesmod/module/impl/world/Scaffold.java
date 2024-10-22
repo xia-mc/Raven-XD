@@ -309,10 +309,6 @@ public class Scaffold extends IAutoClicker {
     @Override
     public boolean click() {
         place = true;
-        if (legit.isToggled()) {
-            Utils.sendClick(1, true);
-            Utils.sendClick(1, false);
-        }
         return true;
     }
 
@@ -573,7 +569,7 @@ public class Scaffold extends IAutoClicker {
                                         if (rayCasted == null) {
                                             forceStrict = (forceStrict(checkYaw)) && i == 1;
                                             if (recycleRotation.isToggled()) {
-                                                Optional<Triple<BlockPos, EnumFacing, keystrokesmod.script.classes.Vec3>> placeSide = RotationUtils.getPlaceSide(raycast.getBlockPos());
+                                                Optional<Triple<BlockPos, EnumFacing, keystrokesmod.script.classes.Vec3>> placeSide = RotationUtils.getPlaceSide(raycast.getBlockPos().offset(raycast.sideHit));
                                                 if (placeSide.isPresent()) {
                                                     rayCasted = new MovingObjectPosition(placeSide.get().getRight().toVec3(), placeSide.get().getMiddle(), placeSide.get().getLeft());
                                                     placeYaw = PlayerRotation.getYaw(placeSide.get().getRight());
@@ -871,7 +867,9 @@ public class Scaffold extends IAutoClicker {
         }
 
         if (legit.isToggled()) {
-            return false;
+            Utils.sendClick(1, true);
+            Utils.sendClick(1, false);
+            return true;
         }
 
         ScaffoldPlaceEvent event = new ScaffoldPlaceEvent(block, extra);

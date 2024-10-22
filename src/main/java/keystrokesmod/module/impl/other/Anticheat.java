@@ -41,8 +41,6 @@ public class Anticheat extends Module {
     @Getter
     private static ButtonSetting experimentalMode;
     @Getter
-    private static ButtonSetting aimCheck;
-    @Getter
     private static ButtonSetting combatCheck;
     @Getter
     private static ButtonSetting movementCheck;
@@ -66,7 +64,6 @@ public class Anticheat extends Module {
         this.registerSetting(pingSound = new ModeSetting("Ping sound", new String[]{"Note", "Augustus"}, 0, shouldPing::isToggled));
         this.registerSetting(autoReport = new ModeSetting("Auto report", new String[]{"None", "/wdr", "/report"}, 0));
         this.registerSetting(experimentalMode = new ButtonSetting("Experimental mode", false));
-        this.registerSetting(aimCheck = new ButtonSetting("Aim checks", true));
         this.registerSetting(combatCheck = new ButtonSetting("Combat checks", true));
         this.registerSetting(movementCheck = new ButtonSetting("Movement checks", true));
         this.registerSetting(scaffoldingCheck = new ButtonSetting("Scaffolding checks", true));

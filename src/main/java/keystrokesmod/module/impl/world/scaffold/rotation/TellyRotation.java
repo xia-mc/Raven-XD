@@ -20,7 +20,6 @@ public class TellyRotation extends IScaffoldRotation {
     private final SliderSetting straightTicks;
     private final SliderSetting diagonalTicks;
     private final SliderSetting jumpDownTicks;
-    private final ButtonSetting extraSnap;
 
     private boolean noPlace = false;
 
@@ -29,7 +28,6 @@ public class TellyRotation extends IScaffoldRotation {
         this.registerSetting(straightTicks = new SliderSetting("Straight ticks", 6, 1, 8, 1));
         this.registerSetting(diagonalTicks = new SliderSetting("Diagonal ticks", 4, 1, 8, 1));
         this.registerSetting(jumpDownTicks = new SliderSetting("Jump down ticks", 1, 1, 8, 1));
-        this.registerSetting(extraSnap = new ButtonSetting("Extra snap", false));
     }
 
     @Override
@@ -39,7 +37,7 @@ public class TellyRotation extends IScaffoldRotation {
 
     @Override
     public @NotNull RotationData onRotation(float placeYaw, float placePitch, boolean forceStrict, @NotNull RotationEvent event) {
-        if (noPlace || (extraSnap.isToggled() && !parent.place)) {
+        if (noPlace || parent.placeBlock == null) {
             return new RotationData(event.getYaw(), event.getPitch());
         } else {
             return new RotationData(placeYaw, placePitch);

@@ -20,7 +20,7 @@ public class ScaffoldA extends Check {
 
     @Override
     public int getAlertBuffer() {
-        return AdvancedConfig.scaffoldAAlertBuffer;
+        return 10;
     }
 
     @Override

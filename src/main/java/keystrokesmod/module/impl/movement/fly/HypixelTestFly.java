@@ -42,6 +42,7 @@ public class HypixelTestFly extends SubMode<Fly> {
                 event.setPosZ(event.getPosZ() + Utils.randomizeDouble(0.09, 0.12));  // 0.095
             }
             event.setPosY(event.getPosY() + speed.getInput());
+            mc.thePlayer.setPosition(mc.thePlayer.posX, event.getPosY(), mc.thePlayer.posZ);
 
             mc.thePlayer.motionY = 0.0;
             MoveUtil.strafe(MoveUtil.isMoving() && active ? speed.getInput() / 10 : 0);
