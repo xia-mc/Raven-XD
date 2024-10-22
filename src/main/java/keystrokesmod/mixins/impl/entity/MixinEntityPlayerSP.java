@@ -6,17 +6,16 @@ import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.movement.NoSlow;
 import keystrokesmod.module.impl.movement.Sprint;
 import keystrokesmod.module.impl.movement.fly.FakeFly;
-import keystrokesmod.module.impl.other.RotationHandler;
 import keystrokesmod.utility.RotationUtils;
 import keystrokesmod.utility.movement.Direction;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.network.play.client.C0BPacketEntityAction;
-import net.minecraft.network.play.client.C0CPacketInput;
 import net.minecraft.potion.Potion;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.MovementInput;
@@ -26,6 +25,7 @@ import net.minecraftforge.common.MinecraftForge;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import static keystrokesmod.utility.movement.Direction.*;
@@ -110,30 +110,19 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
 
     @Shadow protected abstract boolean isOpenBlockSpace(BlockPos p_isOpenBlockSpace_1_);
 
-    /**
-     * @author strangerrrs
-     * @reason mixin on update
-     */
-    @Overwrite
-    public void onUpdate() {
-        if (this.worldObj.isBlockLoaded(new BlockPos(this.posX, 0.0, this.posZ))) {
-            RotationUtils.prevRenderPitch = RotationUtils.renderPitch;
-            RotationUtils.prevRenderYaw = RotationUtils.renderYaw;
+    @Inject(method = "onUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/entity/AbstractClientPlayer;onUpdate()V"))
+    public void onPreUpdate(CallbackInfo ci) {
+        RotationUtils.prevRenderPitch = RotationUtils.renderPitch;
+        RotationUtils.prevRenderYaw = RotationUtils.renderYaw;
 
-            net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new PreUpdateEvent());
+        MinecraftForge.EVENT_BUS.post(new PreUpdateEvent());
+    }
 
-            super.onUpdate();
-
-            if (this.isRiding()) {
-                this.sendQueue.addToSendQueue(new C03PacketPlayer.C05PacketPlayerLook(this.rotationYaw, this.rotationPitch, this.onGround));
-                this.sendQueue.addToSendQueue(new C0CPacketInput(this.moveStrafing, this.moveForward, this.movementInput.jump, this.movementInput.sneak));
-            } else {
-                this.onUpdateWalkingPlayer();
-            }
-
-            net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new PostUpdateEvent());
+    @Inject(method = "onUpdate", at = @At("RETURN"))
+    public void onPostUpdate(CallbackInfo ci) {
+        if (this.worldObj.isBlockLoaded(new BlockPos(this.posX, 0.0, this.posZ))) {  // ensure compat
+            MinecraftForge.EVENT_BUS.post(new PostUpdateEvent());
         }
-
     }
 
     /**
@@ -142,22 +131,27 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
      */
     @Overwrite
     public void onUpdateWalkingPlayer() {
-        PreMotionEvent preMotionEvent = new PreMotionEvent(
+
+        //Todo: EventUpdate Pre
+        PreMotionEvent pre = new PreMotionEvent(
                 this.posX,
-                this.getEntityBoundingBox().minY,
+                this.posY,
                 this.posZ,
-                RotationHandler.getRotationYaw(rotationYaw),
-                RotationHandler.getRotationPitch(rotationPitch),
+                rotationYaw,
+                rotationPitch,
                 this.onGround,
                 this.isSprinting(),
                 this.isSneaking()
         );
 
-        net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(preMotionEvent);
-        if (preMotionEvent.isCanceled())
+        MinecraftForge.EVENT_BUS.post(pre);
+        if (pre.isCanceled()) {
+            //Todo: EventUpdate Post
+            MinecraftForge.EVENT_BUS.post(new PostMotionEvent());
             return;
+        }
 
-        boolean flag = preMotionEvent.isSprinting();
+        boolean flag = pre.isSprinting();
         if (flag != this.serverSprintState) {
             if (flag) {
                 this.sendQueue.addToSendQueue(new C0BPacketEntityAction(this, C0BPacketEntityAction.Action.START_SPRINTING));
@@ -168,7 +162,8 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
             this.serverSprintState = flag;
         }
 
-        boolean flag1 = preMotionEvent.isSneaking();
+        boolean flag1 = pre.isSneaking();
+
         if (flag1 != this.serverSneakState) {
             if (flag1) {
                 this.sendQueue.addToSendQueue(new C0BPacketEntityAction(this, C0BPacketEntityAction.Action.START_SNEAKING));
@@ -180,57 +175,60 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
         }
 
         if (this.isCurrentViewEntity()) {
+
             if (PreMotionEvent.setRenderYaw()) {
-                RotationUtils.setRenderYaw(preMotionEvent.getYaw());
-                preMotionEvent.setRenderYaw(false);
+                RotationUtils.setRenderYaw(pre.getYaw());
+                pre.setRenderYaw(false);
             }
 
             if (FakeFly.hideRotation()) {
                 RotationUtils.renderPitch = rotationPitch;
                 RotationUtils.renderYaw = rotationYaw;
             } else {
-                RotationUtils.renderPitch = preMotionEvent.getPitch();
-                RotationUtils.renderYaw = preMotionEvent.getYaw();
+                RotationUtils.renderPitch = pre.getPitch();
+                RotationUtils.renderYaw = pre.getYaw();
             }
 
-            double d0 = preMotionEvent.getPosX() - this.lastReportedPosX;
-            double d1 = preMotionEvent.getPosY() - this.lastReportedPosY;
-            double d2 = preMotionEvent.getPosZ() - this.lastReportedPosZ;
-            double d3 = preMotionEvent.getYaw() - this.lastReportedYaw;
-            double d4 = preMotionEvent.getPitch() - this.lastReportedPitch;
-            boolean flag2 = d0 * d0 + d1 * d1 + d2 * d2 > 9.0E-4 || this.positionUpdateTicks >= 20;
-            boolean flag3 = d3 != 0.0 || d4 != 0.0;
+            double d0 = pre.getPosX() - this.lastReportedPosX;
+            double d1 = pre.getPosY() - this.lastReportedPosY;
+            double d2 = pre.getPosZ() - this.lastReportedPosZ;
+            double d3 = (double) (pre.getYaw() - this.lastReportedYaw);
+            double d4 = (double) (pre.getPitch() - this.lastReportedPitch);
+            boolean flag2 = d0 * d0 + d1 * d1 + d2 * d2 > 9.0E-4D || this.positionUpdateTicks >= 20;
+            boolean flag3 = d3 != 0.0D || d4 != 0.0D;
+
             if (this.ridingEntity == null) {
                 if (flag2 && flag3) {
-                    this.sendQueue.addToSendQueue(new C03PacketPlayer.C06PacketPlayerPosLook(preMotionEvent.getPosX(), preMotionEvent.getPosY(), preMotionEvent.getPosZ(), preMotionEvent.getYaw(), preMotionEvent.getPitch(), preMotionEvent.isOnGround()));
+                    this.sendQueue.addToSendQueue(new C03PacketPlayer.C06PacketPlayerPosLook(pre.getPosX(), pre.getPosY(), pre.getPosZ(), pre.getYaw(), pre.getPitch(), pre.isOnGround()));
                 } else if (flag2) {
-                    this.sendQueue.addToSendQueue(new C03PacketPlayer.C04PacketPlayerPosition(preMotionEvent.getPosX(), preMotionEvent.getPosY(), preMotionEvent.getPosZ(), preMotionEvent.isOnGround()));
+                    this.sendQueue.addToSendQueue(new C03PacketPlayer.C04PacketPlayerPosition(pre.getPosX(), pre.getPosY(), pre.getPosZ(), pre.isOnGround()));
                 } else if (flag3) {
-                    this.sendQueue.addToSendQueue(new C03PacketPlayer.C05PacketPlayerLook(preMotionEvent.getYaw(), preMotionEvent.getPitch(), preMotionEvent.isOnGround()));
+                    this.sendQueue.addToSendQueue(new C03PacketPlayer.C05PacketPlayerLook(pre.getYaw(), pre.getPitch(), pre.isOnGround()));
                 } else {
-                    this.sendQueue.addToSendQueue(new C03PacketPlayer(preMotionEvent.isOnGround()));
+                    this.sendQueue.addToSendQueue(new C03PacketPlayer(pre.isOnGround()));
                 }
             } else {
-                this.sendQueue.addToSendQueue(new C03PacketPlayer.C06PacketPlayerPosLook(this.motionX, -999.0D, this.motionZ, preMotionEvent.getYaw(), preMotionEvent.getPitch(), preMotionEvent.isOnGround()));
+                this.sendQueue.addToSendQueue(new C03PacketPlayer.C06PacketPlayerPosLook(this.motionX, -999.0D, this.motionZ, pre.getYaw(), pre.getPitch(), pre.isOnGround()));
                 flag2 = false;
             }
 
             ++this.positionUpdateTicks;
 
             if (flag2) {
-                this.lastReportedPosX = preMotionEvent.getPosX();
-                this.lastReportedPosY = preMotionEvent.getPosY();
-                this.lastReportedPosZ = preMotionEvent.getPosZ();
+                this.lastReportedPosX = pre.getPosX();
+                this.lastReportedPosY = pre.getPosY();
+                this.lastReportedPosZ = pre.getPosZ();
                 this.positionUpdateTicks = 0;
             }
 
             if (flag3) {
-                this.lastReportedYaw = preMotionEvent.getYaw();
-                this.lastReportedPitch = preMotionEvent.getPitch();
+                this.lastReportedYaw = pre.getYaw();
+                this.lastReportedPitch = pre.getPitch();
             }
         }
 
-        net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new PostMotionEvent());
+        //Todo: EventUpdate Post
+        MinecraftForge.EVENT_BUS.post(new PostMotionEvent());
     }
 
     /**
@@ -241,6 +239,7 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
     public void onLivingUpdate() {
         if (this.sprintingTicksLeft > 0) {
             --this.sprintingTicksLeft;
+
             if (this.sprintingTicksLeft == 0) {
                 this.setSprinting(false);
             }
@@ -251,9 +250,10 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
         }
 
         this.prevTimeInPortal = this.timeInPortal;
+
         if (this.inPortal) {
             if (this.mc.currentScreen != null && !this.mc.currentScreen.doesGuiPauseGame()) {
-                this.mc.displayGuiScreen(null);
+                this.mc.displayGuiScreen((GuiScreen) null);
             }
 
             if (this.timeInPortal == 0.0F) {
@@ -261,6 +261,7 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
             }
 
             this.timeInPortal += 0.0125F;
+
             if (this.timeInPortal >= 1.0F) {
                 this.timeInPortal = 1.0F;
             }
@@ -268,6 +269,7 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
             this.inPortal = false;
         } else if (this.isPotionActive(Potion.confusion) && this.getActivePotionEffect(Potion.confusion).getDuration() > 60) {
             this.timeInPortal += 0.006666667F;
+
             if (this.timeInPortal > 1.0F) {
                 this.timeInPortal = 1.0F;
             }
@@ -290,6 +292,8 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
         float f = 0.8F;
         boolean flag2 = this.movementInput.moveForward >= f;
         this.movementInput.updatePlayerMoveState();
+
+        // no slow
         boolean usingItemModified = this.isUsingItem() || (ModuleManager.killAura != null && ModuleManager.killAura.isEnabled() && ModuleManager.killAura.block.get() && ((Object) this) == Minecraft.getMinecraft().thePlayer && ModuleManager.killAura.rmbDown && ModuleManager.killAura.manualBlock.isToggled());
         boolean stopSprint = (this.isUsingItem() && ModuleManager.noSlow != null && ModuleManager.noSlow.isEnabled() && NoSlow.getForwardSlowed() == 0.8);
 
@@ -307,12 +311,13 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
             }
         }
 
-        this.pushOutOfBlocks(this.posX - (double) this.width * 0.35, this.getEntityBoundingBox().minY + 0.5, this.posZ + (double) this.width * 0.35);
-        this.pushOutOfBlocks(this.posX - (double) this.width * 0.35, this.getEntityBoundingBox().minY + 0.5, this.posZ - (double) this.width * 0.35);
-        this.pushOutOfBlocks(this.posX + (double) this.width * 0.35, this.getEntityBoundingBox().minY + 0.5, this.posZ - (double) this.width * 0.35);
-        this.pushOutOfBlocks(this.posX + (double) this.width * 0.35, this.getEntityBoundingBox().minY + 0.5, this.posZ + (double) this.width * 0.35);
+        this.pushOutOfBlocks(this.posX - (double) this.width * 0.35D, this.getEntityBoundingBox().minY + 0.5D, this.posZ + (double) this.width * 0.35D);
+        this.pushOutOfBlocks(this.posX - (double) this.width * 0.35D, this.getEntityBoundingBox().minY + 0.5D, this.posZ - (double) this.width * 0.35D);
+        this.pushOutOfBlocks(this.posX + (double) this.width * 0.35D, this.getEntityBoundingBox().minY + 0.5D, this.posZ - (double) this.width * 0.35D);
+        this.pushOutOfBlocks(this.posX + (double) this.width * 0.35D, this.getEntityBoundingBox().minY + 0.5D, this.posZ + (double) this.width * 0.35D);
         boolean flag3 = (float) this.getFoodStats().getFoodLevel() > 6.0F || this.capabilities.allowFlying;
-        if (this.onGround && !flag1 && !flag2 && (Sprint.omni() || this.movementInput.moveForward >= f) && !this.isSprinting() && flag3 && (!usingItemModified || !stopSprint) && !this.isPotionActive(Potion.blindness)) {
+
+        if (this.onGround && !flag1 && !flag2 && this.movementInput.moveForward >= f && !this.isSprinting() && flag3 && !this.isUsingItem() && !this.isPotionActive(Potion.blindness)) {
             if (this.sprintToggleTimer <= 0 && !this.mc.gameSettings.keyBindSprint.isKeyDown()) {
                 this.sprintToggleTimer = 7;
             } else {
@@ -320,11 +325,11 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
             }
         }
 
-        if ((!this.isSprinting() && (Sprint.omni() || this.movementInput.moveForward >= f) && flag3 && (!usingItemModified || !stopSprint) && !this.isPotionActive(Potion.blindness) && this.mc.gameSettings.keyBindSprint.isKeyDown())) {
+        if (!this.isSprinting() && this.movementInput.moveForward >= f && flag3 && !this.isUsingItem() && !this.isPotionActive(Potion.blindness) && this.mc.gameSettings.keyBindSprint.isKeyDown()) {
             this.setSprinting(true);
         }
 
-        if (this.isSprinting() && (!Sprint.omni() && (this.movementInput.moveForward < f || this.isCollidedHorizontally || !flag3) || (ModuleManager.scaffold != null && ModuleManager.scaffold.isEnabled() && !ModuleManager.scaffold.sprint() && !ModuleManager.tower.canSprint()))) {
+        if (this.isSprinting() && (this.movementInput.moveForward < f || this.isCollidedHorizontally || !flag3)) {
             this.setSprinting(false);
         }
 
@@ -347,17 +352,18 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
 
         if (this.capabilities.isFlying && this.isCurrentViewEntity()) {
             if (this.movementInput.sneak) {
-                this.motionY -= this.capabilities.getFlySpeed() * 3.0F;
+                this.motionY -= (double) (this.capabilities.getFlySpeed() * 3.0F);
             }
 
             if (this.movementInput.jump) {
-                this.motionY += this.capabilities.getFlySpeed() * 3.0F;
+                this.motionY += (double) (this.capabilities.getFlySpeed() * 3.0F);
             }
         }
 
         if (this.isRidingHorse()) {
             if (this.horseJumpPowerCounter < 0) {
                 ++this.horseJumpPowerCounter;
+
                 if (this.horseJumpPowerCounter == 0) {
                     this.horseJumpPower = 0.0F;
                 }
@@ -371,6 +377,7 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
                 this.horseJumpPower = 0.0F;
             } else if (flag) {
                 ++this.horseJumpPowerCounter;
+
                 if (this.horseJumpPowerCounter < 10) {
                     this.horseJumpPower = (float) this.horseJumpPowerCounter * 0.1F;
                 } else {
@@ -382,11 +389,11 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
         }
 
         super.onLivingUpdate();
+
         if (this.onGround && this.capabilities.isFlying && !this.mc.playerController.isSpectatorMode()) {
             this.capabilities.isFlying = false;
             this.sendPlayerAbilities();
         }
-
     }
 
     /**

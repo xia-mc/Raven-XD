@@ -48,7 +48,10 @@ public class HypixelSpeed extends SubMode<Speed> {
         if (mc.thePlayer.onGround)
             return false;
         final double curAngle = MoveUtil.direction() * (180 / Math.PI);
-        if (Math.abs(curAngle - lastAngle) < minAngle.getInput() || mc.thePlayer.hurtTime != 0)
+        double angleDifference = curAngle - lastAngle;
+        angleDifference = ((angleDifference + 180) % 360) - 180;
+
+        if (Math.abs(angleDifference) < minAngle.getInput() || mc.thePlayer.hurtTime != 0)
             return false;
         lastAngle = curAngle;
 

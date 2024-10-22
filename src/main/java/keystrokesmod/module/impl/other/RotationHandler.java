@@ -1,6 +1,7 @@
 package keystrokesmod.module.impl.other;
 
 import keystrokesmod.event.MoveInputEvent;
+import keystrokesmod.event.PreMotionEvent;
 import keystrokesmod.event.RotationEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.movement.TargetStrafe;
@@ -95,7 +96,7 @@ public final class RotationHandler extends Module {
     public static float getRotationYaw(float yaw) {
         if (rotationYaw != null)
             return rotationYaw;
-        return RotationUtils.normalize(yaw);
+        return yaw;
     }
 
     public static float getRotationPitch() {
@@ -198,6 +199,23 @@ public final class RotationHandler extends Module {
                     movementYaw = getRotationYaw();
                     break;
             }
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public void onPreMotion(PreMotionEvent event) {
+        if (rotationYaw != null) {
+            final float yaw = rotationYaw;
+            event.setYaw(yaw);
+            // RenderUtils.renderPitch handle this
+//            mc.thePlayer.rotationYawHead = yaw;
+
+        }
+        if (rotationPitch != null) {
+            final float pitch = rotationPitch;
+            event.setPitch(pitch);
+            // RenderUtils.renderPitch handle this
+//            mc.thePlayer.renderPitchHead = pitch;
         }
     }
 
