@@ -44,12 +44,15 @@ public final class RotationHandler extends Module {
     public static final ButtonSetting rotateBody = new ButtonSetting("Rotate body", true);
     public static final ButtonSetting fullBody = new ButtonSetting("Full body", false);
     public static final SliderSetting randomYawFactor = new SliderSetting("Random yaw factor", 1.0, 0.0, 10.0, 1.0);
+    private final ButtonSetting fixSimulationWatchdog = new ButtonSetting("Fix simulation watchdog", false);
 
     public RotationHandler() {
         super("RotationHandler", category.other);
         this.registerSetting(defaultMoveFix, smoothBack, aimSpeed);
         this.registerSetting(new DescriptionSetting("Classic"));
         this.registerSetting(rotateBody, fullBody, randomYawFactor);
+        this.registerSetting(new DescriptionSetting("Debug"));
+        this.registerSetting(fixSimulationWatchdog);
         this.canBeEnabled = false;
     }
 
@@ -206,14 +209,20 @@ public final class RotationHandler extends Module {
     public void onPreMotion(PreMotionEvent event) {
         if (rotationYaw != null) {
             final float yaw = rotationYaw;
-            event.setYaw(yaw);
+            if (fixSimulationWatchdog.isToggled())
+                mc.thePlayer.rotationYaw = yaw;
+            else
+                event.setYaw(yaw);
             // RenderUtils.renderPitch handle this
 //            mc.thePlayer.rotationYawHead = yaw;
 
         }
         if (rotationPitch != null) {
             final float pitch = rotationPitch;
-            event.setPitch(pitch);
+            if (fixSimulationWatchdog.isToggled())
+                mc.thePlayer.rotationPitch = pitch;
+            else
+                event.setPitch(pitch);
             // RenderUtils.renderPitch handle this
 //            mc.thePlayer.renderPitchHead = pitch;
         }
