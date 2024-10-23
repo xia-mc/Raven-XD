@@ -1,5 +1,6 @@
 package keystrokesmod.utility;
 
+import keystrokesmod.event.WorldChangeEvent;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
@@ -42,5 +43,10 @@ public class Ping {
     public static void rs() {
         e = false;
         s = 0L;
+    }
+
+    @SubscribeEvent
+    public void onWorldChange(WorldChangeEvent event) {
+        e = false;
     }
 }
