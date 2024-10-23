@@ -18,9 +18,9 @@ public class BlocksMCSpeed extends SubMode<Speed> {
         if (parent.noAction() || !MoveUtil.isMoving()) return;
 
         if (mc.thePlayer.onGround) {
+            MoveUtil.strafe(MoveUtil.getAllowedHorizontalDistance());
             if (!Utils.jumpDown())
                 mc.thePlayer.jump();
-            MoveUtil.strafe(MoveUtil.getAllowedHorizontalDistance());
         } else {
             MoveUtil.strafe();
         }
