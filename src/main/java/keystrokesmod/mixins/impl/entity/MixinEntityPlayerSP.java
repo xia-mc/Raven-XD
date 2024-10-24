@@ -112,12 +112,15 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
 
     @Shadow protected abstract boolean isOpenBlockSpace(BlockPos p_isOpenBlockSpace_1_);
 
-    @Inject(method = "onUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/entity/AbstractClientPlayer;onUpdate()V"))
+    @Inject(method = "onUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/entity/AbstractClientPlayer;onUpdate()V"), cancellable = true)
     public void onPreUpdate(CallbackInfo ci) {
         RotationUtils.prevRenderPitch = RotationUtils.renderPitch;
         RotationUtils.prevRenderYaw = RotationUtils.renderYaw;
 
-        MinecraftForge.EVENT_BUS.post(new PreUpdateEvent());
+        PreUpdateEvent event = new PreUpdateEvent();
+        MinecraftForge.EVENT_BUS.post(event);
+        if (event.isCanceled())
+            ci.cancel();
     }
 
     @Inject(method = "onUpdate", at = @At("RETURN"))
