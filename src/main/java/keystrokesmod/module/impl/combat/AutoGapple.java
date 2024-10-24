@@ -47,7 +47,6 @@ public class AutoGapple extends Module {
     private int foodSlot;
 
     private final Queue<Packet<?>> delayedSend = new ConcurrentLinkedQueue<>();
-    private final Queue<Packet<INetHandlerPlayClient>> delayedReceive = new ConcurrentLinkedQueue<>();
     private final HashMap<Integer, RealPositionData> realPositions = new HashMap<>();
 
     private final Animation animation = new Animation(Easing.EASE_OUT_CIRC, 500);
@@ -132,71 +131,11 @@ public class AutoGapple extends Module {
     }
 
     private void release() {
-        synchronized (delayedReceive) {
-            for (Packet<INetHandlerPlayClient> p : delayedReceive) {
-                PacketUtils.receivePacket(p);
-            }
-            delayedReceive.clear();
-        }
         synchronized (delayedSend) {
             for (Packet<?> p : delayedSend) {
                 PacketUtils.sendPacket(p);
             }
             delayedSend.clear();
-        }
-    }
-
-    @SubscribeEvent(priority = EventPriority.HIGH)
-    public void onReceivePacket(ReceivePacketEvent event) {
-        if (working) {
-            if (event.isCanceled())
-                return;
-
-            final Packet<INetHandlerPlayClient> p = event.getPacket();
-
-            if (p instanceof S19PacketEntityStatus
-                    || p instanceof S02PacketChat
-                    || p instanceof S0BPacketAnimation
-                    || p instanceof S06PacketUpdateHealth
-            )
-                return;
-
-            if (p instanceof S08PacketPlayerPosLook || p instanceof S40PacketDisconnect) {
-                onDisable();
-                return;
-
-            } else if (p instanceof S13PacketDestroyEntities) {
-                S13PacketDestroyEntities wrapper = (S13PacketDestroyEntities) p;
-                for (int id : wrapper.getEntityIDs()) {
-                    realPositions.remove(id);
-                }
-            } else if (p instanceof S14PacketEntity) {
-                S14PacketEntity wrapper = (S14PacketEntity) p;
-                final int id = ((S14PacketEntityAccessor) wrapper).getEntityId();
-                if (realPositions.containsKey(id)) {
-                    final RealPositionData data = realPositions.get(id);
-                    data.vec3 = data.vec3.add(wrapper.func_149062_c() / 32.0D, wrapper.func_149061_d() / 32.0D,
-                            wrapper.func_149064_e() / 32.0D);
-                }
-            } else if (p instanceof S18PacketEntityTeleport) {
-                S18PacketEntityTeleport wrapper = (S18PacketEntityTeleport) p;
-                final int id = wrapper.getEntityId();
-                if (realPositions.containsKey(id)) {
-                    final RealPositionData data = realPositions.get(id);
-                    data.vec3 = new Vec3(wrapper.getX() / 32.0D, wrapper.getY() / 32.0D, wrapper.getZ() / 32.0D);
-                }
-            } else if (p instanceof S12PacketEntityVelocity) {
-                S12PacketEntityVelocity velo = (S12PacketEntityVelocity) p;
-                if (velo.getEntityID() == mc.thePlayer.getEntityId()) {
-                    if (releaseTicksAfterVelocity.getInput() > 0) {
-                        releaseLeft = (int) releaseTicksAfterVelocity.getInput();
-                    }
-                    return;
-                }
-            }
-
-            event.setCanceled(true);
-            delayedReceive.add(p);
         }
     }
 
