@@ -25,6 +25,7 @@ import keystrokesmod.utility.render.Easing;
 import keystrokesmod.utility.render.RenderUtils;
 import lombok.Getter;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityArmorStand;
 import net.minecraft.entity.player.EntityPlayer;
@@ -54,9 +55,13 @@ import static net.minecraft.util.EnumFacing.DOWN;
 public class KillAura extends IAutoClicker {
     public static EntityLivingBase target;
     private final ModeValue clickMode;
-    public ModeSetting autoBlockMode;
-    private final SliderSetting fov;
     private final ModeSetting attackMode;
+    public ModeSetting autoBlockMode;
+    private final ButtonSetting smartBlock;
+    private final ButtonSetting blockOnlyWhileSwinging;
+    private final ButtonSetting blockOnlyWhileHurt;
+    public SliderSetting slowdown;
+    private final SliderSetting fov;
     public final SliderSetting attackRange;
     private final SliderSetting swingRange;
     private final SliderSetting blockRange;
@@ -100,7 +105,6 @@ public class KillAura extends IAutoClicker {
     private final ButtonSetting disableWhileMining;
     private final ButtonSetting fixSlotReset;
     private final ButtonSetting fixNoSlowFlag;
-    private final ButtonSetting fixHypixelSwitch;
     private final SliderSetting postDelay;
     private final ButtonSetting hitThroughBlocks;
     private final ButtonSetting ignoreTeammates;
@@ -128,6 +132,7 @@ public class KillAura extends IAutoClicker {
     public boolean rmbDown;
     private float[] rotations = new float[]{0, 0};
     private final ConcurrentLinkedQueue<Packet<?>> blinkedPackets = new ConcurrentLinkedQueue<>();
+    private EntityLivingBase lastAttackTarget = null;
 
     private int blockingTime = 0;
     private final AimSimulator aimSimulator = new AimSimulator();
@@ -143,9 +148,14 @@ public class KillAura extends IAutoClicker {
                 .add(new RecordAutoClicker("Record", this, true, true))
                 .setDefaultValue("Normal")
         );
+        this.registerSetting(attackMode = new ModeSetting("Attack mode", new String[]{"Legit", "Packet"}, 1));
         String[] autoBlockModes = new String[]{"Manual", "Vanilla", "Post", "Swap", "Interact A", "Interact B", "Fake", "Partial", "QuickMacro"};
         this.registerSetting(autoBlockMode = new ModeSetting("Autoblock", autoBlockModes, 0));
-        this.registerSetting(attackMode = new ModeSetting("Attack mode", new String[]{"Legit", "Packet"}, 1));
+        final ModeOnly autoBlock = new ModeOnly(autoBlockMode, 0).reserve();
+        this.registerSetting(smartBlock = new ButtonSetting("Smart block", false, autoBlock));
+        this.registerSetting(blockOnlyWhileSwinging = new ButtonSetting("Block only while swinging", false, autoBlock));
+        this.registerSetting(blockOnlyWhileHurt = new ButtonSetting("Block only while hurt", false, autoBlock));
+        this.registerSetting(slowdown = new SliderSetting("Slowdown", 1, 0.2, 1, 0.01, autoBlock));
         this.registerSetting(new DescriptionSetting("Range"));
         this.registerSetting(attackRange = new SliderSetting("Attack range", 3.0, 3.0, 6.0, 0.1));
         this.registerSetting(swingRange = new SliderSetting("Swing range", 3.0, 3.0, 8.0, 0.1));
@@ -194,7 +204,6 @@ public class KillAura extends IAutoClicker {
         this.registerSetting(fixSlotReset = new ButtonSetting("Fix slot reset", false));
         this.registerSetting(fixNoSlowFlag = new ButtonSetting("Fix NoSlow flag", false));
         this.registerSetting(postDelay = new SliderSetting("Post delay", 10, 1, 20, 1, fixNoSlowFlag::isToggled));
-        this.registerSetting(fixHypixelSwitch = new ButtonSetting("Fix hypixel switch (beta)", false, () -> moveFixMode.getInput() == 0));
         this.registerSetting(hitThroughBlocks = new ButtonSetting("Hit through blocks", true));
         this.registerSetting(ignoreTeammates = new ButtonSetting("Ignore teammates", true));
         this.registerSetting(manualBlock = new ButtonSetting("Manual block", false));
@@ -293,15 +302,7 @@ public class KillAura extends IAutoClicker {
     }
 
     @SubscribeEvent
-    public void onPreMotion(PreMotionEvent event) {
-        if (fixHypixelSwitch.isToggled() && moveFixMode.getInput() == 0) {
-            RotationData data = doRotationAction(new RotationData(event.getYaw(), event.getPitch()));
-            if (data != null) {
-                event.setYaw(data.getYaw());
-                event.setPitch(data.getPitch());
-            }
-        }
-
+    public void onPreUpdate(PreUpdateEvent event) {
         if (gameNoAction() || playerNoAction()) {
             resetVariables();
             return;
@@ -401,19 +402,17 @@ public class KillAura extends IAutoClicker {
                 return;
             }
             switchTargets = true;
-            Utils.attackEntity(target, swingWhileBlocking);
+            doAttack(target, swingWhileBlocking);
         }
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)
-    public void onRotation(RotationEvent event) {
-        if (!fixHypixelSwitch.isToggled() || moveFixMode.getInput() != 0) {
-            RotationData data = doRotationAction(new RotationData(event.getYaw(), event.getPitch()));
-            if (data != null) {
-                event.setYaw(data.getYaw());
-                event.setPitch(data.getPitch());
-                event.setMoveFix(RotationHandler.MoveFix.values()[(int) moveFixMode.getInput()]);
-            }
+    public void onRotation(@NotNull RotationEvent event) {
+        RotationData data = doRotationAction(new RotationData(event.getYaw(), event.getPitch()));
+        if (data != null) {
+            event.setYaw(data.getYaw());
+            event.setPitch(data.getPitch());
+            event.setMoveFix(RotationHandler.MoveFix.values()[(int) moveFixMode.getInput()]);
         }
     }
 
@@ -526,7 +525,7 @@ public class KillAura extends IAutoClicker {
     }
 
     private void resetVariables() {
-        target = null;
+        target = lastAttackTarget = null;
         availableTargets.clear();
 
         block.set(false);
@@ -593,13 +592,35 @@ public class KillAura extends IAutoClicker {
         blocking = Reflection.setBlocking(state);
     }
 
+    private boolean canBlock(EntityLivingBase target) {
+        if (smartBlock.isToggled()) {
+            if (target == null)
+                return false;
+            if (lastAttackTarget != target && target.hurtTime == 0)
+                return false;
+            if (!Utils.inFov(140, target, mc.thePlayer))
+                return false;
+            Vec3 predTargetPos = MoveUtil.predictedPos(target, new Vec3(target.motionX, target.motionY, target.motionZ), Utils.getEyePos(), 1);
+            if (RotationUtils.getNearestPoint(mc.thePlayer.getEntityBoundingBox(), predTargetPos).distanceTo(predTargetPos) > 3)
+                return false;
+        }
+        if (blockOnlyWhileSwinging.isToggled()) {
+            if (!mc.thePlayer.isSwingInProgress)
+                return false;
+        }
+        if (blockOnlyWhileHurt.isToggled()) {
+            return mc.thePlayer.hurtTime != 0;
+        }
+        return true;
+    }
+
     private void setTarget(float[] rotations) {
         availableTargets.clear();
         block.set(false);
         swing = false;
 
         final Vec3 eyePos = Utils.getEyePos();
-        mc.theWorld.loadedEntityList.stream()
+        mc.theWorld.loadedEntityList.parallelStream()
                 .filter(Objects::nonNull)
                 .filter(entity -> entity != mc.thePlayer)
                 .filter(entity -> entity instanceof EntityLivingBase)
@@ -623,7 +644,7 @@ public class KillAura extends IAutoClicker {
                 .map(entity -> new Pair<>(entity, eyePos.distanceTo(RotationUtils.getNearestPoint(entity.getEntityBoundingBox(), eyePos))))
                 .forEach(pair -> {
                     // need a more accurate distance check as this can ghost on hypixel
-                    if (pair.second() <= blockRange.getInput() && autoBlockMode.getInput() > 0) {
+                    if (pair.second() <= blockRange.getInput() && autoBlockMode.getInput() > 0 && canBlock(pair.first())) {
                         KeyBinding.setKeyBindState(mc.gameSettings.keyBindUseItem.getKeyCode(), false);
                         block.set(true);
                     }
@@ -710,7 +731,7 @@ public class KillAura extends IAutoClicker {
             }
             mc.thePlayer.sendQueue.addToSendQueue(new C02PacketUseEntity(target, C02PacketUseEntity.Action.INTERACT));
         } else if (ModuleManager.antiFireball != null && ModuleManager.antiFireball.isEnabled() && ModuleManager.antiFireball.fireball != null && ModuleManager.antiFireball.attack) {
-            Utils.attackEntity(ModuleManager.antiFireball.fireball, !ModuleManager.antiFireball.silentSwing.isToggled());
+            doAttack(ModuleManager.antiFireball.fireball, !ModuleManager.antiFireball.silentSwing.isToggled());
             mc.thePlayer.sendQueue.addToSendQueue(new C02PacketUseEntity(ModuleManager.antiFireball.fireball, C02PacketUseEntity.Action.INTERACT));
         }
     }
@@ -724,7 +745,7 @@ public class KillAura extends IAutoClicker {
             return false;
         }
         switchTargets = true;
-        Utils.attackEntity(target, !silentSwing.isToggled());
+        doAttack(target, !silentSwing.isToggled());
         return true;
     }
 
@@ -792,19 +813,22 @@ public class KillAura extends IAutoClicker {
 
     @Override
     public boolean click() {
+        if (swing)
+            attack = true;
+        return swing;
+    }
+
+    private void doAttack(Entity target, boolean swingWhileBlocking) {
         switch ((int) attackMode.getInput()) {
             case 0:
-                if (target != null && mc.thePlayer.getDistanceToEntity(target) <= swingRange.getInput()) {
-                    Utils.sendClick(0, true);
-                    Utils.sendClick(0, false);
-                    return true;
-                }
-                return false;
-            default:
+                Utils.sendClick(0, true);
+                Utils.sendClick(0, false);
+                break;
             case 1:
-                if (swing)
-                    attack = true;
-                return swing;
+                Utils.attackEntity(target, swingWhileBlocking);
+                break;
         }
+        if (target == KillAura.target)
+            lastAttackTarget = KillAura.target;
     }
 }

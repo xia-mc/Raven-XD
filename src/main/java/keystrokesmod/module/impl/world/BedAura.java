@@ -102,7 +102,7 @@ public class BedAura extends Module {
         reset(true);
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @SubscribeEvent
     public void onPreUpdate(PreUpdateEvent e) {
         if (!Utils.nullCheck()) {
             return;

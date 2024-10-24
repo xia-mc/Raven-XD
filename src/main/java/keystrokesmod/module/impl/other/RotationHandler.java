@@ -2,6 +2,7 @@ package keystrokesmod.module.impl.other;
 
 import keystrokesmod.event.MoveInputEvent;
 import keystrokesmod.event.PreMotionEvent;
+import keystrokesmod.event.PreUpdateEvent;
 import keystrokesmod.event.RotationEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.movement.TargetStrafe;
@@ -44,7 +45,6 @@ public final class RotationHandler extends Module {
     public static final ButtonSetting rotateBody = new ButtonSetting("Rotate body", true);
     public static final ButtonSetting fullBody = new ButtonSetting("Full body", false);
     public static final SliderSetting randomYawFactor = new SliderSetting("Random yaw factor", 1.0, 0.0, 10.0, 1.0);
-    private final ButtonSetting fixSimulationWatchdog = new ButtonSetting("Fix simulation watchdog", false);
 
     public RotationHandler() {
         super("RotationHandler", category.other);
@@ -52,7 +52,6 @@ public final class RotationHandler extends Module {
         this.registerSetting(new DescriptionSetting("Classic"));
         this.registerSetting(rotateBody, fullBody, randomYawFactor);
         this.registerSetting(new DescriptionSetting("Debug"));
-        this.registerSetting(fixSimulationWatchdog);
         this.canBeEnabled = false;
     }
 
@@ -123,12 +122,8 @@ public final class RotationHandler extends Module {
         }
     }
 
-    /**
-     * Fix movement
-     * @param event before update living entity (move)
-     */
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public void onMoveInput(MoveInputEvent event) {
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public void onPreUpdate(PreUpdateEvent event) {
         prevRotationYaw = getRotationYaw();
         prevRotationPitch = getRotationPitch();
         if (isSet && mc.currentScreen == null) {
@@ -160,7 +155,14 @@ public final class RotationHandler extends Module {
             movementYaw = null;
             moveFix = null;
         }
+    }
 
+    /**
+     * Fix movement
+     * @param event before update living entity (move)
+     */
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public void onMoveInput(MoveInputEvent event) {
         if (isSet) {
             switch (moveFix) {
                 case None:
@@ -209,20 +211,14 @@ public final class RotationHandler extends Module {
     public void onPreMotion(PreMotionEvent event) {
         if (rotationYaw != null) {
             final float yaw = rotationYaw;
-            if (fixSimulationWatchdog.isToggled())
-                mc.thePlayer.rotationYaw = yaw;
-            else
-                event.setYaw(yaw);
+            event.setYaw(yaw);
             // RenderUtils.renderPitch handle this
 //            mc.thePlayer.rotationYawHead = yaw;
 
         }
         if (rotationPitch != null) {
             final float pitch = rotationPitch;
-            if (fixSimulationWatchdog.isToggled())
-                mc.thePlayer.rotationPitch = pitch;
-            else
-                event.setPitch(pitch);
+            event.setPitch(pitch);
             // RenderUtils.renderPitch handle this
 //            mc.thePlayer.renderPitchHead = pitch;
         }

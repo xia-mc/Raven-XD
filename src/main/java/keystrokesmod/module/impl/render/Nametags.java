@@ -22,22 +22,24 @@ import org.lwjgl.opengl.GL11;
 import java.awt.*;
 
 public class Nametags extends Module {
-    private SliderSetting scale;
-    private ButtonSetting autoScale;
-    private ButtonSetting drawBackground;
-    private ButtonSetting dropShadow;
-    private ButtonSetting showDistance;
-    private ButtonSetting showHealth;
-    private ButtonSetting showHitsToKill;
-    private ButtonSetting showInvis;
-    private ButtonSetting removeTags;
-    private ButtonSetting renderSelf;
-    private ButtonSetting showArmor;
-    private ButtonSetting showEnchants;
-    private ButtonSetting showDurability;
-    private ButtonSetting showStackSize;
-    private int friendColor = new Color(0, 255, 0, 255).getRGB();
-    private int enemyColor = new Color(255, 0, 0, 255).getRGB();
+    private final SliderSetting scale;
+    private final ButtonSetting autoScale;
+    private final ButtonSetting drawBackground;
+    private final ButtonSetting dropShadow;
+    private final ButtonSetting showDistance;
+    private final ButtonSetting showHealth;
+    private final ButtonSetting showHitsToKill;
+    private final ButtonSetting showInvis;
+    private final ButtonSetting removeTags;
+    private final ButtonSetting renderSelf;
+    private final ButtonSetting showArmor;
+    private final ButtonSetting showEnchants;
+    private final ButtonSetting showDurability;
+    private final ButtonSetting showStackSize;
+
+    private final int friendColor = new Color(0, 255, 0, 255).getRGB();
+    private final int enemyColor = new Color(255, 0, 0, 255).getRGB();
+
     public Nametags() {
         super("Nametags", category.render, 0);
         this.registerSetting(scale = new SliderSetting("Scale", 1.0, 0.5, 5.0, 0.1));
@@ -58,7 +60,7 @@ public class Nametags extends Module {
     }
 
     @SubscribeEvent
-    public void onRenderLiving(RenderLivingEvent.Specials.@NotNull Pre e) {
+    public void onRenderLiving(RenderLivingEvent.Specials.@NotNull Pre<?> e) {
         if (e.entity instanceof EntityPlayer && (e.entity != mc.thePlayer || renderSelf.isToggled()) && e.entity.deathTime == 0) {
             final EntityPlayer entityPlayer = (EntityPlayer) e.entity;
             if (!showInvis.isToggled() && entityPlayer.isInvisible()) {
@@ -171,7 +173,7 @@ public class Nametags extends Module {
         }
     }
 
-    private void renderArmor(EntityPlayer e) {
+    private void renderArmor(@NotNull EntityPlayer e) {
         int pos = 0;
         for (ItemStack is : e.inventory.armorInventory) {
             if (is != null) {
@@ -184,36 +186,36 @@ public class Nametags extends Module {
             if (item.hasEffect() && (item.getItem() instanceof ItemTool || item.getItem() instanceof ItemArmor)) {
                 item.stackSize = 1;
             }
-            renderItemStack(item, pos, -20);
+            renderItemStack(item, pos);
             pos += 16;
         }
         for (int i = 3; i >= 0; --i) {
             ItemStack stack = e.inventory.armorInventory[i];
             if (stack != null) {
-                renderItemStack(stack, pos, -20);
+                renderItemStack(stack, pos);
                 pos += 16;
             }
         }
     }
 
-    private void renderItemStack(ItemStack stack, int xPos, int yPos) {
+    private void renderItemStack(ItemStack stack, int xPos) {
         GlStateManager.pushMatrix();
         GlStateManager.disableLighting();
         mc.getRenderItem().zLevel = -150.0F;
-        mc.getRenderItem().renderItemAndEffectIntoGUI(stack, xPos, yPos);
+        mc.getRenderItem().renderItemAndEffectIntoGUI(stack, xPos, -20);
         mc.getRenderItem().zLevel = 0.0F;
         GlStateManager.scale(0.5, 0.5, 0.5);
-        renderText(stack, xPos, yPos);
+        renderText(stack, xPos);
         GlStateManager.scale(2, 2, 2);
         GlStateManager.enableLighting();
         GlStateManager.popMatrix();
     }
 
-    private void renderText(ItemStack stack, int xPos, int yPos) {
-        int newYPos = yPos - 24;
+    private void renderText(@NotNull ItemStack stack, int xPos) {
+        int newYPos = -20 - 24;
         int remainingDurability = stack.getMaxDamage() - stack.getItemDamage();
         if (showDurability.isToggled() && stack.getItem() instanceof ItemArmor) {
-            mc.fontRendererObj.drawString(String.valueOf(remainingDurability), (float) (xPos * 2), (float) yPos, 16777215, dropShadow.isToggled());
+            mc.fontRendererObj.drawString(String.valueOf(remainingDurability), (float) (xPos * 2), (float) -20, 16777215, dropShadow.isToggled());
         }
         if (stack.getEnchantmentTagList() != null && stack.getEnchantmentTagList().tagCount() < 6 && showEnchants.isToggled()) {
             if (stack.getItem() instanceof ItemArmor) {
@@ -327,7 +329,7 @@ public class Nametags extends Module {
             }
         }
         if (showStackSize.isToggled() && !(stack.getItem() instanceof ItemSword) && !(stack.getItem() instanceof ItemBow) && !(stack.getItem() instanceof ItemTool) && !(stack.getItem() instanceof ItemArmor)) {
-            mc.fontRendererObj.drawString(stack.stackSize + "x", (float) (xPos * 2), (float) yPos, -1, dropShadow.isToggled());
+            mc.fontRendererObj.drawString(stack.stackSize + "x", (float) (xPos * 2), (float) -20, -1, dropShadow.isToggled());
         }
     }
 }
