@@ -4,7 +4,6 @@ import keystrokesmod.event.PostVelocityEvent;
 import keystrokesmod.event.PreUpdateEvent;
 import keystrokesmod.mixins.impl.entity.EntityPlayerSPAccessor;
 import keystrokesmod.module.ModuleManager;
-import keystrokesmod.module.impl.combat.AutoGapple;
 import keystrokesmod.module.impl.combat.Velocity;
 import keystrokesmod.module.impl.exploit.viaversionfix.ViaVersionFixHelper;
 import keystrokesmod.module.setting.impl.ButtonSetting;
@@ -14,6 +13,7 @@ import keystrokesmod.utility.MoveUtil;
 import keystrokesmod.utility.PacketUtils;
 import keystrokesmod.utility.Utils;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.play.client.C02PacketUseEntity;
 import net.minecraft.network.play.client.C0APacketAnimation;
 import net.minecraft.network.play.client.C0BPacketEntityAction;
@@ -43,7 +43,7 @@ public class GrimACVelocity extends SubMode<Velocity> {
         if (unReduceTimes > 0 && mc.thePlayer.hurtTime > 0
                 && !(onlyWhileMoving.isToggled() && !MoveUtil.isMoving())
                 && mc.objectMouseOver != null && mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY
-                && mc.objectMouseOver.entityHit instanceof EntityLivingBase) {
+                && mc.objectMouseOver.entityHit instanceof EntityPlayer) {
             if (!((EntityPlayerSPAccessor) mc.thePlayer).isServerSprint()) {
                 PacketUtils.sendPacket(new C0BPacketEntityAction(mc.thePlayer, C0BPacketEntityAction.Action.START_SPRINTING));
                 mc.thePlayer.setSprinting(true);
@@ -61,7 +61,13 @@ public class GrimACVelocity extends SubMode<Velocity> {
 
     private void doReduce() {
         for (int i = 0; i < (int) reduceCountEveryTime.getInput(); i++) {
-            Utils.attackEntity(mc.objectMouseOver.entityHit, false);
+            if (ViaVersionFixHelper.is122()) {
+                PacketUtils.sendPacket(new C02PacketUseEntity(mc.objectMouseOver.entityHit, C02PacketUseEntity.Action.ATTACK));
+                PacketUtils.sendPacket(new C0APacketAnimation());
+            } else {
+                PacketUtils.sendPacket(new C0APacketAnimation());
+                PacketUtils.sendPacket(new C02PacketUseEntity(mc.objectMouseOver.entityHit, C02PacketUseEntity.Action.ATTACK));
+            }
 
             mc.thePlayer.motionX *= 0.6;
             mc.thePlayer.motionZ *= 0.6;

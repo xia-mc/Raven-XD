@@ -78,23 +78,19 @@ public class AutoGapple extends Module {
     public void onPreUpdate(PreUpdateEvent event) {
         if (eatingTicksLeft == 0 && working) {
             working = false;
-            if (airStuck.isToggled()) {
-                int lastSlot = SlotHandler.getCurrentSlot();
-                if (foodSlot != lastSlot)
-                    PacketUtils.sendPacketNoEvent(new C09PacketHeldItemChange(foodSlot));
-                PacketUtils.sendPacketNoEvent(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.DROP_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN));
-                PacketUtils.sendPacketNoEvent(new C08PacketPlayerBlockPlacement(mc.thePlayer.inventory.mainInventory[foodSlot]));
-                Utils.sendMessage("send.");
-                mc.thePlayer.moveForward *= 0.2f;
-                mc.thePlayer.moveStrafing *= 0.2f;
-                release();
-                if (foodSlot != lastSlot)
-                    PacketUtils.sendPacketNoEvent(new C09PacketHeldItemChange(lastSlot));
-                releaseLeft = (int) delayBetweenHeal.getInput();
-                foodSlot = -1;
-            } else {
-                Utils.sendClick(1, false);
-            }
+            int lastSlot = SlotHandler.getCurrentSlot();
+            if (foodSlot != lastSlot)
+                PacketUtils.sendPacketNoEvent(new C09PacketHeldItemChange(foodSlot));
+            PacketUtils.sendPacketNoEvent(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.DROP_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN));
+            PacketUtils.sendPacketNoEvent(new C08PacketPlayerBlockPlacement(mc.thePlayer.inventory.mainInventory[foodSlot]));
+            Utils.sendMessage("send.");
+            mc.thePlayer.moveForward *= 0.2f;
+            mc.thePlayer.moveStrafing *= 0.2f;
+            release();
+            if (foodSlot != lastSlot)
+                PacketUtils.sendPacketNoEvent(new C09PacketHeldItemChange(lastSlot));
+            releaseLeft = (int) delayBetweenHeal.getInput();
+            foodSlot = -1;
         }
 
         if (releaseLeft > 0) {
@@ -102,9 +98,6 @@ public class AutoGapple extends Module {
         }
 
         if (!Utils.nullCheck() || mc.thePlayer.getHealth() >= minHealth.getInput() || (onlyWhileKillAura.isToggled() && KillAura.target == null)) {
-            if (!airStuck.isToggled() && eatingTicksLeft > 0) {
-                Utils.sendClick(1, false);
-            }
             eatingTicksLeft = 0;
             return;
         }
@@ -113,10 +106,6 @@ public class AutoGapple extends Module {
             working = true;
             eatingTicksLeft--;
 
-            if (!airStuck.isToggled()) {
-                SlotHandler.setCurrentSlot(foodSlot);
-                Utils.sendClick(1, true);
-            }
             return;
         }
 
@@ -128,30 +117,17 @@ public class AutoGapple extends Module {
             animation.reset();
             eatingTicksLeft = 36;
             animation.setValue(eatingTicksLeft);
-            if (airStuck.isToggled()) {
-                mc.theWorld.playerEntities.parallelStream()
-                        .filter(p -> p != mc.thePlayer)
-                        .forEach(p -> realPositions.put(p.getEntityId(), new RealPositionData(p)));
-            } else {
-                SlotHandler.setCurrentSlot(foodSlot);
-                Utils.sendClick(1, true);
-            }
+            mc.theWorld.playerEntities.parallelStream()
+                    .filter(p -> p != mc.thePlayer)
+                    .forEach(p -> realPositions.put(p.getEntityId(), new RealPositionData(p)));
         }
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void onSendPacket(SendPacketEvent event) {
-        if (airStuck.isToggled() && working) {
+        if (working) {
             delayedSend.add(event.getPacket());
             event.setCanceled(true);
-        }
-    }
-
-    @SubscribeEvent
-    public void onSprint(SprintEvent event) {
-        if (airStuck.isToggled() && working) {
-            // to fix NoSlowD
-            event.setSprint(false);
         }
     }
 
@@ -172,7 +148,7 @@ public class AutoGapple extends Module {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void onReceivePacket(ReceivePacketEvent event) {
-        if (airStuck.isToggled() && working) {
+        if (working) {
             if (event.isCanceled())
                 return;
 
@@ -226,7 +202,7 @@ public class AutoGapple extends Module {
 
     @SubscribeEvent
     public void onMove(PreMoveEvent event) {
-        if (working && airStuck.isToggled() && releaseLeft == 0) {
+        if (working && releaseLeft == 0 && airStuck.isToggled()) {
             event.setCanceled(true);
         }
     }

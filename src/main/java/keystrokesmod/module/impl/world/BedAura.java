@@ -55,6 +55,8 @@ public class BedAura extends Module {
     private final ButtonSetting renderOutline;
     private final ButtonSetting sendAnimations;
     private final ButtonSetting silentSwing;
+    private final ButtonSetting rotation;
+
     private final String[] modes = new String[]{"Legit", "Instant", "Swap"};
     private BlockPos[] bedPos;
     public double breakProgress;
@@ -90,6 +92,7 @@ public class BedAura extends Module {
         this.registerSetting(renderOutline = new ButtonSetting("Render block outline", true));
         this.registerSetting(sendAnimations = new ButtonSetting("Send animations", false));
         this.registerSetting(silentSwing = new ButtonSetting("Silent swing", false));
+        this.registerSetting(rotation = new ButtonSetting("Rotation", true));
     }
 
     @Override
@@ -202,7 +205,7 @@ public class BedAura extends Module {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onRotation(RotationEvent e) {
-        if ((rotate || breakProgress >= 1 || breakProgress == 0) && currentBlock != null) {
+        if ((rotate || breakProgress >= 1 || breakProgress == 0) && currentBlock != null && rotation.isToggled()) {
             float[] rotations = RotationUtils.getRotations(currentBlock, e.getYaw(), e.getPitch());
             if (RotationUtils.notInRange(currentBlock, range.getInput())) {
                 return;
