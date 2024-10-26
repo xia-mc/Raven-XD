@@ -128,6 +128,7 @@ public class ModuleManager {
     public static RemoteShop remoteShop;
     public static Regen regen;
     public static ChatAI chatAI;
+    public static keystrokesmod.module.impl.render.ArrayList arrayList;
 
     public void register() {
 
@@ -282,6 +283,7 @@ public class ModuleManager {
         this.addModule(new Explosions());
         this.addModule(new KillMessage());
         this.addModule(clientTheme = new ClientTheme());
+        this.addModule(arrayList = new keystrokesmod.module.impl.render.ArrayList());
 
         // world
         this.addModule(antiBot = new AntiBot());
