@@ -1,7 +1,6 @@
 package keystrokesmod.module.impl.render;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.combat.KillAura;
@@ -22,13 +21,12 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
 public class ArrayList extends Module implements Moveable {
-    private static final int BACKGROUND_COLOR = new Color(20, 20, 20, 150).getRGB();
+    private static final int BACKGROUND_COLOR = new Color(0, 0, 0, 80).getRGB();
 
     private final ModeSetting theme;
     private final SliderSetting size;
@@ -100,7 +98,7 @@ public class ArrayList extends Module implements Moveable {
         int nextMaxX = minX;
         int nextMaxY = minY;
 
-        final double shadowExtra = 2 * size.getInput();
+        final double shadowExtra = 1 * size.getInput();
         final double lineInterval = shadowExtra * 3;
         final int enableX = right.isToggled() ? maxX : minX;
         for (ArrayListModule module : mapping.values()) {

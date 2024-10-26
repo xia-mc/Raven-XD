@@ -8,11 +8,14 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.input.Mouse;
 
+import java.awt.*;
 import java.util.Set;
 
 import static keystrokesmod.Raven.mc;
 
 public class MoveableManager {
+    private static final int BACKGROUND_COLOR = new Color(0, 0, 0, 80).getRGB();
+
     private static final Set<Moveable> moveObjs = new ObjectOpenHashSet<>();
     private static int lastX;
     private static int lastY;
@@ -40,7 +43,7 @@ public class MoveableManager {
                 RenderUtils.drawBloomShadow(
                         (float) obj.getMinX() - 4, (float) obj.getMinY() - 4,
                         (float) (obj.getMaxX() - obj.getMinX()) + 8, (float) (obj.getMaxY() - obj.getMinY()) + 8,
-                        1, 8, -1, false);
+                        1, 8, BACKGROUND_COLOR, false);
             }
             obj.render();
         }
