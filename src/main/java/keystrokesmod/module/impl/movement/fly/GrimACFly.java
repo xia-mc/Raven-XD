@@ -18,6 +18,7 @@ public class GrimACFly extends SubMode<Fly> {
     public void onPreMotion(@NotNull PreMotionEvent event) {
         lastY += 0.001;
         mc.thePlayer.setPosition(event.getPosX(), lastY, event.getPosZ());
+        event.setPosY(lastY);
         event.setOnGround(true);
     }
 

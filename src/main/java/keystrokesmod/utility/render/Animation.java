@@ -1,5 +1,10 @@
 package keystrokesmod.utility.render;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Setter
+@Getter
 public class Animation {
 
     private Easing easing;
@@ -62,67 +67,4 @@ public class Animation {
         this.finished = false;
     }
 
-    public Easing getEasing() {
-        return easing;
-    }
-
-    public void setEasing(Easing easing) {
-        this.easing = easing;
-    }
-
-    public long getDuration() {
-        return duration;
-    }
-
-    public void setDuration(long duration) {
-        this.duration = duration;
-    }
-
-    public long getMillis() {
-        return millis;
-    }
-
-    public void setMillis(long millis) {
-        this.millis = millis;
-    }
-
-    public long getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(long startTime) {
-        this.startTime = startTime;
-    }
-
-    public double getStartValue() {
-        return startValue;
-    }
-
-    public void setStartValue(double startValue) {
-        this.startValue = startValue;
-    }
-
-    public double getDestinationValue() {
-        return destinationValue;
-    }
-
-    public void setDestinationValue(double destinationValue) {
-        this.destinationValue = destinationValue;
-    }
-
-    public double getValue() {
-        return value;
-    }
-
-    public void setValue(double value) {
-        this.value = value;
-    }
-
-    public boolean isFinished() {
-        return finished;
-    }
-
-    public void setFinished(boolean finished) {
-        this.finished = finished;
-    }
 }

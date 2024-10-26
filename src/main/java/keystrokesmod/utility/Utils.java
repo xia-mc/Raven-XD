@@ -6,15 +6,12 @@ import com.mojang.realmsclient.gui.ChatFormatting;
 import keystrokesmod.Raven;
 import keystrokesmod.event.ClickEvent;
 import keystrokesmod.mixins.impl.client.GuiScreenAccessor;
-import keystrokesmod.mixins.impl.client.KeyBindingAccessor;
 import keystrokesmod.module.impl.other.NameHider;
 import keystrokesmod.module.impl.other.SlotHandler;
 import keystrokesmod.module.impl.render.AntiShuffle;
 import keystrokesmod.utility.i18n.I18nManager;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.entity.boss.EntityWither;
 import net.minecraftforge.client.event.MouseEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
@@ -210,7 +207,7 @@ public class Utils {
             string = AntiShuffle.removeObfuscation(string);
         }
         if (ModuleManager.language != null && ModuleManager.language.isEnabled()) {
-            List<Map<String, String>> replaceMap = I18nManager.REPLACE_MAP;
+            final List<Map<String, String>> replaceMap = I18nManager.REPLACE_MAP;
             int index = (int) ModuleManager.language.mode.getInput();
             if (replaceMap.size() > index)
                 string = replaceMap.get(index).getOrDefault(string, string);

@@ -48,6 +48,7 @@
     "client.PlayerControllerMPAccessor",
     "entity.EntityPlayerSPAccessor",
     "gui.MixinGuiButton",
+    "gui.MixinGuiChat",
     "gui.MixinGuiConnecting",
     "gui.MixinGuiContainer",
     "gui.MixinGuiDownloadTerrain",

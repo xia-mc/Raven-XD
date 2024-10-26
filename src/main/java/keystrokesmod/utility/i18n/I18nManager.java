@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import keystrokesmod.Raven;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.Setting;
@@ -14,7 +15,6 @@ import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.utility.i18n.settings.*;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -36,8 +36,8 @@ public class I18nManager {
         loaded = true;
 
         for (String s : LANGUAGE_LIST) {
-            Map<Module, I18nModule> moduleMap = new HashMap<>();
-            Map<String, String> replaceMap = new HashMap<>();
+            Map<Module, I18nModule> moduleMap = new Object2ObjectOpenHashMap<>();
+            Map<String, String> replaceMap = new Object2ObjectOpenHashMap<>();
 
             try (InputStream stream = Objects.requireNonNull(Raven.class.getResourceAsStream("/assets/keystrokesmod/i18n/" + s + ".json"))) {
                 JsonObject jsonObject = getJsonObject(stream);

@@ -523,7 +523,7 @@ public class Scaffold extends IAutoClicker {
                     final keystrokesmod.script.classes.Vec3 eyePos = Utils.getEyePos();
                     final BlockPos groundPos = new BlockPos(mc.thePlayer).down();
                     long expDist = Math.round(expandDistance.getInput());
-                    for (double j = 0; j < expDist; j += 0.1) {
+                    for (double j = 0; j < expDist; j += 0.05) {
                         targetPos = RotationUtils.getExtendedPos(groundPos, mc.thePlayer.rotationYaw, j);
 
                         if (sameY.isToggled() || hoverState != HoverState.DONE) {
