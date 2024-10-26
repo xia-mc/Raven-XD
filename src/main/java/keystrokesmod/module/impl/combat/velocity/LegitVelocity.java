@@ -9,6 +9,7 @@ import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.module.setting.utils.ModeOnly;
 import keystrokesmod.utility.Utils;
+import net.minecraft.potion.Potion;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import java.util.concurrent.TimeUnit;
@@ -21,6 +22,7 @@ public class LegitVelocity extends SubMode<Velocity> {
     private final SliderSetting chance;
     private final ButtonSetting targetNearbyCheck;
     private final ButtonSetting ignoreLiquid;
+    private final ButtonSetting skipJumpWithBoost;
 
     public LegitVelocity(String name, Velocity parent) {
         super(name, parent);
@@ -31,6 +33,7 @@ public class LegitVelocity extends SubMode<Velocity> {
         this.registerSetting(chance = new SliderSetting("Chance", 80, 0, 100, 1, "%", new ModeOnly(jumpDelayMode, 1)));
         this.registerSetting(targetNearbyCheck = new ButtonSetting("Target nearby check", false));
         this.registerSetting(ignoreLiquid = new ButtonSetting("Ignore liquid", true));
+        this.registerSetting(skipJumpWithBoost = new ButtonSetting("Skip jump if Jump Boost", true));
     }
 
     @Override
@@ -40,38 +43,39 @@ public class LegitVelocity extends SubMode<Velocity> {
 
     @SubscribeEvent
     public void onPostVelocity(PostVelocityEvent event) {
-        if (Utils.nullCheck()) {
-            if (mc.thePlayer.maxHurtTime <= 0)
-                return;
-            if (ignoreLiquid.isToggled() && Utils.inLiquid())
-                return;
-            if (targetNearbyCheck.isToggled() && !Utils.isTargetNearby())
-                return;
+        if (Utils.nullCheck() || mc.thePlayer.maxHurtTime <= 0)
+            return;
+        if (ignoreLiquid.isToggled() && Utils.inLiquid())
+            return;
+        if (targetNearbyCheck.isToggled() && !Utils.isTargetNearby())
+            return;
 
-            switch ((int) jumpDelayMode.getInput()) {
-                case 0:
-                    long delay = (long) (Math.random() * (maxDelay.getInput() - minDelay.getInput()) + minDelay.getInput());
-                    if (maxDelay.getInput() == 0 || delay == 0) {
-                        if (canJump())
-                            mc.thePlayer.jump();
-                    } else {
-                        Raven.getExecutor().schedule(() -> {
-                            if (canJump())
-                                mc.thePlayer.jump();
-                        }, delay, TimeUnit.MILLISECONDS);
-                    }
-                    break;
-                case 1:
-                    if (chance.getInput() == 100 || Math.random() * 100 >= chance.getInput()) {
-                        if (canJump())
-                            mc.thePlayer.jump();
-                    }
-                    break;
-            }
+        switch ((int) jumpDelayMode.getInput()) {
+            case 0:
+                long delay = (long) (Math.random() * (maxDelay.getInput() - minDelay.getInput()) + minDelay.getInput());
+                if (delay == 0 || maxDelay.getInput() == 0) {
+                    if (canJump()) mc.thePlayer.jump();
+                } else {
+                    Raven.getExecutor().schedule(() -> {
+                        if (canJump()) mc.thePlayer.jump();
+                    }, delay, TimeUnit.MILLISECONDS);
+                }
+                break;
+            case 1:
+                if (chance.getInput() == 100 || Math.random() * 100 < chance.getInput()) {
+                    if (canJump()) mc.thePlayer.jump();
+                }
+                break;
         }
     }
 
     private boolean canJump() {
-        return mc.thePlayer.onGround && (jumpInInv.isToggled() || mc.currentScreen == null);
+        if (!mc.thePlayer.onGround) return false;
+
+        if (skipJumpWithBoost.isToggled() && mc.thePlayer.isPotionActive(Potion.jump)) {
+            return false;
+        }
+
+        return jumpInInv.isToggled() || mc.currentScreen == null;
     }
 }
