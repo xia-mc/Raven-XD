@@ -26,6 +26,7 @@ public class Fly extends Module {
                 .add(new FakeFly("Fake", this))
                 .add(new HypixelTestFly("Test", this))
                 .add(new CustomFly("Custom", this))
+                .add(new GrimACFly("GrimAC", this))
         );
         this.registerSetting(showBPS = new ButtonSetting("Show BPS", false));
         this.registerSetting(stopAtEnd = new ButtonSetting("Stop at end", false));

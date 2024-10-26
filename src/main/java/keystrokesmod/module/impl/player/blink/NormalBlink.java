@@ -28,7 +28,7 @@ public class NormalBlink extends SubMode<Module> {
     private final ButtonSetting pulse;
     private final SliderSetting pulseDelay;
     private final ButtonSetting initialPosition;
-    private final ButtonSetting overlay;
+    public final ButtonSetting overlay;
 
     public final List<Packet<?>> blinkedPackets = new ArrayList<>();
     private long startTime = -1;

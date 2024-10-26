@@ -13,6 +13,7 @@ import keystrokesmod.script.ScriptManager;
 import keystrokesmod.utility.*;
 import keystrokesmod.utility.clicks.CPSCalculator;
 import keystrokesmod.utility.i18n.I18nManager;
+import keystrokesmod.utility.interact.moveable.MoveableManager;
 import keystrokesmod.utility.profile.Profile;
 import keystrokesmod.utility.profile.ProfileManager;
 import keystrokesmod.utility.render.progress.ProgressManager;
@@ -86,6 +87,7 @@ public class Raven {
         MinecraftForge.EVENT_BUS.register(ModuleManager.rotationHandler);
         MinecraftForge.EVENT_BUS.register(ModuleManager.slotHandler);
         MinecraftForge.EVENT_BUS.register(ModuleManager.dynamicManager);
+        MinecraftForge.EVENT_BUS.register(new MoveableManager());
 
         I18nManager.init();
         AutoUpdate.init();

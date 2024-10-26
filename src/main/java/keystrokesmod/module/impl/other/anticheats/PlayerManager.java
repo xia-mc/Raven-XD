@@ -1,5 +1,6 @@
 package keystrokesmod.module.impl.other.anticheats;
 
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import keystrokesmod.module.impl.other.Anticheat;
 import keystrokesmod.module.impl.other.LatencyAlerts;
 import keystrokesmod.module.impl.other.anticheats.utils.alert.LogUtils;
@@ -10,19 +11,16 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
-import java.util.ConcurrentModificationException;
-import java.util.HashMap;
-import java.util.UUID;
+import java.util.*;
 
 public class PlayerManager {
-    public HashMap<UUID, Boolean> activeMap;  // 实时活动玩家(可被检查)列表
+    public Map<UUID, Boolean> activeMap;  // 实时活动玩家(可被检查)列表
 
-    public HashMap<UUID, TRPlayer> dataMap;  // 玩家数据列表
+    public Map<UUID, TRPlayer> dataMap;  // 玩家数据列表
 
     public PlayerManager() {
-        activeMap = new HashMap<>();
-        dataMap = new HashMap<>();
+        activeMap = new Object2ObjectOpenHashMap<>();
+        dataMap = new Object2ObjectOpenHashMap<>();
     }
 
     public void update(@NotNull Minecraft client) {
