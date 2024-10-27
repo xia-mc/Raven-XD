@@ -14,7 +14,7 @@ public abstract class MixinSplashProgress {
     @Inject(method = "getString", at = @At("HEAD"), cancellable = true)
     private static void onGetString(@NotNull String name, String def, CallbackInfoReturnable<String> cir) {
         if (name.equals("logoTexture") && def.equals("textures/gui/title/mojang.png")) {
-            cir.setReturnValue("keystrokesmod:textures/backgrounds/ravenxd.jpg");
+            cir.setReturnValue("keystrokesmod:textures/backgrounds/ravenxd.png");
         }
     }
 }
