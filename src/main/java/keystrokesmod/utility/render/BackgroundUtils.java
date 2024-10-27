@@ -48,5 +48,5 @@ public class BackgroundUtils {
     }
 
     @Getter
-    private static final ResourceLocation logoPng = new ResourceLocation("keystrokesmod:textures/backgrounds/bluearacive.png");
+    private static final ResourceLocation logoPng = new ResourceLocation("keystrokesmod:textures/backgrounds/ravenxd.jpg");
 }
