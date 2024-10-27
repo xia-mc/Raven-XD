@@ -73,7 +73,9 @@ public class LegitVelocity extends SubMode<Velocity> {
         if (!mc.thePlayer.onGround) return false;
 
         if (skipJumpWithBoost.isToggled() && mc.thePlayer.isPotionActive(Potion.jump)) {
-            return false;
+            int amplifier = mc.thePlayer.getActivePotionEffect(Potion.jump).getAmplifier();
+            // Only skip for significant jump boosts (level 2 or higher)
+            return amplifier < 1;
         }
 
         return jumpInInv.isToggled() || mc.currentScreen == null;
