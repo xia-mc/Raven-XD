@@ -62,7 +62,7 @@ public class LegitVelocity extends SubMode<Velocity> {
                 }
                 break;
             case 1:
-                if (chance.getInput() == 100 || Math.random() * 100 < chance.getInput()) {
+                if (chance.getInput() == 100 || Math.random() * 100 <= chance.getInput()) {
                     if (canJump()) mc.thePlayer.jump();
                 }
                 break;
