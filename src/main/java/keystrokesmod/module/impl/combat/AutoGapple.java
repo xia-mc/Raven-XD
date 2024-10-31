@@ -37,6 +37,7 @@ public class AutoGapple extends Module {
     private final SliderSetting delayBetweenHeal;
     public final ButtonSetting disableKillAura;
     private final ButtonSetting airStuck;
+    private final ButtonSetting blink;
     private final ButtonSetting visual;
     private final ButtonSetting onlyWhileKillAura;
 
@@ -54,9 +55,10 @@ public class AutoGapple extends Module {
     public AutoGapple() {
         super("AutoGapple", category.combat, "Made for QuickMacro.");
         this.registerSetting(minHealth = new SliderSetting("Min health", 10, 1, 20, 1));
-        this.registerSetting(delayBetweenHeal = new SliderSetting("Delay between heal", 5, 0, 20, 1));
+        this.registerSetting(delayBetweenHeal = new SliderSetting("Delay between heal", 5, 0, 40, 1));
         this.registerSetting(disableKillAura = new ButtonSetting("Disable killAura", false));
         this.registerSetting(airStuck = new ButtonSetting("Air stuck", false));
+        this.registerSetting(blink = new ButtonSetting("Blink", false));
         this.registerSetting(visual = new ButtonSetting("Visual", true));
         this.registerSetting(onlyWhileKillAura = new ButtonSetting("Only while killAura", true));
     }
@@ -78,7 +80,6 @@ public class AutoGapple extends Module {
             int lastSlot = SlotHandler.getCurrentSlot();
             if (foodSlot != lastSlot)
                 PacketUtils.sendPacketNoEvent(new C09PacketHeldItemChange(foodSlot));
-            PacketUtils.sendPacketNoEvent(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.DROP_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN));
             PacketUtils.sendPacketNoEvent(new C08PacketPlayerBlockPlacement(mc.thePlayer.inventory.mainInventory[foodSlot]));
             Utils.sendMessage("send.");
             release();
@@ -110,7 +111,7 @@ public class AutoGapple extends Module {
         foodSlot = eat();
         if (foodSlot != -1) {
             animation.reset();
-            eatingTicksLeft = 36;
+            eatingTicksLeft = 35;
             animation.setValue(eatingTicksLeft);
             mc.theWorld.playerEntities.parallelStream()
                     .filter(p -> p != mc.thePlayer)
