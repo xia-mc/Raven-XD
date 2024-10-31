@@ -74,7 +74,7 @@ public class HypixelSprint extends IScaffoldSprint {
 
     private int getSpeedEffect() {
         if (mc.thePlayer.isPotionActive(Potion.moveSpeed))
-            return mc.thePlayer.getActivePotionEffect(Potion.moveSpeed).getDuration() + 1;
+            return mc.thePlayer.getActivePotionEffect(Potion.moveSpeed).getAmplifier() + 1;
         return 0;
     }
 
