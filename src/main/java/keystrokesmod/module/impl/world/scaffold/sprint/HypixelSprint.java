@@ -40,16 +40,6 @@ public class HypixelSprint extends IScaffoldSprint {
 
     @SubscribeEvent
     public void onPreUpdate(PreMotionEvent event) {
-        if (getLastDistance() > .22 && mc.thePlayer.ticksExisted % 2 == 0 && mc.thePlayer.onGround) {
-            final double xDist = mc.thePlayer.posX - mc.thePlayer.prevPosX;
-            final double zDist = mc.thePlayer.posZ - mc.thePlayer.prevPosZ;
-            final double multiplier = .5 - getSpeedEffect() * .05;
-            final double random = Math.random() * .007;
-            event.setPosX(event.getPosX() - xDist * (multiplier + random));
-            event.setPosZ(event.getPosZ() - zDist * (multiplier + random));
-            event.setPosY(event.getPosY() + .00625 + Math.random() * 1E-3);
-        }
-
         if (mc.thePlayer.onGround) {
             mc.thePlayer.motionX *= 1.114 - getSpeedEffect() * .01 - Math.random() * 1E-4;
             mc.thePlayer.motionZ *= 1.114 - getSpeedEffect() * .01 - Math.random() * 1E-4;
