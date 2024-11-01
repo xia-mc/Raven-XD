@@ -3,7 +3,6 @@ package keystrokesmod.module.impl.render;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
-import keystrokesmod.module.impl.combat.KillAura;
 import keystrokesmod.module.impl.render.arraylist.ArrayListModule;
 import keystrokesmod.module.setting.impl.*;
 import keystrokesmod.utility.Theme;
@@ -22,7 +21,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 
 public class ArrayList extends Module implements Moveable {
@@ -88,7 +86,7 @@ public class ArrayList extends Module implements Moveable {
         final IFont font = FontManager.getFont(FontManager.Fonts.TENACITY, (int) (20 * size.getInput()));
         final double height = font.height();
 
-        updateArrayList(font);
+        updateArrayList();
 
         final ScaledResolution sr = new ScaledResolution(mc);
         moveX(Utils.limit(minX, 0, sr.getScaledWidth()) - minX);
@@ -98,7 +96,7 @@ public class ArrayList extends Module implements Moveable {
         int nextMaxX = minX;
         int nextMaxY = minY;
 
-        final double shadowExtra = 1 * size.getInput();
+        final double shadowExtra = size.getInput() * 0.5;
         final double lineInterval = shadowExtra * 3;
         final int enableX = right.isToggled() ? maxX : minX;
         for (ArrayListModule module : mapping.values()) {
@@ -178,22 +176,23 @@ public class ArrayList extends Module implements Moveable {
         }
     }
 
-    private void updateArrayList(IFont font) {
+    private void updateArrayList() {
         final int[] renderingIndex = {0};
-        ModuleManager.organizedModules.parallelStream()
+        ModuleManager.organizedModules.stream()
                 .filter(this::canRender)
-                .map(module -> {
-                    if (!mapping.containsKey(module)) {
-                        return mapping.put(module, new ArrayListModule(module));
+                .forEach(module -> {
+                    ArrayListModule arrayListModule = mapping.get(module);
+                    if (module.isEnabled()) {
+                        if (arrayListModule == null) {
+                            mapping.put(module, new ArrayListModule(module));
+                        }
+                        if (arrayListModule != null) {
+                            arrayListModule.onUpdate(renderingIndex[0]);
+                        }
+                        renderingIndex[0]++;
+                    } else {
+                        mapping.remove(module);
                     }
-                    return mapping.get(module);
-                })
-                .filter(Objects::nonNull)
-                .sorted((c1, c2) -> Double.compare(font.width(getText(c2)), font.width(getText(c1))))
-                .forEachOrdered(module -> {
-                    module.onUpdate(renderingIndex[0]);
-                    if (module.getModule().isEnabled())
-                        renderingIndex[0] += 1;
                 });
     }
 
@@ -214,9 +213,7 @@ public class ArrayList extends Module implements Moveable {
         if (module.moduleCategory() == category.client && !client.isToggled()) return false;
         if (module.moduleCategory() == category.scripts && !scripts.isToggled()) return false;
         if (module.moduleCategory() == category.exploit && !exploit.isToggled()) return false;
-        if (module.moduleCategory() == category.experimental && !experimental.isToggled()) return false;
-
-        return true;
+        return module.moduleCategory() != category.experimental || experimental.isToggled();
     }
 
     @Override
