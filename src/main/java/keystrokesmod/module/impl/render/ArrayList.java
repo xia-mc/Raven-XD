@@ -53,7 +53,7 @@ public class ArrayList extends Module implements Moveable {
     private int minX = 10, minY = 10, maxX = 10, maxY = 10;
 
     public ArrayList() {
-        super("ArrayList", category.render);
+        super("ArrayList", category.experimental);
         this.registerSetting(theme = new ModeSetting("Theme", Theme.themes, 0));
         this.registerSetting(size = new SliderSetting("Size", 1, 0.5, 2, 0.1));
         this.registerSetting(info = new ButtonSetting("Info", false));
@@ -107,8 +107,6 @@ public class ArrayList extends Module implements Moveable {
             double width = font.width(text);
 
             int posX = module.getPosX(enableX, right.isToggled() ? sr.getScaledWidth() + width + shadowExtra * 2 : -width - shadowExtra * 2);
-            if (module.getModule() instanceof KillAura)
-                Utils.sendMessage(String.valueOf(posX));
             int posY = module.getPosY(minY, (int) (lineInterval + height));
 
             if (background.isToggled()) {

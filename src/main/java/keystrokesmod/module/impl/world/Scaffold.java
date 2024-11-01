@@ -144,7 +144,7 @@ public class Scaffold extends IAutoClicker {
         this.registerSetting(aimSpeed = new SliderSetting("Aim speed", 20, 5, 20, 0.1, new ModeOnly(rotation, 0).reserve()));
         this.registerSetting(moveFix = new ButtonSetting("MoveFix", false, new ModeOnly(rotation, 0).reserve()));
         this.registerSetting(motion = new SliderSetting("Motion", 1.0, 0.5, 1.2, 0.01, () -> !moveFix.isToggled()));
-        this.registerSetting(strafe = new SliderSetting("Strafe", 0, -45, 45, 5));
+        this.registerSetting(strafe = new SliderSetting("Strafe", 0, -90, 90, 5));
         this.registerSetting(sprint = new ModeValue("Sprint", this)
                 .add(new DisabledSprint("Disabled", this))
                 .add(new VanillaSprint("Vanilla", this))
