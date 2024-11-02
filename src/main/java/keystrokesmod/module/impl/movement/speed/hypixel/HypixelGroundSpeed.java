@@ -19,7 +19,7 @@ public class HypixelGroundSpeed extends SubMode<HypixelSpeed> {
     public void onPrePlayerInput(PrePlayerInputEvent event) {
         if (!Utils.nullCheck() || parent.parent.noAction()) return;
         if (mc.thePlayer.onGround && MoveUtil.isMoving() && mc.currentScreen == null) {
-            event.setSpeed(MoveUtil.getAllowedHorizontalDistance());
+            event.setSpeed(MoveUtil.getAllowedHorizontalDistance() - Math.random() / 100);
         }
     }
 }

@@ -264,7 +264,7 @@ public class Scaffold extends IAutoClicker {
             if (offsetToMid > 0.6 || offsetToMid < 0.4 || lastOffsetToMid == -1) {
                 lastOffsetToMid = offsetToMid;
             }
-            yaw += (float) (lastOffsetToMid > 0.5 ? strafe.getInput() : -strafe.getInput());
+            yaw += (float) (lastOffsetToMid >= 0.5 ? strafe.getInput() : -strafe.getInput());
         }
 
         boolean instant = aimSpeed.getInput() == aimSpeed.getMax();
@@ -721,9 +721,9 @@ public class Scaffold extends IAutoClicker {
         return this.isEnabled() && placeBlock != null;
     }
 
-    public static boolean isDiagonal() {
+    public boolean isDiagonal() {
         float yaw = ((mc.thePlayer.rotationYaw % 360) + 360) % 360 > 180 ? ((mc.thePlayer.rotationYaw % 360) + 360) % 360 - 360 : ((mc.thePlayer.rotationYaw % 360) + 360) % 360;
-        return (yaw >= -170 && yaw <= 170) && !(yaw >= -10 && yaw <= 10) && !(yaw >= 80 && yaw <= 100) && !(yaw >= -100 && yaw <= -80) || Keyboard.isKeyDown(mc.gameSettings.keyBindLeft.getKeyCode()) || Keyboard.isKeyDown(mc.gameSettings.keyBindRight.getKeyCode());
+        return (yaw >= -170 && yaw <= 170) && !(yaw >= -10 && yaw <= 10) && !(yaw >= 80 && yaw <= 100) && !(yaw >= -100 && yaw <= -80) || (rotateWithMovement.isToggled() && (Keyboard.isKeyDown(mc.gameSettings.keyBindLeft.getKeyCode()) || Keyboard.isKeyDown(mc.gameSettings.keyBindRight.getKeyCode())));
     }
 
     public double groundDistance() {

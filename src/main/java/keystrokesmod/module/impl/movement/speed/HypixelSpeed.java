@@ -9,12 +9,14 @@ import keystrokesmod.module.setting.impl.ModeValue;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.MoveUtil;
+import keystrokesmod.utility.PacketUtils;
 import keystrokesmod.utility.movement.Move;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
 public class HypixelSpeed extends SubMode<Speed> {
     private final ModeValue mode;
+    private final ButtonSetting fastTest;
     private final ButtonSetting strafe;
     private final SliderSetting minAngle;
     private final ButtonSetting fullStrafe;
@@ -28,6 +30,7 @@ public class HypixelSpeed extends SubMode<Speed> {
                 .add(new HypixelGroundSpeed("Ground", this))
                 .add(new HypixelLowHopSpeed("LowHop", this))
         );
+        this.registerSetting(fastTest = new ButtonSetting("Fast test", false));
         this.registerSetting(strafe = new ButtonSetting("Strafe", false));
         this.registerSetting(minAngle = new SliderSetting("Min angle", 30, 15, 90, 15, strafe::isToggled));
         this.registerSetting(fullStrafe = new ButtonSetting("Full strafe", false, strafe::isToggled));
@@ -35,14 +38,18 @@ public class HypixelSpeed extends SubMode<Speed> {
 
     @SubscribeEvent
     public void onPreUpdate(PreUpdateEvent event) {
-        if (!strafe.isToggled() || !canStrafe())
-            return;
+        if (strafe.isToggled() && canStrafe()) {
+            if (parent.offGroundTicks == 9) {
+                MoveUtil.strafe(0.2);
+                mc.thePlayer.motionY += 0.1;
+            } else {
+                MoveUtil.strafe(0.11);
+            }
+        }
 
-        if (parent.offGroundTicks == 9) {
-            MoveUtil.strafe(0.2);
-            mc.thePlayer.motionY += 0.1;
-        } else {
-            MoveUtil.strafe(0.11);
+        if (fastTest.isToggled() && mc.thePlayer.onGround) {
+            mc.thePlayer.motionX *= 1.114 - MoveUtil.getSpeedEffect() * .01 - Math.random() * 1E-4;
+            mc.thePlayer.motionZ *= 1.114 - MoveUtil.getSpeedEffect() * .01 - Math.random() * 1E-4;
         }
     }
 
@@ -52,7 +59,7 @@ public class HypixelSpeed extends SubMode<Speed> {
         final double curAngle = Move.fromMovement(mc.thePlayer.moveForward, mc.thePlayer.moveStrafing).getDeltaYaw()
                 + TargetStrafe.getMovementYaw();
 
-        if (Math.abs(curAngle - lastAngle) < minAngle.getInput() || mc.thePlayer.hurtTime != 0)
+        if (Math.abs(curAngle - lastAngle) < minAngle.getInput() || (mc.thePlayer.hurtTime < 7 && mc.thePlayer.hurtTime > 0))
             return false;
         lastAngle = curAngle;
 
@@ -70,5 +77,10 @@ public class HypixelSpeed extends SubMode<Speed> {
     @Override
     public void onDisable() {
         mode.disable();
+
+        if (fastTest.isToggled()) {
+            mc.thePlayer.motionX *= .8;
+            mc.thePlayer.motionZ *= .8;
+        }
     }
 }
