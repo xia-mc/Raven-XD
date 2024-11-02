@@ -23,7 +23,6 @@ public class HypixelSprint extends IScaffoldSprint {
 
     public HypixelSprint(String name, @NotNull Scaffold parent) {
         super(name, parent);
-        blink.overlay.enable();
     }
 
     public void onDisable() {

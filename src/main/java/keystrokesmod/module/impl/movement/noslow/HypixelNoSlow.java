@@ -13,6 +13,7 @@ import net.minecraft.item.ItemBow;
 import net.minecraft.item.ItemPotion;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
+import net.minecraft.network.play.client.C07PacketPlayerDigging;
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
 import net.minecraft.util.BlockPos;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -60,6 +61,15 @@ public class HypixelNoSlow extends INoSlow {
                 }
                 send = true;
                 event.setCanceled(true);
+            }
+        } else if (event.getPacket() instanceof C07PacketPlayerDigging) {
+            C07PacketPlayerDigging packet = (C07PacketPlayerDigging) event.getPacket();
+            if (packet.getStatus() == C07PacketPlayerDigging.Action.RELEASE_USE_ITEM) {
+                if (send) {
+                    // or get bad packet flag
+                    event.setCanceled(true);
+                }
+                send = false;
             }
         }
     }
