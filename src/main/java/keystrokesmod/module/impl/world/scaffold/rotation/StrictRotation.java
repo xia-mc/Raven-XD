@@ -15,7 +15,7 @@ public class StrictRotation extends IScaffoldRotation {
     @Override
     public @NotNull RotationData onRotation(float placeYaw, float placePitch, boolean forceStrict, @NotNull RotationEvent event) {
         if (!forceStrict && MoveUtil.isMoving()) {
-            return new RotationData(parent.getYaw() + (Scaffold.isDiagonal() ? 0 : (float) parent.strafe.getInput()), 85);
+            return new RotationData(parent.getYaw(), 85);
         }
         return new RotationData(placeYaw, placePitch);
     }

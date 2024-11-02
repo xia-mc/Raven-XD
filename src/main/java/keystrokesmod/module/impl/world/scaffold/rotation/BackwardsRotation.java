@@ -13,6 +13,6 @@ public class BackwardsRotation extends IScaffoldRotation {
 
     @Override
     public @NotNull RotationData onRotation(float placeYaw, float placePitch, boolean forceStrict, @NotNull RotationEvent event) {
-        return new RotationData(parent.getYaw() + (Scaffold.isDiagonal() ? 0 : (float) parent.strafe.getInput()), 85);
+        return new RotationData(parent.getYaw(), 85);
     }
 }

@@ -2,10 +2,8 @@ package keystrokesmod.module.impl.world.scaffold.sprint;
 
 import keystrokesmod.event.PreMotionEvent;
 import keystrokesmod.event.SendPacketEvent;
-import keystrokesmod.module.impl.other.anticheats.utils.world.PlayerMove;
 import keystrokesmod.module.impl.world.Scaffold;
 import keystrokesmod.module.impl.world.scaffold.IScaffoldSprint;
-import keystrokesmod.script.classes.Vec3;
 import keystrokesmod.utility.PacketUtils;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
@@ -30,7 +28,7 @@ public class HypixelSprint extends IScaffoldSprint {
 
     public void onDisable() {
         if (!packets.isEmpty()) {
-            packets.forEach(PacketUtils::sendPacketNoEvent);
+            packets.forEach(PacketUtils::sendPacket);
             packets.clear();
         }
 
@@ -45,9 +43,13 @@ public class HypixelSprint extends IScaffoldSprint {
             mc.thePlayer.motionZ *= 1.114 - getSpeedEffect() * .01 - Math.random() * 1E-4;
         }
 
-        if (mc.thePlayer.ticksExisted % 2 != 0 && !packets.isEmpty()) {
-            packets.forEach(PacketUtils::sendPacketNoEvent);
-            packets.clear();
+        if (mc.thePlayer.ticksExisted % 2 != 0) {
+            synchronized (packets) {
+                if (!packets.isEmpty()) {
+                    packets.forEach(PacketUtils::sendPacket);
+                    packets.clear();
+                }
+            }
         }
     }
 
@@ -66,10 +68,6 @@ public class HypixelSprint extends IScaffoldSprint {
         if (mc.thePlayer.isPotionActive(Potion.moveSpeed))
             return mc.thePlayer.getActivePotionEffect(Potion.moveSpeed).getAmplifier() + 1;
         return 0;
-    }
-
-    private static double getLastDistance() {
-        return PlayerMove.getXzTickSpeed(new Vec3(mc.thePlayer.lastTickPosX, mc.thePlayer.lastTickPosY, mc.thePlayer.lastTickPosZ), new Vec3(mc.thePlayer));
     }
 
     @Override
