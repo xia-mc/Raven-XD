@@ -26,7 +26,7 @@ public class ArrayListModule {
     }
 
     public boolean shouldRender() {
-        return animeX.getValue() != 0;
+        return module.isEnabled();
     }
 
     public String getName() {
