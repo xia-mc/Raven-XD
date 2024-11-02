@@ -54,7 +54,8 @@ public class Scaffold extends IAutoClicker {
     public final SliderSetting motion;
     private final ModeValue rotation;
     private final ButtonSetting moveFix;
-    public final SliderSetting strafe;
+    private final SliderSetting strafe;
+    private final ButtonSetting notWhileDiagonal;
     private final ModeValue sprint;
     private final ButtonSetting fast;
     private final ButtonSetting cancelSprint;
@@ -121,6 +122,7 @@ public class Scaffold extends IAutoClicker {
     private boolean jumpScaffold$fast$cycle = false;
     private HoverState hoverState = HoverState.DONE;
     private boolean stopMoving = false;
+    private double lastOffsetToMid = -1;
 
     public Scaffold() {
         super("Scaffold", category.world);
@@ -144,7 +146,8 @@ public class Scaffold extends IAutoClicker {
         this.registerSetting(aimSpeed = new SliderSetting("Aim speed", 20, 5, 20, 0.1, new ModeOnly(rotation, 0).reserve()));
         this.registerSetting(moveFix = new ButtonSetting("MoveFix", false, new ModeOnly(rotation, 0).reserve()));
         this.registerSetting(motion = new SliderSetting("Motion", 1.0, 0.5, 1.2, 0.01, () -> !moveFix.isToggled()));
-        this.registerSetting(strafe = new SliderSetting("Strafe", 0, -45, 45, 5));
+        this.registerSetting(strafe = new SliderSetting("Strafe", 0, 0, 90, 5));
+        this.registerSetting(notWhileDiagonal = new ButtonSetting("Not while diagonal", true, () -> strafe.getInput() != 0));
         this.registerSetting(sprint = new ModeValue("Sprint", this)
                 .add(new DisabledSprint("Disabled", this))
                 .add(new VanillaSprint("Vanilla", this))
@@ -220,6 +223,7 @@ public class Scaffold extends IAutoClicker {
         telly$noBlockPlace = false;
         lastYaw = lastPitch = null;
         polar$waitingForExpand = false;
+        lastOffsetToMid = -1;
         Utils.resetTimer();
     }
 
@@ -254,6 +258,14 @@ public class Scaffold extends IAutoClicker {
         final RotationData data = ((IScaffoldRotation) rotation.getSelected()).onRotation(placeYaw, placePitch, forceStrict, event);
         float yaw = data.getYaw();
         float pitch = data.getPitch();
+
+        if (!isDiagonal() || !notWhileDiagonal.isToggled()) {
+            double offsetToMid = EnumFacing.fromAngle(getYaw()).getAxis() == EnumFacing.Axis.X ? Math.abs(mc.thePlayer.posZ % 1) : Math.abs(mc.thePlayer.posX % 1);
+            if (offsetToMid > 0.6 || offsetToMid < 0.4 || lastOffsetToMid == -1) {
+                lastOffsetToMid = offsetToMid;
+            }
+            yaw += (float) (lastOffsetToMid >= 0.5 ? strafe.getInput() : -strafe.getInput());
+        }
 
         boolean instant = aimSpeed.getInput() == aimSpeed.getMax();
 
@@ -709,9 +721,9 @@ public class Scaffold extends IAutoClicker {
         return this.isEnabled() && placeBlock != null;
     }
 
-    public static boolean isDiagonal() {
+    public boolean isDiagonal() {
         float yaw = ((mc.thePlayer.rotationYaw % 360) + 360) % 360 > 180 ? ((mc.thePlayer.rotationYaw % 360) + 360) % 360 - 360 : ((mc.thePlayer.rotationYaw % 360) + 360) % 360;
-        return (yaw >= -170 && yaw <= 170) && !(yaw >= -10 && yaw <= 10) && !(yaw >= 80 && yaw <= 100) && !(yaw >= -100 && yaw <= -80) || Keyboard.isKeyDown(mc.gameSettings.keyBindLeft.getKeyCode()) || Keyboard.isKeyDown(mc.gameSettings.keyBindRight.getKeyCode());
+        return (yaw >= -170 && yaw <= 170) && !(yaw >= -10 && yaw <= 10) && !(yaw >= 80 && yaw <= 100) && !(yaw >= -100 && yaw <= -80) || (rotateWithMovement.isToggled() && (Keyboard.isKeyDown(mc.gameSettings.keyBindLeft.getKeyCode()) || Keyboard.isKeyDown(mc.gameSettings.keyBindRight.getKeyCode())));
     }
 
     public double groundDistance() {

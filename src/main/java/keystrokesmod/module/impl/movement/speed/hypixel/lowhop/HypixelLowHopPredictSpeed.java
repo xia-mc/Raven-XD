@@ -12,11 +12,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
 public class HypixelLowHopPredictSpeed extends SubMode<HypixelLowHopSpeed> {
-    private final ButtonSetting fast;
-
     public HypixelLowHopPredictSpeed(String name, @NotNull HypixelLowHopSpeed parent) {
         super(name, parent);
-        this.registerSetting(fast = new ButtonSetting("Fast", false));
     }
 
     @SubscribeEvent
@@ -24,17 +21,8 @@ public class HypixelLowHopPredictSpeed extends SubMode<HypixelLowHopSpeed> {
         if (!MoveUtil.isMoving() || parent.parent.parent.noAction()) return;
         if (parent.parent.parent.offGroundTicks == 0) {
             if (!Utils.jumpDown()) {
-                if (fast.isToggled() && !RotationHandler.isSet()) {
-                    mc.thePlayer.jump();
-                    if (mc.thePlayer.isPotionActive(Potion.moveSpeed)) {
-                        MoveUtil.strafe(0.6);
-                    } else {
-                        MoveUtil.strafe(0.485);
-                    }
-                } else {
-                    MoveUtil.strafe(MoveUtil.getAllowedHorizontalDistance() - Math.random() / 100f);
-                    mc.thePlayer.jump();
-                }
+                MoveUtil.strafe(MoveUtil.getAllowedHorizontalDistance() - Math.random() / 100f);
+                mc.thePlayer.jump();
             }
         } else if (parent.parent.parent.offGroundTicks == 5 && !parent.noLowHop()) {
             mc.thePlayer.motionY = MoveUtil.predictedMotion(mc.thePlayer.motionY, 2);

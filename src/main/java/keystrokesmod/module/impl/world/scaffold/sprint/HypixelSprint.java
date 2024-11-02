@@ -1,51 +1,53 @@
 package keystrokesmod.module.impl.world.scaffold.sprint;
 
-import keystrokesmod.event.MoveInputEvent;
-import keystrokesmod.event.ScaffoldPlaceEvent;
-import keystrokesmod.module.ModuleManager;
+import keystrokesmod.event.PreMotionEvent;
+import keystrokesmod.event.SendPacketEvent;
+import keystrokesmod.module.impl.player.blink.NormalBlink;
 import keystrokesmod.module.impl.world.Scaffold;
 import keystrokesmod.module.impl.world.scaffold.IScaffoldSprint;
-import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.utility.MoveUtil;
+import net.minecraft.network.play.client.C0FPacketConfirmTransaction;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
 public class HypixelSprint extends IScaffoldSprint {
-    private final SliderSetting placeSlowdown;
-    private final SliderSetting sneakSlowdown;
-
-    private boolean slow = false;
+    private final NormalBlink blink = new NormalBlink("Blink", this) {
+        @Override
+        public void onSendPacket(@NotNull SendPacketEvent e) {
+            if (e.getPacket() instanceof C0FPacketConfirmTransaction)
+                return;
+            super.onSendPacket(e);
+        }
+    };
 
     public HypixelSprint(String name, @NotNull Scaffold parent) {
         super(name, parent);
-        this.registerSetting(placeSlowdown = new SliderSetting("Place slowdown", 0.6, 0.5, 1, 0.01));
-        this.registerSetting(sneakSlowdown = new SliderSetting("Sneak slowdown", 0.3, 0.3, 1, 0.01));
     }
 
-    @SubscribeEvent
-    public void onScaffold(ScaffoldPlaceEvent event) {
-        if (shouldSlow()) {
-            mc.thePlayer.motionX *= placeSlowdown.getInput();
-            mc.thePlayer.motionZ *= placeSlowdown.getInput();
-            slow = true;
+    public void onDisable() {
+        blink.disable();
+
+        mc.thePlayer.motionX *= .8;
+        mc.thePlayer.motionZ *= .8;
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    public void onPreUpdate(PreMotionEvent event) {
+        if (mc.thePlayer.onGround) {
+            mc.thePlayer.motionX *= 1.114 - MoveUtil.getSpeedEffect() * .01 - Math.random() * 1E-4;
+            mc.thePlayer.motionZ *= 1.114 - MoveUtil.getSpeedEffect() * .01 - Math.random() * 1E-4;
         }
-    }
 
-    @SubscribeEvent
-    public void onMoveInput(MoveInputEvent event) {
-        if (slow) {
-            event.setSneak(true);
-            event.setSneakSlowDown(sneakSlowdown.getInput());
-            slow = false;
+        if (mc.thePlayer.onGround && mc.thePlayer.ticksExisted % 2 == 0) {
+            blink.enable();
+        } else {
+            blink.disable();
         }
-    }
-
-    private static boolean shouldSlow() {
-        return MoveUtil.isMoving() && !ModuleManager.tower.canTower() && !Scaffold.isDiagonal();
     }
 
     @Override
     public boolean isSprint() {
-        return !Scaffold.isDiagonal() || ModuleManager.tower.canTower();
+        return true;
     }
 }

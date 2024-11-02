@@ -65,7 +65,7 @@ public class TellyRotation extends IScaffoldRotation {
                     noPlace = false;
                 }
             } else {
-                if (Scaffold.isDiagonal()) {
+                if (parent.isDiagonal()) {
                     if (parent.offGroundTicks == (int) diagonalTicks.getInput()) {
                         noPlace = false;
                     }

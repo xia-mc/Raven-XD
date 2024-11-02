@@ -4,13 +4,16 @@ import keystrokesmod.event.PreMotionEvent;
 import keystrokesmod.event.SendPacketEvent;
 import keystrokesmod.module.impl.movement.NoSlow;
 import keystrokesmod.module.impl.other.SlotHandler;
+import keystrokesmod.utility.BlockUtils;
 import keystrokesmod.utility.ContainerUtils;
 import keystrokesmod.utility.PacketUtils;
 import keystrokesmod.utility.Utils;
+import net.minecraft.block.BlockStairs;
 import net.minecraft.item.ItemBow;
 import net.minecraft.item.ItemPotion;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
+import net.minecraft.network.play.client.C07PacketPlayerDigging;
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
 import net.minecraft.util.BlockPos;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -23,11 +26,6 @@ public class HypixelNoSlow extends INoSlow {
 
     public HypixelNoSlow(String name, @NotNull NoSlow parent) {
         super(name, parent);
-    }
-
-    @Override
-    public void onUpdate() {
-        if (!mc.thePlayer.isUsingItem() || SlotHandler.getHeldItem() == null) return;
     }
 
     @SubscribeEvent
@@ -64,11 +62,23 @@ public class HypixelNoSlow extends INoSlow {
                 send = true;
                 event.setCanceled(true);
             }
+        } else if (event.getPacket() instanceof C07PacketPlayerDigging) {
+            C07PacketPlayerDigging packet = (C07PacketPlayerDigging) event.getPacket();
+            if (packet.getStatus() == C07PacketPlayerDigging.Action.RELEASE_USE_ITEM) {
+                if (send) {
+                    // or get bad packet flag
+                    event.setCanceled(true);
+                }
+                send = false;
+            }
         }
     }
 
     @Override
     public float getSlowdown() {
+        if (BlockUtils.blockRelativeToPlayer(0, -1, 0) instanceof BlockStairs)
+            return 0.2f;
+
         ItemStack item = SlotHandler.getHeldItem();
         if (item != null && item.getItem() instanceof ItemSword)
             return 0.8f;
