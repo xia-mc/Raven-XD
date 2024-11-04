@@ -61,7 +61,7 @@ public class ChestStealer extends Module {
 
     @SubscribeEvent
     public void onRenderContainer(RenderContainerEvent event) {
-        if (silent.isToggled())
+        if (silent.isToggled() && ContainerUtils.isChest(customChest.isToggled()))
             event.setCanceled(true);
     }
 
