@@ -105,7 +105,7 @@ public abstract class MixinMinecraft {
 
     @Inject(method = "createDisplay", at = @At(value = "RETURN"))
     private void onSetTitle(@NotNull CallbackInfo ci) {
-        Display.setTitle("Raven XD " + Watermark.VERSION);
+        Display.setTitle("Opai " + Watermark.VERSION);
     }
 
 

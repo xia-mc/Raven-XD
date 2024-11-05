@@ -660,15 +660,7 @@ public class Utils {
     }
 
     public static boolean jumpDown() {
-        try {
-            return Keyboard.isKeyDown(mc.gameSettings.keyBindJump.getKeyCode());
-        } catch (Throwable e) {
-            try {
-                return mc.gameSettings.keyBindJump.isKeyDown();
-            } catch (Throwable e2) {
-                return false;
-            }
-        }
+        return mc.gameSettings.keyBindJump.isKeyDown();
     }
 
     public static float gd() {
