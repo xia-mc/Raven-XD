@@ -275,7 +275,6 @@ public class Module {
         this.keycode = keybind;
     }
 
-
     public enum category {
         combat,
         movement,
