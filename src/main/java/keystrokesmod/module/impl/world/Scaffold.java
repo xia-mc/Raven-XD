@@ -733,7 +733,7 @@ public class Scaffold extends IAutoClicker {
         }
         yaw = RotationUtils.normalize(yaw, 0, 360);
         float delta = yaw % 90;
-        return delta > 30 && delta < 60;
+        return delta > 20 && delta < 70;
     }
 
     public double groundDistance() {
