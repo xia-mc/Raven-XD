@@ -22,6 +22,7 @@ import keystrokesmod.utility.*;
 import keystrokesmod.utility.Timer;
 import keystrokesmod.utility.aim.AimSimulator;
 import keystrokesmod.utility.aim.RotationData;
+import keystrokesmod.utility.movement.Move;
 import keystrokesmod.utility.render.RenderUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockAir;
@@ -260,11 +261,15 @@ public class Scaffold extends IAutoClicker {
         float pitch = data.getPitch();
 
         if (!isDiagonal() || !notWhileDiagonal.isToggled()) {
-            double offsetToMid = EnumFacing.fromAngle(getYaw()).getAxis() == EnumFacing.Axis.X ? Math.abs(mc.thePlayer.posZ % 1) : Math.abs(mc.thePlayer.posX % 1);
-            if (offsetToMid > 0.6 || offsetToMid < 0.4 || lastOffsetToMid == -1) {
-                lastOffsetToMid = offsetToMid;
+            if (isDiagonal()) {
+                yaw += (float) strafe.getInput();
+            } else {
+                double offsetToMid = EnumFacing.fromAngle(getYaw()).getAxis() == EnumFacing.Axis.X ? Math.abs(mc.thePlayer.posZ % 1) : Math.abs(mc.thePlayer.posX % 1);
+                if (offsetToMid > 0.6 || offsetToMid < 0.4 || lastOffsetToMid == -1) {
+                    lastOffsetToMid = offsetToMid;
+                }
+                yaw += (float) (lastOffsetToMid >= 0.5 ? strafe.getInput() : -strafe.getInput());
             }
-            yaw += (float) (lastOffsetToMid >= 0.5 ? strafe.getInput() : -strafe.getInput());
         }
 
         boolean instant = aimSpeed.getInput() == aimSpeed.getMax();
@@ -722,8 +727,13 @@ public class Scaffold extends IAutoClicker {
     }
 
     public boolean isDiagonal() {
-        float yaw = ((mc.thePlayer.rotationYaw % 360) + 360) % 360 > 180 ? ((mc.thePlayer.rotationYaw % 360) + 360) % 360 - 360 : ((mc.thePlayer.rotationYaw % 360) + 360) % 360;
-        return (yaw >= -170 && yaw <= 170) && !(yaw >= -10 && yaw <= 10) && !(yaw >= 80 && yaw <= 100) && !(yaw >= -100 && yaw <= -80) || (rotateWithMovement.isToggled() && (Keyboard.isKeyDown(mc.gameSettings.keyBindLeft.getKeyCode()) || Keyboard.isKeyDown(mc.gameSettings.keyBindRight.getKeyCode())));
+        float yaw = mc.thePlayer.rotationYaw;
+        if (rotateWithMovement.isToggled()) {
+            yaw += Move.fromMovement(mc.thePlayer.moveForward, mc.thePlayer.moveStrafing).getDeltaYaw();
+        }
+        yaw = RotationUtils.normalize(yaw, 0, 360);
+        float delta = yaw % 90;
+        return delta > 38 && delta < 52;
     }
 
     public double groundDistance() {

@@ -122,6 +122,12 @@ jar {
     }
 }
 
+task copyDep(type: Copy){
+    from configurations.runtimeClasspath
+    into 'dependencies'
+}
+
+
 reobf {
     jar {
         mappingType = "SEARGE"
