@@ -23,7 +23,7 @@ import org.lwjgl.input.Keyboard;
 import static keystrokesmod.module.ModuleManager.*;
 
 public class InvMove extends Module {
-    public static final String[] MODES = {"Normal", "Blink", "LegitInv", "Hypixel", "None"};
+    public static final String[] MODES = {"Normal", "Blink", "LegitInv", "Hypixel"};
     private final ModeSetting mode;
     private final ButtonSetting container;
     private final ButtonSetting inventory;
@@ -82,8 +82,6 @@ public class InvMove extends Module {
                 case 3:
                     MoveUtil.stop();
                     break;
-                case 4:
-                    return;
             }
 
             doInvMove();
@@ -107,14 +105,12 @@ public class InvMove extends Module {
     private boolean canInvMove() {
         if (!nameCheck() || !targetNearbyCheck() || scaffold.isEnabled())
             return false;
-        if (clickGui.isToggled())
-            return mc.currentScreen instanceof ClickGui;
-        if (inventory.isToggled())
-            return mc.currentScreen instanceof GuiInventory;
-        if (container.isToggled())
-            return mc.currentScreen instanceof GuiContainer;
-        if (inventory.isToggled() && mc.currentScreen instanceof GuiInventory) return true;
-        if (container.isToggled() && mc.currentScreen instanceof GuiContainer) return true;
+        if (clickGui.isToggled() && mc.currentScreen instanceof ClickGui)
+            return true;
+        if (inventory.isToggled() && mc.currentScreen instanceof GuiInventory)
+            return true;
+        if (container.isToggled() && mc.currentScreen instanceof GuiContainer)
+            return true;
         return false;
     }
 
