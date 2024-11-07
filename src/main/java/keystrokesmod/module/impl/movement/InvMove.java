@@ -25,6 +25,8 @@ import static keystrokesmod.module.ModuleManager.*;
 public class InvMove extends Module {
     public static final String[] MODES = {"Normal", "Blink", "LegitInv", "Hypixel", "None"};
     private final ModeSetting mode;
+    private final ButtonSetting container;
+    private final ButtonSetting inventory;
     private final ButtonSetting noOpenPacket;
     private final ButtonSetting allowSprint;
     private final ButtonSetting allowSneak;
@@ -40,12 +42,15 @@ public class InvMove extends Module {
         super("InvMove", category.movement);
         this.registerSetting(new DescriptionSetting("Allow you move in inventory."));
         this.registerSetting(mode = new ModeSetting("Mode", MODES, 0));
+        this.registerSetting(container = new ButtonSetting("Container", true));
+        this.registerSetting(inventory = new ButtonSetting("Inventory", true));
+        this.registerSetting(clickGui = new ButtonSetting("Click gui", true));
+        this.registerSetting(new DescriptionSetting("Advanced"));
         this.registerSetting(noOpenPacket = new ButtonSetting("No open packet", false));
-        this.registerSetting(allowSprint = new ButtonSetting("Allow sprint", false));
+        this.registerSetting(allowSprint = new ButtonSetting("Allow sprint", true));
         this.registerSetting(allowSneak = new ButtonSetting("Allow sneak", false));
         this.registerSetting(chestNameCheck = new ButtonSetting("Chest name check", true));
         this.registerSetting(targetNearbyCheck = new ButtonSetting("Target nearby check", true));
-        this.registerSetting(clickGui = new ButtonSetting("Click gui", true));
     }
 
     @SubscribeEvent
@@ -81,7 +86,6 @@ public class InvMove extends Module {
                     return;
             }
 
-
             doInvMove();
         } else {
             switch ((int) mode.getInput()) {
@@ -101,8 +105,17 @@ public class InvMove extends Module {
     }
 
     private boolean canInvMove() {
-        return (mc.currentScreen instanceof GuiContainer || (clickGui.isToggled() && mc.currentScreen instanceof ClickGui))
-                && nameCheck() && targetNearbyCheck() && !scaffold.isEnabled();
+        if (!nameCheck() || !targetNearbyCheck() || scaffold.isEnabled())
+            return false;
+        if (clickGui.isToggled())
+            return mc.currentScreen instanceof ClickGui;
+        if (inventory.isToggled())
+            return mc.currentScreen instanceof GuiInventory;
+        if (container.isToggled())
+            return mc.currentScreen instanceof GuiContainer;
+        if (inventory.isToggled() && mc.currentScreen instanceof GuiInventory) return true;
+        if (container.isToggled() && mc.currentScreen instanceof GuiContainer) return true;
+        return false;
     }
 
     @SubscribeEvent
