@@ -7,7 +7,6 @@ import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.client.Notifications;
 import keystrokesmod.module.impl.combat.autoclicker.IAutoClicker;
 import keystrokesmod.module.impl.combat.autoclicker.NormalAutoClicker;
-import keystrokesmod.module.impl.exploit.disabler.hypixel.HypixelMotionDisabler;
 import keystrokesmod.module.impl.other.RotationHandler;
 import keystrokesmod.module.impl.other.SlotHandler;
 import keystrokesmod.module.impl.other.anticheats.utils.world.PlayerRotation;
@@ -58,7 +57,6 @@ public class Scaffold extends IAutoClicker {
     private final SliderSetting strafe;
     private final ButtonSetting notWhileDiagonal;
     private final ModeValue sprint;
-    private final ButtonSetting fast;
     private final ButtonSetting cancelSprint;
     private final ButtonSetting legit;
     private final ButtonSetting recycleRotation;
@@ -120,7 +118,6 @@ public class Scaffold extends IAutoClicker {
     public boolean telly$noBlockPlace = false;
     private Float lastYaw = null, lastPitch = null;
     private boolean polar$waitingForExpand = false;
-    private boolean jumpScaffold$fast$cycle = false;
     private HoverState hoverState = HoverState.DONE;
     private boolean stopMoving = false;
     private double lastOffsetToMid = -1;
@@ -156,13 +153,13 @@ public class Scaffold extends IAutoClicker {
                 .add(new JumpSprint("JumpA", this))
                 .add(new JumpSprint("JumpB", this))
                 .add(new JumpSprint("JumpC", this))
-                .add(new JumpDSprint("JumpD", this))
+                .add(new HypixelJumpSprint("HypixelJump", this))
+                .add(new HypixelJump2Sprint("HypixelJump2", this))
                 .add(new HypixelSprint("Hypixel", this))
                 .add(new LegitSprint("Legit", this))
                 .add(new SneakSprint("Sneak", this))
                 .add(new OldIntaveSprint("OldIntave", this))
         );
-        this.registerSetting(fast = new ButtonSetting("Fast", false, new ModeOnly(sprint, 3, 4, 5, 6)));
         this.registerSetting(precision = new ModeSetting("Precision", precisionModes, 4));
         this.registerSetting(cancelSprint = new ButtonSetting("Cancel sprint", false, new ModeOnly(sprint, 0).reserve()));
         this.registerSetting(legit = new ButtonSetting("Legit", false));
@@ -465,12 +462,6 @@ public class Scaffold extends IAutoClicker {
                 if (Math.floor(mc.thePlayer.posY) == Math.floor(startPos) && sprint.getInput() == 5) {
                     placedUp = false;
                 }
-            }
-        }
-        if (keepYPosition() && fast.isToggled()) {
-            if (offGroundTicks == 5 && HypixelMotionDisabler.isDisabled() && !isDiagonal()) {
-                mc.thePlayer.motionY = MoveUtil.predictedMotion(mc.thePlayer.motionY, jumpScaffold$fast$cycle ? 1 : 2);
-                jumpScaffold$fast$cycle = !jumpScaffold$fast$cycle;
             }
         }
 
@@ -780,7 +771,7 @@ public class Scaffold extends IAutoClicker {
     }
 
     public boolean keepYPosition() {
-        boolean sameYSca = sprint.getInput() == 4 || sprint.getInput() == 3 || sprint.getInput() == 5 || sprint.getInput() == 6;
+        boolean sameYSca = sprint.getInput() == 4 || sprint.getInput() == 3 || sprint.getInput() == 5 || sprint.getInput() == 6 || sprint.getInput() == 7;
         return this.isEnabled() && Utils.keysDown() && (sameYSca || sameY.isToggled()) && !Utils.jumpDown() && (!fastOnRMB.isToggled() || Mouse.isButtonDown(1)) || hoverState != HoverState.DONE;
     }
 

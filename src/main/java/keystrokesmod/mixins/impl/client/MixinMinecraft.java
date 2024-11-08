@@ -11,14 +11,14 @@ import keystrokesmod.module.impl.exploit.ExploitFixer;
 import keystrokesmod.module.impl.render.Animations;
 import keystrokesmod.module.impl.render.FreeLook;
 import keystrokesmod.module.impl.render.Watermark;
+import keystrokesmod.utility.Reflection;
 import keystrokesmod.utility.Utils;
 import keystrokesmod.utility.render.BackgroundUtils;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.main.GameConfiguration;
 import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.client.resources.DefaultResourcePack;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -28,14 +28,10 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 import static keystrokesmod.Raven.mc;
 
 @Mixin(value = Minecraft.class, priority = 1001)
 public abstract class MixinMinecraft {
-
     @Unique private @Nullable WorldClient raven_XD$lastWorld = null;
 
     @Inject(method = "runTick", at = @At("HEAD"))
@@ -108,10 +104,9 @@ public abstract class MixinMinecraft {
         Display.setTitle("Opai " + Watermark.VERSION);
     }
 
-
-
-    @Redirect(method = "drawSplashScreen", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/resources/DefaultResourcePack;getInputStream(Lnet/minecraft/util/ResourceLocation;)Ljava/io/InputStream;"))
-    private InputStream modifyConstant(@NotNull DefaultResourcePack instance, ResourceLocation location) throws IOException {
-        return instance.getInputStream(BackgroundUtils.getLogoPng());
+    @Inject(method = "<init>", at = @At("RETURN"))
+    private void onInit(GameConfiguration p_i45547_1_, CallbackInfo ci) {
+        Reflection.set(Minecraft.class, "field_110444_H", BackgroundUtils.getLogoPng());
+        Reflection.set(this, "field_152354_ay", BackgroundUtils.getLogoPng());
     }
 }
