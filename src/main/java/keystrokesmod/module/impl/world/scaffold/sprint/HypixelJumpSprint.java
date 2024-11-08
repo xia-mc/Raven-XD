@@ -2,11 +2,9 @@ package keystrokesmod.module.impl.world.scaffold.sprint;
 
 import keystrokesmod.event.PreUpdateEvent;
 import keystrokesmod.event.ScaffoldPlaceEvent;
-import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.exploit.disabler.hypixel.HypixelMotionDisabler;
 import keystrokesmod.module.impl.world.Scaffold;
-import keystrokesmod.module.impl.world.Tower;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.utility.MoveUtil;
@@ -19,7 +17,7 @@ public class HypixelJumpSprint extends JumpSprint {
     private final ButtonSetting lowHop;
     private final SliderSetting delayTicks;
     private int delay = 0;
-    private boolean lastLowHop = false;
+    private boolean cycle = false;
 
     public HypixelJumpSprint(String name, @NotNull Scaffold parent) {
         super(name, parent);
@@ -31,8 +29,9 @@ public class HypixelJumpSprint extends JumpSprint {
     public void onPreUpdate(PreUpdateEvent event) {
         if (lowHop.isToggled() && parent.offGroundTicks == 5 && HypixelMotionDisabler.isDisabled()
                 && !parent.isDiagonal() && !ModuleManager.tower.canTower()) {
-            mc.thePlayer.motionY = MoveUtil.predictedMotion(mc.thePlayer.motionY, 2);
-            lastLowHop = !lastLowHop;
+            if (cycle)
+                mc.thePlayer.motionY = MoveUtil.predictedMotion(mc.thePlayer.motionY, 2);
+            cycle = !cycle;
         }
     }
 

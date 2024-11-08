@@ -23,7 +23,7 @@ public class HypixelJump2Sprint extends VanillaSprint {
         if (!MoveUtil.isMoving() || ModuleManager.tower.canTower()) return;
         if (parent.offGroundTicks == 0) {
             if (!Utils.jumpDown()) {
-                MoveUtil.strafe(MoveUtil.getAllowedHorizontalDistance() - Math.random() / 100f);
+                MoveUtil.strafe(Math.min(MoveUtil.getAllowedHorizontalDistance(), MoveUtil.speed() * 2) - Math.random() / 100f);
                 mc.thePlayer.jump();
             }
         } else if (parent.offGroundTicks == 5
