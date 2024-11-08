@@ -8,7 +8,6 @@ import keystrokesmod.module.impl.other.SlotHandler;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.ModeSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
-import keystrokesmod.utility.PacketUtils;
 import keystrokesmod.utility.Utils;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.renderer.GlStateManager;
@@ -16,7 +15,6 @@ import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemMap;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.client.C0APacketAnimation;
-import net.minecraft.network.play.server.S09PacketHeldItemChange;
 import net.minecraft.network.play.server.S0BPacketAnimation;
 import net.minecraft.util.MathHelper;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -83,7 +81,7 @@ public class Animations extends Module {
             float swingProgress = event.getSwingProgress();
             final float convertedProgress = MathHelper.sin(MathHelper.sqrt_float(swingProgress) * (float) Math.PI);
 
-            GlStateManager.translate(x.getInput(), y.getInput(), z.getInput());
+            this.translate(x.getInput(), y.getInput(), z.getInput());
 
             if (event.isUseItem()) {
                 switch (itemAction) {
@@ -112,7 +110,7 @@ public class Animations extends Module {
                             case 2:
                                 itemRenderer.transformFirstPersonItem(animationProgression, 0.0F);
                                 final float y = -convertedProgress * 2.0F;
-                                GlStateManager.translate(0.0F, y / 10.0F + 0.1F, 0.0F);
+                                this.translate(0.0F, y / 10.0F + 0.1F, 0.0F);
                                 GlStateManager.rotate(y * 10.0F, 0.0F, 1.0F, 0.0F);
                                 GlStateManager.rotate(250, 0.2F, 1.0F, -0.6F);
                                 GlStateManager.rotate(-10.0F, 1.0F, 0.5F, 1.0F);
@@ -121,7 +119,7 @@ public class Animations extends Module {
 
                             case 3:
                                 itemRenderer.transformFirstPersonItem(animationProgression / 2.0F, 0.0F);
-                                GlStateManager.translate(0.0F, 0.3F, -0.0F);
+                                this.translate(0.0F, 0.3F, -0.0F);
                                 GlStateManager.rotate(-convertedProgress * 31.0F, 1.0F, 0.0F, 2.0F);
                                 GlStateManager.rotate(-convertedProgress * 33.0F, 1.5F, (convertedProgress / 1.1F), 0.0F);
                                 itemRenderer.blockTransformation();
@@ -130,7 +128,7 @@ public class Animations extends Module {
                             case 4:
                                 final float spin = MathHelper.sin(MathHelper.sqrt_float(swingProgress) * (float) Math.PI);
 
-                                GlStateManager.translate(0.6f, 0.3f, -0.6f + -spin * 0.7);
+                                this.translate(0.6f, 0.3f, -0.6f + -spin * 0.7);
                                 GlStateManager.rotate(6090, 0.0f, 0.0f, 0.1f);
                                 GlStateManager.rotate(6085, 0.0f, 0.1f, 0.0f);
                                 GlStateManager.rotate(6110, 0.1f, 0.0f, 0.0f);
@@ -140,7 +138,7 @@ public class Animations extends Module {
 
                             case 5:
                                 itemRenderer.transformFirstPersonItem(animationProgression, 0.0F);
-                                GlStateManager.translate(0, 0.2F, -1);
+                                this.translate(0, 0.2F, -1);
                                 GlStateManager.rotate(-59, -1, 0, 3);
                                 // Don't cast as float
                                 GlStateManager.rotate(-(System.currentTimeMillis() / 2 % 360), 1, 0, 0.0F);
@@ -149,7 +147,7 @@ public class Animations extends Module {
 
                             case 6:
                                 itemRenderer.transformFirstPersonItem(animationProgression, 0.0F);
-                                GlStateManager.translate(0.0f, 0.1F, 0.0F);
+                                this.translate(0.0f, 0.1F, 0.0F);
                                 itemRenderer.blockTransformation();
                                 GlStateManager.rotate(convertedProgress * 35.0F / 2.0F, 0.0F, 1.0F, 1.5F);
                                 GlStateManager.rotate(-convertedProgress * 135.0F / 4.0F, 1.0f, 1.0F, 0.0F);
@@ -158,7 +156,7 @@ public class Animations extends Module {
 
                             case 7:
                                 itemRenderer.transformFirstPersonItem(animationProgression / 2.0F, 0.0F);
-                                GlStateManager.translate(0.0F, 0.3F, -0.0F);
+                                this.translate(0.0F, 0.3F, -0.0F);
                                 GlStateManager.rotate(-convertedProgress * 30.0F, 1.0F, 0.0F, 2.0F);
                                 GlStateManager.rotate(-convertedProgress * 44.0F, 1.5F, (convertedProgress / 1.2F), 0.0F);
                                 itemRenderer.blockTransformation();
@@ -169,7 +167,7 @@ public class Animations extends Module {
                                 itemRenderer.transformFirstPersonItem(animationProgression / 2.0F, swingProgress);
                                 GlStateManager.rotate(convertedProgress * 30.0F / 2.0F, -convertedProgress, -0.0F, 9.0F);
                                 GlStateManager.rotate(convertedProgress * 40.0F, 1.0F, -convertedProgress / 2.0F, -0.0F);
-                                GlStateManager.translate(0.0F, 0.2F, 0.0F);
+                                this.translate(0.0F, 0.2F, 0.0F);
                                 itemRenderer.blockTransformation();
 
                                 break;
@@ -182,8 +180,8 @@ public class Animations extends Module {
                                 break;
 
                             case 10:
-                                GlStateManager.translate(0.41F, -0.25F, -0.5555557F);
-                                GlStateManager.translate(0.0F, 0, 0.0F);
+                                this.translate(0.41F, -0.25F, -0.5555557F);
+                                this.translate(0.0F, 0, 0.0F);
                                 GlStateManager.rotate(35.0F, 0f, 1.5F, 0.0F);
 
                                 final float racism = MathHelper.sin(swingProgress * swingProgress / 64 * (float) Math.PI);
@@ -198,7 +196,7 @@ public class Animations extends Module {
                             case 11:
                                 itemRenderer.transformFirstPersonItem(animationProgression, swingProgress);
                                 itemRenderer.blockTransformation();
-                                GlStateManager.translate(-0.3F, -0.1F, -0.0F);
+                                this.translate(-0.3F, -0.1F, -0.0F);
 
                                 break;
                         }
@@ -242,7 +240,7 @@ public class Animations extends Module {
                     case 1:
                         func_178105_d(swingProgress);
                         itemRenderer.transformFirstPersonItem(animationProgression, swingProgress);
-                        GlStateManager.translate(0, -((swing - 1) -
+                        this.translate(0, -((swing - 1) -
                                 (swing == 0 ? 0 : Utils.getTimer().renderPartialTicks)) / 5f, 0);
                         break;
 
@@ -284,15 +282,23 @@ public class Animations extends Module {
     public void onSwingAnimation(@NotNull SwingAnimationEvent event) {
         event.setAnimationEnd(event.getAnimationEnd() * (int) ((-swingSpeed.getInput() / 100) + 1));
     }
+    
+    private void translate(double x, double y, double z) {
+        GlStateManager.translate(
+                x + this.x.getInput(), 
+                y + this.y.getInput(), 
+                z + this.z.getInput()
+        );
+    }
 
     /**
      * @see net.minecraft.client.renderer.ItemRenderer#func_178105_d(float swingProgress)
      */
-    void func_178105_d(float swingProgress) {
+    private void func_178105_d(float swingProgress) {
         float f = -0.4F * MathHelper.sin(MathHelper.sqrt_float(swingProgress) * 3.1415927F);
         float f1 = 0.2F * MathHelper.sin(MathHelper.sqrt_float(swingProgress) * 3.1415927F * 2.0F);
         float f2 = -0.2F * MathHelper.sin(swingProgress * 3.1415927F);
-        GlStateManager.translate(f, f1, f2);
+        this.translate(f, f1, f2);
     }
 
     /**
@@ -308,9 +314,9 @@ public class Animations extends Module {
             f2 = 0.0F;
         }
 
-        GlStateManager.translate(0.0F, f2, 0.0F);
+        this.translate(0.0F, f2, 0.0F);
         float f3 = 1.0F - (float)Math.pow(f1, 27.0);
-        GlStateManager.translate(f3 * 0.6F, f3 * -0.5F, f3 * 0.0F);
+        this.translate(f3 * 0.6F, f3 * -0.5F, f3 * 0.0F);
         GlStateManager.rotate(f3 * 90.0F, 0.0F, 1.0F, 0.0F);
         GlStateManager.rotate(f3 * 10.0F, 1.0F, 0.0F, 0.0F);
         GlStateManager.rotate(f3 * 30.0F, 0.0F, 0.0F, 1.0F);
@@ -319,11 +325,11 @@ public class Animations extends Module {
     /**
      * @see net.minecraft.client.renderer.ItemRenderer#func_178098_a(float, AbstractClientPlayer)
      */
-    private void func_178098_a(ItemStack itemToRender, float p_178098_1_, AbstractClientPlayer p_178098_2_) {
+    private void func_178098_a(@NotNull ItemStack itemToRender, float p_178098_1_, @NotNull AbstractClientPlayer p_178098_2_) {
         GlStateManager.rotate(-18.0F, 0.0F, 0.0F, 1.0F);
         GlStateManager.rotate(-12.0F, 0.0F, 1.0F, 0.0F);
         GlStateManager.rotate(-8.0F, 1.0F, 0.0F, 0.0F);
-        GlStateManager.translate(-0.9F, 0.2F, 0.0F);
+        this.translate(-0.9F, 0.2F, 0.0F);
         float f = (float)itemToRender.getMaxItemUseDuration() - ((float)p_178098_2_.getItemInUseCount() - p_178098_1_ + 1.0F);
         float f1 = f / 20.0F;
         f1 = (f1 * f1 + f1 * 2.0F) / 3.0F;
@@ -335,10 +341,10 @@ public class Animations extends Module {
             float f2 = MathHelper.sin((f - 0.1F) * 1.3F);
             float f3 = f1 - 0.1F;
             float f4 = f2 * f3;
-            GlStateManager.translate(f4 * 0.0F, f4 * 0.01F, f4 * 0.0F);
+            this.translate(f4 * 0.0F, f4 * 0.01F, f4 * 0.0F);
         }
 
-        GlStateManager.translate(f1 * 0.0F, f1 * 0.0F, f1 * 0.1F);
+        this.translate(f1 * 0.0F, f1 * 0.0F, f1 * 0.1F);
         GlStateManager.scale(1.0F, 1.0F, 1.0F + f1 * 0.2F);
     }
 }

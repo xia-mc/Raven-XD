@@ -68,21 +68,6 @@ public class Module {
             Raven.moduleCounter++;
     }
 
-    public static @Nullable Module getModule(Class<? extends Module> a) {
-        Iterator<Module> var1 = ModuleManager.modules.iterator();
-
-        Module module;
-        do {
-            if (!var1.hasNext()) {
-                return null;
-            }
-
-            module = var1.next();
-        } while (module.getClass() != a);
-
-        return module;
-    }
-
     public Module(String name, Module.category moduleCategory) {
         this(name, moduleCategory, null);
     }
@@ -274,7 +259,6 @@ public class Module {
     public void setBind(int keybind) {
         this.keycode = keybind;
     }
-
 
     public enum category {
         combat,

@@ -24,6 +24,15 @@ import java.util.Objects;
 
 public class BackgroundUtils {
     private static final int BLOOM_COLOR = new Color(255, 255, 255, 50).getRGB();
+    public static final ResourceLocation RES_BG = new ResourceLocation("keystrokesmod:textures/backgrounds/bg.png");
+    public static final ResourceLocation RES_QI = new ResourceLocation("keystrokesmod:textures/backgrounds/qi.png");
+    public static final ResourceLocation RES_DIANXIAN = new ResourceLocation("keystrokesmod:textures/backgrounds/DianXian.png");
+    public static final ResourceLocation RES_HUOCHE = new ResourceLocation("keystrokesmod:textures/backgrounds/huoChe.png");
+    public static final ResourceLocation RES_DIANXIAN2 = new ResourceLocation("keystrokesmod:textures/backgrounds/DianXian2.png");
+    public static final ResourceLocation RES_CAO = new ResourceLocation("keystrokesmod:textures/backgrounds/cao.png");
+    public static final ResourceLocation RES_REN = new ResourceLocation("keystrokesmod:textures/backgrounds/ren.png");
+    public static final ResourceLocation RES_LOGO = new ResourceLocation("keystrokesmod:textures/backgrounds/ravenxd.png");
+
     private static int huoCheX = -99999;
 
     public static void renderBackground(@NotNull GuiScreen gui) {
@@ -33,20 +42,21 @@ public class BackgroundUtils {
         if (huoCheX == -99999)
             huoCheX = -width;
 
-        RenderUtils.drawImage(new ResourceLocation("keystrokesmod:textures/backgrounds/bg.png"), 0, 0, width, height);
-        RenderUtils.drawImage(new ResourceLocation("keystrokesmod:textures/backgrounds/qi.png"), 0, 0, width, height);
-        RenderUtils.drawImage(new ResourceLocation("keystrokesmod:textures/backgrounds/DianXian.png"), 0, 0, width, height);
-        RenderUtils.drawImage(new ResourceLocation("keystrokesmod:textures/backgrounds/huoChe.png"), huoCheX, height / 3F, width * 2F, height / 3F);
-        RenderUtils.drawImage(new ResourceLocation("keystrokesmod:textures/backgrounds/DianXian2.png"), 0, 0, width, height);
-        RenderUtils.drawImage(new ResourceLocation("keystrokesmod:textures/backgrounds/cao.png"), 0, 0, width, height);
+        RenderUtils.drawImage(RES_BG, 0, 0, width, height);
+        RenderUtils.drawImage(RES_QI, 0, 0, width, height);
+        RenderUtils.drawImage(RES_DIANXIAN, 0, 0, width, height);
+        RenderUtils.drawImage(RES_HUOCHE, huoCheX, height / 3F, width * 2F, height / 3F);
+        RenderUtils.drawImage(RES_DIANXIAN2, 0, 0, width, height);
+        RenderUtils.drawImage(RES_CAO, 0, 0, width, height);
         RenderUtils.drawBloomShadow(0, 0, width, height, 12, 6, BLOOM_COLOR, true);
-        RenderUtils.drawImage(new ResourceLocation("keystrokesmod:textures/backgrounds/ren.png"), 0, 0, width, height);
+        RenderUtils.drawImage(RES_REN, 0, 0, width, height);
         if (huoCheX >= 0) {
             huoCheX = -width;
         }
         huoCheX++;
     }
 
-    @Getter
-    private static final ResourceLocation logoPng = new ResourceLocation("keystrokesmod:textures/backgrounds/ravenxd.png");
+    public static ResourceLocation getLogoPng() {
+        return RES_LOGO;
+    }
 }

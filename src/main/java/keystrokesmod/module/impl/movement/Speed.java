@@ -57,8 +57,7 @@ public class Speed extends Module {
         return !Utils.nullCheck()
                 || ((mc.thePlayer.isInWater() || mc.thePlayer.isInLava())
                 && liquidDisable.isToggled())
-                || (mc.thePlayer.isSneaking() && sneakDisable.isToggled())
-                || scaffold.isEnabled();
+                || (mc.thePlayer.isSneaking() && sneakDisable.isToggled());
     }
 
     @Override

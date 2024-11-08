@@ -54,6 +54,7 @@ public abstract class MixinEntity {
             PrePlayerInputEvent prePlayerInput = new PrePlayerInputEvent(p_moveFlying_1_, p_moveFlying_2_, p_moveFlying_3_, RotationHandler.getMovementYaw((Entity) (Object) this));
             net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(prePlayerInput);
             if (prePlayerInput.isCanceled()) {
+                ci.cancel();
                 return;
             }
             p_moveFlying_1_ = prePlayerInput.getStrafe();

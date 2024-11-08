@@ -34,7 +34,7 @@ public class AutoHeal extends Module {
         this.registerSetting(soup = new ButtonSetting("Soup", false));
         this.registerSetting(autoDrop = new ButtonSetting("Auto drop", false, soup::isToggled));
         this.registerSetting(minHealth = new SliderSetting("Min health", 10, 0, 20, 1));
-        this.registerSetting(healDelay = new SliderSetting("Heal delay", 500, 0, 1500, 1));
+        this.registerSetting(healDelay = new SliderSetting("Heal delay", 500, 0, 8500, 1));
         this.registerSetting(startDelay = new SliderSetting("Start delay", 0, 0, 300, 1));
     }
 

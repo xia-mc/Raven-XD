@@ -7,7 +7,6 @@ import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.client.Notifications;
 import keystrokesmod.module.impl.combat.autoclicker.IAutoClicker;
 import keystrokesmod.module.impl.combat.autoclicker.NormalAutoClicker;
-import keystrokesmod.module.impl.exploit.disabler.hypixel.HypixelMotionDisabler;
 import keystrokesmod.module.impl.other.RotationHandler;
 import keystrokesmod.module.impl.other.SlotHandler;
 import keystrokesmod.module.impl.other.anticheats.utils.world.PlayerRotation;
@@ -22,6 +21,7 @@ import keystrokesmod.utility.*;
 import keystrokesmod.utility.Timer;
 import keystrokesmod.utility.aim.AimSimulator;
 import keystrokesmod.utility.aim.RotationData;
+import keystrokesmod.utility.movement.Move;
 import keystrokesmod.utility.render.RenderUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockAir;
@@ -57,7 +57,6 @@ public class Scaffold extends IAutoClicker {
     private final SliderSetting strafe;
     private final ButtonSetting notWhileDiagonal;
     private final ModeValue sprint;
-    private final ButtonSetting fast;
     private final ButtonSetting cancelSprint;
     private final ButtonSetting legit;
     private final ButtonSetting recycleRotation;
@@ -119,7 +118,6 @@ public class Scaffold extends IAutoClicker {
     public boolean telly$noBlockPlace = false;
     private Float lastYaw = null, lastPitch = null;
     private boolean polar$waitingForExpand = false;
-    private boolean jumpScaffold$fast$cycle = false;
     private HoverState hoverState = HoverState.DONE;
     private boolean stopMoving = false;
     private double lastOffsetToMid = -1;
@@ -155,13 +153,13 @@ public class Scaffold extends IAutoClicker {
                 .add(new JumpSprint("JumpA", this))
                 .add(new JumpSprint("JumpB", this))
                 .add(new JumpSprint("JumpC", this))
-                .add(new JumpDSprint("JumpD", this))
+                .add(new HypixelJumpSprint("HypixelJump", this))
+                .add(new HypixelJump2Sprint("HypixelJump2", this))
                 .add(new HypixelSprint("Hypixel", this))
                 .add(new LegitSprint("Legit", this))
                 .add(new SneakSprint("Sneak", this))
                 .add(new OldIntaveSprint("OldIntave", this))
         );
-        this.registerSetting(fast = new ButtonSetting("Fast", false, new ModeOnly(sprint, 3, 4, 5, 6)));
         this.registerSetting(precision = new ModeSetting("Precision", precisionModes, 4));
         this.registerSetting(cancelSprint = new ButtonSetting("Cancel sprint", false, new ModeOnly(sprint, 0).reserve()));
         this.registerSetting(legit = new ButtonSetting("Legit", false));
@@ -260,11 +258,15 @@ public class Scaffold extends IAutoClicker {
         float pitch = data.getPitch();
 
         if (!isDiagonal() || !notWhileDiagonal.isToggled()) {
-            double offsetToMid = EnumFacing.fromAngle(getYaw()).getAxis() == EnumFacing.Axis.X ? Math.abs(mc.thePlayer.posZ % 1) : Math.abs(mc.thePlayer.posX % 1);
-            if (offsetToMid > 0.6 || offsetToMid < 0.4 || lastOffsetToMid == -1) {
-                lastOffsetToMid = offsetToMid;
+            if (isDiagonal()) {
+                yaw += (float) strafe.getInput();
+            } else {
+                double offsetToMid = EnumFacing.fromAngle(getYaw()).getAxis() == EnumFacing.Axis.X ? Math.abs(mc.thePlayer.posZ % 1) : Math.abs(mc.thePlayer.posX % 1);
+                if (offsetToMid > 0.6 || offsetToMid < 0.4 || lastOffsetToMid == -1) {
+                    lastOffsetToMid = offsetToMid;
+                }
+                yaw += (float) (lastOffsetToMid >= 0.5 ? strafe.getInput() : -strafe.getInput());
             }
-            yaw += (float) (lastOffsetToMid >= 0.5 ? strafe.getInput() : -strafe.getInput());
         }
 
         boolean instant = aimSpeed.getInput() == aimSpeed.getMax();
@@ -460,12 +462,6 @@ public class Scaffold extends IAutoClicker {
                 if (Math.floor(mc.thePlayer.posY) == Math.floor(startPos) && sprint.getInput() == 5) {
                     placedUp = false;
                 }
-            }
-        }
-        if (keepYPosition() && fast.isToggled()) {
-            if (offGroundTicks == 5 && HypixelMotionDisabler.isDisabled() && !isDiagonal()) {
-                mc.thePlayer.motionY = MoveUtil.predictedMotion(mc.thePlayer.motionY, jumpScaffold$fast$cycle ? 1 : 2);
-                jumpScaffold$fast$cycle = !jumpScaffold$fast$cycle;
             }
         }
 
@@ -722,8 +718,13 @@ public class Scaffold extends IAutoClicker {
     }
 
     public boolean isDiagonal() {
-        float yaw = ((mc.thePlayer.rotationYaw % 360) + 360) % 360 > 180 ? ((mc.thePlayer.rotationYaw % 360) + 360) % 360 - 360 : ((mc.thePlayer.rotationYaw % 360) + 360) % 360;
-        return (yaw >= -170 && yaw <= 170) && !(yaw >= -10 && yaw <= 10) && !(yaw >= 80 && yaw <= 100) && !(yaw >= -100 && yaw <= -80) || (rotateWithMovement.isToggled() && (Keyboard.isKeyDown(mc.gameSettings.keyBindLeft.getKeyCode()) || Keyboard.isKeyDown(mc.gameSettings.keyBindRight.getKeyCode())));
+        float yaw = mc.thePlayer.rotationYaw;
+        if (rotateWithMovement.isToggled()) {
+            yaw += Move.fromMovement(mc.thePlayer.moveForward, mc.thePlayer.moveStrafing).getDeltaYaw();
+        }
+        yaw = RotationUtils.normalize(yaw, 0, 360);
+        float delta = yaw % 90;
+        return delta > 20 && delta < 70;
     }
 
     public double groundDistance() {
@@ -770,7 +771,7 @@ public class Scaffold extends IAutoClicker {
     }
 
     public boolean keepYPosition() {
-        boolean sameYSca = sprint.getInput() == 4 || sprint.getInput() == 3 || sprint.getInput() == 5 || sprint.getInput() == 6;
+        boolean sameYSca = sprint.getInput() == 4 || sprint.getInput() == 3 || sprint.getInput() == 5 || sprint.getInput() == 6 || sprint.getInput() == 7;
         return this.isEnabled() && Utils.keysDown() && (sameYSca || sameY.isToggled()) && !Utils.jumpDown() && (!fastOnRMB.isToggled() || Mouse.isButtonDown(1)) || hoverState != HoverState.DONE;
     }
 

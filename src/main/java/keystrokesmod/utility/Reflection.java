@@ -33,6 +33,7 @@ import org.lwjgl.input.Mouse;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.nio.ByteBuffer;
 import java.util.*;
 
@@ -355,7 +356,6 @@ public class Reflection {
     private static final HashMap<MethodData, Method> methodMap = new HashMap<>();
     private static final HashMap<FieldData, Field> fieldMap = new HashMap<>();
 
-    @Contract(pure = true)
     private static @NotNull Method getMethod(@NotNull MethodData data) {
         if (!methodMap.containsKey(data)) {
             try {
@@ -370,12 +370,17 @@ public class Reflection {
         return methodMap.get(data);
     }
 
-    @Contract(pure = true)
     private static @NotNull Field getField(@NotNull FieldData data) {
         if (!fieldMap.containsKey(data)) {
             try {
                 final Field target = data.getAClass().getDeclaredField(data.getField());
                 target.setAccessible(true);
+
+                int modifiers = target.getModifiers();
+                if (Modifier.isFinal(modifiers)) {
+                    set(target, "modifiers", modifiers & ~Modifier.FINAL);
+                }
+
                 fieldMap.put(data, target);
                 return target;
             } catch (NoSuchFieldException e) {
