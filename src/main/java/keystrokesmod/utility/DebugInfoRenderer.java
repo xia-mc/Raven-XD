@@ -1,6 +1,7 @@
 package keystrokesmod.utility;
 
 import keystrokesmod.Raven;
+import keystrokesmod.event.PreMotionEvent;
 import keystrokesmod.module.impl.other.anticheats.utils.world.PlayerMove;
 import keystrokesmod.script.classes.Vec3;
 import keystrokesmod.utility.font.CenterMode;
@@ -22,8 +23,8 @@ public class DebugInfoRenderer extends net.minecraft.client.gui.Gui {
     private static double avgSpeedFromJump = -1;
 
     @SubscribeEvent
-    public void onRenderTick(RenderTickEvent ev) {
-        if (!Raven.debugger || ev.phase != TickEvent.Phase.END || !Utils.nullCheck()) {
+    public void onPreMotion(PreMotionEvent event) {
+        if (!Raven.debugger || !Utils.nullCheck()) {
             speedFromJump.clear();
             avgSpeedFromJump = -1;
             return;
@@ -32,15 +33,24 @@ public class DebugInfoRenderer extends net.minecraft.client.gui.Gui {
         if (mc.thePlayer.onGround) {
             if (!speedFromJump.isEmpty()) {
                 avgSpeedFromJump = 0;
-                speedFromJump.forEach(speed -> avgSpeedFromJump += speed);
+                for (double speed : speedFromJump) {
+                    avgSpeedFromJump += speed;
+                }
                 avgSpeedFromJump /= speedFromJump.size();
             }
             speedFromJump.clear();
         }
         speedFromJump.add(PlayerMove.getXzSecSpeed(
                 new Vec3(mc.thePlayer.lastTickPosX, mc.thePlayer.lastTickPosY, mc.thePlayer.lastTickPosZ),
-                new Vec3(mc.thePlayer))
+                new Vec3(event.getPosX(), event.getPosY(), event.getPosZ()))
         );
+    }
+
+    @SubscribeEvent
+    public void onRenderTick(RenderTickEvent ev) {
+        if (!Raven.debugger || !Utils.nullCheck()) {
+            return;
+        }
 
         if (mc.currentScreen == null) {
             RenderUtils.renderBPS(true, true);
@@ -52,7 +62,7 @@ public class DebugInfoRenderer extends net.minecraft.client.gui.Gui {
                         (float)(scaledResolution.getScaledWidth() / 2),
                         (float)(scaledResolution.getScaledHeight() / 2 + 30),
                         CenterMode.X,
-                        true,
+                        false,
                         new Color(255, 255, 255).getRGB()
                 );
             }

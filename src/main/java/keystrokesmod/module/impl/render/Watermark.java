@@ -27,7 +27,7 @@ import java.util.HashMap;
 import java.util.Objects;
 
 public class Watermark extends Module {
-    public static final String VERSION = "2.11";
+    public static final String VERSION = "2.12-Dev";
     public static final HashMap<String, ResourceLocation> WATERMARK = new HashMap<>();
 
     public static String customName = "CustomClient";
