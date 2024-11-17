@@ -4,7 +4,6 @@ package keystrokesmod.event;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.Entity;
 import net.minecraft.util.BlockPos;
 import net.minecraftforge.fml.common.eventhandler.Cancelable;
 import net.minecraftforge.fml.common.eventhandler.Event;

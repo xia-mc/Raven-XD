@@ -19,8 +19,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.awt.*;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 
@@ -29,11 +27,13 @@ public abstract class MixinGuiMainMenu extends GuiScreen {
     @Unique
     private static final int LOGO_COLOR = new Color(255, 255, 255, 200).getRGB();
 
-    @Shadow private int field_92022_t;
+    @Shadow
+    private int field_92022_t;
+    @Shadow
+    private GuiScreen field_183503_M;
 
-    @Shadow protected abstract boolean func_183501_a();
-
-    @Shadow private GuiScreen field_183503_M;
+    @Shadow
+    protected abstract boolean func_183501_a();
 
     @Inject(method = "drawScreen", at = @At("HEAD"), cancellable = true)
     public void onDrawScreen(int p_drawScreen_1_, int p_drawScreen_2_, float p_drawScreen_3_, CallbackInfo ci) {
@@ -46,7 +46,7 @@ public abstract class MixinGuiMainMenu extends GuiScreen {
 
         List<String> branding = Lists.reverse(FMLCommonHandler.instance().getBrandings(true));
 
-        for(int breadline = 0; breadline < branding.size(); ++breadline) {
+        for (int breadline = 0; breadline < branding.size(); ++breadline) {
             String brd = branding.get(breadline);
             if (!Strings.isNullOrEmpty(brd)) {
                 this.drawString(this.fontRendererObj, brd, 2, this.height - (10 + breadline * (this.fontRendererObj.FONT_HEIGHT + 1)), 16777215);

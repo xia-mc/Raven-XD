@@ -45,8 +45,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.input.Mouse;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -54,19 +56,16 @@ import static net.minecraft.util.EnumFacing.DOWN;
 
 public class KillAura extends IAutoClicker {
     public static EntityLivingBase target;
+    public final SliderSetting attackRange;
     private final ModeValue clickMode;
     private final ModeSetting attackMode;
-    public ModeSetting autoBlockMode;
     private final ButtonSetting smartBlock;
     private final ButtonSetting blockOnlyWhileSwinging;
     private final ButtonSetting blockOnlyWhileHurt;
-    public SliderSetting slowdown;
     private final SliderSetting fov;
-    public final SliderSetting attackRange;
     private final SliderSetting swingRange;
     private final SliderSetting blockRange;
     private final SliderSetting preAimRange;
-
     private final ModeSetting rotationMode;
     private final ModeSetting moveFixMode;
     private final ModeSetting rayCastMode;
@@ -92,14 +91,12 @@ public class KillAura extends IAutoClicker {
     private final SliderSetting offsetHorizontal;
     private final SliderSetting offsetVertical;
     private final ModeSetting offsetTiming;
-
     private final ModeSetting sortMode;
     private final SliderSetting switchDelay;
     private final SliderSetting targets;
     private final ButtonSetting targetInvisible;
     private final ButtonSetting targetPlayer;
     private final ButtonSetting targetEntity;
-
     private final ButtonSetting disableInInventory;
     private final ButtonSetting disableWhileBlocking;
     private final ButtonSetting disableWhileMining;
@@ -108,17 +105,22 @@ public class KillAura extends IAutoClicker {
     private final SliderSetting postDelay;
     private final ButtonSetting hitThroughBlocks;
     private final ButtonSetting ignoreTeammates;
-    public ButtonSetting manualBlock;
     private final ButtonSetting requireMouseDown;
     private final ButtonSetting silentSwing;
     private final ButtonSetting weaponOnly;
-
     private final ButtonSetting dot;
     private final SliderSetting dotSize;
-
     private final String[] rotationModes = new String[]{"None", "Silent", "Lock view"};
     private final List<EntityLivingBase> availableTargets = new ArrayList<>();
+    private final ConcurrentLinkedQueue<Packet<?>> blinkedPackets = new ConcurrentLinkedQueue<>();
+    private final AimSimulator aimSimulator = new AimSimulator();
+    public ModeSetting autoBlockMode;
+    public SliderSetting slowdown;
+    public ButtonSetting manualBlock;
     public AtomicBoolean block = new AtomicBoolean();
+    public boolean blinking;
+    public boolean lag;
+    public boolean rmbDown;
     private long lastSwitched = System.currentTimeMillis();
     private boolean switchTargets;
     private byte entityIndex;
@@ -126,16 +128,10 @@ public class KillAura extends IAutoClicker {
     @Getter
     private boolean attack;
     private boolean blocking;
-    public boolean blinking;
-    public boolean lag;
     private boolean swapped;
-    public boolean rmbDown;
     private float[] rotations = new float[]{0, 0};
-    private final ConcurrentLinkedQueue<Packet<?>> blinkedPackets = new ConcurrentLinkedQueue<>();
     private EntityLivingBase lastAttackTarget = null;
-
     private int blockingTime = 0;
-    private final AimSimulator aimSimulator = new AimSimulator();
     private @Nullable Animation animationX;
     private @Nullable Animation animationY;
     private @Nullable Animation animationZ;
@@ -149,7 +145,7 @@ public class KillAura extends IAutoClicker {
                 .setDefaultValue("Normal")
         );
         this.registerSetting(attackMode = new ModeSetting("Attack mode", new String[]{"Legit", "Packet"}, 1));
-        String[] autoBlockModes = new String[]{"Manual", "Vanilla", "Post", "Swap", "Interact A", "Interact B", "Fake", "Partial", "QuickMacro"};
+        String[] autoBlockModes = new String[]{"Manual", "Vanilla", "Post", "Swap", "Interact A", "Interact B", "Fake", "Partial", "QuickMacro", "Hypixel"};
         this.registerSetting(autoBlockMode = new ModeSetting("Autoblock", autoBlockModes, 0));
         final ModeOnly autoBlock = new ModeOnly(autoBlockMode, 0).reserve();
         this.registerSetting(smartBlock = new ButtonSetting("Smart block", false, autoBlock));
@@ -213,6 +209,19 @@ public class KillAura extends IAutoClicker {
         this.registerSetting(new DescriptionSetting("Visual"));
         this.registerSetting(dot = new ButtonSetting("Dot", false));
         this.registerSetting(dotSize = new SliderSetting("Dot size", 0.1, 0.05, 0.2, 0.05, dot::isToggled));
+    }
+
+    public static boolean behindBlocks(float[] rotations, EntityLivingBase target) {
+        try {
+            Vec3 eyePos = Utils.getEyePos();
+            MovingObjectPosition hitResult = RotationUtils.rayCast(
+                    RotationUtils.getNearestPoint(target.getEntityBoundingBox(), eyePos).distanceTo(eyePos) - 0.05,
+                    rotations[0], rotations[1]
+            );
+            return hitResult != null;
+        } catch (NullPointerException ignored) {
+        }
+        return false;
     }
 
     public void onEnable() {
@@ -346,7 +355,7 @@ public class KillAura extends IAutoClicker {
                     if (lag) {
                         blinking = true;
                         if (Raven.badPacketsHandler.playerSlot != mc.thePlayer.inventory.currentItem % 8 + 1) {
-                            mc.thePlayer.sendQueue.addToSendQueue(new C09PacketHeldItemChange( mc.thePlayer.inventory.currentItem % 8 + 1));
+                            mc.thePlayer.sendQueue.addToSendQueue(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem % 8 + 1));
                             Raven.badPacketsHandler.playerSlot = mc.thePlayer.inventory.currentItem % 8 + 1;
                             swapped = true;
                         }
@@ -368,8 +377,7 @@ public class KillAura extends IAutoClicker {
                         blinking = true;
                         unBlock();
                         lag = false;
-                    }
-                    else {
+                    } else {
                         attackAndInteract(target, autoBlockMode.getInput() == 5); // attack while blinked
                         releasePackets(); // release
                         sendBlock(); // block after releasing unblock
@@ -386,10 +394,21 @@ public class KillAura extends IAutoClicker {
                         sendBlock();
                     }
                     break;
+                case 9:
+                    if (lag) {
+                        blinking = true;
+                        unBlock();
+                        lag = false;
+                    } else {
+                        attackAndInteract(target, true, Utils.getEyePos(target)); // attack while blinked
+                        releasePackets(); // release
+                        sendBlock(); // block after releasing unblock
+                        lag = true;
+                    }
+                    break;
             }
             return;
-        }
-        else if (blinking || lag) {
+        } else if (blinking || lag) {
             resetBlinkState(true);
         }
         if (target == null) {
@@ -476,8 +495,7 @@ public class KillAura extends IAutoClicker {
             if (target != null || swing) {
                 mouseEvent.setCanceled(true);
             }
-        }
-        else if (mouseEvent.button == 1) {
+        } else if (mouseEvent.button == 1) {
             rmbDown = mouseEvent.buttonstate;
             if (autoBlockMode.getInput() >= 1 && Utils.holdingSword() && block.get() && autoBlockMode.getInput() != 7) {
                 KeyBinding.setKeyBindState(mc.gameSettings.keyBindUseItem.getKeyCode(), false);
@@ -552,7 +570,7 @@ public class KillAura extends IAutoClicker {
             case 0:  // manual
                 setBlockState(false, false, true);
                 break;
-            case 8:
+            case 8: // quickmacro
             case 1: // vanilla
                 setBlockState(block.get(), true, true);
                 break;
@@ -562,6 +580,7 @@ public class KillAura extends IAutoClicker {
             case 3: // interact
             case 4:
             case 5:
+            case 9: // hypixel
                 setBlockState(block.get(), false, false);
                 break;
             case 6: // fake
@@ -669,10 +688,10 @@ public class KillAura extends IAutoClicker {
             Comparator<EntityLivingBase> comparator = null;
             switch ((int) sortMode.getInput()) {
                 case 0:
-                    comparator = Comparator.comparingDouble(entityPlayer -> (double)entityPlayer.getHealth());
+                    comparator = Comparator.comparingDouble(entityPlayer -> (double) entityPlayer.getHealth());
                     break;
                 case 1:
-                    comparator = Comparator.comparingDouble(entityPlayer2 -> (double)entityPlayer2.hurtTime);
+                    comparator = Comparator.comparingDouble(entityPlayer2 -> (double) entityPlayer2.hurtTime);
                     break;
                 case 2:
                     comparator = Comparator.comparingDouble(entity -> mc.thePlayer.getDistanceSqToEntity(entity));
@@ -720,10 +739,13 @@ public class KillAura extends IAutoClicker {
     }
 
     private void attackAndInteract(EntityLivingBase target, boolean sendInteractAt) {
+        attackAndInteract(target, sendInteractAt, aimSimulator.getHitPos());
+    }
+
+    private void attackAndInteract(EntityLivingBase target, boolean sendInteractAt, Vec3 hitVec) {
         if (target != null && attack) {
             if (!attack(target)) return;
             if (sendInteractAt) {
-                Vec3 hitVec = aimSimulator.getHitPos();
                 if (hitVec != null) {
                     hitVec = new Vec3(hitVec.x - target.posX, hitVec.y - target.posY, hitVec.z - target.posZ);
                     mc.thePlayer.sendQueue.addToSendQueue(new C02PacketUseEntity(target, hitVec.toVec3()));
@@ -796,19 +818,6 @@ public class KillAura extends IAutoClicker {
         }
         blinkedPackets.clear();
         blinking = false;
-    }
-
-    public static boolean behindBlocks(float[] rotations, EntityLivingBase target) {
-        try {
-            Vec3 eyePos = Utils.getEyePos();
-            MovingObjectPosition hitResult = RotationUtils.rayCast(
-                    RotationUtils.getNearestPoint(target.getEntityBoundingBox(), eyePos).distanceTo(eyePos) - 0.01,
-                    RotationHandler.getRotationYaw(), RotationHandler.getRotationPitch()
-            );
-            return hitResult != null;
-        } catch (NullPointerException ignored) {
-        }
-        return false;
     }
 
     @Override
