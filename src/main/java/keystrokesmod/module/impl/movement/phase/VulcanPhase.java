@@ -32,16 +32,17 @@ public class VulcanPhase extends SubMode<Phase> {
         super(name, parent);
         this.registerSetting(fast, cancelVelocity);
     }
+
     @Override
     public void onEnable() {
         flag = true;
         timer1 = 0;
         teleport = false;
         enable = true;
-        if( mc.thePlayer.onGround ){
+        if (mc.thePlayer.onGround) {
             mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY - 1, mc.thePlayer.posZ);
             MoveUtil.stop();
-        } else{
+        } else {
             Notifications.sendNotification(Notifications.NotificationTypes.INFO, "You must me on the ground to do this");
             parent.toggle();
         }
@@ -51,21 +52,21 @@ public class VulcanPhase extends SubMode<Phase> {
     @SubscribeEvent
     public void onPreMotion(PreMotionEvent event) {
         mc.thePlayer.cameraYaw = 0.1F;
-        if( timer1 > 25) {
+        if (timer1 > 25) {
 
-            if(insideBlock()) {
+            if (insideBlock()) {
                 event.setOnGround(false);
             }
 
 
         }
 
-        if(insideBlock()){
+        if (insideBlock()) {
             timer1++;
         }
 
 
-        if((insideBlock() && !enable && flag)) {
+        if ((insideBlock() && !enable && flag)) {
             flag = false;
             Notifications.sendNotification(Notifications.NotificationTypes.INFO, "Phased");
         }
@@ -86,7 +87,7 @@ public class VulcanPhase extends SubMode<Phase> {
                     event.setBoundingBox(AxisAlignedBB.fromBounds(-15, -1, -15, 15, 1, 15).offset(x, y, z));
                 }
             }
-        } else if (!teleport){
+        } else if (!teleport) {
 
 
             if (event.getBlock() instanceof BlockAir && !mc.thePlayer.isSneaking()) {
@@ -96,7 +97,7 @@ public class VulcanPhase extends SubMode<Phase> {
                     event.setBoundingBox(AxisAlignedBB.fromBounds(-15, -1, -15, 15, 1, 15).offset(x, y, z));
                 }
             }
-        } else if (!insideBlock()){
+        } else if (!insideBlock()) {
             Notifications.sendNotification(Notifications.NotificationTypes.INFO, "Disabled due to not being in a block");
             parent.toggle();
         }
@@ -104,33 +105,33 @@ public class VulcanPhase extends SubMode<Phase> {
 
     @SubscribeEvent
     public void onStrafe(PrePlayerInputEvent event) {
-        if(mc.gameSettings.keyBindJump.isKeyDown() && mc.thePlayer.hurtTime>0){
-            mc.thePlayer.motionY=.99;
+        if (mc.gameSettings.keyBindJump.isKeyDown() && mc.thePlayer.hurtTime > 0) {
+            mc.thePlayer.motionY = .99;
             yMoving = true;
-        } else if (mc.gameSettings.keyBindSneak.isKeyDown()){
-            mc.thePlayer.motionY=-.4;
+        } else if (mc.gameSettings.keyBindSneak.isKeyDown()) {
+            mc.thePlayer.motionY = -.4;
             yMoving = true;
-        } else if (!mc.gameSettings.keyBindJump.isKeyDown() && insideBlock() && timer1 > 25){
+        } else if (!mc.gameSettings.keyBindJump.isKeyDown() && insideBlock() && timer1 > 25) {
             yMoving = false;
         }
-        if(fast.isToggled() && insideBlock()) {
+        if (fast.isToggled() && insideBlock()) {
             if (mc.thePlayer.isPotionActive(Potion.moveSpeed)) {
-                event.setSpeed(((.0765*(1+(mc.thePlayer.getActivePotionEffect(Potion.moveSpeed).getAmplifier()))) +.306));
+                event.setSpeed(((.0765 * (1 + (mc.thePlayer.getActivePotionEffect(Potion.moveSpeed).getAmplifier()))) + .306));
             } else {
                 event.setSpeed(.306);
             }
         }
 
-        if (mc.thePlayer.onGround && enable && teleport){
+        if (mc.thePlayer.onGround && enable && teleport) {
 
             mc.thePlayer.jump();
             teleport = false;
             enable = false;
 
         }
-        if (mc.thePlayer.onGround && !teleport &&!enable) {
+        if (mc.thePlayer.onGround && !teleport && !enable) {
 
-            if (mc.thePlayer.ticksExisted % 2 == 1|| !(mc.thePlayer.moveForward ==0 )) {
+            if (mc.thePlayer.ticksExisted % 2 == 1 || !(mc.thePlayer.moveForward == 0)) {
 
                 event.setForward(1);
             } else {

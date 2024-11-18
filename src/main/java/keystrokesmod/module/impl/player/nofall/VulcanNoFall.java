@@ -14,9 +14,8 @@ import java.util.Arrays;
 import java.util.List;
 
 public class VulcanNoFall extends SubMode<NoFall> {
-    private final SliderSetting minFallDistance;
-
     public static final List<Integer> maxModCount = new ArrayList<>(Arrays.asList(3, 2, 2));
+    private final SliderSetting minFallDistance;
     private int currentModCount = 0;
     private int hasModCount = 0;
 

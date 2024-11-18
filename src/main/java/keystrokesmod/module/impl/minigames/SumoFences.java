@@ -19,11 +19,6 @@ import java.util.List;
 import java.util.TimerTask;
 
 public class SumoFences extends Module {
-    public static SliderSetting fenceHeight;
-    public ModeSetting blockType;
-    private java.util.Timer t;
-    private final List<String> maps = Arrays.asList("Sumo", "Space Mine", "White Crystal", "Fort");
-    private IBlockState f;
     private static final List<BlockPos> f_p = Arrays.asList(new BlockPos(9, 65, -2), new BlockPos(9, 65, -1),
             new BlockPos(9, 65, 0), new BlockPos(9, 65, 1), new BlockPos(9, 65, 2), new BlockPos(9, 65, 3),
             new BlockPos(8, 65, 3), new BlockPos(8, 65, 4), new BlockPos(8, 65, 5), new BlockPos(7, 65, 5),
@@ -43,7 +38,12 @@ public class SumoFences extends Module {
             new BlockPos(5, 65, -8), new BlockPos(5, 65, -7), new BlockPos(6, 65, -7), new BlockPos(7, 65, -7),
             new BlockPos(7, 65, -6), new BlockPos(7, 65, -5), new BlockPos(8, 65, -5), new BlockPos(8, 65, -4),
             new BlockPos(8, 65, -3), new BlockPos(9, 65, -3));
+    public static SliderSetting fenceHeight;
+    private final List<String> maps = Arrays.asList("Sumo", "Space Mine", "White Crystal", "Fort");
     private final String[] mode = new String[]{"Oak fence", "Leaves", "Glass", "Barrier"};
+    public ModeSetting blockType;
+    private java.util.Timer t;
+    private IBlockState f;
 
     public SumoFences() {
         super("Sumo Fences", category.minigames, 0);

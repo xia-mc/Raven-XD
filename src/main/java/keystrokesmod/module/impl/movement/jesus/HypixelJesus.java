@@ -18,8 +18,9 @@ import org.jetbrains.annotations.NotNull;
  * Skidded from Rise (com.alan.clients.module.impl.movement.jesus.WatchdogJesus)
  * <p>
  * Counter-confused by xia__mc
- * @see hackclient.rise.lk
+ *
  * @author Alan34
+ * @see hackclient.rise.lk
  */
 public class HypixelJesus extends SubMode<Jesus> {
     private Boolean tW = false;

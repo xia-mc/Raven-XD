@@ -1,6 +1,8 @@
 package keystrokesmod.module.impl.render;
 
-import keystrokesmod.event.*;
+import keystrokesmod.event.JumpEvent;
+import keystrokesmod.event.PrePlayerInputEvent;
+import keystrokesmod.event.RotationEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.setting.impl.ButtonSetting;
@@ -13,23 +15,12 @@ import org.lwjgl.input.Keyboard;
 import javax.annotation.Nullable;
 
 public class FreeLook extends Module {
-    private final ButtonSetting onlyIfPressed = new ButtonSetting("Only if pressed", true);
-
     public static @Nullable ViewData viewData = null;
+    private final ButtonSetting onlyIfPressed = new ButtonSetting("Only if pressed", true);
 
     public FreeLook() {
         super("FreeLook", category.render);
         this.registerSetting(onlyIfPressed);
-    }
-
-    @Override
-    public void onDisable() {
-        if (viewData != null) {
-            mc.gameSettings.thirdPersonView = viewData.thirdPersonView;
-            mc.thePlayer.rotationYaw = viewData.rotationYaw;
-            mc.thePlayer.rotationPitch = viewData.rotationPitch;
-        }
-        viewData = null;
     }
 
     public static void call() {
@@ -42,6 +33,16 @@ public class FreeLook extends Module {
         }
     }
 
+    @Override
+    public void onDisable() {
+        if (viewData != null) {
+            mc.gameSettings.thirdPersonView = viewData.thirdPersonView;
+            mc.thePlayer.rotationYaw = viewData.rotationYaw;
+            mc.thePlayer.rotationPitch = viewData.rotationPitch;
+        }
+        viewData = null;
+    }
+
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onPreMotion(RotationEvent event) {
         try {
@@ -52,7 +53,7 @@ public class FreeLook extends Module {
         } catch (IndexOutOfBoundsException ignored) {
         }
 
-        if (viewData != null){
+        if (viewData != null) {
             call();
             if (!event.isSet()) {
                 event.setYaw(viewData.rotationYaw);

@@ -17,19 +17,19 @@ import net.minecraft.util.MathHelper;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-import static keystrokesmod.module.ModuleManager.*;
+import static keystrokesmod.module.ModuleManager.killAura;
+import static keystrokesmod.module.ModuleManager.scaffold;
 
 public class TargetStrafe extends Module {
+    private static float yaw;
+    private static EntityLivingBase target = null;
+    private static boolean active = false;
     private final SliderSetting range = new SliderSetting("Range", 1, 0.2, 6, 0.1);
     private final ButtonSetting speed = new ButtonSetting("Allow speed", true);
     private final ButtonSetting fly = new ButtonSetting("Allow fly", false);
     private final ButtonSetting manual = new ButtonSetting("Allow manual", false);
     private final ButtonSetting strafe = new ButtonSetting("Strafe around", true);
-
-    private static float yaw;
-    private static EntityLivingBase target = null;
     private boolean left, colliding;
-    private static boolean active = false;
 
     public TargetStrafe() {
         super("TargetStrafe", category.movement);

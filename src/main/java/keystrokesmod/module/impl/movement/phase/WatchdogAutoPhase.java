@@ -16,9 +16,9 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
 public class WatchdogAutoPhase extends SubMode<Phase> {
-    private boolean phase;
     private final CoolDown stopWatch = new CoolDown(4000);
     private final NormalBlink blink = new NormalBlink("Blink", this);
+    private boolean phase;
 
     public WatchdogAutoPhase(String name, Phase parent) {
         super(name, parent);

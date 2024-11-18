@@ -11,21 +11,22 @@ import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.settings.KeyBinding;
 
 public class AntiAFK extends Module {
-    private ModeSetting afk;
-    private ButtonSetting jump;
-    private ButtonSetting jumpWhenCollided;
-    private ButtonSetting randomClicks;
-    private ButtonSetting swapItem;
-    private ModeSetting spin;
-    private ButtonSetting randomizeDelta;
-    private ButtonSetting randomizePitch;
-    private SliderSetting minDelay;
-    private SliderSetting maxDelay;
-    private String[] afkModes = new String[]{"None", "Wander", "Lateral shuffle", "Forward", "Backward"};
-    private String[] spinModes = new String[]{"None", "Random", "Right", "Left"};
+    public boolean stop = false;
+    private final ModeSetting afk;
+    private final ButtonSetting jump;
+    private final ButtonSetting jumpWhenCollided;
+    private final ButtonSetting randomClicks;
+    private final ButtonSetting swapItem;
+    private final ModeSetting spin;
+    private final ButtonSetting randomizeDelta;
+    private final ButtonSetting randomizePitch;
+    private final SliderSetting minDelay;
+    private final SliderSetting maxDelay;
+    private final String[] afkModes = new String[]{"None", "Wander", "Lateral shuffle", "Forward", "Backward"};
+    private final String[] spinModes = new String[]{"None", "Random", "Right", "Left"};
     private int ticks;
     private boolean c;
-    public boolean stop = false;
+
     public AntiAFK() {
         super("AntiAFK", category.player);
         this.registerSetting(afk = new ModeSetting("AFK", afkModes, 0));
@@ -154,14 +155,14 @@ public class AntiAFK extends Module {
 
     private int h() {
         if (minDelay.getInput() == maxDelay.getInput()) {
-            return (int)minDelay.getInput();
+            return (int) minDelay.getInput();
         }
-        return Utils.randomizeInt((int)minDelay.getInput(), (int) maxDelay.getInput());
+        return Utils.randomizeInt((int) minDelay.getInput(), (int) maxDelay.getInput());
     }
 
     private void d() {
         if (randomizePitch.isToggled()) {
-            mc.thePlayer.rotationPitch = RotationUtils.clampTo90((float)(mc.thePlayer.rotationPitch + this.a()));
+            mc.thePlayer.rotationPitch = RotationUtils.clampTo90((float) (mc.thePlayer.rotationPitch + this.a()));
         }
     }
 

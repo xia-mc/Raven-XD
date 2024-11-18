@@ -53,7 +53,7 @@ public class HitLog extends Module {
 
                 switch ((int) language.getInput()) {
                     case 0:
-                        Utils.sendMessage("Miss "+ target.getName() + "'s " + hitPos.getEnglish() + " Cause " + reason.getEnglish() + " | Trying to predict " + predTicks + " ticks");
+                        Utils.sendMessage("Miss " + target.getName() + "'s " + hitPos.getEnglish() + " Cause " + reason.getEnglish() + " | Trying to predict " + predTicks + " ticks");
                         break;
                     case 1:
                         Utils.sendMessage("空了 " + target.getName() + "的" + hitPos.getChinese() + " 原因 " + reason.getChinese() + " | 尝试预测 " + predTicks + " ticks");
@@ -62,7 +62,7 @@ public class HitLog extends Module {
             } else {
                 switch ((int) language.getInput()) {
                     case 0:
-                        Utils.sendMessage("Hit "+ target.getName() + "'s " + hitPos.getEnglish() + " | Trying to predict " + predTicks + " ticks | Health " + target.getHealth());
+                        Utils.sendMessage("Hit " + target.getName() + "'s " + hitPos.getEnglish() + " | Trying to predict " + predTicks + " ticks | Health " + target.getHealth());
                         break;
                     case 1:
                         Utils.sendMessage("命中 " + target.getName() + "的" + hitPos.getChinese() + " | 尝试预测 " + predTicks + " ticks | 血量 " + target.getHealth());
@@ -85,7 +85,7 @@ public class HitLog extends Module {
         PRED_FAIL("Predicted failed", "预测失败"),
         WATCHDOG("Watchdog", "Watchdog"),
         BLOCK("Blocking", "格挡");
-        
+
         private final String english;
         private final String chinese;
     }

@@ -4,7 +4,10 @@ import akka.japi.Pair;
 import keystrokesmod.Raven;
 import keystrokesmod.event.PreUpdateEvent;
 import keystrokesmod.event.RotationEvent;
-import keystrokesmod.module.impl.combat.autoclicker.*;
+import keystrokesmod.module.impl.combat.autoclicker.IAutoClicker;
+import keystrokesmod.module.impl.combat.autoclicker.LowCPSAutoClicker;
+import keystrokesmod.module.impl.combat.autoclicker.NormalAutoClicker;
+import keystrokesmod.module.impl.combat.autoclicker.RecordAutoClicker;
 import keystrokesmod.module.impl.combat.ragebot.IRageBotFeature;
 import keystrokesmod.module.impl.combat.ragebot.nospread.LegitNoSpread;
 import keystrokesmod.module.impl.combat.ragebot.nospread.SwitchNoSpread;
@@ -14,10 +17,14 @@ import keystrokesmod.module.impl.other.RotationHandler;
 import keystrokesmod.module.impl.other.SlotHandler;
 import keystrokesmod.module.impl.other.anticheats.utils.world.PlayerRotation;
 import keystrokesmod.module.impl.world.AntiBot;
-import keystrokesmod.module.setting.impl.*;
+import keystrokesmod.module.setting.impl.ButtonSetting;
+import keystrokesmod.module.setting.impl.ModeSetting;
+import keystrokesmod.module.setting.impl.ModeValue;
+import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.utils.ModeOnly;
 import keystrokesmod.script.classes.Vec3;
-import keystrokesmod.utility.*;
+import keystrokesmod.utility.RageBotUtils;
+import keystrokesmod.utility.Utils;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityArmorStand;
 import net.minecraft.entity.monster.EntityGiantZombie;
@@ -27,7 +34,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.MovingObjectPosition;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.apache.commons.lang3.tuple.Triple;
@@ -35,12 +41,12 @@ import org.apache.commons.lang3.tuple.Triple;
 import java.util.*;
 
 public class RageBot extends IAutoClicker {
+    public final ModeSetting weaponMode;
+    public final ModeSetting priorityHitBox;
     private final ModeValue clickMode;
     private final ModeSetting mode;
     private final SliderSetting switchDelay;
     private final ModeSetting sortMode;
-    public final ModeSetting weaponMode;
-    public final ModeSetting priorityHitBox;
     private final SliderSetting range;
     private final SliderSetting fov;
     private final ButtonSetting perfect;
@@ -58,12 +64,11 @@ public class RageBot extends IAutoClicker {
     private final ButtonSetting ignoreTeammates;
     private final ButtonSetting ignoreTeammatesCSGO;
     private final ButtonSetting notWhileKillAura;
-
-    public boolean targeted = false;
-    private boolean armed = false;
-    public Pair<Pair<EntityLivingBase, Vec3>, Triple<Double, Float, Float>> target = null;
-    private int predTicks = 0;
     private final Set<EntityLivingBase> switchedTarget = new HashSet<>();
+    public boolean targeted = false;
+    public Pair<Pair<EntityLivingBase, Vec3>, Triple<Double, Float, Float>> target = null;
+    private boolean armed = false;
+    private int predTicks = 0;
     private long lastSwitched = -1;
 
     public RageBot() {

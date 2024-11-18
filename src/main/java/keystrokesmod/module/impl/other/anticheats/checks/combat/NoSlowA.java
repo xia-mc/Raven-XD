@@ -14,6 +14,7 @@ public class NoSlowA extends Check {
     public static final List<Double> SLOW_SPEED = new ArrayList<>();
     public short itemUseTick = 0;
     public short disableTick = 0;  // 跳跃弱检测
+
     public NoSlowA(@NotNull TRPlayer player) {
         super("NoSlowA", player);
         SLOW_SPEED.add(2.56);

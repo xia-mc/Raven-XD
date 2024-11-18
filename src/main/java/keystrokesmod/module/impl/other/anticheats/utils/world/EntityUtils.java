@@ -9,7 +9,8 @@ import org.jetbrains.annotations.NotNull;
 
 public class EntityUtils {
     public static boolean isOnPlaceBlock(@NotNull TRPlayer player) {
-        if (player.currentMainHead == ItemStack.EMPTY || player.lastMainHead == ItemStack.EMPTY) return false;  // not as same as 1.20.1
+        if (player.currentMainHead == ItemStack.EMPTY || player.lastMainHead == ItemStack.EMPTY)
+            return false;  // not as same as 1.20.1
 
         if (!(player.lastMainHead.isBlock)) return false;
         //            BlockHitResult hitResult1 = RayCastUtils.blockRayCast(player.fabricPlayer, LevelUtils.getClientLevel(), 4.5);

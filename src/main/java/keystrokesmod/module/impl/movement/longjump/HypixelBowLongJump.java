@@ -28,9 +28,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class HypixelBowLongJump extends SubMode<LongJump> {
     private final SliderSetting speed;
     private final ButtonSetting autoDisable;
-
-    private State state = State.SELF_DAMAGE;
     private final Queue<Packet<INetHandlerPlayClient>> delayedPackets = new ConcurrentLinkedQueue<>();
+    private State state = State.SELF_DAMAGE;
 
     public HypixelBowLongJump(String name, @NotNull LongJump parent) {
         super(name, parent);

@@ -4,7 +4,6 @@ import keystrokesmod.Raven;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.DescriptionSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
-import keystrokesmod.utility.Utils;
 import net.minecraft.client.settings.KeyBinding;
 import org.lwjgl.input.Keyboard;
 
@@ -13,6 +12,7 @@ import java.util.concurrent.TimeUnit;
 public class SaveMoveKeys extends Module {
     private final SliderSetting delay;
     private boolean lastInGUI = false;
+
     public SaveMoveKeys() {
         super("SaveMoveKeys", category.movement);
         this.registerSetting(new DescriptionSetting("re-press movement keys when close gui."));
@@ -32,7 +32,7 @@ public class SaveMoveKeys extends Module {
                     KeyBinding.setKeyBindState(mc.gameSettings.keyBindRight.getKeyCode(), Keyboard.isKeyDown(mc.gameSettings.keyBindRight.getKeyCode()));
                     KeyBinding.setKeyBindState(mc.gameSettings.keyBindSprint.getKeyCode(), Keyboard.isKeyDown(mc.gameSettings.keyBindSprint.getKeyCode()));
                     KeyBinding.setKeyBindState(mc.gameSettings.keyBindSneak.getKeyCode(), Keyboard.isKeyDown(mc.gameSettings.keyBindSneak.getKeyCode()));
-                    KeyBinding.setKeyBindState(mc.gameSettings.keyBindJump.getKeyCode(), Utils.jumpDown());
+                    KeyBinding.setKeyBindState(mc.gameSettings.keyBindJump.getKeyCode(), Keyboard.isKeyDown(mc.gameSettings.keyBindJump.getKeyCode()));
                     KeyBinding.onTick(mc.gameSettings.keyBindForward.getKeyCode());
                     KeyBinding.onTick(mc.gameSettings.keyBindBack.getKeyCode());
                     KeyBinding.onTick(mc.gameSettings.keyBindLeft.getKeyCode());

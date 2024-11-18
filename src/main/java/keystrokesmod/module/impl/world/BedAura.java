@@ -11,7 +11,10 @@ import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.ModeSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.script.classes.Vec3;
-import keystrokesmod.utility.*;
+import keystrokesmod.utility.BlockUtils;
+import keystrokesmod.utility.RotationUtils;
+import keystrokesmod.utility.Theme;
+import keystrokesmod.utility.Utils;
 import keystrokesmod.utility.render.RenderUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockBed;
@@ -39,40 +42,39 @@ import java.util.List;
 import java.util.Map;
 
 public class BedAura extends Module {
-    public ModeSetting mode;
     private final SliderSetting breakSpeed;
     private final SliderSetting fov;
     private final SliderSetting range;
     private final SliderSetting rate;
     private final ButtonSetting lobbyCheck;
-    public ButtonSetting allowAura;
     private final ButtonSetting breakNearBlock;
     private final ButtonSetting cancelKnockback;
     private final ButtonSetting disableBreakEffects;
-    public ButtonSetting groundSpoof;
-    public ButtonSetting ignoreSlow;
     private final ButtonSetting onlyWhileVisible;
     private final ButtonSetting renderOutline;
     private final ButtonSetting sendAnimations;
     private final ButtonSetting silentSwing;
     private final ButtonSetting rotation;
-
     private final String[] modes = new String[]{"Legit", "Instant", "Swap"};
-    private BlockPos[] bedPos;
+    private final Map<BlockPos, Double> breakProgressMap = new HashMap<>();
+    private final int defaultOutlineColor = new Color(226, 65, 65).getRGB();
+    public ModeSetting mode;
+    public ButtonSetting allowAura;
+    public ButtonSetting groundSpoof;
+    public ButtonSetting ignoreSlow;
     public double breakProgress;
-    private int currentSlot = -1;
-    private int lastSlot = -1;
     public boolean rotate;
     public BlockPos currentBlock;
-    private long lastCheck = 0;
     public boolean stopAutoblock;
+    public double lastProgress;
+    public float vanillaProgress;
+    private BlockPos[] bedPos;
+    private int currentSlot = -1;
+    private int lastSlot = -1;
+    private long lastCheck = 0;
     private int ticksAfterBreak = 0;
     private boolean delayStart;
     private BlockPos nearestBlock;
-    private final Map<BlockPos, Double> breakProgressMap = new HashMap<>();
-    public double lastProgress;
-    public float vanillaProgress;
-    private final int defaultOutlineColor = new Color(226, 65, 65).getRGB();
 
     public BedAura() {
         super("BedAura", category.world, 0);
@@ -140,8 +142,7 @@ public class BedAura extends Module {
                 reset(true);
                 return;
             }
-        }
-        else {
+        } else {
             if (!(BlockUtils.getBlock(bedPos[0]) instanceof BlockBed) || (currentBlock != null && BlockUtils.replaceable(currentBlock))) {
                 reset(true);
                 return;
@@ -155,8 +156,7 @@ public class BedAura extends Module {
                     stopAutoblock = true;
                 }
                 return;
-            }
-            else {
+            } else {
                 if (currentSlot != -1 && currentSlot != mc.thePlayer.inventory.currentItem) {
                     stopAutoblock = true;
                 }
@@ -164,8 +164,7 @@ public class BedAura extends Module {
                 delayStart = false;
                 ticksAfterBreak = 0;
             }
-        }
-        else {
+        } else {
             ticksAfterBreak = 0;
         }
 
@@ -174,8 +173,7 @@ public class BedAura extends Module {
                 nearestBlock = getBestBlock(bedPos, true);
             }
             breakBlock(nearestBlock);
-        }
-        else {
+        } else {
             nearestBlock = null;
             resetSlot();
             BlockPos bestBlock = getBestBlock(bedPos, false);
@@ -192,8 +190,7 @@ public class BedAura extends Module {
             if (((S12PacketEntityVelocity) e.getPacket()).getEntityID() == mc.thePlayer.getEntityId()) {
                 e.setCanceled(true);
             }
-        }
-        else if (e.getPacket() instanceof S27PacketExplosion) {
+        } else if (e.getPacket() instanceof S27PacketExplosion) {
             e.setCanceled(true);
         }
     }
@@ -236,11 +233,9 @@ public class BedAura extends Module {
         int outlineColor;
         if (ModuleManager.bedESP != null && ModuleManager.bedESP.isEnabled()) {
             outlineColor = Theme.getGradient((int) ModuleManager.bedESP.theme.getInput(), 0);
-        }
-        else if (ModuleManager.hud != null && ModuleManager.hud.isEnabled()) {
+        } else if (ModuleManager.hud != null && ModuleManager.hud.isEnabled()) {
             outlineColor = Theme.getGradient((int) HUD.theme.getInput(), 0);
-        }
-        else {
+        } else {
             outlineColor = defaultOutlineColor;
         }
         RenderUtils.renderBlock(currentBlock, outlineColor, true, false);
@@ -251,8 +246,7 @@ public class BedAura extends Module {
             stopAutoblock = true;
             delayStart = true;
             setPacketSlot(mc.thePlayer.inventory.currentItem);
-        }
-        else if (lastSlot != -1) {
+        } else if (lastSlot != -1) {
             mc.thePlayer.inventory.currentItem = lastSlot;
         }
     }
@@ -315,8 +309,7 @@ public class BedAura extends Module {
                         closestBlock = offset;
                     }
                 }
-            }
-            else {
+            } else {
                 if (RotationUtils.notInRange(pos, range.getInput())) {
                     continue;
                 }
@@ -389,8 +382,7 @@ public class BedAura extends Module {
     private void swing() {
         if (!silentSwing.isToggled()) {
             mc.thePlayer.swingItem();
-        }
-        else {
+        } else {
             mc.thePlayer.sendQueue.addToSendQueue(new C0APacketAnimation());
         }
     }
@@ -425,8 +417,7 @@ public class BedAura extends Module {
                     setSlot(Utils.getTool(block));
                 }
                 startBreak(blockPos);
-            }
-            else if (breakProgress >= 1) {
+            } else if (breakProgress >= 1) {
                 if (mode.getInput() == 2) {
                     ModuleManager.killAura.resetBlinkState(false);
                     setPacketSlot(Utils.getTool(block));
@@ -440,8 +431,7 @@ public class BedAura extends Module {
                     mc.playerController.onPlayerDestroyBlock(blockPos, EnumFacing.UP);
                 }
                 return;
-            }
-            else {
+            } else {
                 if (mode.getInput() == 0) {
                     stopAutoblock = true;
                     rotate = true;
@@ -461,8 +451,7 @@ public class BedAura extends Module {
             while (lastProgress + progress < 1) {
                 lastProgress += progress;
             }
-        }
-        else if (mode.getInput() == 1) {
+        } else if (mode.getInput() == 1) {
             stopAutoblock = true;
             rotate = true;
             if (!silentSwing.isToggled()) {
@@ -487,7 +476,7 @@ public class BedAura extends Module {
     private boolean isCovered(BlockPos blockPos) {
         for (EnumFacing enumFacing : EnumFacing.values()) {
             BlockPos offset = blockPos.offset(enumFacing);
-            if (BlockUtils.replaceable(offset) || BlockUtils.notFull(BlockUtils.getBlock(offset)) ) {
+            if (BlockUtils.replaceable(offset) || BlockUtils.notFull(BlockUtils.getBlock(offset))) {
                 return false;
             }
         }

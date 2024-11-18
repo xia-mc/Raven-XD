@@ -27,20 +27,18 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class StoreRapidFire extends LegitRapidFire {
+    private static final ButtonSetting disableAntiAim = new ButtonSetting("Disable antiAim", true);
+    private static boolean storing = false;
     private final SliderSetting ticks;
     private final SliderSetting maxStoreTime;
     private final ButtonSetting visual;
-    private static final ButtonSetting disableAntiAim = new ButtonSetting("Disable antiAim", true);
-
-    private static boolean storing = false;
-    private int storeTicks = 0;
     private final Queue<TimedPacket> packetQueue = new ConcurrentLinkedQueue<>();
     private final List<Packet<?>> skipPackets = new ArrayList<>();
-    private boolean fire;
-    private long lastEndStoreTime = 0;
-
     private final Animation animation = new Animation(Easing.EASE_OUT_CIRC, 200);
     private final Progress progress = new Progress("Rapid fire");
+    private int storeTicks = 0;
+    private boolean fire;
+    private long lastEndStoreTime = 0;
 
     public StoreRapidFire(String name, @NotNull RageBot parent) {
         super(name, parent);

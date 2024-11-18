@@ -15,9 +15,9 @@ import org.lwjgl.input.Mouse;
 
 public class FastMine extends Module { // from b4 src
     private final SliderSetting delay;
-    public SliderSetting multiplier;
     private final ModeSetting mode;
     private final ButtonSetting creativeDisable;
+    public SliderSetting multiplier;
     private float lastCurBlockDamageMP;
 
     public FastMine() {

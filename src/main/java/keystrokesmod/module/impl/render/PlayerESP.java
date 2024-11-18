@@ -8,9 +8,9 @@ import keystrokesmod.module.impl.world.AntiBot;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.DescriptionSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
+import keystrokesmod.utility.Utils;
 import keystrokesmod.utility.render.ColorUtils;
 import keystrokesmod.utility.render.RenderUtils;
-import keystrokesmod.utility.Utils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
@@ -19,25 +19,24 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import java.awt.*;
 
 public class PlayerESP extends Module {
-    public SliderSetting red;
-    public SliderSetting green;
-    public SliderSetting blue;
-    public ButtonSetting colorByName;
-    public ButtonSetting rainbow;
     private final ButtonSetting twoD;
     private final ButtonSetting arrow;
     private final ButtonSetting box;
     private final ButtonSetting health;
-    public ButtonSetting outline;
     private final ButtonSetting shaded;
     private final ButtonSetting ring;
     private final SliderSetting expand;
     private final SliderSetting xShift;
     private final ButtonSetting redOnDamage;
     private final ButtonSetting showInvis;
-    private int rgb = 0;
-
     private final Object2IntOpenHashMap<EntityLivingBase> targets = new Object2IntOpenHashMap<>(5);
+    public SliderSetting red;
+    public SliderSetting green;
+    public SliderSetting blue;
+    public ButtonSetting colorByName;
+    public ButtonSetting rainbow;
+    public ButtonSetting outline;
+    private int rgb = 0;
 
     public PlayerESP() {
         super("PlayerESP", category.render, 0);
@@ -58,6 +57,14 @@ public class PlayerESP extends Module {
         this.registerSetting(xShift = new SliderSetting("X-Shift", 0.0D, -35.0D, 10.0D, 1.0D));
         this.registerSetting(redOnDamage = new ButtonSetting("Red on damage", true));
         this.registerSetting(showInvis = new ButtonSetting("Show invis", true));
+    }
+
+    public static int getColorFromTags(String displayName) {
+        displayName = Utils.removeFormatCodes(displayName);
+        if (displayName.isEmpty() || !displayName.startsWith("§") || displayName.charAt(1) == 'f') {
+            return new Color(255, 255, 255).getRGB();
+        }
+        return ColorUtils.getColorFromCode(displayName).getRGB();
     }
 
     @Override
@@ -135,13 +142,5 @@ public class PlayerESP extends Module {
         if (ring.isToggled()) {
             RenderUtils.renderEntity(en, 6, expand.getInput(), xShift.getInput(), rgb, redOnDamage.isToggled());
         }
-    }
-
-    public static int getColorFromTags(String displayName) {
-        displayName = Utils.removeFormatCodes(displayName);
-        if (displayName.isEmpty() || !displayName.startsWith("§") || displayName.charAt(1) == 'f') {
-            return new Color(255, 255, 255).getRGB();
-        }
-        return ColorUtils.getColorFromCode(displayName).getRGB();
     }
 }

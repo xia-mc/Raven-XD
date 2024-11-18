@@ -13,10 +13,10 @@ import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.ModeValue;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.script.classes.Vec3;
-import keystrokesmod.utility.aim.AimSimulator;
 import keystrokesmod.utility.BlockUtils;
 import keystrokesmod.utility.RotationUtils;
 import keystrokesmod.utility.Utils;
+import keystrokesmod.utility.aim.AimSimulator;
 import net.minecraft.block.BlockChest;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.gui.inventory.GuiChest;
@@ -42,14 +42,13 @@ public class ChestAura extends IAutoClicker {
     private final ButtonSetting onlyCloseChest;
     private final ButtonSetting onlyNotBelowChest;
     private final ButtonSetting targetNearbyCheck;
-
+    private final Set<BlockPos> clicked = new HashSet<>();
+    private final Set<BlockPos> opened = new HashSet<>();
     private boolean click = false;
     private Pair<BlockPos, MovingObjectPosition> target = null;
     private float yaw;
     private float pitch;
     private Float lastYaw = null, lastPitch = null;
-    private final Set<BlockPos> clicked = new HashSet<>();
-    private final Set<BlockPos> opened = new HashSet<>();
     private long lastDone = 0;
 
     public ChestAura() {

@@ -25,17 +25,16 @@ import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public final class DynamicManager extends Module {
+    public static final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+    private static final Set<Dynamic> activeDynamics = new HashSet<>();
     public static File directory = null;
     public static File cacheDirectory = null;
-    public static final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-
-    private static final Set<Dynamic> activeDynamics = new HashSet<>();
     private boolean needToLoad = false;
 
     public DynamicManager() {
@@ -44,15 +43,14 @@ public final class DynamicManager extends Module {
         this.registerSetting(new ButtonSetting("Open folder", () -> {
             try {
                 Desktop.getDesktop().open(directory);
-            }
-            catch (IOException ex) {
+            } catch (IOException ex) {
                 directory.mkdirs();
                 Utils.sendMessage("&cError locating folder, recreated.");
             }
         }));
         this.registerSetting(new DescriptionSetting("Dynamics:", () -> !activeDynamics.isEmpty()));
         this.canBeEnabled = false;
-      
+
         directory = new File(Raven.mc.mcDataDir + File.separator + "keystrokes", "dynamics");
         if (!directory.exists()) {
             boolean success = directory.mkdirs();
@@ -71,6 +69,33 @@ public final class DynamicManager extends Module {
         }
 
         loadDynamics();
+    }
+
+    private static @NotNull Set<File> getClassPath() {
+        Set<File> classPath = new HashSet<>();
+
+        for (File file : Objects.requireNonNull(new File(mc.mcDataDir, "mods").listFiles())) {
+            if (file.exists() && file.isFile() && file.getName().endsWith(".jar"))
+                classPath.add(file);
+        }
+        classPath.add(new File(Raven.class.getProtectionDomain().getCodeSource().getLocation().getFile()));
+        classPath.add(new File(Minecraft.class.getProtectionDomain().getCodeSource().getLocation().getFile()));
+        return classPath;
+    }
+
+    private static List<File> findClassFiles(String dir) {
+        try (Stream<Path> stream = Files.walk(Paths.get(dir))) {
+            return stream.filter(file -> !Files.isDirectory(file) && file.toString().endsWith(".class"))
+                    .map(Path::toFile)
+                    .collect(Collectors.toList());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static @NotNull String getClassName(@NotNull String outputDir, @NotNull File classFile) {
+        String relativePath = classFile.getAbsolutePath().substring(outputDir.length() + 1);
+        return relativePath.replace(File.separator, ".").replace(".class", "");
     }
 
     @SubscribeEvent
@@ -193,32 +218,5 @@ public final class DynamicManager extends Module {
             }
         } catch (NullPointerException ignored) {
         }
-    }
-
-    private static @NotNull Set<File> getClassPath() {
-        Set<File> classPath = new HashSet<>();
-
-        for (File file : Objects.requireNonNull(new File(mc.mcDataDir, "mods").listFiles())) {
-            if (file.exists() && file.isFile() && file.getName().endsWith(".jar"))
-                classPath.add(file);
-        }
-        classPath.add(new File(Raven.class.getProtectionDomain().getCodeSource().getLocation().getFile()));
-        classPath.add(new File(Minecraft.class.getProtectionDomain().getCodeSource().getLocation().getFile()));
-        return classPath;
-    }
-
-    private static List<File> findClassFiles(String dir) {
-        try (Stream<Path> stream = Files.walk(Paths.get(dir))) {
-            return stream.filter(file -> !Files.isDirectory(file) && file.toString().endsWith(".class"))
-                    .map(Path::toFile)
-                    .collect(Collectors.toList());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private static @NotNull String getClassName(@NotNull String outputDir, @NotNull File classFile) {
-        String relativePath = classFile.getAbsolutePath().substring(outputDir.length() + 1);
-        return relativePath.replace(File.separator, ".").replace(".class", "");
     }
 }

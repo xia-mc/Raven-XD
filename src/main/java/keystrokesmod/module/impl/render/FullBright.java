@@ -10,9 +10,9 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.PlayerTickEvent;
 
 public class FullBright extends Module {
+    private static final float brightness = 15.0f;
     private final ModeSetting mode;
     private float originalGamma;
-    private static final float brightness = 15.0f;
     private boolean nightVisionEnabled = false;
 
     private int lastMode = -1;

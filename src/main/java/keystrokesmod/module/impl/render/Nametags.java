@@ -5,9 +5,11 @@ import keystrokesmod.module.impl.world.AntiBot;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.DescriptionSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
-import keystrokesmod.utility.render.RenderUtils;
 import keystrokesmod.utility.Utils;
-import net.minecraft.client.renderer.*;
+import keystrokesmod.utility.render.RenderUtils;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -74,8 +76,7 @@ public class Nametags extends Module {
             String name;
             if (removeTags.isToggled()) {
                 name = entityPlayer.getName();
-            }
-            else {
+            } else {
                 name = entityPlayer.getDisplayName().getFormattedText();
             }
             if (showHealth.isToggled()) {
@@ -89,14 +90,11 @@ public class Nametags extends Module {
                 String color = "§";
                 if (distance <= 8) {
                     color += "c";
-                }
-                else if (distance <= 15) {
+                } else if (distance <= 15) {
                     color += "6";
-                }
-                else if (distance <= 25) {
+                } else if (distance <= 25) {
                     color += "e";
-                }
-                else {
+                } else {
                     color = "";
                 }
                 name = color + distance + "m§r " + name;
@@ -107,8 +105,7 @@ public class Nametags extends Module {
             GlStateManager.rotate(-mc.getRenderManager().playerViewY, 0.0f, 1.0f, 0.0f);
             if (entityPlayer == mc.thePlayer && mc.gameSettings.thirdPersonView == 2) {
                 GlStateManager.rotate(-mc.getRenderManager().playerViewX, 1.0f, 0.0f, 0.0f);
-            }
-            else {
+            } else {
                 GlStateManager.rotate(mc.getRenderManager().playerViewX, 1.0f, 0.0f, 0.0f);
             }
             final float n = 0.02666667f;
@@ -143,8 +140,7 @@ public class Nametags extends Module {
             int y2 = 8;
             if (Utils.isFriended(entityPlayer)) {
                 RenderUtils.drawOutline(x1, y1, x2, y2, 2, friendColor);
-            }
-            else if (Utils.isEnemy(entityPlayer)) {
+            } else if (Utils.isEnemy(entityPlayer)) {
                 RenderUtils.drawOutline(x1, y1, x2, y2, 2, enemyColor);
             }
             if (drawBackground.isToggled()) {
@@ -254,8 +250,7 @@ public class Nametags extends Module {
                 if (unbreakingLvl > 0) {
                     mc.fontRendererObj.drawString("ub" + unbreakingLvl, (float) (xPos * 2), (float) newYPos, -1, dropShadow.isToggled());
                 }
-            }
-            else if (stack.getItem() instanceof ItemBow) {
+            } else if (stack.getItem() instanceof ItemBow) {
                 int powerLvl = EnchantmentHelper.getEnchantmentLevel(Enchantment.power.effectId, stack);
                 int punchLvl = EnchantmentHelper.getEnchantmentLevel(Enchantment.punch.effectId, stack);
                 int flameLvl = EnchantmentHelper.getEnchantmentLevel(Enchantment.flame.effectId, stack);
@@ -278,8 +273,7 @@ public class Nametags extends Module {
                 if (unbreakingLvl > 0) {
                     mc.fontRendererObj.drawString("ub" + unbreakingLvl, (float) (xPos * 2), (float) newYPos, -1, dropShadow.isToggled());
                 }
-            }
-            else if (stack.getItem() instanceof ItemSword) {
+            } else if (stack.getItem() instanceof ItemSword) {
                 int sharpnessLvl = EnchantmentHelper.getEnchantmentLevel(Enchantment.sharpness.effectId, stack);
                 int knockbackLvl = EnchantmentHelper.getEnchantmentLevel(Enchantment.knockback.effectId, stack);
                 int fireAspectLvl = EnchantmentHelper.getEnchantmentLevel(Enchantment.fireAspect.effectId, stack);
@@ -302,8 +296,7 @@ public class Nametags extends Module {
                 if (unbreakingLvl > 0) {
                     mc.fontRendererObj.drawString("ub" + unbreakingLvl, (float) (xPos * 2), (float) newYPos, -1, dropShadow.isToggled());
                 }
-            }
-            else if (stack.getItem() instanceof ItemTool) {
+            } else if (stack.getItem() instanceof ItemTool) {
                 int unbreakingLvl = EnchantmentHelper.getEnchantmentLevel(Enchantment.unbreaking.effectId, stack);
                 int efficiencyLvl = EnchantmentHelper.getEnchantmentLevel(Enchantment.efficiency.effectId, stack);
                 int fortuneLvl = EnchantmentHelper.getEnchantmentLevel(Enchantment.fortune.effectId, stack);

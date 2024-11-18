@@ -4,9 +4,9 @@ import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.utility.Reflection;
+import keystrokesmod.utility.Utils;
 import keystrokesmod.utility.render.ColorUtils;
 import keystrokesmod.utility.render.RenderUtils;
-import keystrokesmod.utility.Utils;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityEnderPearl;
@@ -28,18 +28,19 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Indicators extends Module {
-    private ButtonSetting renderArrows;
-    private ButtonSetting renderPearls;
-    private ButtonSetting renderFireballs;
-    private ButtonSetting renderPlayers;
-    private SliderSetting radius;
-    private ButtonSetting itemColors, arrowColor;
-    private ButtonSetting renderItem;
-    private ButtonSetting threatsOnly;
-    private HashSet<Entity> threats = new HashSet<>();
-    private Map<String, String> lastHeldItems = new ConcurrentHashMap<>();
-    private int pearlColor = new Color(173, 12, 255).getRGB();
-    private int fireBallColor = new Color(255, 109, 0).getRGB();
+    private final ButtonSetting renderArrows;
+    private final ButtonSetting renderPearls;
+    private final ButtonSetting renderFireballs;
+    private final ButtonSetting renderPlayers;
+    private final SliderSetting radius;
+    private final ButtonSetting itemColors;
+    private final ButtonSetting arrowColor;
+    private final ButtonSetting renderItem;
+    private final ButtonSetting threatsOnly;
+    private final HashSet<Entity> threats = new HashSet<>();
+    private final Map<String, String> lastHeldItems = new ConcurrentHashMap<>();
+    private final int pearlColor = new Color(173, 12, 255).getRGB();
+    private final int fireBallColor = new Color(255, 109, 0).getRGB();
 
     public Indicators() {
         super("Indicators", category.render);
@@ -116,7 +117,7 @@ public class Indicators extends Module {
                 GL11.glTranslated(x + position[0], y + position[1], 0.0);
                 String distanceStr = (int) mc.thePlayer.getDistanceToEntity(e) + "m";
                 float textWidth = mc.fontRendererObj.getStringWidth(distanceStr);
-                mc.fontRendererObj.drawStringWithShadow(distanceStr, -textWidth / 2, -mc.fontRendererObj.FONT_HEIGHT/2, -1);
+                mc.fontRendererObj.drawStringWithShadow(distanceStr, -textWidth / 2, -mc.fontRendererObj.FONT_HEIGHT / 2, -1);
                 GL11.glPopMatrix();
 
                 GL11.glPushMatrix();
@@ -125,8 +126,7 @@ public class Indicators extends Module {
                 RenderUtils.drawArrow(-5f, (float) -radius.getInput() - 38, itemColors.isToggled() ? color : -1, 3, 5);
                 GL11.glPopMatrix();
             }
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
@@ -147,18 +147,14 @@ public class Indicators extends Module {
         try {
             if (entity instanceof EntityArrow && !Reflection.inGround.getBoolean(entity) && renderArrows.isToggled()) {
                 return true;
-            }
-            else if (entity instanceof EntityFireball && renderFireballs.isToggled()) {
+            } else if (entity instanceof EntityFireball && renderFireballs.isToggled()) {
+                return true;
+            } else if (entity instanceof EntityEnderPearl && renderPearls.isToggled()) {
+                return true;
+            } else if (entity instanceof EntityPlayer && renderPlayers.isToggled()) {
                 return true;
             }
-            else if (entity instanceof EntityEnderPearl && renderPearls.isToggled()) {
-                return true;
-            }
-            else if (entity instanceof EntityPlayer && renderPlayers.isToggled()) {
-                return true;
-            }
-        }
-        catch (IllegalAccessException e) {
+        } catch (IllegalAccessException e) {
             Utils.sendMessage("&cIssue checking entity.");
             e.printStackTrace();
             return false;

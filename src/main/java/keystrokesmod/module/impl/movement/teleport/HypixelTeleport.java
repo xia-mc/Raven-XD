@@ -19,10 +19,10 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class HypixelTeleport extends SubMode<Teleport> {
+    private final Queue<Packet<?>> delayedPackets = new ConcurrentLinkedQueue<>();
     private State state = State.NONE;
     private int hasLag = 0;
     private int timerTicks = -1;
-    private final Queue<Packet<?>> delayedPackets = new ConcurrentLinkedQueue<>();
     private float yaw, pitch;
 
     public HypixelTeleport(String name, @NotNull Teleport parent) {

@@ -125,7 +125,7 @@ public class Watermark extends Module {
                         RenderUtils.drawImage(WATERMARK.get("enders"), posX, posY, 150, 45);
                         break;
                 }
-            break;
+                break;
         }
     }
 }

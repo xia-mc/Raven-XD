@@ -27,11 +27,10 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 public class HypixelTower extends SubMode<Tower> {
-    private final ButtonSetting notWhileMoving;
-    private final SliderSetting stopOnBlocks;
-
     public static final Set<EnumFacing> LIMIT_FACING = new HashSet<>(Collections.singleton(EnumFacing.SOUTH));
     public static final MoveCorrect moveCorrect = new MoveCorrect(0.3, MoveCorrect.Mode.POSITION);
+    private final ButtonSetting notWhileMoving;
+    private final SliderSetting stopOnBlocks;
     private boolean towering;
     private int towerTicks;
     private boolean blockPlaceRequest = false;
@@ -43,6 +42,14 @@ public class HypixelTower extends SubMode<Tower> {
         super(name, parent);
         this.registerSetting(notWhileMoving = new ButtonSetting("Not while moving", true));
         this.registerSetting(stopOnBlocks = new SliderSetting("Stop on blocks", 6, 6, 10, 1));
+    }
+
+    public static boolean isGoingDiagonally(double amount) {
+        return Math.abs(mc.thePlayer.motionX) > amount && Math.abs(mc.thePlayer.motionZ) > amount;
+    }
+
+    public static double randomAmount() {
+        return 8.0E-4 + Math.random() * 0.008;
     }
 
     @SubscribeEvent
@@ -140,14 +147,6 @@ public class HypixelTower extends SubMode<Tower> {
         } else {
             verticalPlaced = 0;
         }
-    }
-
-    public static boolean isGoingDiagonally(double amount) {
-        return Math.abs(mc.thePlayer.motionX) > amount && Math.abs(mc.thePlayer.motionZ) > amount;
-    }
-
-    public static double randomAmount() {
-        return 8.0E-4 + Math.random() * 0.008;
     }
 
     @Override

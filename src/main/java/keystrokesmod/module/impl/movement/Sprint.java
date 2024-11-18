@@ -14,10 +14,10 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.PlayerTickEvent;
 
 public class Sprint extends Module {
-    private final ModeSetting mode = new ModeSetting("Mode", new String[]{"Legit", "Omni"}, 0);
-    private final ModeSetting omniMode = new ModeSetting("Bypass mode", new String[]{"None", "Legit"}, 1, new ModeOnly(mode, 1));
     public static boolean omni = false;
     public static boolean stopSprint = false;
+    private final ModeSetting mode = new ModeSetting("Mode", new String[]{"Legit", "Omni"}, 0);
+    private final ModeSetting omniMode = new ModeSetting("Bypass mode", new String[]{"None", "Legit"}, 1, new ModeOnly(mode, 1));
 
     public Sprint() {
         super("Sprint", Module.category.movement, 0);

@@ -6,8 +6,6 @@ import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.Utils;
 import org.jetbrains.annotations.NotNull;
 
-import javax.rmi.CORBA.Util;
-
 public class Vanilla1Fly extends SubMode<Fly> {
     private final SliderSetting horizontalSpeed;
 
@@ -26,7 +24,7 @@ public class Vanilla1Fly extends SubMode<Fly> {
 
     @Override
     public void onUpdate() {
-        mc.thePlayer.capabilities.setFlySpeed((float)(0.05000000074505806 * horizontalSpeed.getInput()));
+        mc.thePlayer.capabilities.setFlySpeed((float) (0.05000000074505806 * horizontalSpeed.getInput()));
         mc.thePlayer.capabilities.isFlying = true;
     }
 

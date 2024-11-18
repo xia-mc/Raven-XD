@@ -31,6 +31,31 @@ public class AutoRegister extends Module {
         this.registerSetting(maxDelay = new SliderSetting("Max delay", 3000, 0, 5000, 500));
     }
 
+    public static @NotNull String generatePassword(@NotNull String gameId) {
+        final MessageDigest digest;
+        try {
+            digest = MessageDigest.getInstance("SHA-256");
+        } catch (NoSuchAlgorithmException e) {
+            Utils.sendMessage("Your environment doesn't support this.");
+            throw new RuntimeException(e);
+        }
+        byte[] hashBytes = digest.digest(gameId.getBytes());
+
+        final StringBuilder passwordBuilder = new StringBuilder();
+
+        for (byte b : hashBytes) {
+            int value = b & 0xFF;
+            char selectedChar = CHARS[value % CHARS.length];
+            passwordBuilder.append(selectedChar);
+
+            if (passwordBuilder.length() >= 12) {
+                break;
+            }
+        }
+
+        return passwordBuilder.toString();
+    }
+
     @SubscribeEvent
     public void onReceivePacket(@NotNull ReceivePacketEvent event) {
         if (event.getPacket() instanceof S02PacketChat) {
@@ -61,30 +86,5 @@ public class AutoRegister extends Module {
             }
             PacketUtils.sendPacket(new C01PacketChatMessage(text));
         }, time, TimeUnit.MILLISECONDS);
-    }
-
-    public static @NotNull String generatePassword(@NotNull String gameId) {
-        final MessageDigest digest;
-        try {
-            digest = MessageDigest.getInstance("SHA-256");
-        } catch (NoSuchAlgorithmException e) {
-            Utils.sendMessage("Your environment doesn't support this.");
-            throw new RuntimeException(e);
-        }
-        byte[] hashBytes = digest.digest(gameId.getBytes());
-
-        final StringBuilder passwordBuilder = new StringBuilder();
-
-        for (byte b : hashBytes) {
-            int value = b & 0xFF;
-            char selectedChar = CHARS[value % CHARS.length];
-            passwordBuilder.append(selectedChar);
-
-            if (passwordBuilder.length() >= 12) {
-                break;
-            }
-        }
-
-        return passwordBuilder.toString();
     }
 }

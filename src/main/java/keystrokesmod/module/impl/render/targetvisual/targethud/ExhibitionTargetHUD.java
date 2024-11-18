@@ -19,12 +19,65 @@ import java.awt.*;
 
 public class ExhibitionTargetHUD extends SubMode<TargetHUD> implements ITargetVisual {
     private final ModeSetting font;
-    
+
     public ExhibitionTargetHUD(String name, @NotNull TargetHUD parent) {
         super(name, parent);
         this.registerSetting(font = new ModeSetting("Font", new String[]{"Minecraft", "ProductSans", "Regular"}, 0));
     }
-    
+
+    private static Color getColor(@NotNull EntityLivingBase target) { // a VERY retarded way to do health colors :smile:
+        Color healthColor = new Color(0, 165, 0); //green
+        if (target.getHealth() < target.getMaxHealth() / 1.5)
+            healthColor = new Color(200, 200, 0); //yellow
+        if (target.getHealth() < target.getMaxHealth() / 2.5)
+            healthColor = new Color(200, 155, 0); //orange
+        if (target.getHealth() < target.getMaxHealth() / 4)
+            healthColor = new Color(120, 0, 0); //red
+        return healthColor;
+    }
+
+    public static void drawModel(final float yaw, final float pitch, final @NotNull EntityLivingBase entityLivingBase) { //method to draw model (skidded)
+        GlStateManager.resetColor();
+        GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+        GlStateManager.enableColorMaterial();
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(0.0f, 0.0f, 50.0f);
+        GlStateManager.scale(-50.0f, 50.0f, 50.0f);
+        GlStateManager.rotate(180.0f, 0.0f, 0.0f, 1.0f);
+        final float renderYawOffset = entityLivingBase.renderYawOffset;
+        final float rotationYaw = entityLivingBase.rotationYaw;
+        final float rotationPitch = entityLivingBase.rotationPitch;
+        final float prevRotationYawHead = entityLivingBase.prevRotationYawHead;
+        final float rotationYawHead = entityLivingBase.rotationYawHead;
+        GlStateManager.rotate(135.0f, 0.0f, 1.0f, 0.0f);
+        RenderHelper.enableStandardItemLighting();
+        GlStateManager.rotate(-135.0f, 0.0f, 1.0f, 0.0f);
+        GlStateManager.rotate((float) (-Math.atan(pitch / 40.0f) * 20.0), 1.0f, 0.0f, 0.0f);
+        entityLivingBase.renderYawOffset = yaw - 0.4f;
+        entityLivingBase.rotationYaw = yaw - 0.2f;
+        entityLivingBase.rotationPitch = pitch;
+        entityLivingBase.rotationYawHead = entityLivingBase.rotationYaw;
+        entityLivingBase.prevRotationYawHead = entityLivingBase.rotationYaw;
+        GlStateManager.translate(0.0f, 0.0f, 0.0f);
+        final RenderManager renderManager = mc.getRenderManager();
+        renderManager.setPlayerViewY(180.0f);
+        renderManager.setRenderShadow(false);
+        renderManager.renderEntityWithPosYaw(entityLivingBase, 0.0, 0.0, 0.0, 0.0f, 1.0f);
+        renderManager.setRenderShadow(true);
+        entityLivingBase.renderYawOffset = renderYawOffset;
+        entityLivingBase.rotationYaw = rotationYaw;
+        entityLivingBase.rotationPitch = rotationPitch;
+        entityLivingBase.prevRotationYawHead = prevRotationYawHead;
+        entityLivingBase.rotationYawHead = rotationYawHead;
+        GlStateManager.popMatrix();
+        RenderHelper.disableStandardItemLighting();
+        GlStateManager.disableRescaleNormal();
+        GlStateManager.setActiveTexture(OpenGlHelper.lightmapTexUnit);
+        GlStateManager.disableTexture2D();
+        GlStateManager.setActiveTexture(OpenGlHelper.defaultTexUnit);
+        GlStateManager.resetColor();
+    }
+
     private IFont getFont() {
         switch ((int) font.getInput()) {
             default:
@@ -102,58 +155,5 @@ public class ExhibitionTargetHUD extends SubMode<TargetHUD> implements ITargetVi
             drawModel(target.rotationYaw, target.rotationPitch, target); //drawing model
             GlStateManager.popMatrix(); //more gay shit
         }
-    }
-
-    private static Color getColor(@NotNull EntityLivingBase target) { // a VERY retarded way to do health colors :smile:
-        Color healthColor = new Color(0, 165, 0); //green
-        if (target.getHealth() < target.getMaxHealth() / 1.5)
-            healthColor = new Color(200, 200, 0); //yellow
-        if (target.getHealth() < target.getMaxHealth() / 2.5)
-            healthColor = new Color(200, 155, 0); //orange
-        if (target.getHealth() < target.getMaxHealth() / 4)
-            healthColor = new Color(120, 0, 0); //red
-        return healthColor;
-    }
-
-    public static void drawModel(final float yaw, final float pitch, final @NotNull EntityLivingBase entityLivingBase) { //method to draw model (skidded)
-        GlStateManager.resetColor();
-        GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-        GlStateManager.enableColorMaterial();
-        GlStateManager.pushMatrix();
-        GlStateManager.translate(0.0f, 0.0f, 50.0f);
-        GlStateManager.scale(-50.0f, 50.0f, 50.0f);
-        GlStateManager.rotate(180.0f, 0.0f, 0.0f, 1.0f);
-        final float renderYawOffset = entityLivingBase.renderYawOffset;
-        final float rotationYaw = entityLivingBase.rotationYaw;
-        final float rotationPitch = entityLivingBase.rotationPitch;
-        final float prevRotationYawHead = entityLivingBase.prevRotationYawHead;
-        final float rotationYawHead = entityLivingBase.rotationYawHead;
-        GlStateManager.rotate(135.0f, 0.0f, 1.0f, 0.0f);
-        RenderHelper.enableStandardItemLighting();
-        GlStateManager.rotate(-135.0f, 0.0f, 1.0f, 0.0f);
-        GlStateManager.rotate((float) (-Math.atan(pitch / 40.0f) * 20.0), 1.0f, 0.0f, 0.0f);
-        entityLivingBase.renderYawOffset = yaw - 0.4f;
-        entityLivingBase.rotationYaw = yaw - 0.2f;
-        entityLivingBase.rotationPitch = pitch;
-        entityLivingBase.rotationYawHead = entityLivingBase.rotationYaw;
-        entityLivingBase.prevRotationYawHead = entityLivingBase.rotationYaw;
-        GlStateManager.translate(0.0f, 0.0f, 0.0f);
-        final RenderManager renderManager = mc.getRenderManager();
-        renderManager.setPlayerViewY(180.0f);
-        renderManager.setRenderShadow(false);
-        renderManager.renderEntityWithPosYaw(entityLivingBase, 0.0, 0.0, 0.0, 0.0f, 1.0f);
-        renderManager.setRenderShadow(true);
-        entityLivingBase.renderYawOffset = renderYawOffset;
-        entityLivingBase.rotationYaw = rotationYaw;
-        entityLivingBase.rotationPitch = rotationPitch;
-        entityLivingBase.prevRotationYawHead = prevRotationYawHead;
-        entityLivingBase.rotationYawHead = rotationYawHead;
-        GlStateManager.popMatrix();
-        RenderHelper.disableStandardItemLighting();
-        GlStateManager.disableRescaleNormal();
-        GlStateManager.setActiveTexture(OpenGlHelper.lightmapTexUnit);
-        GlStateManager.disableTexture2D();
-        GlStateManager.setActiveTexture(OpenGlHelper.defaultTexUnit);
-        GlStateManager.resetColor();
     }
 }

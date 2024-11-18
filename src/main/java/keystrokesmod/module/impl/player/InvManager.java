@@ -22,7 +22,9 @@ import net.minecraft.network.play.client.C0DPacketCloseWindow;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class InvManager extends Module {
@@ -217,14 +219,14 @@ public class InvManager extends Module {
         return result;
     }
 
+    @Override
+    public String getInfo() {
+        return mode.getOptions()[(int) mode.getInput()];
+    }
+
     enum State {
         NONE,
         BEFORE,
         TASKING
-    }
-
-    @Override
-    public String getInfo() {
-        return mode.getOptions()[(int) mode.getInput()];
     }
 }

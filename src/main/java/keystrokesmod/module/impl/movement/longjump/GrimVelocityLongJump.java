@@ -2,7 +2,6 @@ package keystrokesmod.module.impl.movement.longjump;
 
 import keystrokesmod.event.PreMotionEvent;
 import keystrokesmod.event.ReceivePacketEvent;
-import keystrokesmod.mixins.impl.network.S27PacketExplosionAccessor;
 import keystrokesmod.module.impl.movement.LongJump;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.ModeSetting;
@@ -30,10 +29,9 @@ public class GrimVelocityLongJump extends SubMode<LongJump> {
     private final ButtonSetting timer;
     private final SliderSetting timerSpeed;
     private final ButtonSetting debug;
-
+    private final Queue<Packet<INetHandlerPlayClient>> delayedPackets = new ConcurrentLinkedQueue<>();
     private long lastVelocityTime = -1;
     private boolean delayed = false;
-    private final Queue<Packet<INetHandlerPlayClient>> delayedPackets = new ConcurrentLinkedQueue<>();
 
     public GrimVelocityLongJump(String name, @NotNull LongJump parent) {
         super(name, parent);
@@ -49,7 +47,7 @@ public class GrimVelocityLongJump extends SubMode<LongJump> {
     public void onReceivePacket(@NotNull ReceivePacketEvent event) {
         if (event.getPacket() instanceof S27PacketExplosion) {
             event.setCanceled(true);
-            delayedPackets.add((S27PacketExplosion) event.getPacket());
+            delayedPackets.add(event.getPacket());
         }
         if (event.getPacket() instanceof S12PacketEntityVelocity) {
             if (((S12PacketEntityVelocity) event.getPacket()).getEntityID() != mc.thePlayer.getEntityId()) return;
@@ -59,14 +57,14 @@ public class GrimVelocityLongJump extends SubMode<LongJump> {
                 delayed = true;
             }
             event.setCanceled(true);
-            delayedPackets.add((S12PacketEntityVelocity) event.getPacket());
+            delayedPackets.add(event.getPacket());
         } else if (event.getPacket() instanceof S32PacketConfirmTransaction) {
             if (delayed) {
                 if (System.currentTimeMillis() - lastVelocityTime >= (int) delayTime.getInput()) {
                     delayed = false;
                 }
                 event.setCanceled(true);
-                delayedPackets.add((S32PacketConfirmTransaction) event.getPacket());
+                delayedPackets.add(event.getPacket());
             }
         }
     }

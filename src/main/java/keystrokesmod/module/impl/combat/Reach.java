@@ -39,17 +39,6 @@ public class Reach extends Module {
         this.registerSetting(hitThroughBlocks = new ButtonSetting("Hit through blocks", false));
     }
 
-    public void guiUpdate() {
-        Utils.correctValue(min, max);
-    }
-
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public void e(@NotNull MouseEvent ev) {
-        if (ev.button >= 0 && ev.buttonstate && Utils.nullCheck()) {
-            call();
-        }
-    }
-
     public static void call() {
         if (!ModuleManager.reach.isEnabled()) return;
         if (Utils.nullCheck()
@@ -93,8 +82,7 @@ public class Reach extends Module {
             Vec3 zz4;
             if (rotations != null) {
                 zz4 = RotationUtils.getVectorForRotation(rotations[1], rotations[0]);
-            }
-            else {
+            } else {
                 zz4 = zz2.getLook(1.0F);
             }
             Vec3 zz5 = zz3.addVector(zz4.xCoord * reach, zz4.yCoord * reach, zz4.zCoord * reach);
@@ -143,6 +131,17 @@ public class Reach extends Module {
             } else {
                 return null;
             }
+        }
+    }
+
+    public void guiUpdate() {
+        Utils.correctValue(min, max);
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public void e(@NotNull MouseEvent ev) {
+        if (ev.button >= 0 && ev.buttonstate && Utils.nullCheck()) {
+            call();
         }
     }
 }

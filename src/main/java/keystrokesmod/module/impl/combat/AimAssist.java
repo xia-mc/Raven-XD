@@ -2,7 +2,8 @@ package keystrokesmod.module.impl.combat;
 
 
 import keystrokesmod.module.Module;
-import keystrokesmod.module.impl.combat.aimassist.*;
+import keystrokesmod.module.impl.combat.aimassist.NormalAimAssist;
+import keystrokesmod.module.impl.combat.aimassist.TejasAssist;
 import keystrokesmod.module.setting.impl.ModeValue;
 
 public class AimAssist extends Module {

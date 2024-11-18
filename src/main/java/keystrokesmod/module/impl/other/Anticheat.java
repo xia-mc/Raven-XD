@@ -50,6 +50,7 @@ public class Anticheat extends Module {
     private static ButtonSetting simulationCheck;
 
     private PlayerManager manager = new PlayerManager();
+
     public Anticheat() {
         super("Anticheat", category.other);
         this.registerSetting(new DescriptionSetting("Tries to detect cheaters."));

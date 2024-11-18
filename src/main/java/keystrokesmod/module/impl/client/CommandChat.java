@@ -13,11 +13,16 @@ import org.jetbrains.annotations.NotNull;
 public class CommandChat extends Module {
     private static final String[] IDENTIFIERS = new String[]{".", "#", "@"};
     private static final ModeSetting identifier = new ModeSetting("Identifier", IDENTIFIERS, 0);
+
     public CommandChat() {
         super("Command chat", category.client);
         this.registerSetting(identifier);
         this.canBeEnabled = false;
         MinecraftForge.EVENT_BUS.register(this);
+    }
+
+    public static String getIdentifier() {
+        return IDENTIFIERS[(int) identifier.getInput()];
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
@@ -31,9 +36,5 @@ public class CommandChat extends Module {
                 Commands.rCMD(message.substring(1));
             }
         }
-    }
-
-    public static String getIdentifier() {
-        return IDENTIFIERS[(int) identifier.getInput()];
     }
 }

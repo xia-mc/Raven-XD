@@ -14,10 +14,9 @@ public class SpinAntiAim extends SubMode<AntiAim> {
     private final SliderSetting speed = new SliderSetting("Speed", 25, -30, 30, 1);
     private final ButtonSetting constantPitch = new ButtonSetting("Constant pitch", true);
     private final SliderSetting pitch = new SliderSetting("Pitch", 90, -90, 90, 5, constantPitch::isToggled);
-
+    public boolean pitchReserve = false;
     private Float lastYaw = null;
     private Float lastPitch = null;
-    public boolean pitchReserve = false;
 
     public SpinAntiAim(String name, AntiAim parent) {
         super(name, parent);

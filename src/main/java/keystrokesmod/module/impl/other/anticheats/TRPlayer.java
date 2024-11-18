@@ -39,10 +39,14 @@ public class TRPlayer {
     public boolean lastSwing = false;
     public Vec2 currentRot = Vec2.ZERO;
     public Vec2 lastRot = Vec2.ZERO;
-    @Range(from = 0, to = 19) public List<Vec3> posHistory = new ArrayList<>(20);
-    @Range(from = 0, to = 19) public List<Vec3> motionHistory = new ArrayList<>(20);
-    @Range(from = 0, to = 19) public List<Vec3> vehicleMotionHistory = new ArrayList<>(20);
-    @Range(from = 0, to = 19) public List<Boolean> sprintHistory = new ArrayList<>(20);
+    @Range(from = 0, to = 19)
+    public List<Vec3> posHistory = new ArrayList<>(20);
+    @Range(from = 0, to = 19)
+    public List<Vec3> motionHistory = new ArrayList<>(20);
+    @Range(from = 0, to = 19)
+    public List<Vec3> vehicleMotionHistory = new ArrayList<>(20);
+    @Range(from = 0, to = 19)
+    public List<Boolean> sprintHistory = new ArrayList<>(20);
     public Vec3 lastOnGroundPos = Vec3.ZERO;
     public Vec3 lastOnGroundPos2 = Vec3.ZERO;
     public Vec3 lastInLiquidPos = Vec3.ZERO;
@@ -64,10 +68,6 @@ public class TRPlayer {
     public PlayerData compatPlayerData = new PlayerData();
 
     public @NotNull ScheduledExecutorService timeTask = Executors.newScheduledThreadPool(1);
-    @Contract("_ -> new")
-    public static @NotNull TRPlayer create(@NotNull AbstractClientPlayer player) {
-        return new TRPlayer(player, false);
-    }
 
     public TRPlayer(AbstractClientPlayer player, boolean self) {
         this.fabricPlayer = player;
@@ -83,8 +83,8 @@ public class TRPlayer {
         currentRot = new Vec2(fabricPlayer.rotationPitch, fabricPlayer.rotationYaw);
         currentOnGround = lastOnGround = lastOnGround2 = fabricPlayer.onGround;
         currentGameType = lastGameType =
-                        fabricPlayer.isSpectator() ? GameType.SPECTATOR :
-                                GameType.SURVIVAL;
+                fabricPlayer.isSpectator() ? GameType.SPECTATOR :
+                        GameType.SURVIVAL;
         for (int i = 0; i < 20; i++) {
             posHistory.add(currentPos);
         }
@@ -97,6 +97,11 @@ public class TRPlayer {
         for (int i = 0; i < 20; i++) {
             sprintHistory.add(currentSprint);
         }
+    }
+
+    @Contract("_ -> new")
+    public static @NotNull TRPlayer create(@NotNull AbstractClientPlayer player) {
+        return new TRPlayer(player, false);
     }
 
     public void update(AbstractClientPlayer player) {

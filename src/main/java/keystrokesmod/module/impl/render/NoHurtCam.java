@@ -9,8 +9,8 @@ import net.minecraft.network.play.server.S0BPacketAnimation;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class NoHurtCam extends Module {
-    public SliderSetting multiplier;
     private final ButtonSetting noHurtAnime;
+    public SliderSetting multiplier;
 
     public NoHurtCam() {
         super("NoHurtCam", category.render);

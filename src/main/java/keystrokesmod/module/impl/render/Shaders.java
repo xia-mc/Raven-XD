@@ -11,6 +11,7 @@ public class Shaders extends Module {
     private ModeSetting shader;
     private String[] shaderNames;
     private ResourceLocation[] shaderLocations;
+
     public Shaders() {
         super("Shaders", category.render);
         try {
@@ -19,8 +20,7 @@ public class Shaders extends Module {
             for (int i = 0; i < shaderLocations.length; ++i) {
                 shaderNames[i] = ((String[]) shaderLocations[i].getResourcePath().replaceFirst("shaders/post/", "").split("\\.json"))[0].toUpperCase();
             }
-        }
-        catch (IllegalAccessException ex) {
+        } catch (IllegalAccessException ex) {
             ex.printStackTrace();
             return;
         }
@@ -35,12 +35,10 @@ public class Shaders extends Module {
             if (Reflection.shaderIndex.getInt(mc.entityRenderer) != (int) shader.getInput()) {
                 Reflection.shaderIndex.setInt(mc.entityRenderer, (int) shader.getInput());
                 Reflection.loadShader.invoke(mc.entityRenderer, shaderLocations[(int) shader.getInput()]);
-            }
-            else if (!Reflection.useShader.getBoolean(mc.entityRenderer)) {
+            } else if (!Reflection.useShader.getBoolean(mc.entityRenderer)) {
                 Reflection.useShader.setBoolean(mc.entityRenderer, true);
             }
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
             Utils.sendMessage("&cError loading shader.");
             this.disable();

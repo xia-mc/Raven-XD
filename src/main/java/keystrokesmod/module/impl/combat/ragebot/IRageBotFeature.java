@@ -9,5 +9,6 @@ public class IRageBotFeature extends SubMode<RageBot> {
         super(name, parent);
     }
 
-    public void onFire() {}
+    public void onFire() {
+    }
 }

@@ -25,12 +25,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class NormalBlink extends SubMode<Module> {
+    public final ButtonSetting overlay;
+    public final List<Packet<?>> blinkedPackets = new ArrayList<>();
     private final ButtonSetting pulse;
     private final SliderSetting pulseDelay;
     private final ButtonSetting initialPosition;
-    public final ButtonSetting overlay;
-
-    public final List<Packet<?>> blinkedPackets = new ArrayList<>();
     private long startTime = -1;
     private Vec3 pos;
 

@@ -18,14 +18,14 @@ import java.util.function.Supplier;
 public class SliderSetting extends Setting implements InputSetting {
     private final String settingName;
     @Getter
+    private final double min;
+    private final double intervals;
+    public boolean isString;
+    @Getter
     private String[] options = null;
     private double defaultValue;
     @Getter
     private double max;
-    @Getter
-    private final double min;
-    private final double intervals;
-    public boolean isString;
     private String settingInfo = "";
 
     public SliderSetting(String settingName, double defaultValue, double min, double max, double intervals) {
@@ -70,6 +70,22 @@ public class SliderSetting extends Setting implements InputSetting {
         this.isString = true;
     }
 
+    public static double correctValue(double v, double i, double a) {
+        v = Math.max(i, v);
+        v = Math.min(a, v);
+        return v;
+    }
+
+    public static double roundToInterval(double v, int p) {
+        if (p < 0) {
+            return 0.0D;
+        } else {
+            BigDecimal bd = new BigDecimal(v);
+            bd = bd.setScale(p, RoundingMode.HALF_UP);
+            return bd.doubleValue();
+        }
+    }
+
     public String getPrettyInfo() {
         if (parent != null) {
             I18nModule i18nObject = parent.getI18nObject();
@@ -111,22 +127,6 @@ public class SliderSetting extends Setting implements InputSetting {
 
     public void setValueRaw(double n) {
         this.defaultValue = n;
-    }
-
-    public static double correctValue(double v, double i, double a) {
-        v = Math.max(i, v);
-        v = Math.min(a, v);
-        return v;
-    }
-
-    public static double roundToInterval(double v, int p) {
-        if (p < 0) {
-            return 0.0D;
-        } else {
-            BigDecimal bd = new BigDecimal(v);
-            bd = bd.setScale(p, RoundingMode.HALF_UP);
-            return bd.doubleValue();
-        }
     }
 
     @Override

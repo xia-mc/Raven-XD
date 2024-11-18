@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 
 
 public class BlinkA extends Check {
-    
+
     public BlinkA(@NotNull TRPlayer player) {
         super("BlinkA", player);
     }

@@ -30,6 +30,10 @@ public class BacktrackAntiVoid extends SubMode<AntiVoid> {
         this.registerSetting(clearXZMotion = new ButtonSetting("Clear xz motion", true));
     }
 
+    private static boolean predVoid() {
+        return Utils.overVoid(mc.thePlayer.posX + mc.thePlayer.motionX, mc.thePlayer.posY + mc.thePlayer.motionY, mc.thePlayer.posZ + mc.thePlayer.motionZ);
+    }
+
     @Override
     public void onUpdate() throws Throwable {
         if (fallbackPosition == null) {
@@ -68,10 +72,6 @@ public class BacktrackAntiVoid extends SubMode<AntiVoid> {
                 fallbackMotion = null;
             }
         }
-    }
-
-    private static boolean predVoid() {
-        return Utils.overVoid(mc.thePlayer.posX + mc.thePlayer.motionX, mc.thePlayer.posY + mc.thePlayer.motionY, mc.thePlayer.posZ + mc.thePlayer.motionZ);
     }
 
     @Override

@@ -13,11 +13,9 @@ public class DragClickAutoClicker extends SubMode<IAutoClicker> {
     private final SliderSetting maxLength = new SliderSetting("Max Length", 18, 1, 50, 1);
     private final SliderSetting minDelay = new SliderSetting("Min delay between", 6, 1, 20, 1);
     private final SliderSetting maxDelay = new SliderSetting("Max delay between", 6, 1, 20, 1);
-
-    private int nextLength, nextDelay;
-
     private final boolean left;
     private final boolean always;
+    private int nextLength, nextDelay;
 
     public DragClickAutoClicker(String name, @NotNull IAutoClicker parent, boolean left, boolean always) {
         super(name, parent);

@@ -25,11 +25,9 @@ import java.util.Arrays;
 public class AutoPot extends Module {
     private final SliderSetting health;
     private final ButtonSetting randomRot;
-
+    private final ArrayList<Integer> acceptedPotions = new ArrayList<>(Arrays.asList(6, 1, 5, 8, 14, 12, 10, 16));
     private int ticksSinceLastSplash, ticksSinceCanSplash, oldSlot;
     private boolean needSplash, switchBack;
-
-    private final ArrayList<Integer> acceptedPotions = new ArrayList<>(Arrays.asList(6, 1, 5, 8, 14, 12, 10, 16));
 
     public AutoPot() {
         super("AutoPot", category.player);
@@ -47,7 +45,7 @@ public class AutoPot extends Module {
     public void onRotation(RotationEvent event) {
         ticksSinceLastSplash++;
 
-        Block blockBelow = BlockUtils.getBlock(new BlockPos(mc.thePlayer.posX, mc.thePlayer.posY-1, mc.thePlayer.posZ ));
+        Block blockBelow = BlockUtils.getBlock(new BlockPos(mc.thePlayer.posX, mc.thePlayer.posY - 1, mc.thePlayer.posZ));
 
         if (mc.thePlayer.isInWater() || mc.thePlayer.isInLava() || (blockBelow instanceof BlockAir || blockBelow instanceof BlockLadder))
             ticksSinceCanSplash = 0;
@@ -94,7 +92,7 @@ public class AutoPot extends Module {
                                 if (!needSplash) {
                                     needSplash = true;
                                 } else {
-                                    mc.thePlayer.inventory.currentItem = i-36;
+                                    mc.thePlayer.inventory.currentItem = i - 36;
                                     final MovingObjectPosition hitResult = RotationUtils.rayCast(1, event.getPitch(), event.getYaw());
                                     if (hitResult != null) {
                                         mc.playerController.onPlayerRightClick(
