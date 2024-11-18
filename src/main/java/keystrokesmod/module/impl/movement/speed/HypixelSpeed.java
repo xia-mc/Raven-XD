@@ -17,7 +17,6 @@ import org.jetbrains.annotations.NotNull;
 
 public class HypixelSpeed extends SubMode<Speed> {
     private final ModeValue mode;
-    private final ButtonSetting fastTest;
     private final ButtonSetting strafe;
     private final SliderSetting minAngle;
     private final ButtonSetting fullStrafe;
@@ -31,7 +30,6 @@ public class HypixelSpeed extends SubMode<Speed> {
                 .add(new HypixelGroundSpeed("Ground", this))
                 .add(new HypixelLowHopSpeed("LowHop", this))
         );
-        this.registerSetting(fastTest = new ButtonSetting("Fast test", false));
         this.registerSetting(strafe = new ButtonSetting("Strafe", false));
         this.registerSetting(minAngle = new SliderSetting("Min angle", 30, 15, 90, 15, strafe::isToggled));
         this.registerSetting(fullStrafe = new ButtonSetting("Full strafe", false, strafe::isToggled));
@@ -46,11 +44,6 @@ public class HypixelSpeed extends SubMode<Speed> {
             } else {
                 MoveUtil.strafe(0.11);
             }
-        }
-
-        if (fastTest.isToggled() && mc.thePlayer.onGround) {
-            mc.thePlayer.motionX *= 1.114 - MoveUtil.getSpeedEffect() * .01 - Math.random() * 1E-4;
-            mc.thePlayer.motionZ *= 1.114 - MoveUtil.getSpeedEffect() * .01 - Math.random() * 1E-4;
         }
     }
 
@@ -78,10 +71,5 @@ public class HypixelSpeed extends SubMode<Speed> {
     @Override
     public void onDisable() {
         mode.disable();
-
-        if (fastTest.isToggled()) {
-            mc.thePlayer.motionX *= .8;
-            mc.thePlayer.motionZ *= .8;
-        }
     }
 }

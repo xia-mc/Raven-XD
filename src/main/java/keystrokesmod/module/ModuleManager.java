@@ -127,6 +127,7 @@ public class ModuleManager {
     public static Regen regen;
     public static ChatAI chatAI;
     public static keystrokesmod.module.impl.render.ArrayList arrayList;
+
     static List<Module> modules = new ArrayList<>();
 
     private static double getWidth(@NotNull Module module) {

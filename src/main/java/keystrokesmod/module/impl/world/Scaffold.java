@@ -61,6 +61,7 @@ public class Scaffold extends IAutoClicker {
     private final ButtonSetting moveFix;
     private final SliderSetting strafe;
     private final ButtonSetting notWhileDiagonal;
+    private final ButtonSetting notWhileTower;
     private final ModeValue sprint;
     private final ButtonSetting cancelSprint;
     private final ButtonSetting legit;
@@ -145,6 +146,7 @@ public class Scaffold extends IAutoClicker {
         this.registerSetting(motion = new SliderSetting("Motion", 1.0, 0.5, 1.2, 0.01, () -> !moveFix.isToggled()));
         this.registerSetting(strafe = new SliderSetting("Strafe", 0, 0, 90, 5));
         this.registerSetting(notWhileDiagonal = new ButtonSetting("Not while diagonal", true, () -> strafe.getInput() != 0));
+        this.registerSetting(notWhileTower = new ButtonSetting("Not while tower", false, () -> strafe.getInput() != 0));
         this.registerSetting(sprint = new ModeValue("Sprint", this)
                 .add(new DisabledSprint("Disabled", this))
                 .add(new VanillaSprint("Vanilla", this))
@@ -280,7 +282,7 @@ public class Scaffold extends IAutoClicker {
         float yaw = data.getYaw();
         float pitch = data.getPitch();
 
-        if (!isDiagonal() || !notWhileDiagonal.isToggled()) {
+        if ((!isDiagonal() || !notWhileDiagonal.isToggled()) && (!ModuleManager.tower.canTower() || !notWhileTower.isToggled())) {
             if (isDiagonal()) {
                 yaw += (float) strafe.getInput();
             } else {
