@@ -24,7 +24,7 @@ public class Sprint extends Module {
     public Sprint() {
         super("Sprint", Module.category.movement, 0);
         this.registerSetting(mode, omniMode);
-        //Only needs to work in legit mode
+        // This setting is only applicable in legit mode as omni mode handles sprinting differently
         this.registerSetting(disableWhileScaffold = new ButtonSetting("Disable While Scaffold", false, new ModeOnly(mode, 0)));
     }
 
