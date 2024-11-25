@@ -3,8 +3,8 @@ package keystrokesmod.module.impl.render;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
-import keystrokesmod.utility.render.RenderUtils;
 import keystrokesmod.utility.Utils;
+import keystrokesmod.utility.render.RenderUtils;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.tileentity.TileEntityEnderChest;
@@ -14,8 +14,13 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import java.awt.*;
 
 public class ChestESP extends Module {
-    private SliderSetting red, green, blue;
-    private ButtonSetting rainbow, outline, shade, disableIfOpened;
+    private final SliderSetting red;
+    private final SliderSetting green;
+    private final SliderSetting blue;
+    private final ButtonSetting rainbow;
+    private final ButtonSetting outline;
+    private final ButtonSetting shade;
+    private final ButtonSetting disableIfOpened;
 
     public ChestESP() {
         super("ChestESP", Module.category.render, 0);

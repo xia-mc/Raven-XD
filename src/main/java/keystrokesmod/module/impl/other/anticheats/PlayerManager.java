@@ -11,7 +11,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.ConcurrentModificationException;
+import java.util.Map;
+import java.util.UUID;
 
 public class PlayerManager {
     public Map<UUID, Boolean> activeMap;  // 实时活动玩家(可被检查)列表

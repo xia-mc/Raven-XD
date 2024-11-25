@@ -1,8 +1,8 @@
 package keystrokesmod.mixins.impl.gui;
 
 import keystrokesmod.module.ModuleManager;
-import keystrokesmod.module.impl.render.NoBackground;
 import keystrokesmod.module.impl.player.ChestStealer;
+import keystrokesmod.module.impl.render.NoBackground;
 import keystrokesmod.utility.Utils;
 import keystrokesmod.utility.render.BackgroundUtils;
 import net.minecraft.client.gui.GuiScreen;

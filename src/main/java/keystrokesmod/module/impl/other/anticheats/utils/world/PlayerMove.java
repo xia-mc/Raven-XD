@@ -12,7 +12,7 @@ import java.util.List;
 
 public class PlayerMove {
     public static double getXzTickSpeed(@NotNull Vec3 lastTick, @NotNull Vec3 currentTick) {
-            return getXZOnlyPos(currentTick).distanceTo(getXZOnlyPos(lastTick));
+        return getXZOnlyPos(currentTick).distanceTo(getXZOnlyPos(lastTick));
     }
 
     public static double getXzSecSpeed(@NotNull Vec3 lastTick, @NotNull Vec3 currentTick) {
@@ -32,7 +32,7 @@ public class PlayerMove {
                     .orElseThrow(NullPointerException::new)
                     .getAmplifier() + 1;
 //            return -9.331952072919326 * x * x - 3.672263213983712 * x + 0.6261016701268645;  // chat gpt
-          return 0.04837 * x + 0.5356 * x + 1.252;  // numpy
+            return 0.04837 * x + 0.5356 * x + 1.252;  // numpy
         } catch (NullPointerException e) {
             return 1.252203340253729;
         }

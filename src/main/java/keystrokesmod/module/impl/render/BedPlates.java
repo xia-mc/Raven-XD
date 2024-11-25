@@ -7,6 +7,7 @@ import keystrokesmod.utility.BlockUtils;
 import keystrokesmod.utility.CoolDown;
 import keystrokesmod.utility.ShaderUtils;
 import keystrokesmod.utility.Utils;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockBed;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.gui.Gui;
@@ -14,7 +15,6 @@ import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
-import net.minecraft.block.Block;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
@@ -22,8 +22,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
-import java.util.*;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -34,11 +34,11 @@ public class BedPlates extends Module {
     public static SliderSetting updateRate, yShift, layers;
     private final CoolDown updateCooldown = new CoolDown(0);
     private final ButtonSetting showDistance;
-    private BlockPos[] bed = null;
     private final SliderSetting range;
     private final List<BlockPos> beds = new ArrayList<>();
     private final ButtonSetting firstBed;
     private final List<List<Block>> bedBlocks = new ArrayList<>();
+    private BlockPos[] bed = null;
 
     public BedPlates() {
         super("Bed Plates", category.render);
@@ -48,6 +48,24 @@ public class BedPlates extends Module {
         this.registerSetting(range = new SliderSetting("Range", 10.0, 2.0, 30.0, 1.0));
         this.registerSetting(layers = new SliderSetting("Layers", 3, 1, 10, 1));
         this.registerSetting(firstBed = new ButtonSetting("Only render first bed", false));
+    }
+
+    public static void drawRound(double x, double y, double width, double height, double radius, @NotNull Color color) {
+        GlStateManager.color(1, 1, 1, 1);
+        roundedShader.init();
+
+        setupRoundedRectUniforms(x, y, width, height, radius);
+        roundedShader.setUniformf("color", color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, color.getAlpha() / 255f);
+
+        ShaderUtils.drawQuads(x - 1, y - 1, width + 2, height + 2);
+        roundedShader.unload();
+    }
+
+    private static void setupRoundedRectUniforms(double x, double y, double width, double height, double radius) {
+        ScaledResolution sr = new ScaledResolution(mc);
+        BedPlates.roundedShader.setUniformf("location", x * sr.getScaleFactor(), (mc.displayHeight - (height * sr.getScaleFactor())) - (y * sr.getScaleFactor()));
+        BedPlates.roundedShader.setUniformf("rectSize", width * sr.getScaleFactor(), height * sr.getScaleFactor());
+        BedPlates.roundedShader.setUniformf("radius", radius * sr.getScaleFactor());
     }
 
     public void onUpdate() {
@@ -140,12 +158,12 @@ public class BedPlates extends Module {
         glScaled(-0.01666666753590107D * Math.sqrt(mc.thePlayer.getDistance(blockPos.getX(), blockPos.getY(), blockPos.getZ())), -0.01666666753590107D * Math.sqrt(mc.thePlayer.getDistance(blockPos.getX(), blockPos.getY(), blockPos.getZ())), 0.01666666753590107D * Math.sqrt(mc.thePlayer.getDistance(blockPos.getX(), blockPos.getY(), blockPos.getZ())));
         List<Block> blocks = bedBlocks.get(index);
         drawRound(Math.max(17.5, blocks.size() * 17.5) / -2, -0.5, Math.max(17.5, blocks.size() * 17.5) - 2.5, 26.5, 3, new Color(0, 0, 0, 90));
-        if(showDistance.isToggled()) {
+        if (showDistance.isToggled()) {
             String dist = Math.round(mc.thePlayer.getDistance(blockPos.getX(), blockPos.getY(), blockPos.getZ())) + "m";
             mc.fontRendererObj.drawString(dist, -mc.fontRendererObj.getStringWidth(dist) / 2, 0, new Color(255, 255, 255, 255).getRGB());
         }
         double offset = (blocks.size() * -17.5) / 2;
-        for (Block block :blocks) {
+        for (Block block : blocks) {
             mc.getTextureManager().bindTexture(new ResourceLocation("keystrokesmod:images/" + block.getLocalizedName() + ".png"));
             Gui.drawModalRectWithCustomSizedTexture((int) offset, 10, 0, 0, 15, 15, 15, 15);
             offset += 17.5;
@@ -203,23 +221,5 @@ public class BedPlates extends Module {
                 block.equals(Blocks.log) || block.equals(Blocks.log2) ||
                 block.equals(Blocks.end_stone) || block.equals(Blocks.obsidian) ||
                 block.equals(Blocks.water);
-    }
-
-    public static void drawRound(double x, double y, double width, double height, double radius, @NotNull Color color) {
-        GlStateManager.color(1, 1, 1, 1);
-        roundedShader.init();
-
-        setupRoundedRectUniforms(x, y, width, height, radius);
-        roundedShader.setUniformf("color", color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, color.getAlpha() / 255f);
-
-        ShaderUtils.drawQuads(x - 1, y - 1, width + 2, height + 2);
-        roundedShader.unload();
-    }
-
-    private static void setupRoundedRectUniforms(double x, double y, double width, double height, double radius) {
-        ScaledResolution sr = new ScaledResolution(mc);
-        BedPlates.roundedShader.setUniformf("location", x * sr.getScaleFactor(), (mc.displayHeight - (height * sr.getScaleFactor())) - (y * sr.getScaleFactor()));
-        BedPlates.roundedShader.setUniformf("rectSize", width * sr.getScaleFactor(), height * sr.getScaleFactor());
-        BedPlates.roundedShader.setUniformf("radius", radius * sr.getScaleFactor());
     }
 }

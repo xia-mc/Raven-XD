@@ -3,7 +3,6 @@ package keystrokesmod.module.impl.render;
 import keystrokesmod.event.PreMotionEvent;
 import keystrokesmod.event.ReceivePacketEvent;
 import keystrokesmod.module.Module;
-import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.setting.impl.ModeSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.utility.Utils;
@@ -21,8 +20,8 @@ public class Ambience extends Module {
 
     public Ambience() {
         super("Ambience", category.render);
-        this.registerSetting(time = new SliderSetting("Time", 0,0, 24000, 10));
-        this.registerSetting(speed = new SliderSetting("Speed", 0,0, 20, 1));
+        this.registerSetting(time = new SliderSetting("Time", 0, 0, 24000, 10));
+        this.registerSetting(speed = new SliderSetting("Speed", 0, 0, 20, 1));
 
         String[] MODES = new String[]{"Unchanged", "Clear", "Rain"};
         this.registerSetting(weather = new ModeSetting("Weather", MODES, 0));
@@ -74,9 +73,7 @@ public class Ambience extends Module {
     public void onReceivePacket(@NotNull ReceivePacketEvent event) {
         if (event.getPacket() instanceof S03PacketTimeUpdate) {
             event.setCanceled(true);
-        }
-
-        else if (event.getPacket() instanceof S2BPacketChangeGameState && this.weather.getInput() != 0) {
+        } else if (event.getPacket() instanceof S2BPacketChangeGameState && this.weather.getInput() != 0) {
             S2BPacketChangeGameState s2b = (S2BPacketChangeGameState) event.getPacket();
 
             if (s2b.getGameState() == 1 || s2b.getGameState() == 2) {

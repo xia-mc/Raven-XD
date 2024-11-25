@@ -24,11 +24,11 @@ public class BreakProgress extends Module {
     private final ButtonSetting manual;
     private final ButtonSetting bedAura;
     private final ButtonSetting progressBar;
+    private final Animation progressAnimation = new Animation(Easing.EASE_OUT_CIRC, 200);
+    private final Progress progressObj = new Progress("BedAura");
     private double progress;
     private BlockPos block;
     private String progressStr;
-    private final Animation progressAnimation = new Animation(Easing.EASE_OUT_CIRC, 200);
-    private final Progress progressObj = new Progress("BedAura");
 
     public BreakProgress() {
         super("BreakProgress", category.render);
@@ -74,11 +74,11 @@ public class BreakProgress extends Module {
     private void setProgress() {
         switch ((int) mode.getInput()) {
             case 0: {
-                this.progressStr = (int) (100.0 * (this.progress / 1.0)) + "%";
+                this.progressStr = (int) (100.0 * (this.progress)) + "%";
                 break;
             }
             case 1: {
-                double timeLeft = Utils.rnd((double) ((1.0f - this.progress) / BlockUtils.getBlockHardness(BlockUtils.getBlock(this.block), mc.thePlayer.getHeldItem(), false, false)) / 20.0, 1);
+                double timeLeft = Utils.rnd((1.0f - this.progress) / BlockUtils.getBlockHardness(BlockUtils.getBlock(this.block), mc.thePlayer.getHeldItem(), false, false) / 20.0, 1);
                 this.progressStr = timeLeft == 0 ? "0" : timeLeft + "s";
                 break;
             }

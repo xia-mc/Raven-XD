@@ -24,6 +24,7 @@ public abstract class IScaffoldSprint extends SubMode<Scaffold> {
 
     /**
      * The final rotation data before set.
+     *
      * @param data rotation data
      * @return the new rotation data
      */

@@ -15,8 +15,8 @@ import org.lwjgl.opengl.GL11;
 import java.awt.*;
 
 public class Blink extends Module {
-    private final ModeValue mode;
     public static final int color = new Color(255, 255, 255, 200).getRGB();
+    private final ModeValue mode;
 
     public Blink() {
         super("Blink", category.player);
@@ -24,21 +24,6 @@ public class Blink extends Module {
                 .add(new NormalBlink("Normal", this))
                 .add(new FakeLagBlink("FakeLag", this))
         );
-    }
-
-    @Override
-    public void onEnable() throws Throwable {
-        mode.enable();
-    }
-
-    @Override
-    public void onDisable() throws Throwable {
-        mode.disable();
-    }
-
-    @Override
-    public String getInfo() {
-        return mode.getSelected().getInfo();
     }
 
     public static boolean isBlinking() {
@@ -76,6 +61,21 @@ public class Blink extends Module {
         GL11.glDepthMask(true);
         GL11.glDisable(3042);
         GlStateManager.popMatrix();
+    }
+
+    @Override
+    public void onEnable() throws Throwable {
+        mode.enable();
+    }
+
+    @Override
+    public void onDisable() throws Throwable {
+        mode.disable();
+    }
+
+    @Override
+    public String getInfo() {
+        return mode.getSelected().getInfo();
     }
 }
 

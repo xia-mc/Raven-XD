@@ -3,7 +3,10 @@ package keystrokesmod.module.impl.movement.speed.hypixel;
 import keystrokesmod.module.impl.exploit.disabler.hypixel.HypixelMotionDisabler;
 import keystrokesmod.module.impl.movement.speed.HypixelSpeed;
 import keystrokesmod.module.impl.movement.speed.hypixel.lowhop.HypixelLowHopPredictSpeed;
-import keystrokesmod.module.setting.impl.*;
+import keystrokesmod.module.setting.impl.ButtonSetting;
+import keystrokesmod.module.setting.impl.DescriptionSetting;
+import keystrokesmod.module.setting.impl.ModeValue;
+import keystrokesmod.module.setting.impl.SubMode;
 import org.jetbrains.annotations.NotNull;
 
 /**

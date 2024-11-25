@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 public class SpeedA extends Check {
     public boolean hasJumped = false;
     public short jumpTick = 0;
+
     public SpeedA(@NotNull TRPlayer player) {
         super("SpeedA", player);
     }
@@ -25,7 +26,8 @@ public class SpeedA extends Check {
         if (jumpTick > 0) jumpTick--;
 
         // check if player is on ground (not in liquid or in water)
-        if (player.lastPos == null || player.hasSetback || !player.currentOnGround || !player.lastOnGround || player.fabricPlayer.isInWater()) return;
+        if (player.lastPos == null || player.hasSetback || !player.currentOnGround || !player.lastOnGround || player.fabricPlayer.isInWater())
+            return;
 
         double maxSecSpeed;
         if (jumpTick > 0)

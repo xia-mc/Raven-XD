@@ -18,7 +18,7 @@ public class LogUtils {
             final ChatComponentText chatComponentText = new ChatComponentText(String.format("%s§r §r%s§r %s§r §b%s§r | %s§r", "§b§lTR§r§l>", player, "failed", module, extraMsg));
             final ChatStyle chatStyle = new ChatStyle();
             chatStyle.setChatClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/wdr " + player));
-            ((IChatComponent)chatComponentText).appendSibling(new ChatComponentText(Utils.formatColor(" §7[§cWDR§7]")).setChatStyle(chatStyle));
+            ((IChatComponent) chatComponentText).appendSibling(new ChatComponentText(Utils.formatColor(" §7[§cWDR§7]")).setChatStyle(chatStyle));
             Raven.mc.thePlayer.addChatMessage(chatComponentText);
             if (Anticheat.getShouldPing().isToggled()) {
                 switch ((int) Anticheat.getPingSound().getInput()) {

@@ -39,7 +39,7 @@ public class WurstTargetHUD extends SubMode<TargetHUD> implements ITargetVisual 
         double x = TargetHUD.current$minX;
         double y = TargetHUD.current$minY;
 
-        RenderUtils.drawRect(x, y,  x + 185, y + 34, new Color(255, 255, 255, 100).getRGB());
+        RenderUtils.drawRect(x, y, x + 185, y + 34, new Color(255, 255, 255, 100).getRGB());
         getFont().drawString("Name: " + name, x + 4, y + 4, Color.BLACK.getRGB());
 
         double health = Math.min(Math.round(target.getHealth()), target.getMaxHealth());

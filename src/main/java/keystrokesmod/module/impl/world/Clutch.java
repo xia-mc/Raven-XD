@@ -11,7 +11,10 @@ import keystrokesmod.module.setting.impl.ModeSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.utils.ModeOnly;
 import keystrokesmod.script.classes.Vec3;
-import keystrokesmod.utility.*;
+import keystrokesmod.utility.BlockUtils;
+import keystrokesmod.utility.ContainerUtils;
+import keystrokesmod.utility.RotationUtils;
+import keystrokesmod.utility.Utils;
 import keystrokesmod.utility.aim.AimSimulator;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
@@ -74,7 +77,8 @@ public class Clutch extends Module {
         double minDistance = Double.MAX_VALUE;
         Triple<BlockPos, EnumFacing, Vec3> bestPlace = null;
         for (BlockPos block : blocks) {
-            if (!BlockUtils.replaceable(block) || BlockUtils.isSamePos(block, position) || BlockUtils.isSamePos(block, position.up())) continue;
+            if (!BlockUtils.replaceable(block) || BlockUtils.isSamePos(block, position) || BlockUtils.isSamePos(block, position.up()))
+                continue;
 
             final Optional<Triple<BlockPos, EnumFacing, Vec3>> optional = RotationUtils.getPlaceSide(block);
             if (!optional.isPresent()) continue;

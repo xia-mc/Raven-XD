@@ -30,12 +30,11 @@ public class DynamicFakeLag extends SubMode<FakeLag> {
     private final SliderSetting stopRange;
     private final SliderSetting maxTargetRange;
     private final ButtonSetting debug;
-
+    private final Queue<TimedPacket> packetQueue = new ConcurrentLinkedQueue<>();
     private AbstractClientPlayer target = null;
     private long lastDisableTime = -1;
     private boolean lastHurt = false;
     private long lastStartBlinkTime = -1;
-    private final Queue<TimedPacket> packetQueue = new ConcurrentLinkedQueue<>();
 
     public DynamicFakeLag(String name, @NotNull FakeLag parent) {
         super(name, parent);
@@ -94,14 +93,15 @@ public class DynamicFakeLag extends SubMode<FakeLag> {
                 blink.disable();
             } else if (!blink.isEnabled() && distance > stopRange.getInput()
                     && new Vec3(mc.thePlayer).distanceTo(target) < startRange.getInput()) {
-                if (debug.isToggled()) Utils.sendModuleMessage(parent,  "start lag: in range.");
+                if (debug.isToggled()) Utils.sendModuleMessage(parent, "start lag: in range.");
                 lastStartBlinkTime = System.currentTimeMillis();
                 blink.enable();
             } else if (blink.isEnabled() && distance > startRange.getInput()) {
                 if (debug.isToggled()) Utils.sendModuleMessage(parent, "stop lag: out of range.");
                 blink.disable();
             } else if (distance > maxTargetRange.getInput()) {
-                if (debug.isToggled()) Utils.sendModuleMessage(parent, String.format("release target: %s", target.getName()));
+                if (debug.isToggled())
+                    Utils.sendModuleMessage(parent, String.format("release target: %s", target.getName()));
                 target = null;
                 blink.disable();
             }
@@ -109,7 +109,7 @@ public class DynamicFakeLag extends SubMode<FakeLag> {
 
         lastHurt = mc.thePlayer.hurtTime > 0;
     }
-    
+
     @SubscribeEvent
     public void onAttack(@NotNull AttackEntityEvent e) {
         if (e.target instanceof AbstractClientPlayer) {

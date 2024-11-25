@@ -27,9 +27,9 @@ public class GrimACAdvancedVelocity extends SubMode<GrimACVelocity> {
     private final ButtonSetting test;
 
     public boolean velocityInput;
+    public float velocityYaw;
     private boolean attacked;
     private double reduceXZ;
-    public float velocityYaw;
     private int skipTicks = 0;
 
     public GrimACAdvancedVelocity(String name, @NotNull GrimACVelocity parent) {
@@ -65,10 +65,11 @@ public class GrimACAdvancedVelocity extends SubMode<GrimACVelocity> {
             }
         }
     }
-    
+
     @SubscribeEvent
     public void onPreVelocity(PreVelocityEvent event) {
-        if(notWhileEating.isToggled() && mc.thePlayer.getHeldItem() != null && mc.thePlayer.getHeldItem().getItem() instanceof ItemFood && mc.thePlayer.isUsingItem())return;
+        if (notWhileEating.isToggled() && mc.thePlayer.getHeldItem() != null && mc.thePlayer.getHeldItem().getItem() instanceof ItemFood && mc.thePlayer.isUsingItem())
+            return;
 
         double x = event.getMotionX() / 8000D;
         double z = event.getMotionZ() / 8000D;

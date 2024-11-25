@@ -11,7 +11,7 @@ import net.minecraft.util.BlockPos;
 import org.jetbrains.annotations.NotNull;
 
 public class ScaffoldB extends Check {
-    public ScaffoldB( @NotNull TRPlayer player) {
+    public ScaffoldB(@NotNull TRPlayer player) {
         super("ScaffoldB", player);
     }
 

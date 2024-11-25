@@ -22,6 +22,7 @@ public class Notifications extends Module {
     public static ModeValue mode;
     public static ButtonSetting chatNoti;
     public static ButtonSetting moduleToggled;
+
     public Notifications() {
         super("Notifications", category.client);
         this.registerSetting(mode = new ModeValue("Mode", this)
@@ -29,17 +30,6 @@ public class Notifications extends Module {
         );
         this.registerSetting(chatNoti = new ButtonSetting("Show in chat", false));
         this.registerSetting(moduleToggled = new ButtonSetting("Module toggled", true));
-    }
-
-    @Override
-    public void onEnable() {
-        mode.enable();
-        notifs.clear();
-    }
-
-    @Override
-    public void onDisable() {
-        mode.disable();
     }
 
     public static void sendNotification(NotificationTypes notificationType, String message) {
@@ -63,6 +53,17 @@ public class Notifications extends Module {
         } else {
             Utils.sendMessage("&7[&1LI&7-" + ((notificationType == NotificationTypes.INFO) ? "&1" : notificationType == NotificationTypes.WARN ? "&e" : "&4") + notificationType.toString() + "&7]&r " + message);
         }
+    }
+
+    @Override
+    public void onEnable() {
+        mode.enable();
+        notifs.clear();
+    }
+
+    @Override
+    public void onDisable() {
+        mode.disable();
     }
 
     @SubscribeEvent

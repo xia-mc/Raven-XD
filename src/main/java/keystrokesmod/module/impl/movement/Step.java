@@ -2,7 +2,6 @@ package keystrokesmod.module.impl.movement;
 
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.movement.step.Hypixel15Step;
-import keystrokesmod.module.impl.movement.step.HypixelStep;
 import keystrokesmod.module.setting.impl.ModeValue;
 
 public class Step extends Module {
@@ -12,7 +11,6 @@ public class Step extends Module {
         super("Step", category.movement);
         this.registerSetting(mode = new ModeValue("Mode", this)
                 .add(new Hypixel15Step("Hypixel 1.5", this))
-                .add(new HypixelStep("Hypixel", this))
         );
     }
 

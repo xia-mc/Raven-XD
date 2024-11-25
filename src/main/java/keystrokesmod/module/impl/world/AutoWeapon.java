@@ -1,7 +1,6 @@
 package keystrokesmod.module.impl.world;
 
 import keystrokesmod.event.PreMotionEvent;
-import keystrokesmod.event.PreUpdateEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.other.SlotHandler;
 import keystrokesmod.module.setting.impl.ButtonSetting;
@@ -12,7 +11,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.lwjgl.input.Mouse;
 
 
@@ -24,6 +22,7 @@ public class AutoWeapon extends Module {
     private int previousSlot = -1;
     private int ticksHovered;
     private Entity currentEntity;
+
     public AutoWeapon() {
         super("AutoWeapon", category.world);
         this.registerSetting(hoverDelay = new SliderSetting("Hover delay", 0.0, 0.0, 20.0, 1.0));
@@ -74,6 +73,7 @@ public class AutoWeapon extends Module {
             }
         }
     }
+
     private void resetVariables() {
         ticksHovered = 0;
         resetSlot();

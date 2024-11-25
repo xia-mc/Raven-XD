@@ -11,16 +11,13 @@ import keystrokesmod.utility.ai.chatgpt.ConversationContext;
 import keystrokesmod.utility.ai.chatgpt.GPTModel;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
 import java.util.Collections;
 
 public class ChatGPTChatAI extends IChatAI {
-    private @NotNull String apiKey = "";
-
     private final ModeSetting model;
     private final ButtonSetting keepContext;
     private final ButtonSetting clearContextOnDisable;
-
+    private @NotNull String apiKey = "";
     private ChatGPTClient client = null;
     private ConversationContext context = null;
     private boolean working = false;

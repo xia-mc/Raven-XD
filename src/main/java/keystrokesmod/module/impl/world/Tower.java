@@ -3,10 +3,11 @@ package keystrokesmod.module.impl.world;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.world.tower.*;
-import keystrokesmod.module.setting.impl.*;
+import keystrokesmod.module.setting.impl.ButtonSetting;
+import keystrokesmod.module.setting.impl.DescriptionSetting;
+import keystrokesmod.module.setting.impl.ModeValue;
 import keystrokesmod.utility.MoveUtil;
 import keystrokesmod.utility.Utils;
-import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -42,7 +43,7 @@ public class Tower extends Module {
         this.canBeEnabled = false;
 
         mode.enable();
-        MinecraftForge.EVENT_BUS.register(new Object(){
+        MinecraftForge.EVENT_BUS.register(new Object() {
             @SubscribeEvent
             public void onUpdate(TickEvent.ClientTickEvent event) {
                 final boolean curCanTower = canTower();
@@ -58,14 +59,11 @@ public class Tower extends Module {
         if (mc.currentScreen != null) return false;
         if (!Utils.nullCheck() || !Utils.jumpDown()) {
             return false;
-        }
-        else if (disableWhileHurt.isToggled() && mc.thePlayer.hurtTime >= 9) {
+        } else if (disableWhileHurt.isToggled() && mc.thePlayer.hurtTime >= 9) {
             return false;
-        }
-        else if (disableWhileCollided.isToggled() && mc.thePlayer.isCollidedHorizontally) {
+        } else if (disableWhileCollided.isToggled() && mc.thePlayer.isCollidedHorizontally) {
             return false;
-        }
-        else return modulesEnabled();
+        } else return modulesEnabled();
     }
 
     public boolean modulesEnabled() {

@@ -17,7 +17,7 @@ public class NoFallA extends Check {
         if (!player.fabricPlayer.capabilities.isFlying) {
             double serverPosX = (double) player.fabricPlayer.serverPosX / 32;
             double serverPosY = (double) player.fabricPlayer.serverPosY / 32;
-            double serverPosZ= (double) player.fabricPlayer.serverPosZ / 32;
+            double serverPosZ = (double) player.fabricPlayer.serverPosZ / 32;
             double deltaX = Math.abs(player.compatPlayerData.serverPosX - serverPosX);
             double deltaY = player.compatPlayerData.serverPosY - serverPosY;
             double deltaZ = Math.abs(player.compatPlayerData.serverPosZ - serverPosZ);

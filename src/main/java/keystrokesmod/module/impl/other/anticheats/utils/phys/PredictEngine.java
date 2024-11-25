@@ -153,7 +153,7 @@ public class PredictEngine extends EntityPlayer implements Cloneable {
     }
 
     private boolean isHeadspaceFree(BlockPos p_isHeadspaceFree_1_, int p_isHeadspaceFree_2_) {
-        for(int y = 0; y < p_isHeadspaceFree_2_; ++y) {
+        for (int y = 0; y < p_isHeadspaceFree_2_; ++y) {
             if (!this.isOpenBlockSpace(p_isHeadspaceFree_1_.add(0, y, 0))) {
                 return false;
             }
@@ -167,7 +167,7 @@ public class PredictEngine extends EntityPlayer implements Cloneable {
             BlockPos blockpos = new BlockPos(p_pushOutOfBlocks_1_, p_pushOutOfBlocks_3_, p_pushOutOfBlocks_5_);
             double d0 = p_pushOutOfBlocks_1_ - (double) blockpos.getX();
             double d1 = p_pushOutOfBlocks_5_ - (double) blockpos.getZ();
-            int entHeight = Math.max((int) Math.ceil((double) this.height), 1);
+            int entHeight = Math.max((int) Math.ceil(this.height), 1);
             boolean inTranslucentBlock = !this.isHeadspaceFree(blockpos, entHeight);
             if (inTranslucentBlock) {
                 int i = -1;
@@ -226,10 +226,10 @@ public class PredictEngine extends EntityPlayer implements Cloneable {
             var10000.moveForward *= 0.2F;
         }
 
-        this.pushOutOfBlocks(this.posX - (double)this.width * 0.35, this.getEntityBoundingBox().minY + 0.5, this.posZ + (double)this.width * 0.35);
-        this.pushOutOfBlocks(this.posX - (double)this.width * 0.35, this.getEntityBoundingBox().minY + 0.5, this.posZ - (double)this.width * 0.35);
-        this.pushOutOfBlocks(this.posX + (double)this.width * 0.35, this.getEntityBoundingBox().minY + 0.5, this.posZ - (double)this.width * 0.35);
-        this.pushOutOfBlocks(this.posX + (double)this.width * 0.35, this.getEntityBoundingBox().minY + 0.5, this.posZ + (double)this.width * 0.35);
+        this.pushOutOfBlocks(this.posX - (double) this.width * 0.35, this.getEntityBoundingBox().minY + 0.5, this.posZ + (double) this.width * 0.35);
+        this.pushOutOfBlocks(this.posX - (double) this.width * 0.35, this.getEntityBoundingBox().minY + 0.5, this.posZ - (double) this.width * 0.35);
+        this.pushOutOfBlocks(this.posX + (double) this.width * 0.35, this.getEntityBoundingBox().minY + 0.5, this.posZ - (double) this.width * 0.35);
+        this.pushOutOfBlocks(this.posX + (double) this.width * 0.35, this.getEntityBoundingBox().minY + 0.5, this.posZ + (double) this.width * 0.35);
 
         if (this.capabilities.allowFlying) {
             if (player.currentGameType == WorldSettings.GameType.SPECTATOR) {

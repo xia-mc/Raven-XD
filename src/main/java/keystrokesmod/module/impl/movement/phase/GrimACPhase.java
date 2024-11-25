@@ -23,6 +23,14 @@ public class GrimACPhase extends SubMode<Phase> {
         this.registerSetting(onlyMurderMystery = new ButtonSetting("Only murder mystery", false));
     }
 
+    private static boolean isMurderMystery() {
+        try {
+            return Utils.getSidebarLines().get(0).contains("MURDER");
+        } catch (IndexOutOfBoundsException e) {
+            return false;
+        }
+    }
+
     @SubscribeEvent
     public void onWorldChange(WorldChangeEvent event) {
         if (!onlyMurderMystery.isToggled() || isMurderMystery())
@@ -46,13 +54,5 @@ public class GrimACPhase extends SubMode<Phase> {
     @Override
     public void onDisable() {
         blink.disable();
-    }
-
-    private static boolean isMurderMystery() {
-        try {
-            return Utils.getSidebarLines().get(0).contains("MURDER");
-        } catch (IndexOutOfBoundsException e) {
-            return false;
-        }
     }
 }

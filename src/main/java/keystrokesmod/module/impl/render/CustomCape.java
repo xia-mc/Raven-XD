@@ -15,21 +15,21 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static com.mojang.realmsclient.gui.ChatFormatting.*;
 
 public final class CustomCape extends Module {
-    private static File directory;
+    public static final List<ResourceLocation> LOADED_CAPES = new ArrayList<>();
     public static String[] CAPES_NAME = new String[]{
             "RavenAnime", "RavenAqua", "RavenGreen", "RavenPurple", "RavenRed", "RavenWhite", "RavenYellow",
             "Cherry", "Die",
             "Astolfo"
     };
-    public static final List<ResourceLocation> LOADED_CAPES = new ArrayList<>();
     public static final ModeSetting cape = new ModeSetting("Cape", CAPES_NAME, 0);
+    private static File directory;
 
     public CustomCape() {
         super("CustomCape", category.render);
@@ -47,8 +47,7 @@ public final class CustomCape extends Module {
         this.registerSetting(new ButtonSetting("Open folder", () -> {
             try {
                 Desktop.getDesktop().open(directory);
-            }
-            catch (IOException ex) {
+            } catch (IOException ex) {
                 Raven.profileManager.directory.mkdirs();
                 Utils.sendMessage("&cError locating folder, recreated.");
             }

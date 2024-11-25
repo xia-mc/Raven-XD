@@ -1,7 +1,8 @@
 package keystrokesmod.module.impl.combat;
 
-import keystrokesmod.event.*;
-import keystrokesmod.mixins.impl.network.S14PacketEntityAccessor;
+import keystrokesmod.event.PreMoveEvent;
+import keystrokesmod.event.PreUpdateEvent;
+import keystrokesmod.event.SendPacketEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.other.SlotHandler;
 import keystrokesmod.module.impl.player.Blink;
@@ -18,11 +19,9 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.Packet;
-import net.minecraft.network.play.INetHandlerPlayClient;
-import net.minecraft.network.play.client.*;
-import net.minecraft.network.play.server.*;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.network.play.client.C03PacketPlayer;
+import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
+import net.minecraft.network.play.client.C09PacketHeldItemChange;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -33,24 +32,21 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class AutoGapple extends Module {
+    public final ButtonSetting disableKillAura;
     private final SliderSetting minHealth;
     private final SliderSetting delayBetweenHeal;
-    public final ButtonSetting disableKillAura;
     private final ButtonSetting airStuck;
     private final ButtonSetting blink;
     private final ButtonSetting visual;
     private final ButtonSetting onlyWhileKillAura;
-
+    private final Queue<Packet<?>> delayedSend = new ConcurrentLinkedQueue<>();
+    private final HashMap<Integer, RealPositionData> realPositions = new HashMap<>();
+    private final Animation animation = new Animation(Easing.EASE_OUT_CIRC, 500);
+    private final Progress progress = new Progress("AutoGapple");
     public boolean working = false;
     private int eatingTicksLeft = 0;
     private int releaseLeft = 0;
     private int foodSlot;
-
-    private final Queue<Packet<?>> delayedSend = new ConcurrentLinkedQueue<>();
-    private final HashMap<Integer, RealPositionData> realPositions = new HashMap<>();
-
-    private final Animation animation = new Animation(Easing.EASE_OUT_CIRC, 500);
-    private final Progress progress = new Progress("AutoGapple");
 
     public AutoGapple() {
         super("AutoGapple", category.combat, "Made for QuickMacro.");

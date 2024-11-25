@@ -16,9 +16,9 @@ import org.jetbrains.annotations.NotNull;
 import org.lwjgl.input.Keyboard;
 
 public class SafeWalk extends Module {
+    private static ButtonSetting shift, blocksOnly, pitchCheck, disableOnForward;
     private final SliderSetting shiftDelay;
     private final SliderSetting motion;
-    private static ButtonSetting shift, blocksOnly, pitchCheck, disableOnForward;
     public ButtonSetting tower;
     private boolean isSneaking;
     private long b = 0L;
@@ -32,6 +32,22 @@ public class SafeWalk extends Module {
         this.registerSetting(pitchCheck = new ButtonSetting("Pitch check", false));
         this.registerSetting(shift = new ButtonSetting("Shift", false));
         this.registerSetting(tower = new ButtonSetting("Tower", false));
+    }
+
+    public static boolean canSafeWalk() {
+        if (ModuleManager.safeWalk != null && ModuleManager.safeWalk.isEnabled()) {
+            if (disableOnForward.isToggled() && Keyboard.isKeyDown(mc.gameSettings.keyBindForward.getKeyCode())) {
+                return false;
+            }
+            if (pitchCheck.isToggled() && mc.thePlayer.rotationPitch < 70) {
+                return false;
+            }
+            if (blocksOnly.isToggled() && (mc.thePlayer.getHeldItem() == null || !(mc.thePlayer.getHeldItem().getItem() instanceof ItemBlock))) {
+                return false;
+            }
+            return true;
+        }
+        return false;
     }
 
     public void onDisable() {
@@ -100,8 +116,7 @@ public class SafeWalk extends Module {
             if (down) {
                 return;
             }
-        }
-        else if (!down) {
+        } else if (!down) {
             return;
         }
         if (down) {
@@ -112,8 +127,7 @@ public class SafeWalk extends Module {
                 }
                 this.b = System.currentTimeMillis();
             }
-        }
-        else {
+        } else {
             if (Keyboard.isKeyDown(mc.gameSettings.keyBindSneak.getKeyCode())) {
                 return;
             }
@@ -122,21 +136,5 @@ public class SafeWalk extends Module {
         final int getKeyCode = mc.gameSettings.keyBindSneak.getKeyCode();
         this.isSneaking = down;
         KeyBinding.setKeyBindState(getKeyCode, down);
-    }
-
-    public static boolean canSafeWalk() {
-        if (ModuleManager.safeWalk != null && ModuleManager.safeWalk.isEnabled()) {
-            if (disableOnForward.isToggled() && Keyboard.isKeyDown(mc.gameSettings.keyBindForward.getKeyCode())) {
-                return false;
-            }
-            if (pitchCheck.isToggled() && mc.thePlayer.rotationPitch < 70) {
-                return false;
-            }
-            if (blocksOnly.isToggled() && (mc.thePlayer.getHeldItem() == null || !(mc.thePlayer.getHeldItem().getItem() instanceof ItemBlock))) {
-                return false;
-            }
-            return true;
-        }
-        return false;
     }
 }

@@ -6,7 +6,6 @@ import keystrokesmod.event.RotationEvent;
 import keystrokesmod.event.ScaffoldPlaceEvent;
 import keystrokesmod.module.impl.world.Scaffold;
 import keystrokesmod.module.impl.world.scaffold.IScaffoldRotation;
-import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.utility.BlockUtils;
 import keystrokesmod.utility.MoveUtil;

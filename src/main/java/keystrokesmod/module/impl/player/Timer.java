@@ -6,14 +6,8 @@ import keystrokesmod.module.impl.player.timer.BalanceTimer;
 import keystrokesmod.module.impl.player.timer.HypixelTimer;
 import keystrokesmod.module.impl.player.timer.NormalTimer;
 import keystrokesmod.module.setting.impl.ButtonSetting;
-import keystrokesmod.module.setting.impl.ModeSetting;
 import keystrokesmod.module.setting.impl.ModeValue;
-import keystrokesmod.module.setting.impl.SliderSetting;
-import keystrokesmod.module.setting.utils.ModeOnly;
-import keystrokesmod.utility.MoveUtil;
 import keystrokesmod.utility.Utils;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 public class Timer extends Module {
     private final ModeValue mode;

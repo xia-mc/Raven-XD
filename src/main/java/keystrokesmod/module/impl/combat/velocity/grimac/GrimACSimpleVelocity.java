@@ -5,7 +5,6 @@ import keystrokesmod.event.PreUpdateEvent;
 import keystrokesmod.mixins.impl.entity.EntityPlayerSPAccessor;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.combat.velocity.GrimACVelocity;
-import keystrokesmod.module.impl.exploit.viaversionfix.ViaVersionFixHelper;
 import keystrokesmod.module.impl.other.SlotHandler;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
@@ -15,8 +14,6 @@ import keystrokesmod.utility.PacketUtils;
 import keystrokesmod.utility.Utils;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemFood;
-import net.minecraft.network.play.client.C02PacketUseEntity;
-import net.minecraft.network.play.client.C0APacketAnimation;
 import net.minecraft.network.play.client.C0BPacketEntityAction;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -56,7 +53,7 @@ public class GrimACSimpleVelocity extends SubMode<GrimACVelocity> {
 
             doReduce();
             if (debug.isToggled())
-                Utils.sendMessage(String.format("%d Reduced %.3f %.3f", (int) reduceTimes.getInput() - unReduceTimes,  mc.thePlayer.motionX, mc.thePlayer.motionZ));
+                Utils.sendMessage(String.format("%d Reduced %.3f %.3f", (int) reduceTimes.getInput() - unReduceTimes, mc.thePlayer.motionX, mc.thePlayer.motionZ));
             unReduceTimes--;
         } else {
             unReduceTimes = 0;

@@ -10,10 +10,10 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.Vec3;
 
 public class KeepSprint extends Module {
-    private static SliderSetting slow;
-    private static SliderSetting chance;
     public static ButtonSetting disableWhileJump;
     public static ButtonSetting reduceReachHits;
+    private static SliderSetting slow;
+    private static SliderSetting chance;
 
     public KeepSprint() {
         super("KeepSprint", Module.category.movement, 0);
@@ -28,14 +28,12 @@ public class KeepSprint extends Module {
         boolean vanilla = false;
         if (disableWhileJump.isToggled() && !mc.thePlayer.onGround) {
             vanilla = true;
-        }
-        else if (reduceReachHits.isToggled() && !mc.thePlayer.capabilities.isCreativeMode) {
+        } else if (reduceReachHits.isToggled() && !mc.thePlayer.capabilities.isCreativeMode) {
             double n = -1.0;
             final Vec3 getPositionEyes = mc.thePlayer.getPositionEyes(1.0f);
             if (ModuleManager.killAura != null && ModuleManager.killAura.isEnabled() && KillAura.target != null) {
                 n = getPositionEyes.distanceTo(KillAura.target.getPositionEyes(1.0f));
-            }
-            else if (ModuleManager.reach != null && ModuleManager.reach.isEnabled()) {
+            } else if (ModuleManager.reach != null && ModuleManager.reach.isEnabled()) {
                 n = getPositionEyes.distanceTo(mc.objectMouseOver.hitVec);
             }
             if (n != -1.0 && n <= 3.0) {

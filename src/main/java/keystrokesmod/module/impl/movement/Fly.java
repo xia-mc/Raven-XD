@@ -2,7 +2,8 @@ package keystrokesmod.module.impl.movement;
 
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.movement.fly.*;
-import keystrokesmod.module.setting.impl.*;
+import keystrokesmod.module.setting.impl.ButtonSetting;
+import keystrokesmod.module.setting.impl.ModeValue;
 import keystrokesmod.utility.render.RenderUtils;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;

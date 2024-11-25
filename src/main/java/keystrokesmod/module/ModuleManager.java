@@ -17,9 +17,7 @@ import java.util.Comparator;
 import java.util.List;
 
 public class ModuleManager {
-    static List<Module> modules = new ArrayList<>();
     public static List<Module> organizedModules = new ArrayList<>();
-
     public static Module longJump;
     public static Blink blink;
     public static Module nameHider;
@@ -118,7 +116,7 @@ public class ModuleManager {
     public static BedDefender bedDefender;
     public static ChestAura chestAura;
     public static AutoRod autoRod;
-//    public static AbilitiesBedWars abilitiesBedWars;
+    //    public static AbilitiesBedWars abilitiesBedWars;
     public static ClientTheme clientTheme;
     public static AutoChest autoChest;
     public static Teleport teleport;
@@ -129,6 +127,22 @@ public class ModuleManager {
     public static Regen regen;
     public static ChatAI chatAI;
     public static keystrokesmod.module.impl.render.ArrayList arrayList;
+
+    static List<Module> modules = new ArrayList<>();
+
+    private static double getWidth(@NotNull Module module) {
+        String text = module.getPrettyName()
+                + ((HUD.showInfo.isToggled() && !module.getPrettyInfo().isEmpty()) ? " " + module.getPrettyInfo() : "");
+        return HUD.getFontRenderer().width(HUD.lowercase.isToggled() ? text.toLowerCase() : text);
+    }
+
+    public static void sort() {
+        if (HUD.alphabeticalSort.isToggled()) {
+            organizedModules.sort(Comparator.comparing(Module::getPrettyName));
+        } else {
+            organizedModules.sort((c1, c2) -> Double.compare(getWidth(c2), getWidth(c1)));
+        }
+    }
 
     public void register() {
 
@@ -350,19 +364,5 @@ public class ModuleManager {
             }
         }
         return null;
-    }
-
-    private static double getWidth(@NotNull Module module) {
-        String text = module.getPrettyName()
-                + ((HUD.showInfo.isToggled() && !module.getPrettyInfo().isEmpty()) ? " " + module.getPrettyInfo() : "");
-        return HUD.getFontRenderer().width(HUD.lowercase.isToggled() ? text.toLowerCase() : text);
-    }
-
-    public static void sort() {
-        if (HUD.alphabeticalSort.isToggled()) {
-            organizedModules.sort(Comparator.comparing(Module::getPrettyName));
-        } else {
-            organizedModules.sort((c1, c2) -> Double.compare(getWidth(c2), getWidth(c1)));
-        }
     }
 }

@@ -12,12 +12,11 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
 public class VanillaSpeed extends SubMode<Speed> {
+    private static boolean warning = false;
     private final SliderSetting horizonSpeed;
     private final ButtonSetting autoJump;
     private final SliderSetting verticalSpeed;
     private final ButtonSetting fastStop;
-
-    private static boolean warning = false;
 
     public VanillaSpeed(String name, @NotNull Speed parent) {
         super(name, parent);

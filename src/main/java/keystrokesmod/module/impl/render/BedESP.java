@@ -5,9 +5,9 @@ import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.ModeSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.utility.BlockUtils;
-import keystrokesmod.utility.render.RenderUtils;
 import keystrokesmod.utility.Theme;
 import keystrokesmod.utility.Utils;
+import keystrokesmod.utility.render.RenderUtils;
 import net.minecraft.block.BlockBed;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
@@ -26,11 +26,11 @@ import java.util.List;
 
 public class BedESP extends Module {
     public ModeSetting theme;
-    private SliderSetting range;
-    private SliderSetting rate;
-    private ButtonSetting firstBed;
+    private final SliderSetting range;
+    private final SliderSetting rate;
+    private final ButtonSetting firstBed;
     private BlockPos[] bed = null;
-    private List<BlockPos[]> beds = new ArrayList<>();
+    private final List<BlockPos[]> beds = new ArrayList<>();
     private long lastCheck = 0;
 
     public BedESP() {

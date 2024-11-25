@@ -15,25 +15,33 @@ import static keystrokesmod.module.ModuleManager.hitSelect;
 public class HitSelect extends Module {
     private static final String[] MODES = new String[]{"Pause", "Active"};
     private static final String[] PREFERENCES = new String[]{"Move speed", "KB reduction", "Critical hits"};
+    private static long attackTime = -1;
+    private static boolean currentShouldAttack = false;
     private final ModeSetting preference;
     private final ModeSetting mode;
     private final SliderSetting delay;
     private final SliderSetting chance;
 
-    private static long attackTime = -1;
-    private static boolean currentShouldAttack = false;
-
     public HitSelect() {
         super("HitSelect", category.combat, "Chooses the best time to hit.");
         this.registerSetting(mode = new ModeSetting("Mode", MODES, 0,
                 "Pause: Legitimate pause clicking\n" +
-                "Active: Cancel attack but allow click"));
+                        "Active: Cancel attack but allow click"));
         this.registerSetting(preference = new ModeSetting("Preference", PREFERENCES, 0,
                 "Move speed: Keep sprint but legitimate\n" +
                         "KB reduction: KnockBack reduction\n" +
                         "Critical hits: Critical hit frequency"));
         this.registerSetting(delay = new SliderSetting("Delay", 420, 300, 500, 1));
         this.registerSetting(chance = new SliderSetting("Chance", 80, 0, 100, 1));
+    }
+
+    public static boolean canAttack() {
+        return canSwing();
+    }
+
+    public static boolean canSwing() {
+        if (!hitSelect.isEnabled() || hitSelect.mode.getInput() == 1) return true;
+        return currentShouldAttack;
     }
 
     @Override
@@ -71,14 +79,5 @@ public class HitSelect extends Module {
             if (!currentShouldAttack)
                 currentShouldAttack = System.currentTimeMillis() - HitSelect.attackTime >= hitSelect.delay.getInput();
         }
-    }
-
-    public static boolean canAttack() {
-        return canSwing();
-    }
-
-    public static boolean canSwing() {
-        if (!hitSelect.isEnabled() || hitSelect.mode.getInput() == 1) return true;
-        return currentShouldAttack;
     }
 }

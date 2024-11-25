@@ -16,16 +16,15 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 public class LunarClientRPC extends SubMode<DiscordRpc> {
-    private final String clientId = "562286213059444737";
-    private final String mappingUrl = "https://servermappings.lunarclientcdn.com/servers.json";
     private static final String DEFAULT_SERVER_NAME = "Active in the launcher";
     private static final String DEFAULT_IMAGE = "logo-default";
     private static final String DEFAULT_SMALL_IMAGE = "logo-blue";
-    private Map<String, ServerData> serverDataMap = new HashMap<>();
+    private final String clientId = "562286213059444737";
+    private final String mappingUrl = "https://servermappings.lunarclientcdn.com/servers.json";
+    private final Map<String, ServerData> serverDataMap = new HashMap<>();
     private boolean started;
     private String serverName;
     private String bigImage;
@@ -35,9 +34,10 @@ public class LunarClientRPC extends SubMode<DiscordRpc> {
         super(name, parent);
     }
 
-    private static class ServerData {
-        String name;
-        String logo;
+    private static String readFromConnection(HttpURLConnection connection) throws IOException {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+            return reader.lines().collect(Collectors.joining("\n"));
+        }
     }
 
     @Override
@@ -116,12 +116,6 @@ public class LunarClientRPC extends SubMode<DiscordRpc> {
         }
     }
 
-    private static String readFromConnection(HttpURLConnection connection) throws IOException {
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
-            return reader.lines().collect(Collectors.joining("\n"));
-        }
-    }
-
     private boolean findServerData(String serverIP) {
         if (serverIP == null) return false;
         serverIP = serverIP.toLowerCase();
@@ -146,7 +140,6 @@ public class LunarClientRPC extends SubMode<DiscordRpc> {
         return false;
     }
 
-
     private void updatePrivateRPC() {
         bigImage = DEFAULT_IMAGE;
         serverName = "Playing Private Server";
@@ -167,5 +160,10 @@ public class LunarClientRPC extends SubMode<DiscordRpc> {
                 .setSmallImage(small, smallText)
                 .setStartTimestamps(System.currentTimeMillis())
                 .build();
+    }
+
+    private static class ServerData {
+        String name;
+        String logo;
     }
 }

@@ -3,12 +3,12 @@ package keystrokesmod.module.impl.movement;
 import keystrokesmod.event.PreUpdateEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.movement.speed.*;
-import keystrokesmod.module.setting.impl.*;
-import keystrokesmod.utility.*;
+import keystrokesmod.module.setting.impl.ButtonSetting;
+import keystrokesmod.module.setting.impl.ModeValue;
+import keystrokesmod.utility.MoveUtil;
+import keystrokesmod.utility.Utils;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-
-import static keystrokesmod.module.ModuleManager.scaffold;
 
 public class Speed extends Module {
     private final ModeValue mode;

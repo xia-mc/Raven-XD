@@ -17,8 +17,8 @@ import java.util.function.Supplier;
 public class ButtonSetting extends Setting {
     @Getter
     private final String name;
-    private boolean isEnabled;
     public boolean isMethodButton;
+    private boolean isEnabled;
     private Runnable method;
     private Consumer<ButtonSetting> onToggle;
 
@@ -39,11 +39,13 @@ public class ButtonSetting extends Setting {
     }
 
     public ButtonSetting(String name, boolean isEnabled, @NotNull Supplier<Boolean> visibleCheck) {
-        this(name, isEnabled, visibleCheck, setting -> {});
+        this(name, isEnabled, visibleCheck, setting -> {
+        });
     }
 
     public ButtonSetting(String name, boolean isEnabled, @NotNull Supplier<Boolean> visibleCheck, @Nullable String toolTip) {
-        this(name, isEnabled, visibleCheck, setting -> {}, toolTip);
+        this(name, isEnabled, visibleCheck, setting -> {
+        }, toolTip);
     }
 
     public ButtonSetting(String name, boolean isEnabled, @NotNull Supplier<Boolean> visibleCheck, @NotNull Consumer<ButtonSetting> onToggle) {

@@ -18,8 +18,6 @@ import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-import java.util.List;
-
 public class AutoClicker extends IAutoClicker {
     private final ModeValue mode;
     private final ButtonSetting breakBlocks;

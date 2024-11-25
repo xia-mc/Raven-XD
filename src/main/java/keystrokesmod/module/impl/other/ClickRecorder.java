@@ -16,9 +16,8 @@ import java.util.List;
 
 public class ClickRecorder extends Module {
     private final ButtonSetting showMessage;
-
-    private long lastClick = -1;
     private final List<Integer> delays = new ArrayList<>();
+    private long lastClick = -1;
 
     public ClickRecorder() {
         super("ClickRecorder", category.other);

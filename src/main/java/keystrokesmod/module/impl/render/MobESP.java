@@ -2,8 +2,8 @@ package keystrokesmod.module.impl.render;
 
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.ButtonSetting;
-import keystrokesmod.utility.render.RenderUtils;
 import keystrokesmod.utility.Utils;
+import keystrokesmod.utility.render.RenderUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.*;

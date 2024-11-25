@@ -13,10 +13,10 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 public abstract class Setting {
+    private final @Nullable String toolTip;
     public String n;
     public Supplier<Boolean> visibleCheck;
     public boolean viewOnly;
-    private final @Nullable String toolTip;
     @Setter
     protected @Nullable Module parent = null;
 

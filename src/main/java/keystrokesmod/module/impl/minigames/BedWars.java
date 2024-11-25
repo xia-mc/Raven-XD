@@ -2,13 +2,12 @@ package keystrokesmod.module.impl.minigames;
 
 import com.mojang.realmsclient.gui.ChatFormatting;
 import keystrokesmod.module.Module;
-import java.util.concurrent.CopyOnWriteArrayList;
 import keystrokesmod.module.impl.world.AntiBot;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.ModeSetting;
 import keystrokesmod.utility.BlockUtils;
-import keystrokesmod.utility.render.RenderUtils;
 import keystrokesmod.utility.Utils;
+import keystrokesmod.utility.render.RenderUtils;
 import net.minecraft.block.BlockBed;
 import net.minecraft.block.BlockObsidian;
 import net.minecraft.entity.player.EntityPlayer;
@@ -25,27 +24,28 @@ import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import java.awt.*;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class BedWars extends Module {
+    private static final double MAX_SPAWN_DISTANCE_SQUARED = 800;
+    public static ButtonSetting whitelistOwnBed;
+    public static boolean outsideSpawn = true;
+    private static BlockPos spawnPos;
     private final String[] SERVERS = new String[]{"Hypixel", "Pika/Jartex"};
     private final ModeSetting serverMode;
-    public static ButtonSetting whitelistOwnBed;
     private final ButtonSetting diamondArmor;
     private final ButtonSetting enderPearl;
     private final ButtonSetting fireball;
     private final ButtonSetting obsidian;
     private final ButtonSetting shouldPing;
-    private static BlockPos spawnPos;
-    private boolean check;
-    public static boolean outsideSpawn = true;
     private final List<String> armoredPlayer = new CopyOnWriteArrayList<>();
     private final Map<String, String> lastHeldMap = new ConcurrentHashMap<>();
     private final Set<BlockPos> obsidianPos = new HashSet<>();
-    private static final double MAX_SPAWN_DISTANCE_SQUARED = 800;
     private final int obsidianColor = new Color(0, 0, 0).getRGB();
+    private boolean check;
 
     public BedWars() {
         super("Bed Wars", category.minigames);
@@ -56,6 +56,10 @@ public class BedWars extends Module {
         this.registerSetting(fireball = new ButtonSetting("Fireball", true));
         this.registerSetting(obsidian = new ButtonSetting("Obsidian", true));
         this.registerSetting(shouldPing = new ButtonSetting("Should ping", true));
+    }
+
+    public static BlockPos getSpawnPos() {
+        return spawnPos;
     }
 
     public void onEnable() {
@@ -103,7 +107,8 @@ public class BedWars extends Module {
                     }
                     RenderUtils.renderBlock(blockPos, obsidianColor, false, true);
                 }
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         }
     }
 
@@ -162,7 +167,8 @@ public class BedWars extends Module {
                         spawnPos = mc.thePlayer.getPosition();
                         check = false;
                     }
-                    if (spawnPos != null) outsideSpawn = mc.thePlayer.getDistanceSq(spawnPos) > MAX_SPAWN_DISTANCE_SQUARED;
+                    if (spawnPos != null)
+                        outsideSpawn = mc.thePlayer.getDistanceSq(spawnPos) > MAX_SPAWN_DISTANCE_SQUARED;
                 } else {
                     outsideSpawn = true;
                 }
@@ -171,6 +177,7 @@ public class BedWars extends Module {
             Utils.sendMessage(e.getLocalizedMessage());
         }
     }
+
     @SubscribeEvent
     public void onChat(ClientChatReceivedEvent c) {
         if (!Utils.nullCheck()) {
@@ -209,9 +216,6 @@ public class BedWars extends Module {
         if (shouldPing.isToggled()) {
             mc.thePlayer.playSound("note.pling", 1.0f, 1.0f);
         }
-    }
-    public static BlockPos getSpawnPos() {
-        return spawnPos;
     }
 
     @Override

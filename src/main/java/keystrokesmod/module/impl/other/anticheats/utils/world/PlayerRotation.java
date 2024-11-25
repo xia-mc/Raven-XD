@@ -11,6 +11,7 @@ public class PlayerRotation {
     public static float getYaw(@NotNull BlockPos pos) {
         return getYaw(new Vec3(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5));
     }
+
     public static float getYaw(@NotNull AbstractClientPlayer from, @NotNull Vec3 pos) {
         return from.rotationYaw +
                 MathHelper.wrapAngleTo180_float(

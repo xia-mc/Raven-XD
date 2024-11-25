@@ -18,6 +18,7 @@ public class Sprint extends Module {
     private final ModeSetting mode = new ModeSetting("Mode", new String[]{"Legit", "Omni"}, 0);
     private final ModeSetting omniMode = new ModeSetting("Bypass mode", new String[]{"None", "Legit"}, 1, new ModeOnly(mode, 1));
     private final ButtonSetting disableWhileScaffold;
+  
     public static boolean omni = false;
     public static boolean stopSprint = false;
 

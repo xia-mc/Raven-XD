@@ -16,15 +16,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(GuiConnecting.class)
 public abstract class MixinGuiConnecting extends GuiScreen {
+    @Unique
+    public PreConnectEvent raven_bS$preConnectEvent = null;
     @Shadow
     private NetworkManager networkManager;
 
-    @Unique
-    public PreConnectEvent raven_bS$preConnectEvent = null;
-
     @Inject(method = "connect", at = @At("HEAD"), cancellable = true)
     public void onConnect(String p_connect_1_, int p_connect_2_, CallbackInfo ci) {
-        raven_bS$preConnectEvent = new PreConnectEvent((GuiConnecting)(Object) this, p_connect_1_, p_connect_2_);
+        raven_bS$preConnectEvent = new PreConnectEvent((GuiConnecting) (Object) this, p_connect_1_, p_connect_2_);
         MinecraftForge.EVENT_BUS.post(raven_bS$preConnectEvent);
         if (raven_bS$preConnectEvent.isCanceled()) {
             ci.cancel();

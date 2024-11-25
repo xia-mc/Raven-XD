@@ -5,8 +5,8 @@ import keystrokesmod.module.impl.other.SlotHandler;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.DescriptionSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
-import keystrokesmod.utility.clicks.CPSCalculator;
 import keystrokesmod.utility.Utils;
+import keystrokesmod.utility.clicks.CPSCalculator;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.client.event.MouseEvent;
@@ -17,9 +17,16 @@ import org.lwjgl.input.Mouse;
 import java.awt.*;
 
 public class ClickAssist extends Module {
-    private DescriptionSetting description;
-    private SliderSetting chanceLeft, chanceRight;
-    private ButtonSetting rightClick, blocksOnly, weaponOnly, onlyWhileTargeting, aboveCPS, leftClick, disableInCreative;
+    private final DescriptionSetting description;
+    private final SliderSetting chanceLeft;
+    private final SliderSetting chanceRight;
+    private final ButtonSetting rightClick;
+    private final ButtonSetting blocksOnly;
+    private final ButtonSetting weaponOnly;
+    private final ButtonSetting onlyWhileTargeting;
+    private final ButtonSetting aboveCPS;
+    private final ButtonSetting leftClick;
+    private final ButtonSetting disableInCreative;
     private Robot bot;
     private boolean ignNL = false;
     private boolean ignNR = false;
@@ -64,8 +71,7 @@ public class ClickAssist extends Module {
                 if (ev.button == 0 && leftClick.isToggled() && chanceLeft.getInput() != 0.0D) {
                     if (this.ignNL) {
                         this.ignNL = false;
-                    }
-                    else {
+                    } else {
                         if (chanceLeft.getInput() == 0) {
                             return;
                         }
@@ -86,12 +92,10 @@ public class ClickAssist extends Module {
                         this.bot.mousePress(16);
                         this.ignNL = true;
                     }
-                }
-                else if (ev.button == 1 && rightClick.isToggled()) {
+                } else if (ev.button == 1 && rightClick.isToggled()) {
                     if (this.ignNR) {
                         this.ignNR = false;
-                    }
-                    else {
+                    } else {
                         if (chanceRight.getInput() == 0) {
                             return;
                         }
@@ -123,13 +127,13 @@ public class ClickAssist extends Module {
             this.fix(1);
         }
     }
+
     private void fix(int t) {
         if (t == 0) {
             if (this.ignNL && !Mouse.isButtonDown(0)) {
                 this.bot.mouseRelease(16);
             }
-        }
-        else if (t == 1 && this.ignNR && !Mouse.isButtonDown(1)) {
+        } else if (t == 1 && this.ignNR && !Mouse.isButtonDown(1)) {
             this.bot.mouseRelease(4);
         }
 

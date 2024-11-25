@@ -3,13 +3,16 @@ package keystrokesmod.module.impl.render;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.world.AntiBot;
 import keystrokesmod.module.setting.impl.ButtonSetting;
-import keystrokesmod.utility.render.RenderUtils;
 import keystrokesmod.utility.Utils;
+import keystrokesmod.utility.render.RenderUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.*;
-import net.minecraft.util.*;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.MathHelper;
+import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.Vec3;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.lwjgl.opengl.GL11;
@@ -17,10 +20,11 @@ import org.lwjgl.opengl.GL11;
 import java.awt.*;
 
 public class Trajectories extends Module {
+    private static final int HIGHLIGHT_COLOR = new Color(234, 38, 38).getRGB();
     private final ButtonSetting autoScale;
     private final ButtonSetting disableUncharged;
     private final ButtonSetting highlightOnEntity;
-    private static final int HIGHLIGHT_COLOR = new Color(234, 38, 38).getRGB();
+
     public Trajectories() {
         super("Trajectories", category.render);
         this.registerSetting(autoScale = new ButtonSetting("Auto-scale", true));
@@ -45,20 +49,20 @@ public class Trajectories extends Module {
         float playerYaw = mc.thePlayer.rotationYaw;
         float playerPitch = mc.thePlayer.rotationPitch;
 
-        double posX = mc.getRenderManager().viewerPosX - (double)(MathHelper.cos(playerYaw / 180.0f * (float)Math.PI) * 0.16f);
-        double posY = mc.getRenderManager().viewerPosY + (double)mc.thePlayer.getEyeHeight() - (double)0.1f;
-        double posZ = mc.getRenderManager().viewerPosZ - (double)(MathHelper.sin(playerYaw / 180.0f * (float)Math.PI) * 0.16f);
+        double posX = mc.getRenderManager().viewerPosX - (double) (MathHelper.cos(playerYaw / 180.0f * (float) Math.PI) * 0.16f);
+        double posY = mc.getRenderManager().viewerPosY + (double) mc.thePlayer.getEyeHeight() - (double) 0.1f;
+        double posZ = mc.getRenderManager().viewerPosZ - (double) (MathHelper.sin(playerYaw / 180.0f * (float) Math.PI) * 0.16f);
 
-        double motionX = (double)(-MathHelper.sin(playerYaw / 180.0f * (float)Math.PI) * MathHelper.cos(playerPitch / 180.0f * (float)Math.PI)) * (bow ? 1.0 : 0.4);
-        double motionY = (double)(-MathHelper.sin(playerPitch / 180.0f * (float)Math.PI)) * (bow ? 1.0 : 0.4);
-        double motionZ = (double)(MathHelper.cos(playerYaw / 180.0f * (float)Math.PI) * MathHelper.cos(playerPitch / 180.0f * (float)Math.PI)) * (bow ? 1.0 : 0.4);
+        double motionX = (double) (-MathHelper.sin(playerYaw / 180.0f * (float) Math.PI) * MathHelper.cos(playerPitch / 180.0f * (float) Math.PI)) * (bow ? 1.0 : 0.4);
+        double motionY = (double) (-MathHelper.sin(playerPitch / 180.0f * (float) Math.PI)) * (bow ? 1.0 : 0.4);
+        double motionZ = (double) (MathHelper.cos(playerYaw / 180.0f * (float) Math.PI) * MathHelper.cos(playerPitch / 180.0f * (float) Math.PI)) * (bow ? 1.0 : 0.4);
         int itemInUse = 40;
         if (mc.thePlayer.getItemInUseCount() > 0 && bow) {
             itemInUse = mc.thePlayer.getItemInUseCount();
         }
         int n10 = 72000 - itemInUse;
-        float f10 = (float)n10 / 20.0f;
-        if ((double)(f10 = (f10 * f10 + f10 * 2.0f) / 3.0f) < 0.1) {
+        float f10 = (float) n10 / 20.0f;
+        if ((double) (f10 = (f10 * f10 + f10 * 2.0f) / 3.0f) < 0.1) {
             return;
         }
         if (f10 > 1.0f) {
@@ -84,9 +88,9 @@ public class Trajectories extends Module {
         motionX /= f11;
         motionY /= f11;
         motionZ /= f11;
-        motionX *= (double)(bow ? f10 * 2.0f : 1.0f) * 1.5;
-        motionY *= (double)(bow ? f10 * 2.0f : 1.0f) * 1.5;
-        motionZ *= (double)(bow ? f10 * 2.0f : 1.0f) * 1.5;
+        motionX *= (double) (bow ? f10 * 2.0f : 1.0f) * 1.5;
+        motionY *= (double) (bow ? f10 * 2.0f : 1.0f) * 1.5;
+        motionZ *= (double) (bow ? f10 * 2.0f : 1.0f) * 1.5;
         GL11.glLineWidth(1.5f);
         GL11.glBegin(3);
         boolean ground = false;
@@ -118,8 +122,7 @@ public class Trajectories extends Module {
             if (rayTraced != null) {
                 ground = true;
                 target = rayTraced;
-            }
-            else {
+            } else {
                 MovingObjectPosition entityHit = getEntityHit(start, predicted);
                 if (entityHit != null) {
                     target = entityHit;

@@ -89,7 +89,8 @@ public class AutoHeal extends Module {
                 mc.playerController.sendUseItem(mc.thePlayer, mc.theWorld, stack);
                 lastDoneUse = System.currentTimeMillis();
             } else {
-                if (autoDrop.isToggled() && stack.getItem() instanceof ItemSoup) {mc.thePlayer.dropOneItem(true);
+                if (autoDrop.isToggled() && stack.getItem() instanceof ItemSoup) {
+                    mc.thePlayer.dropOneItem(true);
                 }
 
                 if (originalSlot != -1) {

@@ -20,16 +20,16 @@ import org.lwjgl.input.Mouse;
 import java.util.HashSet;
 
 public class AntiFireball extends Module {
-    private SliderSetting fov;
-    private SliderSetting range;
-    private ButtonSetting disableWhileFlying;
-    private ButtonSetting disableWhileScaffold;
-    private ButtonSetting blocksRotate;
-    private ButtonSetting projectileRotate;
     public ButtonSetting silentSwing;
     public EntityFireball fireball;
-    private HashSet<Entity> fireballs = new HashSet<>();
     public boolean attack;
+    private final SliderSetting fov;
+    private final SliderSetting range;
+    private final ButtonSetting disableWhileFlying;
+    private final ButtonSetting disableWhileScaffold;
+    private final ButtonSetting blocksRotate;
+    private final ButtonSetting projectileRotate;
+    private final HashSet<Entity> fireballs = new HashSet<>();
 
     public AntiFireball() {
         super("AntiFireball", category.player);

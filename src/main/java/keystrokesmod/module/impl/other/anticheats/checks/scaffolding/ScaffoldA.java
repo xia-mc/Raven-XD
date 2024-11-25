@@ -3,7 +3,6 @@ package keystrokesmod.module.impl.other.anticheats.checks.scaffolding;
 import keystrokesmod.module.impl.other.Anticheat;
 import keystrokesmod.module.impl.other.anticheats.Check;
 import keystrokesmod.module.impl.other.anticheats.TRPlayer;
-import keystrokesmod.module.impl.other.anticheats.config.AdvancedConfig;
 import org.jetbrains.annotations.NotNull;
 
 public class ScaffoldA extends Check {

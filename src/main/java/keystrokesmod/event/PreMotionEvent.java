@@ -9,12 +9,13 @@ import org.jetbrains.annotations.NotNull;
 
 @Cancelable
 public class PreMotionEvent extends Event {
-    @Setter
-    @Getter
-    private double posX;
+    private static boolean setRenderYaw;
     @Setter
     @Getter
     public double posY;
+    @Setter
+    @Getter
+    private double posX;
     @Setter
     @Getter
     private double posZ;
@@ -26,7 +27,6 @@ public class PreMotionEvent extends Event {
     @Setter
     @Getter
     private boolean onGround;
-    private static boolean setRenderYaw;
     private boolean isSprinting;
     private boolean isSneaking;
 
@@ -41,18 +41,19 @@ public class PreMotionEvent extends Event {
         this.isSneaking = isSneaking;
     }
 
+    public static boolean setRenderYaw() {
+        return setRenderYaw;
+    }
+
     public void setYaw(float yaw) {
         this.yaw = yaw;
         setRenderYaw = true;
     }
 
-    public static boolean setRenderYaw() {
-        return setRenderYaw;
-    }
-
     public void setRenderYaw(boolean setRenderYaw) {
         PreMotionEvent.setRenderYaw = setRenderYaw;
     }
+
     public boolean isSprinting() {
         return isSprinting;
     }

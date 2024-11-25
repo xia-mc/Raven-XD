@@ -36,16 +36,16 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.nio.file.InvalidPathException;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 public class NoteBot extends Module {
+    public static String fileName = "";
     @Getter
     @Nullable
     private static NoteBot instance = null;
     private static File directory;
-    public static String fileName = "";
-
     public final ModeSetting mode;
     public final ButtonSetting roundOutOfRange;
     public final SliderSetting checkDelay;
@@ -55,22 +55,18 @@ public class NoteBot extends Module {
     public final SliderSetting concurrentTuneBlocks;
     public final ButtonSetting polyphonic;
     private final ButtonSetting debug;
-
-    private CompletableFuture<Song> loadingSongFuture = null;
-
-    private Song song; // Loaded song
     private final Map<Note, BlockPos> noteBlockPositions = new HashMap<>(); // Currently used noteblocks by the song
     private final Multimap<Note, BlockPos> scannedNoteblocks = MultimapBuilder.linkedHashKeys().arrayListValues().build(); // Found noteblocks
     private final List<BlockPos> clickedBlocks = new ArrayList<>();
+    private final Map<BlockPos, Integer> tuneHits = new HashMap<>(); // noteblock -> target hits number
+    private CompletableFuture<Song> loadingSongFuture = null;
+    private Song song; // Loaded song
     private Stage stage = Stage.None;
     private PlayingMode playingMode = PlayingMode.None;
     private boolean isPlaying = false;
     private int currentTick = 0;
     private int ticks = 0;
-
     private boolean anyNoteblockTuned = false;
-    private final Map<BlockPos, Integer> tuneHits = new HashMap<>(); // noteblock -> target hits number
-
     private int waitTicks = -1;
 
     public NoteBot() {
@@ -94,6 +90,14 @@ public class NoteBot extends Module {
             if (!success) {
                 System.out.println("There was an issue creating clickPatterns directory.");
             }
+        }
+    }
+
+    private static int calcNumberOfHits(int from, int to) {
+        if (from > to) {
+            return (25 - from) + to;
+        } else {
+            return to - from;
         }
     }
 
@@ -128,8 +132,7 @@ public class NoteBot extends Module {
                 setupTuneHitsMap();
                 stage = Stage.Tune;
             }
-        }
-        else if (stage == Stage.SetUp) {
+        } else if (stage == Stage.SetUp) {
             scanForNoteblocks();
             if (scannedNoteblocks.isEmpty()) {
                 error("Can't find any nearby noteblock!");
@@ -145,11 +148,9 @@ public class NoteBot extends Module {
             }
             setupTuneHitsMap();
             stage = Stage.Tune;
-        }
-        else if (stage == Stage.Tune) {
+        } else if (stage == Stage.Tune) {
             tune();
-        }
-        else if (stage == Stage.Playing) {
+        } else if (stage == Stage.Playing) {
             if (!isPlaying) return;
 
             if (mc.thePlayer == null || currentTick > song.getLastTick()) {
@@ -163,14 +164,12 @@ public class NoteBot extends Module {
                     error("You need to be in survival mode.");
                     stop();
                     return;
-                }
-                else onTickPlay();
+                } else onTickPlay();
             }
 
             currentTick++;
         }
     }
-
 
     /**
      * 为了兼容meteor代码
@@ -178,6 +177,7 @@ public class NoteBot extends Module {
     public void info(String msg1) {
         Notifications.sendNotification(Notifications.NotificationTypes.INFO, msg1);
     }
+
     public void info(String msg1, String msg2) {
         info(String.format(msg1, msg2));
     }
@@ -189,6 +189,7 @@ public class NoteBot extends Module {
         if (!debug.isToggled()) return;
         warning(String.format(msg1, msg2));
     }
+
     public void warning(String msg1) {
         if (!debug.isToggled()) return;
         Notifications.sendNotification(Notifications.NotificationTypes.WARN, msg1);
@@ -269,18 +270,18 @@ public class NoteBot extends Module {
         var iterator = tuneHits.entrySet().iterator();
 
         // Concurrent tuning :o
-        while (iterator.hasNext()){
+        while (iterator.hasNext()) {
             var entry = iterator.next();
             BlockPos pos = entry.getKey();
             int hitsNumber = entry.getValue();
 
             if (rotation.getInput() != 0)
                 RotationHandler.setRotationYaw(PlayerRotation.getYaw(pos));
-                RotationHandler.setRotationPitch(PlayerRotation.getPitch(pos));
-                if (lookView.isToggled()) {
-                    mc.thePlayer.rotationYaw = PlayerRotation.getYaw(pos);
-                    mc.thePlayer.rotationPitch = PlayerRotation.getPitch(pos);
-                }
+            RotationHandler.setRotationPitch(PlayerRotation.getPitch(pos));
+            if (lookView.isToggled()) {
+                mc.thePlayer.rotationYaw = PlayerRotation.getYaw(pos);
+                mc.thePlayer.rotationPitch = PlayerRotation.getPitch(pos);
+            }
             this.tuneNoteblockWithPackets(pos);
 
             clickedBlocks.add(pos);
@@ -327,7 +328,7 @@ public class NoteBot extends Module {
     /**
      * Loads and plays song directly
      *
-     * @param file Song supported by one of {@link SongDecoder}
+     * @param file     Song supported by one of {@link SongDecoder}
      * @param callback Callback that is run when song has been loaded
      * @return Success
      */
@@ -352,7 +353,7 @@ public class NoteBot extends Module {
                 long time2 = System.currentTimeMillis();
                 long diff = time2 - time1;
 
-                info("Song '" + FilenameUtils.getBaseName(file.getName()) + "' has been loaded to the memory! Took "+diff+"ms");
+                info("Song '" + FilenameUtils.getBaseName(file.getName()) + "' has been loaded to the memory! Took " + diff + "ms");
                 callback.run();
             } catch (Exception e) {
                 if (e instanceof CancellationException) {
@@ -411,14 +412,6 @@ public class NoteBot extends Module {
             if (targetLevel != currentLevel) {
                 tuneHits.put(blockPos, calcNumberOfHits(currentLevel, targetLevel));
             }
-        }
-    }
-
-    private static int calcNumberOfHits(int from, int to) {
-        if (from > to) {
-            return (25 - from) + to;
-        } else {
-            return to - from;
         }
     }
 
@@ -571,9 +564,9 @@ public class NoteBot extends Module {
 
         if (!uniqueNotesToUse.isEmpty()) {
             for (Note note : uniqueNotesToUse) {
-                warning("Missing note: "+note.getInstrument()+", "+note.getNoteLevel());
+                warning("Missing note: " + note.getInstrument() + ", " + note.getNoteLevel());
             }
-            warning(uniqueNotesToUse.size()+" missing notes!");
+            warning(uniqueNotesToUse.size() + " missing notes!");
         }
     }
 

@@ -16,16 +16,13 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static keystrokesmod.module.ModuleManager.*;
-import static keystrokesmod.module.ModuleManager.scaffold;
 
 public class HypixelAntiVoid extends SubMode<AntiVoid> {
     @Getter
     private static @Nullable HypixelAntiVoid instance = null;
-
+    public final NormalBlink blink = new NormalBlink("Blink", this);
     private final SliderSetting distance;
     private final ButtonSetting toggleScaffold;
-
-    public final NormalBlink blink = new NormalBlink("Blink", this);
     private Vec3 position, motion;
     private boolean wasVoid, setBack;
     private int overVoidTicks;

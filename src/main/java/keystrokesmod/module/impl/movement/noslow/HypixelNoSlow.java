@@ -4,11 +4,9 @@ import keystrokesmod.event.PreMotionEvent;
 import keystrokesmod.event.SendPacketEvent;
 import keystrokesmod.module.impl.movement.NoSlow;
 import keystrokesmod.module.impl.other.SlotHandler;
-import keystrokesmod.utility.BlockUtils;
 import keystrokesmod.utility.ContainerUtils;
 import keystrokesmod.utility.PacketUtils;
 import keystrokesmod.utility.Utils;
-import net.minecraft.block.BlockStairs;
 import net.minecraft.item.ItemBow;
 import net.minecraft.item.ItemPotion;
 import net.minecraft.item.ItemStack;
@@ -76,9 +74,6 @@ public class HypixelNoSlow extends INoSlow {
 
     @Override
     public float getSlowdown() {
-        if (BlockUtils.blockRelativeToPlayer(0, -1, 0) instanceof BlockStairs)
-            return 0.2f;
-
         ItemStack item = SlotHandler.getHeldItem();
         if (item != null && item.getItem() instanceof ItemSword)
             return 0.8f;

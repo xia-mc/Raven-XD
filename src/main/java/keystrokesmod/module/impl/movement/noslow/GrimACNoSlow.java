@@ -1,7 +1,6 @@
 package keystrokesmod.module.impl.movement.noslow;
 
 import keystrokesmod.event.SendPacketEvent;
-import keystrokesmod.mixins.impl.client.KeyBindingAccessor;
 import keystrokesmod.module.impl.movement.NoSlow;
 import keystrokesmod.module.impl.other.SlotHandler;
 import keystrokesmod.utility.PacketUtils;
