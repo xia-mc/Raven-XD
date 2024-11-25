@@ -95,6 +95,8 @@ public class Scaffold extends IAutoClicker {
     private final ButtonSetting polar;
     private final ButtonSetting postPlace;
     private final ButtonSetting lookView;
+    private final ButtonSetting cancelSprintAtStart;
+
     private final Map<BlockPos, Timer> highlight = new HashMap<>();
     public @Nullable MovingObjectPosition rayCasted = null;
     public MovingObjectPosition placeBlock;
@@ -197,6 +199,7 @@ public class Scaffold extends IAutoClicker {
         this.registerSetting(polar = new ButtonSetting("Polar", false, expand::isToggled));
         this.registerSetting(postPlace = new ButtonSetting("Post place", false, "Place on PostUpdate."));
         this.registerSetting(lookView = new ButtonSetting("Look view", false));
+        this.registerSetting(cancelSprintAtStart = new ButtonSetting("Cancel sprint at start", false));
     }
 
     public static boolean sprint() {
@@ -266,8 +269,14 @@ public class Scaffold extends IAutoClicker {
             hoverState = HoverState.DONE;
         }
 
-        if (stopAtStart.isToggled())
+        if (stopAtStart.isToggled()) {
             stopMoving = true;
+        }
+
+        if (cancelSprintAtStart.isToggled()) {
+            mc.thePlayer.setSprinting(false);
+        }
+
     }
 
     @SubscribeEvent
