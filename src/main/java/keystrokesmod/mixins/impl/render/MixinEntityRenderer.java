@@ -1,5 +1,6 @@
 package keystrokesmod.mixins.impl.render;
 
+import keystrokesmod.event.PreOrientCameraEvent;
 import keystrokesmod.module.ModuleManager;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -10,6 +11,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.passive.EntityAnimal;
+import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.MathHelper;
 import net.minecraftforge.client.ForgeHooksClient;
@@ -20,6 +22,8 @@ import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(EntityRenderer.class)
@@ -61,6 +65,12 @@ public abstract class MixinEntityRenderer {
         }
     }
 
+    @ModifyVariable(method = "orientCamera", at = @At("HEAD"), ordinal = 0, argsOnly = true)
+    public float modifySmooth(float smooth) {
+        PreOrientCameraEvent event = new PreOrientCameraEvent(smooth);
+        MinecraftForge.EVENT_BUS.post(event);
+        return event.getSmooth();
+    }
 
     @Inject(method = "orientCamera", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/Vec3;distanceTo(Lnet/minecraft/util/Vec3;)D"), cancellable = true)
     public void orientCamera(float partialTicks, CallbackInfo ci) {
@@ -74,7 +84,7 @@ public abstract class MixinEntityRenderer {
                 GlStateManager.translate(0.0F, 0.3F, 0.0F);
                 if (!this.mc.gameSettings.debugCamEnable) {
                     BlockPos blockpos = new BlockPos(entity);
-                    IBlockState iblockstate = this.mc.theWorld.getBlockState(blockpos);
+                    IBlockState iblockstate = Blocks.air.getDefaultState();  // for no clip when in the block
                     ForgeHooksClient.orientBedCamera(this.mc.theWorld, blockpos, iblockstate, entity);
                     GlStateManager.rotate(entity.prevRotationYaw + (entity.rotationYaw - entity.prevRotationYaw) * partialTicks + 180.0F, 0.0F, -1.0F, 0.0F);
                     GlStateManager.rotate(entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * partialTicks, -1.0F, 0.0F, 0.0F);

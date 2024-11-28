@@ -27,7 +27,7 @@ import java.util.HashMap;
 import java.util.Objects;
 
 public class Watermark extends Module {
-    public static final String VERSION = "2.11";
+    public static final String VERSION = "2.12";
     public static final HashMap<String, ResourceLocation> WATERMARK = new HashMap<>();
 
     public static String customName = "CustomClient";
@@ -125,7 +125,7 @@ public class Watermark extends Module {
                         RenderUtils.drawImage(WATERMARK.get("enders"), posX, posY, 150, 45);
                         break;
                 }
-            break;
+                break;
         }
     }
 }

@@ -9,12 +9,16 @@ import keystrokesmod.utility.Theme;
 import keystrokesmod.utility.Utils;
 import keystrokesmod.utility.font.FontManager;
 import keystrokesmod.utility.font.IFont;
-import keystrokesmod.utility.render.*;
+import keystrokesmod.utility.render.Animation;
+import keystrokesmod.utility.render.Easing;
+import keystrokesmod.utility.render.RenderUtils;
 import keystrokesmod.utility.render.blur.GaussianBlur;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.entity.EntityLivingBase;
 import org.jetbrains.annotations.NotNull;
+
 import java.awt.*;
+
 import static keystrokesmod.module.impl.render.TargetHUD.*;
 
 public class RavenNewTargetHUD extends SubMode<TargetHUD> implements ITargetVisual {

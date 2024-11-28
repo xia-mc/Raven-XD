@@ -2,7 +2,6 @@ package keystrokesmod.module.impl.render;
 
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.ButtonSetting;
-import keystrokesmod.module.setting.impl.DescriptionSetting;
 import keystrokesmod.utility.Utils;
 import keystrokesmod.utility.render.RenderUtils;
 import net.minecraft.client.renderer.GlStateManager;
@@ -39,7 +38,7 @@ public class Explosions extends Module {
                 if (showBlastRing.isToggled()) {
                     renderBlastRing();
                 }
-                if(showDamageRing.isToggled()) {
+                if (showDamageRing.isToggled()) {
                     renderExplosionSphere();
                 }
                 GL11.glPopMatrix();

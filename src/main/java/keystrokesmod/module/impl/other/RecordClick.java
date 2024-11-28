@@ -12,19 +12,20 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 
 public final class RecordClick extends Module {
+    public static String[] LOADED_PATTERNS_NAMES = new String[]{Pattern.DEFAULT.getName(), Pattern.VAPE.getName()};
     private static File directory;
     private static List<Pattern> LOADED_PATTERNS = new ArrayList<>(Arrays.asList(Pattern.DEFAULT, Pattern.VAPE));
-    public static String[] LOADED_PATTERNS_NAMES = new String[]{Pattern.DEFAULT.getName(), Pattern.VAPE.getName()};
-
     private static ModeSetting currentPattern;
-    private int lastPattern = 0;
-
     private static Pattern pattern = Pattern.DEFAULT;
     private static int index = 0;
     private static long lastClick = -1;
+    private int lastPattern = 0;
 
     public RecordClick() {
         super("RecordClick", category.other);
@@ -42,14 +43,6 @@ public final class RecordClick extends Module {
         }
 
         loadPatterns();
-    }
-
-    @Override
-    public void onUpdate() {
-        if (lastPattern != (int) currentPattern.getInput()) {
-            reset();
-        }
-        lastPattern = (int) currentPattern.getInput();
     }
 
     public static void click() {
@@ -156,6 +149,14 @@ public final class RecordClick extends Module {
         } catch (Exception e) {
             Utils.sendMessage("&cFailed to save pattern: &b" + pattern.getName());
         }
+    }
+
+    @Override
+    public void onUpdate() {
+        if (lastPattern != (int) currentPattern.getInput()) {
+            reset();
+        }
+        lastPattern = (int) currentPattern.getInput();
     }
 
 

@@ -20,6 +20,11 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class ChestStealer extends Module {
+    private static final ButtonSetting customChest = new ButtonSetting("Custom chest", false);
+    private static final ButtonSetting silent = new ButtonSetting("Silent", false);
+    private static final ButtonSetting notMoving = new ButtonSetting("Not Moving", false);
+    public static ButtonSetting allowMouseControl = new ButtonSetting("Allow mouse control", false);
+    private static State state = State.NONE;
     private final SliderSetting minStartDelay = new SliderSetting("Min start delay", 100, 0, 500, 10, "ms");
     private final SliderSetting maxStartDelay = new SliderSetting("Max start delay", 200, 0, 500, 10, "ms");
     private final SliderSetting minStealDelay = new SliderSetting("Min steal delay", 100, 0, 500, 10, "ms");
@@ -29,27 +34,21 @@ public class ChestStealer extends Module {
     private final ButtonSetting autoCloseIfInvFull = new ButtonSetting("Auto close if inv full", true, autoClose::isToggled);
     private final SliderSetting minCloseDelay = new SliderSetting("Min close delay", 50, 0, 500, 10, "ms", autoClose::isToggled);
     private final SliderSetting maxCloseDelay = new SliderSetting("Max close delay", 100, 0, 500, 10, "ms", autoClose::isToggled);
-    private static final ButtonSetting customChest = new ButtonSetting("Custom chest", false);
     private final ButtonSetting ignoreTrash = new ButtonSetting("Ignore trash", false);
-    private static final ButtonSetting silent = new ButtonSetting("Silent", false);
-    private static final ButtonSetting notMoving = new ButtonSetting("Not Moving", false);
-    public static ButtonSetting allowMouseControl = new ButtonSetting("Allow mouse control", false);
-
-    private static State state = State.NONE;
+    private final Set<Integer> stole = new HashSet<>();
     private long nextStealTime;
     private long nextCloseTime;
-    private final Set<Integer> stole = new HashSet<>();
-
-    public static boolean noChestRender() {
-        return ModuleManager.chestStealer != null && ModuleManager.chestStealer.isEnabled()
-                && silent.isToggled() && ContainerUtils.isChest(customChest.isToggled());
-    }
 
     public ChestStealer() {
         super("ChestStealer", category.player);
         this.registerSetting(minStartDelay, maxStartDelay, minStealDelay, maxStealDelay, shuffle,
                 autoClose, autoCloseIfInvFull, minCloseDelay, maxCloseDelay,
                 customChest, ignoreTrash, silent, notMoving, allowMouseControl);
+    }
+
+    public static boolean noChestRender() {
+        return ModuleManager.chestStealer != null && ModuleManager.chestStealer.isEnabled()
+                && silent.isToggled() && ContainerUtils.isChest(customChest.isToggled());
     }
 
     @Override

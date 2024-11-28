@@ -13,8 +13,8 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.lwjgl.input.Mouse;
 
 public class MiddleClick extends Module {
-    int prevSlot;
     public static ModeSetting middleClick;
+    int prevSlot;
     private boolean hasClicked;
     private int pearlEvent;
 

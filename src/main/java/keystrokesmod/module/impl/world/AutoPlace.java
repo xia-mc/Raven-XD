@@ -90,8 +90,7 @@ public class AutoPlace extends Module {
         if (fastPlaceJump.isToggled() && holdRight.isToggled() && !ModuleManager.fastPlace.isEnabled() && Mouse.isButtonDown(1)) {
             if (mc.thePlayer.motionY > 0.0) {
                 this.rd(1);
-            }
-            else if (!pitchCheck.isToggled()) {
+            } else if (!pitchCheck.isToggled()) {
                 this.rd(1000);
             }
         }

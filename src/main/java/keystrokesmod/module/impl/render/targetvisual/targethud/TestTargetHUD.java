@@ -17,7 +17,9 @@ import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.EntityLivingBase;
 import org.jetbrains.annotations.NotNull;
+
 import java.awt.*;
+
 import static keystrokesmod.module.impl.render.TargetHUD.*;
 
 public class TestTargetHUD extends SubMode<TargetHUD> implements ITargetVisual {

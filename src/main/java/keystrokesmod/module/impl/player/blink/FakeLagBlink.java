@@ -38,15 +38,15 @@ public class FakeLagBlink extends SubMode<Blink> {
     private final ButtonSetting drawRealPosition;
 
     private final Queue<TimedPacket> packetQueue = new ConcurrentLinkedQueue<>();
+    private final Animation animationX = new Animation(Easing.EASE_OUT_CIRC, 200);
+    private final Animation animationY = new Animation(Easing.EASE_OUT_CIRC, 200);
+    private final Animation animationZ = new Animation(Easing.EASE_OUT_CIRC, 200);
+    private final Progress progress = new Progress("Blink");
     public boolean needToDisable = false;
     private Vec3 vec3 = Vec3.ZERO;
     private long startTime = 0;
     private long stopTime = 0;
     private long blinkedTime = 0;
-    private final Animation animationX = new Animation(Easing.EASE_OUT_CIRC, 200);
-    private final Animation animationY = new Animation(Easing.EASE_OUT_CIRC, 200);
-    private final Animation animationZ = new Animation(Easing.EASE_OUT_CIRC, 200);
-    private final Progress progress = new Progress("Blink");
 
     public FakeLagBlink(String name, @NotNull Blink parent) {
         super(name, parent);

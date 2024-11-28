@@ -3,7 +3,6 @@ package keystrokesmod.module.impl.movement.noweb;
 import keystrokesmod.event.BlockWebEvent;
 import keystrokesmod.module.impl.movement.NoWeb;
 import keystrokesmod.module.setting.impl.SubMode;
-import net.minecraft.init.Blocks;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 

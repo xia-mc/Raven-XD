@@ -19,7 +19,7 @@ public class VulcanJesus extends SubMode<Jesus> {
 
     @SubscribeEvent
     public void onPreMotion(PreMotionEvent event) {
-        if (!mc.gameSettings.keyBindJump.isPressed() && mc.thePlayer.isInWater() && isFirstTimeInWater && !(mc.thePlayer.posY % 1 == 0 || (mc.thePlayer.posY * 2) % 1 == 0) ) {
+        if (!mc.gameSettings.keyBindJump.isPressed() && mc.thePlayer.isInWater() && isFirstTimeInWater && !(mc.thePlayer.posY % 1 == 0 || (mc.thePlayer.posY * 2) % 1 == 0)) {
             mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY - .85, mc.thePlayer.posZ);
             isFirstTimeInWater = false;
 
@@ -29,43 +29,44 @@ public class VulcanJesus extends SubMode<Jesus> {
             if (MoveUtil.isMoving()) MoveUtil.strafe(MoveUtil.getAllowedHorizontalDistance() - Math.random() / 1000);
             mc.thePlayer.motionY = 0;
         }
-        if (isFirstTimeInWater){
-            posY = mc.thePlayer.posY-.85;
+        if (isFirstTimeInWater) {
+            posY = mc.thePlayer.posY - .85;
         }
 
         if (mc.thePlayer.isInWater()) {
             waterTicks = 0;
         }
 
-        if(waterTicks<20){
+        if (waterTicks < 20) {
             MoveUtil.strafe();
         }
         waterTicks++;
 
         boolean jump = mc.gameSettings.keyBindJump.isKeyDown() || mc.gameSettings.keyBindJump.isPressed();
 
-        if (jump && mc.thePlayer.isInWater() && !mc.gameSettings.keyBindJump.isKeyDown() && !mc.gameSettings.keyBindJump.isPressed()){
+        if (jump && mc.thePlayer.isInWater() && !mc.gameSettings.keyBindJump.isKeyDown() && !mc.gameSettings.keyBindJump.isPressed()) {
             mc.thePlayer.setPosition(mc.thePlayer.posX, posY, mc.thePlayer.posZ);
         }
 
         if (mc.thePlayer.isPotionActive(Potion.moveSpeed) && mc.thePlayer.isInWater() && !mc.gameSettings.keyBindJump.isKeyDown()) {
-            if (MoveUtil.isMoving()) MoveUtil.strafe((.05*(1+(mc.thePlayer.getActivePotionEffect(Potion.moveSpeed).getAmplifier())) +.34 - Math.random() / 1000));
+            if (MoveUtil.isMoving())
+                MoveUtil.strafe((.05 * (1 + (mc.thePlayer.getActivePotionEffect(Potion.moveSpeed).getAmplifier())) + .34 - Math.random() / 1000));
         }
 
-        if(!mc.gameSettings.keyBindJump.isKeyDown() && mc.thePlayer.isInWater()  && !(mc.thePlayer.posY % 1 == 0 || (mc.thePlayer.posY * 2) % 1 == 0)){
+        if (!mc.gameSettings.keyBindJump.isKeyDown() && mc.thePlayer.isInWater() && !(mc.thePlayer.posY % 1 == 0 || (mc.thePlayer.posY * 2) % 1 == 0)) {
             mc.thePlayer.setPosition(mc.thePlayer.posX, posY, mc.thePlayer.posZ);
         }
-        if(mc.gameSettings.keyBindJump.isKeyDown() && mc.thePlayer.isInWater()){
+        if (mc.gameSettings.keyBindJump.isKeyDown() && mc.thePlayer.isInWater()) {
             mc.thePlayer.motionY = .6;
             MoveUtil.strafe(.1);
 
         }
 
-        if(mc.thePlayer.isInWater() && !mc.gameSettings.keyBindJump.isKeyDown() && !mc.gameSettings.keyBindJump.isPressed()  && !(mc.thePlayer.posY % 1 == 0 || (mc.thePlayer.posY * 2) % 1 == 0)){
-            mc.thePlayer.setPosition(mc.thePlayer.posX, posY-.2, mc.thePlayer.posZ);
+        if (mc.thePlayer.isInWater() && !mc.gameSettings.keyBindJump.isKeyDown() && !mc.gameSettings.keyBindJump.isPressed() && !(mc.thePlayer.posY % 1 == 0 || (mc.thePlayer.posY * 2) % 1 == 0)) {
+            mc.thePlayer.setPosition(mc.thePlayer.posX, posY - .2, mc.thePlayer.posZ);
         }
 
-        if (!mc.thePlayer.isInWater() && !isFirstTimeInWater  && !(mc.thePlayer.posY % 1 == 0 || (mc.thePlayer.posY * 2) % 1 == 0))  {
+        if (!mc.thePlayer.isInWater() && !isFirstTimeInWater && !(mc.thePlayer.posY % 1 == 0 || (mc.thePlayer.posY * 2) % 1 == 0)) {
             isFirstTimeInWater = true;
         }
     }

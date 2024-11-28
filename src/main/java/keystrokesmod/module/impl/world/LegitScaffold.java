@@ -1,6 +1,5 @@
 package keystrokesmod.module.impl.world;
 
-import keystrokesmod.event.BlockPlaceEvent;
 import keystrokesmod.mixins.impl.client.KeyBindingAccessor;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.other.SlotHandler;

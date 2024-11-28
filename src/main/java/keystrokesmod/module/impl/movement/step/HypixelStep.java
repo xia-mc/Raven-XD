@@ -1,89 +1,80 @@
 package keystrokesmod.module.impl.movement.step;
 
-import keystrokesmod.event.MoveEvent;
+import it.unimi.dsi.fastutil.doubles.DoubleList;
 import keystrokesmod.event.PreMotionEvent;
-import keystrokesmod.event.SprintEvent;
+import keystrokesmod.event.StepEvent;
 import keystrokesmod.module.impl.movement.Step;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.impl.SubMode;
-import keystrokesmod.utility.BlockUtils;
 import keystrokesmod.utility.MoveUtil;
+import keystrokesmod.utility.PacketUtils;
 import keystrokesmod.utility.Utils;
-import net.minecraft.potion.Potion;
+import net.minecraft.network.play.client.C03PacketPlayer;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-
-import static keystrokesmod.module.impl.world.tower.HypixelTower.isGoingDiagonally;
-import static keystrokesmod.module.impl.world.tower.HypixelTower.randomAmount;
+import org.jetbrains.annotations.NotNull;
 
 public class HypixelStep extends SubMode<Step> {
-    private final SliderSetting boost = new SliderSetting("Boost", 0, 0, 0.4, 0.1);
-    private final SliderSetting delay = new SliderSetting("Delay", 0, 0, 5000, 250, "ms");
+    public static final DoubleList MOTION = DoubleList.of(.41999998688698, .7531999805212, 1.001335997911214, 1.16610926093821, 1.24918707874468, 1.093955074228084);
 
-    private int offGroundTicks = -1;
-    private boolean stepping = false;
+    private final SliderSetting delay;
+    private final SliderSetting tick;
+
+    private State state = State.NONE;
+    private double x, y, z;
     private long lastStep = -1;
 
-    public HypixelStep(String name, Step parent) {
+    public HypixelStep(String name, @NotNull Step parent) {
         super(name, parent);
-        this.registerSetting(boost, delay);
+        this.registerSetting(delay = new SliderSetting("Delay", 1000, 0, 5000, 250, "ms"));
+        this.registerSetting(tick = new SliderSetting("Tick", MOTION.size(), 1, MOTION.size(), 1));
     }
 
     @Override
-    public void onDisable() {
-        offGroundTicks = -1;
-        stepping = false;
+    public void onDisable() throws Throwable {
+        mc.thePlayer.stepHeight = 0.6f;
+        state = State.NONE;
     }
 
     @SubscribeEvent
+    public void onStep(@NotNull StepEvent event) {
+        if (event.getHeight() == 1) {
+            state = State.BALANCE;
+            Utils.getTimer().timerSpeed = (float) (1.0 / tick.getInput());
+            mc.thePlayer.stepHeight = 0.6f;
+
+            x = mc.thePlayer.lastTickPosX;
+            y = mc.thePlayer.posY;
+            z = mc.thePlayer.lastTickPosZ;
+            lastStep = System.currentTimeMillis();
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOW)
     public void onPreMotion(PreMotionEvent event) {
-        final long time = System.currentTimeMillis();
-        if (mc.thePlayer.onGround && mc.thePlayer.isCollidedHorizontally && MoveUtil.isMoving() && time - lastStep >= delay.getInput()) {
-            stepping = true;
-            lastStep = time;
+        if (System.currentTimeMillis() - lastStep > delay.getInput())
+            mc.thePlayer.stepHeight = 1;
+
+        switch (state) {
+            case BALANCE:
+                event.setCanceled(true);
+                MoveUtil.stop();
+                state = State.STEP;
+                break;
+            case STEP:
+                for (double motion : MOTION) {
+                    PacketUtils.sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(x, y + motion, z, false));
+                }
+                MoveUtil.stop();
+                Utils.resetTimer();
+                state = State.NONE;
+                break;
         }
     }
 
-    @SubscribeEvent
-    public void onMove(MoveEvent event) {
-        if (mc.thePlayer.onGround) {
-            offGroundTicks = 0;
-        } else if (offGroundTicks != -1) {
-            offGroundTicks++;
-        }
-
-        if (stepping) {
-            if (!MoveUtil.isMoving() || Utils.jumpDown() || (!mc.thePlayer.isCollidedHorizontally && offGroundTicks > 5)) {
-                stepping = false;
-                return;
-            }
-
-            if (mc.thePlayer.isPotionActive(Potion.jump)) return;
-            final boolean airUnder = !BlockUtils.insideBlock(
-                    mc.thePlayer.getEntityBoundingBox()
-                            .offset(0, -1, 0)
-                            .expand(0.239, 0, 0.239)
-            );;
-            final float speed = isGoingDiagonally(0.1) ? 0.22F : 0.29888888F;
-
-            switch (offGroundTicks) {
-                case 0:
-                    event.setY(mc.thePlayer.motionY = 0.4198479950428009);
-                    MoveUtil.strafe(speed - randomAmount());
-                    break;
-                case 5:
-                    if (mc.thePlayer.isCollidedHorizontally || !BlockUtils.blockRelativeToPlayer(0, -1, 0).isFullCube())
-                        return;
-                    MoveUtil.moveFlying(boost.getInput());
-                    mc.thePlayer.motionY = MoveUtil.predictedMotion(mc.thePlayer.motionY, 2);
-                    break;
-            }
-        }
-    }
-
-    @SubscribeEvent
-    public void onSprint(SprintEvent event) {
-        if (stepping) {
-            event.setOmni(true);
-        }
+    private enum State {
+        NONE,
+        BALANCE,
+        STEP
     }
 }

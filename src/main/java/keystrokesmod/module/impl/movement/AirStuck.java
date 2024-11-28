@@ -1,7 +1,6 @@
 package keystrokesmod.module.impl.movement;
 
 import keystrokesmod.event.MoveEvent;
-import keystrokesmod.event.MoveInputEvent;
 import keystrokesmod.event.RotationEvent;
 import keystrokesmod.event.SendPacketEvent;
 import keystrokesmod.module.Module;

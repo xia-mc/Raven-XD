@@ -1,14 +1,11 @@
 package keystrokesmod.module.impl.render;
 
-import keystrokesmod.Raven;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.world.AntiBot;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
-import keystrokesmod.utility.render.RenderUtils;
 import keystrokesmod.utility.Utils;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
+import keystrokesmod.utility.render.RenderUtils;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;

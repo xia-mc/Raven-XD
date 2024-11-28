@@ -36,11 +36,10 @@ public class TimerRange extends Module {
     private final ButtonSetting clearMotion;
     private final ButtonSetting notWhileKB;
     private final ButtonSetting notWhileScaffold;
-
+    private final Queue<Packet<?>> delayedPackets = new ConcurrentLinkedQueue<>();
     private State state = State.NONE;
     private int hasLag = 0;
     private long lastTimerTime = -1;
-    private final Queue<Packet<?>> delayedPackets = new ConcurrentLinkedQueue<>();
     private float yaw, pitch;
     private double motionX, motionY, motionZ;
 

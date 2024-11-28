@@ -9,7 +9,6 @@ import keystrokesmod.module.impl.other.SlotHandler;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.ModeSetting;
 import keystrokesmod.module.setting.impl.ModeValue;
-import keystrokesmod.utility.BlockUtils;
 import keystrokesmod.utility.ContainerUtils;
 import keystrokesmod.utility.CoolDown;
 import keystrokesmod.utility.Utils;

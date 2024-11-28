@@ -13,7 +13,9 @@ import keystrokesmod.module.setting.impl.ModeSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.utils.ModeOnly;
 import keystrokesmod.script.classes.Vec3;
-import keystrokesmod.utility.*;
+import keystrokesmod.utility.BlockUtils;
+import keystrokesmod.utility.RotationUtils;
+import keystrokesmod.utility.Utils;
 import keystrokesmod.utility.aim.AimSimulator;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.network.play.client.C0APacketAnimation;
@@ -24,7 +26,9 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.apache.commons.lang3.tuple.Triple;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.Set;
 
 public class BlockIn extends Module {
     private static final String[] rotationModes = new String[]{"None", "Block", "Strict"};

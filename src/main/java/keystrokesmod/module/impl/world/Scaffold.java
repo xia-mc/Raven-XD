@@ -17,8 +17,8 @@ import keystrokesmod.module.impl.world.scaffold.rotation.*;
 import keystrokesmod.module.impl.world.scaffold.sprint.*;
 import keystrokesmod.module.setting.impl.*;
 import keystrokesmod.module.setting.utils.ModeOnly;
-import keystrokesmod.utility.*;
 import keystrokesmod.utility.Timer;
+import keystrokesmod.utility.*;
 import keystrokesmod.utility.aim.AimSimulator;
 import keystrokesmod.utility.aim.RotationData;
 import keystrokesmod.utility.movement.Move;
@@ -48,14 +48,20 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class Scaffold extends IAutoClicker {
+    private static final String[] precisionModes = new String[]{"Very low", "Low", "Moderate", "High", "Very high", "Unlimited"};
+    public final SliderSetting motion;
+    public final ButtonSetting safeWalk;
+    public final ButtonSetting tower;
+    public final ButtonSetting sameY;
+    public final ButtonSetting autoJump;
     private final ModeValue clickMode;
     private final ButtonSetting alwaysPlaceIfPossible;
     private final SliderSetting aimSpeed;
-    public final SliderSetting motion;
     private final ModeValue rotation;
     private final ButtonSetting moveFix;
     private final SliderSetting strafe;
     private final ButtonSetting notWhileDiagonal;
+    private final ButtonSetting notWhileTower;
     private final ModeValue sprint;
     private final ButtonSetting cancelSprint;
     private final ButtonSetting legit;
@@ -79,43 +85,39 @@ public class Scaffold extends IAutoClicker {
     private final ButtonSetting fastOnRMB;
     private final ButtonSetting highlightBlocks;
     private final ButtonSetting multiPlace;
-    public final ButtonSetting safeWalk;
     private final ButtonSetting showBlockCount;
     private final ButtonSetting delayOnJump;
     private final ButtonSetting stopAtStart;
     private final ButtonSetting silentSwing;
     private final ButtonSetting noSwing;
-    public final ButtonSetting tower;
-    public final ButtonSetting sameY;
-    public final ButtonSetting autoJump;
     private final ButtonSetting expand;
     private final SliderSetting expandDistance;
     private final ButtonSetting polar;
     private final ButtonSetting postPlace;
     private final ButtonSetting lookView;
+    private final ButtonSetting cancelSprintAtStart;
 
+    private final Map<BlockPos, Timer> highlight = new HashMap<>();
     public @Nullable MovingObjectPosition rayCasted = null;
     public MovingObjectPosition placeBlock;
-    private int lastSlot;
-    private static final String[] precisionModes = new String[]{"Very low", "Low", "Moderate", "High", "Very high", "Unlimited"};
     public float placeYaw;
     public float placePitch = 85;
     public int at;
     public int index;
     public boolean rmbDown;
-    private double startPos = -1;
-    private final Map<BlockPos, Timer> highlight = new HashMap<>();
-    private boolean forceStrict;
-    private boolean down;
     public boolean delay;
     public boolean place;
+    public int offGroundTicks = 0;
+    public int onGroundTicks = 0;
+    public boolean telly$noBlockPlace = false;
+    private int lastSlot;
+    private double startPos = -1;
+    private boolean forceStrict;
+    private boolean down;
     private int add = 0;
     private int sneak$bridged = 0;
     private int jump$bridged = 0;
     private boolean placedUp;
-    public int offGroundTicks = 0;
-    public int onGroundTicks = 0;
-    public boolean telly$noBlockPlace = false;
     private Float lastYaw = null, lastPitch = null;
     private boolean polar$waitingForExpand = false;
     private HoverState hoverState = HoverState.DONE;
@@ -146,6 +148,7 @@ public class Scaffold extends IAutoClicker {
         this.registerSetting(motion = new SliderSetting("Motion", 1.0, 0.5, 1.2, 0.01, () -> !moveFix.isToggled()));
         this.registerSetting(strafe = new SliderSetting("Strafe", 0, 0, 90, 5));
         this.registerSetting(notWhileDiagonal = new ButtonSetting("Not while diagonal", true, () -> strafe.getInput() != 0));
+        this.registerSetting(notWhileTower = new ButtonSetting("Not while tower", false, () -> strafe.getInput() != 0));
         this.registerSetting(sprint = new ModeValue("Sprint", this)
                 .add(new DisabledSprint("Disabled", this))
                 .add(new VanillaSprint("Vanilla", this))
@@ -196,6 +199,31 @@ public class Scaffold extends IAutoClicker {
         this.registerSetting(polar = new ButtonSetting("Polar", false, expand::isToggled));
         this.registerSetting(postPlace = new ButtonSetting("Post place", false, "Place on PostUpdate."));
         this.registerSetting(lookView = new ButtonSetting("Look view", false));
+        this.registerSetting(cancelSprintAtStart = new ButtonSetting("Cancel sprint at start", false));
+    }
+
+    public static boolean sprint() {
+        if (ModuleManager.scaffold.isEnabled()
+                && ModuleManager.scaffold.sprint.getInput() > 0
+                && (!ModuleManager.scaffold.fastOnRMB.isToggled() || Mouse.isButtonDown(1))) {
+            return ((IScaffoldSprint) ModuleManager.scaffold.sprint.getSelected()).isSprint();
+        }
+        return false;
+    }
+
+    public static int getSlot() {
+        int slot = -1;
+        int highestStack = -1;
+        for (int i = 0; i < 9; ++i) {
+            final ItemStack itemStack = mc.thePlayer.inventory.mainInventory[i];
+            if (itemStack != null && itemStack.getItem() instanceof ItemBlock && ContainerUtils.canBePlaced((ItemBlock) itemStack.getItem()) && itemStack.stackSize > 0) {
+                if (mc.thePlayer.inventory.mainInventory[i].stackSize > highestStack) {
+                    highestStack = mc.thePlayer.inventory.mainInventory[i].stackSize;
+                    slot = i;
+                }
+            }
+        }
+        return slot;
     }
 
     public void onDisable() {
@@ -241,8 +269,14 @@ public class Scaffold extends IAutoClicker {
             hoverState = HoverState.DONE;
         }
 
-        if (stopAtStart.isToggled())
+        if (stopAtStart.isToggled()) {
             stopMoving = true;
+        }
+
+        if (cancelSprintAtStart.isToggled()) {
+            mc.thePlayer.setSprinting(false);
+        }
+
     }
 
     @SubscribeEvent
@@ -257,7 +291,7 @@ public class Scaffold extends IAutoClicker {
         float yaw = data.getYaw();
         float pitch = data.getPitch();
 
-        if (!isDiagonal() || !notWhileDiagonal.isToggled()) {
+        if ((!isDiagonal() || !notWhileDiagonal.isToggled()) && (!ModuleManager.tower.canTower() || !notWhileTower.isToggled())) {
             if (isDiagonal()) {
                 yaw += (float) strafe.getInput();
             } else {
@@ -637,17 +671,14 @@ public class Scaffold extends IAutoClicker {
             String color = "§";
             if (blocks <= 5) {
                 color += "c";
-            }
-            else if (blocks <= 15) {
+            } else if (blocks <= 15) {
                 color += "6";
-            }
-            else if (blocks <= 25) {
+            } else if (blocks <= 25) {
                 color += "e";
-            }
-            else {
+            } else {
                 color = "";
             }
-            mc.fontRendererObj.drawStringWithShadow(color + blocks + " §rblock" + (blocks == 1 ? "" : "s"), (float) scaledResolution.getScaledWidth() /2 + 8, (float) scaledResolution.getScaledHeight() /2 + 4, -1);
+            mc.fontRendererObj.drawStringWithShadow(color + blocks + " §rblock" + (blocks == 1 ? "" : "s"), (float) scaledResolution.getScaledWidth() / 2 + 8, (float) scaledResolution.getScaledHeight() / 2 + 4, -1);
         }
     }
 
@@ -757,15 +788,6 @@ public class Scaffold extends IAutoClicker {
         }
     }
 
-    public static boolean sprint() {
-        if (ModuleManager.scaffold.isEnabled()
-                && ModuleManager.scaffold.sprint.getInput() > 0
-                && (!ModuleManager.scaffold.fastOnRMB.isToggled() || Mouse.isButtonDown(1))) {
-            return ((IScaffoldSprint) ModuleManager.scaffold.sprint.getSelected()).isSprint();
-        }
-        return false;
-    }
-
     private boolean forceStrict(float value) {
         return (inBetween(-170, -105, value) || inBetween(-80, 80, value) || inBetween(98, 170, value)) && !inBetween(-10, 10, value);
     }
@@ -813,8 +835,7 @@ public class Scaffold extends IAutoClicker {
             } else {
                 if (moveStrafe > 0.0) {
                     yaw = 90.0f;
-                }
-                else if (moveStrafe < 0.0) {
+                } else if (moveStrafe < 0.0) {
                     yaw = -90.0f;
                 }
             }
@@ -909,21 +930,6 @@ public class Scaffold extends IAutoClicker {
         return false;
     }
 
-    public static int getSlot() {
-        int slot = -1;
-        int highestStack = -1;
-        for (int i = 0; i < 9; ++i) {
-            final ItemStack itemStack = mc.thePlayer.inventory.mainInventory[i];
-            if (itemStack != null && itemStack.getItem() instanceof ItemBlock && ContainerUtils.canBePlaced((ItemBlock) itemStack.getItem()) && itemStack.stackSize > 0) {
-                if (mc.thePlayer.inventory.mainInventory[i].stackSize > highestStack) {
-                    highestStack = mc.thePlayer.inventory.mainInventory[i].stackSize;
-                    slot = i;
-                }
-            }
-        }
-        return slot;
-    }
-
     public int totalBlocks() {
         if (!Utils.nullCheck()) return 0;
 
@@ -938,24 +944,6 @@ public class Scaffold extends IAutoClicker {
             return totalBlocks;
         } catch (Throwable e) {
             return 0;
-        }
-    }
-
-    static class EnumFacingOffset {
-        EnumFacing enumFacing;
-        Vec3 offset;
-
-        EnumFacingOffset(EnumFacing enumFacing, Vec3 offset) {
-            this.enumFacing = enumFacing;
-            this.offset = offset;
-        }
-
-        EnumFacing getEnumFacing() {
-            return enumFacing;
-        }
-
-        Vec3 getOffset() {
-            return offset;
         }
     }
 
@@ -974,5 +962,23 @@ public class Scaffold extends IAutoClicker {
         JUMP,
         FALL,
         DONE
+    }
+
+    static class EnumFacingOffset {
+        EnumFacing enumFacing;
+        Vec3 offset;
+
+        EnumFacingOffset(EnumFacing enumFacing, Vec3 offset) {
+            this.enumFacing = enumFacing;
+            this.offset = offset;
+        }
+
+        EnumFacing getEnumFacing() {
+            return enumFacing;
+        }
+
+        Vec3 getOffset() {
+            return offset;
+        }
     }
 }

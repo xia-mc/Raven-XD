@@ -22,10 +22,9 @@ public class ZipVelocity extends SubMode<Velocity> {
     private final SliderSetting delay;
     private final ButtonSetting stopOnAttack;
     private final ButtonSetting debug;
-
+    private final Queue<Packet<INetHandlerPlayClient>> delayedPackets = new ConcurrentLinkedQueue<>();
     private long lastVelocityTime = -1;
     private boolean delayed = false;
-    private final Queue<Packet<INetHandlerPlayClient>> delayedPackets = new ConcurrentLinkedQueue<>();
 
     public ZipVelocity(String name, @NotNull Velocity parent) {
         super(name, parent);
@@ -60,7 +59,7 @@ public class ZipVelocity extends SubMode<Velocity> {
             if (((S12PacketEntityVelocity) event.getPacket()).getEntityID() != mc.thePlayer.getEntityId()) return;
 
             event.setCanceled(true);
-            delayedPackets.add(((S12PacketEntityVelocity) event.getPacket()));
+            delayedPackets.add(event.getPacket());
             if (lastVelocityTime == -1) {
                 lastVelocityTime = System.currentTimeMillis();
                 delayed = true;
@@ -71,7 +70,7 @@ public class ZipVelocity extends SubMode<Velocity> {
                     release();
                 }
                 event.setCanceled(true);
-                delayedPackets.add(((S32PacketConfirmTransaction) event.getPacket()));
+                delayedPackets.add(event.getPacket());
             }
         }
     }

@@ -1,6 +1,5 @@
 package keystrokesmod.module.impl.other.anticheats.checks.movement;
 
-import keystrokesmod.module.impl.other.Anticheat;
 import keystrokesmod.module.impl.other.anticheats.Check;
 import keystrokesmod.module.impl.other.anticheats.TRPlayer;
 import keystrokesmod.module.impl.other.anticheats.config.AdvancedConfig;
@@ -13,7 +12,10 @@ import net.minecraft.util.BlockPos;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Objects;
 
 public class MotionA extends Check {
     public static final List<Block> IGNORED_BLOCKS = new ArrayList<>();
@@ -72,6 +74,27 @@ public class MotionA extends Check {
         JUMP_MOTIONS_2.add(-0.06843069924140427);
     }
 
+    public static @Nullable List<Double> getPossibleMotions(@NotNull TRPlayer player) {
+        try {
+            switch (player.fabricPlayer.getActivePotionEffects().stream()
+                    .filter(effect -> effect.getEffectName().toLowerCase().contains("jump"))
+                    .findAny()
+                    .orElseThrow(NoSuchElementException::new).getAmplifier()) {
+                case 0: {
+                    return JUMP_MOTIONS_1;
+                }
+                case 1: {
+                    return JUMP_MOTIONS_2;
+                }
+                default: {
+                    return null;
+                }
+            }
+        } catch (NoSuchElementException e) {
+            return JUMP_MOTIONS;
+        }
+    }
+
     @Override
     public void _onTick() {
         if (disableTicks > 0) {
@@ -114,21 +137,6 @@ public class MotionA extends Check {
                 && !player.fabricPlayer.isOnLadder() && player.fabricPlayer.hurtTime <= 0
                 && BlockUtils.isFullBlock(LevelUtils.getClientLevel().getBlockState(new BlockPos(player.fabricPlayer)))
                 && IGNORED_BLOCKS.stream().noneMatch(block -> LevelUtils.getClientLevel().getBlockState(new BlockPos(player.fabricPlayer)).getBlock().equals(block));
-    }
-
-    public static @Nullable List<Double> getPossibleMotions(@NotNull TRPlayer player) {
-        try {
-            switch (player.fabricPlayer.getActivePotionEffects().stream()
-                    .filter(effect -> effect.getEffectName().toLowerCase().contains("jump"))
-                    .findAny()
-                    .orElseThrow(NoSuchElementException::new).getAmplifier()) {
-                case 0 : { return JUMP_MOTIONS_1;}
-                case 1 : { return JUMP_MOTIONS_2;}
-                default : { return null;}
-            }
-        } catch (NoSuchElementException e) {
-            return JUMP_MOTIONS;
-        }
     }
 
     @Override

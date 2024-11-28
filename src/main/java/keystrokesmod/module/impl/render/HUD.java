@@ -7,12 +7,15 @@ import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.DescriptionSetting;
 import keystrokesmod.module.setting.impl.ModeSetting;
 import keystrokesmod.module.setting.impl.SubMode;
+import keystrokesmod.utility.Theme;
+import keystrokesmod.utility.Utils;
 import keystrokesmod.utility.font.FontManager;
 import keystrokesmod.utility.font.IFont;
 import keystrokesmod.utility.render.RenderUtils;
-import keystrokesmod.utility.Theme;
-import keystrokesmod.utility.Utils;
-import net.minecraft.client.gui.*;
+import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.GuiChat;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.config.GuiButtonExt;
@@ -24,20 +27,11 @@ import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 import java.io.IOException;
-import java.util.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class HUD extends Module {
-    public static ModeSetting theme;
-    public static ModeSetting font;
-    public static ButtonSetting dropShadow;
-    private final ButtonSetting background;
-    private final ButtonSetting sidebar;
-    public static ButtonSetting alphabeticalSort;
-    private static ButtonSetting alignRight;
-    public static ButtonSetting lowercase;
-    public static ButtonSetting showInfo;
     private static final ButtonSetting combat = new ButtonSetting("Combat", true);
     private static final ButtonSetting movement = new ButtonSetting("Movement", true);
     private static final ButtonSetting player = new ButtonSetting("Player", true);
@@ -50,8 +44,17 @@ public class HUD extends Module {
     private static final ButtonSetting scripts = new ButtonSetting("Scripts", true);
     private static final ButtonSetting exploit = new ButtonSetting("Exploit", true);
     private static final ButtonSetting experimental = new ButtonSetting("Experimental", true);
+    public static ModeSetting theme;
+    public static ModeSetting font;
+    public static ButtonSetting dropShadow;
+    public static ButtonSetting alphabeticalSort;
+    public static ButtonSetting lowercase;
+    public static ButtonSetting showInfo;
     public static int hudX = 5;
     public static int hudY = 70;
+    private static ButtonSetting alignRight;
+    private final ButtonSetting background;
+    private final ButtonSetting sidebar;
     private boolean isAlphabeticalSort;
     private boolean canShowInfo;
 
@@ -75,6 +78,65 @@ public class HUD extends Module {
 
         this.registerSetting(new DescriptionSetting("Categories"));
         this.registerSetting(combat, movement, player, world, render, minigames, fun, other, client, scripts, exploit, experimental);
+    }
+
+    public static double getLongestModule(IFont fr) {
+        double length = 0;
+
+        for (Module module : ModuleManager.organizedModules) {
+            if (module.isEnabled()) {
+                String moduleName = module.getPrettyName();
+                if (showInfo.isToggled() && !module.getInfo().isEmpty()) {
+                    moduleName += " §7" + module.getInfo();
+                }
+                if (lowercase.isToggled()) {
+                    moduleName = moduleName.toLowerCase();
+                }
+                if (fr.width(moduleName) > length) {
+                    length = fr.width(moduleName);
+                }
+            }
+        }
+        return length;
+    }
+
+    private static boolean isIgnored(@NotNull Module module) {
+        if (!module.isEnabled() || module.getName().equals("HUD"))
+            return true;
+        if (module instanceof SubMode)
+            return true;
+
+        if (module.moduleCategory() == category.combat && !combat.isToggled()) return true;
+        if (module.moduleCategory() == category.movement && !movement.isToggled()) return true;
+        if (module.moduleCategory() == category.player && !player.isToggled()) return true;
+        if (module.moduleCategory() == category.world && !world.isToggled()) return true;
+        if (module.moduleCategory() == category.render && !render.isToggled()) return true;
+        if (module.moduleCategory() == category.minigames && !minigames.isToggled()) return true;
+        if (module.moduleCategory() == category.fun && !fun.isToggled()) return true;
+        if (module.moduleCategory() == category.other && !other.isToggled()) return true;
+        if (module.moduleCategory() == category.client && !client.isToggled()) return true;
+        if (module.moduleCategory() == category.scripts && !scripts.isToggled()) return true;
+        if (module.moduleCategory() == category.exploit && !exploit.isToggled()) return true;
+        if (module.moduleCategory() == category.experimental && !experimental.isToggled()) return true;
+
+        if (module.isHidden()) {
+            return true;
+        }
+        return module == ModuleManager.commandLine;
+    }
+
+    public static IFont getFontRenderer() {
+        switch ((int) font.getInput()) {
+            default:
+            case 0:
+                return FontManager.getMinecraft();
+            case 1:
+                return FontManager.productSans20;
+            case 2:
+                return FontManager.regular22;
+            case 3:
+                return FontManager.tenacity20;
+        }
     }
 
     public void onEnable() {
@@ -129,8 +191,7 @@ public class HUD extends Module {
                 getFontRenderer().drawString(text, n3, n, e, dropShadow.isToggled());
                 n += Math.round(getFontRenderer().height() + 2);
             }
-        }
-        catch (Exception exception) {
+        } catch (Exception exception) {
             Utils.sendMessage("&cAn error occurred rendering HUD. check your logs");
             Utils.sendDebugMessage(Arrays.toString(exception.getStackTrace()));
             Utils.log.error(exception);
@@ -155,26 +216,6 @@ public class HUD extends Module {
             texts.add(text);
         }
         return texts;
-    }
-
-    public static double getLongestModule(IFont fr) {
-        double length = 0;
-
-        for (Module module : ModuleManager.organizedModules) {
-            if (module.isEnabled()) {
-                String moduleName = module.getPrettyName();
-                if (showInfo.isToggled() && !module.getInfo().isEmpty()) {
-                    moduleName += " §7" + module.getInfo();
-                }
-                if (lowercase.isToggled()) {
-                    moduleName = moduleName.toLowerCase();
-                }
-                if (fr.width(moduleName) > length) {
-                    length = fr.width(moduleName);
-                }
-            }
-        }
-        return length;
     }
 
     static class EditScreen extends GuiScreen {
@@ -220,8 +261,7 @@ public class HUD extends Module {
                 this.maX = maX;
                 this.maY = maY;
                 this.clickMinX = miX;
-            }
-            else {
+            } else {
                 this.maX = clickPos[0];
                 this.maY = clickPos[1];
                 this.clickMinX = clickPos[2];
@@ -260,8 +300,7 @@ public class HUD extends Module {
                     fr.drawString(s, (float) x, (float) y, Color.white.getRGB(), HUD.dropShadow.isToggled());
                     y += Math.round(fr.height() + 2);
                 }
-            }
-            else {
+            } else {
                 double longestModule = getLongestModule(getFontRenderer());
                 double n = this.miY;
                 double n2 = 0.0;
@@ -278,8 +317,7 @@ public class HUD extends Module {
                     int e = Theme.getGradient((int) theme.getInput(), n2);
                     if (theme.getInput() == 0) {
                         n2 -= 120;
-                    }
-                    else {
+                    } else {
                         n2 -= 12;
                     }
                     double n3 = this.miX;
@@ -368,45 +406,6 @@ public class HUD extends Module {
                 }
             }
             return true;
-        }
-    }
-
-    private static boolean isIgnored(@NotNull Module module) {
-        if (!module.isEnabled() || module.getName().equals("HUD"))
-            return true;
-        if (module instanceof SubMode)
-            return true;
-
-        if (module.moduleCategory() == category.combat && !combat.isToggled()) return true;
-        if (module.moduleCategory() == category.movement && !movement.isToggled()) return true;
-        if (module.moduleCategory() == category.player && !player.isToggled()) return true;
-        if (module.moduleCategory() == category.world && !world.isToggled()) return true;
-        if (module.moduleCategory() == category.render && !render.isToggled()) return true;
-        if (module.moduleCategory() == category.minigames && !minigames.isToggled()) return true;
-        if (module.moduleCategory() == category.fun && !fun.isToggled()) return true;
-        if (module.moduleCategory() == category.other && !other.isToggled()) return true;
-        if (module.moduleCategory() == category.client && !client.isToggled()) return true;
-        if (module.moduleCategory() == category.scripts && !scripts.isToggled()) return true;
-        if (module.moduleCategory() == category.exploit && !exploit.isToggled()) return true;
-        if (module.moduleCategory() == category.experimental && !experimental.isToggled()) return true;
-
-        if (module.isHidden()) {
-            return true;
-        }
-        return module == ModuleManager.commandLine;
-    }
-
-    public static IFont getFontRenderer() {
-        switch ((int) font.getInput()) {
-            default:
-            case 0:
-                return FontManager.getMinecraft();
-            case 1:
-                return FontManager.productSans20;
-            case 2:
-                return FontManager.regular22;
-            case 3:
-                return FontManager.tenacity20;
         }
     }
 }

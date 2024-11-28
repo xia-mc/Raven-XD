@@ -4,8 +4,8 @@ import keystrokesmod.event.SendPacketEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
-import keystrokesmod.utility.render.RenderUtils;
 import keystrokesmod.utility.Utils;
+import keystrokesmod.utility.render.RenderUtils;
 import net.minecraft.client.entity.EntityOtherPlayerMP;
 import net.minecraft.network.play.client.C02PacketUseEntity;
 import net.minecraft.network.play.client.C07PacketPlayerDigging;
@@ -19,15 +19,15 @@ import org.lwjgl.input.Keyboard;
 import java.awt.*;
 
 public class Freecam extends Module {
-    public SliderSetting speed;
-    private ButtonSetting disableOnDamage;
-    private ButtonSetting showArm;
-    private ButtonSetting allowDigging;
-    private ButtonSetting allowInteracting;
-    private ButtonSetting allowPlacing;
     public static EntityOtherPlayerMP freeEntity = null;
+    public SliderSetting speed;
+    private final ButtonSetting disableOnDamage;
+    private final ButtonSetting showArm;
+    private final ButtonSetting allowDigging;
+    private final ButtonSetting allowInteracting;
+    private final ButtonSetting allowPlacing;
     private int[] lcc = new int[]{Integer.MAX_VALUE, 0};
-    private float[] sAng = new float[]{0.0F, 0.0F};
+    private final float[] sAng = new float[]{0.0F, 0.0F};
 
     public Freecam() {
         super("Freecam", category.render, 0);

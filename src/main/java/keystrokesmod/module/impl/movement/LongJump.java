@@ -17,6 +17,7 @@ public class LongJump extends Module {
                 .add(new VulcanLongJump("Vulcan", this))
                 .add(new GrimBoatLongJump("GrimBoat", this))
                 .add(new GrimVelocityLongJump("Test", this))
+//                .add(new HypixelLongJump("Hypixel", this))
         );
     }
 

@@ -18,7 +18,7 @@ public class FlyA extends Check {
         if (PlayerMove.isNoMove(player.currentMotion) || player.currentOnGround) return;
 
         if (player.lastMotion.y() == 0 && player.currentMotion.y() == 0) {
-            flag(String.format("Invalid Y-motion: %.2f  onGround=%s", player.currentMotion.y() , player.currentOnGround));
+            flag(String.format("Invalid Y-motion: %.2f  onGround=%s", player.currentMotion.y(), player.currentOnGround));
         }
     }
 

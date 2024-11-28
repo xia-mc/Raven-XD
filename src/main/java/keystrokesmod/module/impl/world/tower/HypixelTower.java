@@ -27,22 +27,32 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 public class HypixelTower extends SubMode<Tower> {
-    private final ButtonSetting notWhileMoving;
-    private final SliderSetting stopOnBlocks;
-
     public static final Set<EnumFacing> LIMIT_FACING = new HashSet<>(Collections.singleton(EnumFacing.SOUTH));
     public static final MoveCorrect moveCorrect = new MoveCorrect(0.3, MoveCorrect.Mode.POSITION);
+    private final ButtonSetting notWhileMoving;
+    private final SliderSetting airStrafeAmount;
+    private final SliderSetting stopOnBlocks;
     private boolean towering;
     private int towerTicks;
     private boolean blockPlaceRequest = false;
     private int lastOnGroundY;
     private BlockPos deltaPlace = BlockPos.ORIGIN;
     private int verticalPlaced = 0;
+    private float movementYaw;
 
     public HypixelTower(String name, @NotNull Tower parent) {
         super(name, parent);
         this.registerSetting(notWhileMoving = new ButtonSetting("Not while moving", true));
+        this.registerSetting(airStrafeAmount = new SliderSetting("Air strafe amount", 20, 15, 90, 5));
         this.registerSetting(stopOnBlocks = new SliderSetting("Stop on blocks", 6, 6, 10, 1));
+    }
+
+    public static boolean isGoingDiagonally(double amount) {
+        return Math.abs(mc.thePlayer.motionX) > amount && Math.abs(mc.thePlayer.motionZ) > amount;
+    }
+
+    public static double randomAmount() {
+        return 8.0E-4 + Math.random() * 0.008;
     }
 
     @SubscribeEvent
@@ -75,8 +85,10 @@ public class HypixelTower extends SubMode<Tower> {
                     } else if (this.towerTicks == 3) {
                         if (parent.canTower()) {
                             event.setY(mc.thePlayer.motionY = 0.4198499917984009);
-                            if (MoveUtil.isMoving())
+                            if (MoveUtil.isMoving()) {
                                 MoveUtil.strafe((float) towerSpeed - randomAmount());
+                                movementYaw = MoveUtil.simulationStrafeAngle(movementYaw, (float) airStrafeAmount.getInput());
+                            }
                             this.towerTicks = 0;
                         } else {
                             this.towering = false;
@@ -90,8 +102,10 @@ public class HypixelTower extends SubMode<Tower> {
                     Reflection.jumpTicks.set(mc.thePlayer, 0);
                     if (event.getY() > 0.0) {
                         event.setY(mc.thePlayer.motionY = 0.4198479950428009);
-                        if (MoveUtil.isMoving())
+                        if (MoveUtil.isMoving()) {
                             MoveUtil.strafe((float) towerSpeed - randomAmount());
+                            movementYaw = mc.thePlayer.rotationYaw;
+                        }
                     }
                 }
             }
@@ -105,6 +119,7 @@ public class HypixelTower extends SubMode<Tower> {
         if (mc.thePlayer.onGround) {
             lastOnGroundY = (int) mc.thePlayer.posY;
             deltaPlace = new BlockPos(0, 1, 1);
+            movementYaw = mc.thePlayer.rotationYaw;
         }
 
         if (blockPlaceRequest && !Utils.isMoving()) {
@@ -142,16 +157,9 @@ public class HypixelTower extends SubMode<Tower> {
         }
     }
 
-    public static boolean isGoingDiagonally(double amount) {
-        return Math.abs(mc.thePlayer.motionX) > amount && Math.abs(mc.thePlayer.motionZ) > amount;
-    }
-
-    public static double randomAmount() {
-        return 8.0E-4 + Math.random() * 0.008;
-    }
-
     @Override
     public void onEnable() throws Throwable {
         verticalPlaced = 0;
+        movementYaw = mc.thePlayer.rotationYaw;
     }
 }

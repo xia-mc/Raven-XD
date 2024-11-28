@@ -17,22 +17,6 @@ public class GroundSpoofA extends Check {
         super("GroundSpoofA", player);
     }
 
-    @Override
-    public void _onTick() {
-        if (player.lastOnGround2 && player.lastOnGround && player.currentOnGround) {  // check if it's legit
-            final BlockPos groundPos = new BlockPos(player.fabricPlayer).down();
-
-            if (check(LevelUtils.getClientLevel(), groundPos)) {
-                flag("spoof onGround=true");
-                setback();
-            }
-        }
-    }
-
-    public void setback() {
-        player.currentOnGround = false;
-    }
-
     public static boolean check(@NotNull WorldClient level, @NotNull BlockPos groundPos) {
         if (!level.getBlockState(groundPos).getBlock().isAir(level, groundPos) || !level.getBlockState(groundPos.down()).getBlock().isAir(level, groundPos.down()))
             return false;
@@ -55,6 +39,22 @@ public class GroundSpoofA extends Check {
         }
 
         return count >= 8;
+    }
+
+    @Override
+    public void _onTick() {
+        if (player.lastOnGround2 && player.lastOnGround && player.currentOnGround) {  // check if it's legit
+            final BlockPos groundPos = new BlockPos(player.fabricPlayer).down();
+
+            if (check(LevelUtils.getClientLevel(), groundPos)) {
+                flag("spoof onGround=true");
+                setback();
+            }
+        }
+    }
+
+    public void setback() {
+        player.currentOnGround = false;
     }
 
     @Override

@@ -4,6 +4,7 @@ import keystrokesmod.event.PreMotionEvent;
 import keystrokesmod.event.SprintEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
+import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.ModeSetting;
 import keystrokesmod.module.setting.utils.ModeOnly;
 import keystrokesmod.utility.MoveUtil;
@@ -16,12 +17,16 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.PlayerTickEvent;
 public class Sprint extends Module {
     private final ModeSetting mode = new ModeSetting("Mode", new String[]{"Legit", "Omni"}, 0);
     private final ModeSetting omniMode = new ModeSetting("Bypass mode", new String[]{"None", "Legit"}, 1, new ModeOnly(mode, 1));
+    private final ButtonSetting disableWhileScaffold;
+  
     public static boolean omni = false;
     public static boolean stopSprint = false;
 
     public Sprint() {
         super("Sprint", Module.category.movement, 0);
         this.registerSetting(mode, omniMode);
+        // This setting is only applicable in legit mode as omni mode handles sprinting differently
+        this.registerSetting(disableWhileScaffold = new ButtonSetting("Disable While Scaffold", false, new ModeOnly(mode, 0)));
     }
 
     public static boolean omni() {
@@ -42,7 +47,14 @@ public class Sprint extends Module {
     @SubscribeEvent
     public void p(PlayerTickEvent e) {
         if (Utils.nullCheck() && mc.inGameHasFocus) {
-            KeyBinding.setKeyBindState(mc.gameSettings.keyBindSprint.getKeyCode(), true);
+
+            if(ModuleManager.scaffold.isEnabled() && disableWhileScaffold.isToggled()) {
+                KeyBinding.setKeyBindState(mc.gameSettings.keyBindSprint.getKeyCode(), false);
+            }
+            else {
+                KeyBinding.setKeyBindState(mc.gameSettings.keyBindSprint.getKeyCode(), true);
+            }
+
         }
     }
 

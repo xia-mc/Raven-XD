@@ -13,7 +13,7 @@ public class Yeet extends Module {
     }
 
     @Override
-    public void onEnable(){
+    public void onEnable() {
         enableTicks = 0;
         Raven.mc.thePlayer.playSound("keystrokesmod:yeet", 1, 1);
         mc.ingameGUI.displayTitle("还是PVP大佬", "", 10, 10, 10);

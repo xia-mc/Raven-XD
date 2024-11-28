@@ -45,10 +45,10 @@ public class BedProximityAlert extends Module {
                     continue;
                 }
                 if (ignoreTeammates.isToggled()) {
-                    if (Utils.isTeamMate(otherPlayer)){
+                    if (Utils.isTeamMate(otherPlayer)) {
                         return;
                     }
-                }    
+                }
                 double distance = otherPlayer.getDistance(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ());
                 String playerName = otherPlayer.getDisplayName().getFormattedText();
 
@@ -71,6 +71,7 @@ public class BedProximityAlert extends Module {
             mc.thePlayer.playSound("note.pling", 1.0f, 1.0f);
         }
     }
+
     public void informTeam(String playerName, int distance) {
         if (tellTheteam.isToggled()) {
             mc.thePlayer.sendChatMessage(Utils.getUnformatedString(playerName + " is " + distance + " blocks away from the bed!"));

@@ -39,13 +39,11 @@ public class VanillaTower extends SubMode<Tower> {
             if (wasTowering && slowedTicks.getInput() > 0) {
                 if (slowTicks++ < slowedTicks.getInput()) {
                     Utils.setSpeed(Math.max(slowedSpeed.getInput() * 0.1 - 0.25, 0));
-                }
-                else {
+                } else {
                     slowTicks = 0;
                     wasTowering = false;
                 }
-            }
-            else {
+            } else {
                 if (wasTowering) {
                     wasTowering = false;
                 }

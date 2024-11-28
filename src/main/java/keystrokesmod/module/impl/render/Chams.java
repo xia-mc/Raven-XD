@@ -12,8 +12,8 @@ import org.lwjgl.opengl.GL11;
 import java.util.HashSet;
 
 public class Chams extends Module {
-    private ButtonSetting ignoreBots;
-    private HashSet<Entity> bots = new HashSet<>();
+    private final ButtonSetting ignoreBots;
+    private final HashSet<Entity> bots = new HashSet<>();
 
     public Chams() {
         super("Chams", Module.category.render, 0);

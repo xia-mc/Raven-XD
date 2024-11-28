@@ -1,10 +1,14 @@
 package keystrokesmod.module.impl.other.anticheats;
 
-import keystrokesmod.module.impl.other.anticheats.checks.simulation.Simulation;
-import keystrokesmod.module.impl.other.anticheats.utils.world.EntityUtils;
-import keystrokesmod.module.impl.other.anticheats.checks.combat.*;
+import keystrokesmod.module.impl.other.anticheats.checks.combat.AutoBlockA;
+import keystrokesmod.module.impl.other.anticheats.checks.combat.AutoClickerA;
+import keystrokesmod.module.impl.other.anticheats.checks.combat.NoSlowA;
+import keystrokesmod.module.impl.other.anticheats.checks.combat.ReachA;
 import keystrokesmod.module.impl.other.anticheats.checks.movement.*;
-import keystrokesmod.module.impl.other.anticheats.checks.scaffolding.*;
+import keystrokesmod.module.impl.other.anticheats.checks.scaffolding.ScaffoldA;
+import keystrokesmod.module.impl.other.anticheats.checks.scaffolding.ScaffoldB;
+import keystrokesmod.module.impl.other.anticheats.checks.scaffolding.ScaffoldC;
+import keystrokesmod.module.impl.other.anticheats.utils.world.EntityUtils;
 import net.minecraft.world.WorldSettings;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -19,6 +23,7 @@ public class CheckManager {
     private final @NotNull Map<Class<? extends Check>, Check> normalChecks;
     private final @NotNull Map<Class<? extends Check>, Check> postChecks;
     public short disableTick;
+
     public CheckManager(@NotNull Map<Class<? extends Check>, Check> preChecks,
                         @NotNull Map<Class<? extends Check>, Check> normalChecks,
                         @NotNull Map<Class<? extends Check>, Check> postChecks, TRPlayer player) {
@@ -68,7 +73,8 @@ public class CheckManager {
             for (Check check : postChecks.values()) check._onGameTypeChange();
         }
 
-        if (player.currentGameType == WorldSettings.GameType.CREATIVE || player.currentGameType == WorldSettings.GameType.SPECTATOR) return;
+        if (player.currentGameType == WorldSettings.GameType.CREATIVE || player.currentGameType == WorldSettings.GameType.SPECTATOR)
+            return;
         if (player.fabricPlayer.capabilities.isFlying) return;  // bro 1.8.9 is soooooooo special
         if (player.lastOnGround && !player.currentOnGround) onJump();
 

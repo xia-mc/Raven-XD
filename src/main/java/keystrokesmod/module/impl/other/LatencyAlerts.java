@@ -10,10 +10,10 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class LatencyAlerts extends Module {
-    private final SliderSetting minLatency;
-    private long lastPacket;
     @Getter
     private static boolean freeze = false;
+    private final SliderSetting minLatency;
+    private long lastPacket;
 
     public LatencyAlerts() {
         super("Latency Alerts", category.other);
@@ -40,7 +40,7 @@ public class LatencyAlerts extends Module {
             freeze = true;
             mc.ingameGUI.setRecordPlaying(
                     "§7Packet loss has exceeded: §c" + (System.currentTimeMillis() - lastPacket) + "§7ms",
-            false);
+                    false);
         }
     }
 

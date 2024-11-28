@@ -34,7 +34,7 @@ public class VulcanLongJump extends SubMode<LongJump> {
                 mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY + 9.9, mc.thePlayer.posZ);
         }
 
-        if (ticks > 0 && !(ticks >3)) {
+        if (ticks > 0 && !(ticks > 3)) {
             mc.thePlayer.motionY = 0;
             mc.thePlayer.onGround = true;
 

@@ -4,33 +4,32 @@ import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.DescriptionSetting;
 import keystrokesmod.module.setting.impl.ModeSetting;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.utility.Utils;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 public class BridgeAssist extends Module {
+    private static final String NORMAL = "Normal";
+    private static final String GODBRIDGE = "GodBridge";
+    private static final String MOONWALK = "Moonwalk";
+    private static final String BREEZILY = "Breezily";
+    private static final String[] BridgeModes = new String[]{NORMAL, GODBRIDGE, MOONWALK, BREEZILY};
     private final ButtonSetting onSneak;
     private final SliderSetting waitFor;
     private final SliderSetting glideTime;
     private final SliderSetting assistRange;
     private final DescriptionSetting description;
     private final ModeSetting assistMode;
-    private boolean waitingForAim;
-    private boolean gliding;
-    private long startWaitTime;
     private final float[] godbridgePos = {75.6f, -315, -225, -135, -45, 0, 45, 135, 225, 315};
     private final float[] moonwalkPos = {79.6f, -340, -290, -250, -200, -160, -110, -70, -20, 0, 20, 70, 110, 160, 200, 250, 290, 340};
     private final float[] breezilyPos = {79.9f, -360, -270, -180, -90, 0, 90, 180, 270, 360};
     private final float[] normalPos = {78f, -315, -225, -135, -45, 0, 45, 135, 225, 315};
+    private boolean waitingForAim;
+    private boolean gliding;
+    private long startWaitTime;
     private double speedYaw, speedPitch;
     private float waitingForYaw, waitingForPitch;
-
-    private static final String NORMAL = "Normal";
-    private static final String GODBRIDGE = "GodBridge";
-    private static final String MOONWALK = "Moonwalk";
-    private static final String BREEZILY = "Breezily";
-    private static final String[] BridgeModes = new String[]{NORMAL, GODBRIDGE, MOONWALK, BREEZILY};
 
     public BridgeAssist() {
         super("BridgeAssist", Module.category.world);
@@ -174,8 +173,8 @@ public class BridgeAssist extends Module {
         this.waitingForAim = false;
     }
 
-    public void aimAt(float pitch, float yaw, float fuckedYaw, float fuckedPitch){
-        mc.thePlayer.rotationPitch = pitch + ((int)fuckedPitch/360) * 360;
+    public void aimAt(float pitch, float yaw, float fuckedYaw, float fuckedPitch) {
+        mc.thePlayer.rotationPitch = pitch + ((int) fuckedPitch / 360) * 360;
         mc.thePlayer.rotationYaw = yaw;
     }
 }

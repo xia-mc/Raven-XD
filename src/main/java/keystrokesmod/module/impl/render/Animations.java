@@ -22,11 +22,11 @@ import org.jetbrains.annotations.NotNull;
 import org.lwjgl.opengl.GL11;
 
 public class Animations extends Module {
+    public static final ButtonSetting swingWhileDigging = new ButtonSetting("Swing while digging", true);
+    public static final ButtonSetting clientSide = new ButtonSetting("Client side (visual 1.7)", true, swingWhileDigging::isToggled);
     private final ModeSetting blockAnimation = new ModeSetting("Block animation", new String[]{"None", "1.7", "Smooth", "Exhibition", "Stab", "Spin", "Sigma", "Wood", "Swong", "Chill", "Komorebi", "Rhys", "Allah"}, 1);
     private final ModeSetting swingAnimation = new ModeSetting("Swing animation", new String[]{"None", "1.9+", "Smooth", "Punch", "Shove"}, 0);
     private final ModeSetting otherAnimation = new ModeSetting("Other animation", new String[]{"None", "1.7"}, 1);
-    public static final ButtonSetting swingWhileDigging = new ButtonSetting("Swing while digging", true);
-    public static final ButtonSetting clientSide = new ButtonSetting("Client side (visual 1.7)", true, swingWhileDigging::isToggled);
     private final ButtonSetting fakeSlotReset = new ButtonSetting("Fake slot reset", false);
     private final SliderSetting x = new SliderSetting("X", 0, -1, 1, 0.05);
     private final SliderSetting y = new SliderSetting("Y", 0, -1, 1, 0.05);
@@ -282,11 +282,11 @@ public class Animations extends Module {
     public void onSwingAnimation(@NotNull SwingAnimationEvent event) {
         event.setAnimationEnd(event.getAnimationEnd() * (int) ((-swingSpeed.getInput() / 100) + 1));
     }
-    
+
     private void translate(double x, double y, double z) {
         GlStateManager.translate(
-                x + this.x.getInput(), 
-                y + this.y.getInput(), 
+                x + this.x.getInput(),
+                y + this.y.getInput(),
                 z + this.z.getInput()
         );
     }
@@ -307,15 +307,15 @@ public class Animations extends Module {
     private void func_178104_a(ItemStack itemToRender, @NotNull AbstractClientPlayer p_178104_1_, float p_178104_2_) {
         if (itemToRender == null) return;
 
-        float f = (float)p_178104_1_.getItemInUseCount() - p_178104_2_ + 1.0F;
-        float f1 = f / (float)itemToRender.getMaxItemUseDuration();
+        float f = (float) p_178104_1_.getItemInUseCount() - p_178104_2_ + 1.0F;
+        float f1 = f / (float) itemToRender.getMaxItemUseDuration();
         float f2 = MathHelper.abs(MathHelper.cos(f / 4.0F * 3.1415927F) * 0.1F);
         if (f1 >= 0.8F) {
             f2 = 0.0F;
         }
 
         this.translate(0.0F, f2, 0.0F);
-        float f3 = 1.0F - (float)Math.pow(f1, 27.0);
+        float f3 = 1.0F - (float) Math.pow(f1, 27.0);
         this.translate(f3 * 0.6F, f3 * -0.5F, f3 * 0.0F);
         GlStateManager.rotate(f3 * 90.0F, 0.0F, 1.0F, 0.0F);
         GlStateManager.rotate(f3 * 10.0F, 1.0F, 0.0F, 0.0F);
@@ -330,7 +330,7 @@ public class Animations extends Module {
         GlStateManager.rotate(-12.0F, 0.0F, 1.0F, 0.0F);
         GlStateManager.rotate(-8.0F, 1.0F, 0.0F, 0.0F);
         this.translate(-0.9F, 0.2F, 0.0F);
-        float f = (float)itemToRender.getMaxItemUseDuration() - ((float)p_178098_2_.getItemInUseCount() - p_178098_1_ + 1.0F);
+        float f = (float) itemToRender.getMaxItemUseDuration() - ((float) p_178098_2_.getItemInUseCount() - p_178098_1_ + 1.0F);
         float f1 = f / 20.0F;
         f1 = (f1 * f1 + f1 * 2.0F) / 3.0F;
         if (f1 > 1.0F) {

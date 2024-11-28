@@ -1,7 +1,6 @@
 package keystrokesmod.module.impl.other.anticheats.utils.world;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockGlass;
 import net.minecraft.block.state.IBlockState;
 import org.jetbrains.annotations.NotNull;
 

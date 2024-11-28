@@ -4,8 +4,8 @@ import keystrokesmod.clickgui.ClickGui;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.world.AntiBot;
 import keystrokesmod.module.setting.impl.ButtonSetting;
-import keystrokesmod.utility.render.RenderUtils;
 import keystrokesmod.utility.Utils;
+import keystrokesmod.utility.render.RenderUtils;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.entity.player.EntityPlayer;
@@ -16,9 +16,10 @@ import org.lwjgl.opengl.GL11;
 import java.awt.*;
 
 public class Radar extends Module {
-    private ButtonSetting tracerLines;
+    private final ButtonSetting tracerLines;
     private int scale = 2;
-    private int rectColor = new Color(0, 0, 0, 125).getRGB();
+    private final int rectColor = new Color(0, 0, 0, 125).getRGB();
+
     public Radar() {
         super("Radar", category.render);
         this.registerSetting(tracerLines = new ButtonSetting("Show tracer lines", false));
@@ -48,7 +49,7 @@ public class Radar extends Module {
         Gui.drawRect(n - 1, n4, n3 + 1, n4 + 1, -1);
         Gui.drawRect(n - 1, n2, n, n4, -1);
         Gui.drawRect(n3, n2, n3 + 1, n4, -1);
-        RenderUtils.drawPolygon((double)(n3 / 2 + 3), (double)(n2 + 52), 5.0, 3, -1);
+        RenderUtils.drawPolygon(n3 / 2 + 3, n2 + 52, 5.0, 3, -1);
         GL11.glPushMatrix();
         GL11.glEnable(3089);
         GL11.glScissor(n * this.scale, mc.displayHeight - this.scale * 170, n3 * this.scale - this.scale * 5, this.scale * 100);
@@ -76,8 +77,8 @@ public class Radar extends Module {
                     GL11.glLineWidth(0.5f);
                     GL11.glColor3d(1.0, 1.0, 1.0);
                     GL11.glBegin(2);
-                    GL11.glVertex2d((double)(n3 / 2 + 3), (double)(n2 + 52));
-                    GL11.glVertex2d((double)(n3 / 2 + 3) - n7, (double)(n2 + 52) - n8);
+                    GL11.glVertex2d(n3 / 2 + 3, n2 + 52);
+                    GL11.glVertex2d((double) (n3 / 2 + 3) - n7, (double) (n2 + 52) - n8);
                     GL11.glEnd();
                     GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
                     GL11.glDisable(3042);
@@ -87,7 +88,7 @@ public class Radar extends Module {
                     GL11.glDisable(3042);
                     GL11.glPopMatrix();
                 }
-                RenderUtils.drawPolygon((double)(n3 / 2 + 3) - n7, (double)(n2 + 52) - n8, 3.0, 4, Color.red.getRGB());
+                RenderUtils.drawPolygon((double) (n3 / 2 + 3) - n7, (double) (n2 + 52) - n8, 3.0, 4, Color.red.getRGB());
             }
         }
         GL11.glDisable(3089);

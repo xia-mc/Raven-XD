@@ -19,10 +19,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class CustomNoSlow extends INoSlow {
-    private final ButtonSetting onlyWhileMove;
-    private final ButtonSetting startSlow;
     public final ModeSetting switchMode;
     public final ModeSetting slotMode;
+    private final ButtonSetting onlyWhileMove;
+    private final ButtonSetting startSlow;
     private final ModeSetting mode;
     private final ModeValue sword;
     private final ModeValue bow;

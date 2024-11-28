@@ -2,7 +2,6 @@ package keystrokesmod.module.impl.combat;
 
 import keystrokesmod.event.PreUpdateEvent;
 import keystrokesmod.event.RotationEvent;
-import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.combat.autoclicker.IAutoClicker;
 import keystrokesmod.module.impl.combat.autoclicker.LowCPSAutoClicker;
 import keystrokesmod.module.impl.combat.autoclicker.NormalAutoClicker;
@@ -17,7 +16,9 @@ import keystrokesmod.module.setting.impl.ModeSetting;
 import keystrokesmod.module.setting.impl.ModeValue;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.script.classes.Vec3;
-import keystrokesmod.utility.*;
+import keystrokesmod.utility.MoveUtil;
+import keystrokesmod.utility.RotationUtils;
+import keystrokesmod.utility.Utils;
 import keystrokesmod.utility.aim.AimSimulator;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.Items;

@@ -10,17 +10,15 @@ import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.ModeValue;
 import keystrokesmod.utility.Utils;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.util.MovingObjectPosition;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.event.entity.player.AttackEntityEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.Nullable;
 
 public class TargetESP extends Module {
+    private static @Nullable EntityLivingBase target = null;
     private final ModeValue mode;
     private final ButtonSetting onlyKillAura;
-
-    private static @Nullable EntityLivingBase target = null;
     private long lastTargetTime = -1;
 
     public TargetESP() {

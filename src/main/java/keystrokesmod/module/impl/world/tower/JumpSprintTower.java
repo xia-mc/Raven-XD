@@ -65,8 +65,8 @@ public class JumpSprintTower extends SubMode<Tower> {
                     if (mc.thePlayer.motionY == -0.3919991420476618) mc.thePlayer.motionY = -0.3968991421057737;
                 }
             }
-            }
         }
+    }
 
     @SubscribeEvent
     public void onPreUpdate(PreUpdateEvent event) {

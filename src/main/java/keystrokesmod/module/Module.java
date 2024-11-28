@@ -21,34 +21,32 @@ import org.lwjgl.input.Mouse;
 import scala.reflect.internal.util.WeakHashSet;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 public class Module {
-    @Getter
-    @Setter
-    private @Nullable I18nModule i18nObject = null;
-
+    protected static Minecraft mc;
     @Getter
     protected final ArrayList<Setting> settings;
     private final WeakHashSet<Setting> settingsWeak;
     private final String moduleName;
-    private String prettyName;
-    private String prettyInfo = "";
     private final Module.category moduleCategory;
-    @Getter
-    @Setter
-    private boolean enabled;
-    @Getter
-    private int keycode;
     private final @Nullable String toolTip;
-    protected static Minecraft mc;
-    private boolean isToggled = false;
     public boolean canBeEnabled = true;
     public boolean ignoreOnSave = false;
     @Setter
     @Getter
     public boolean hidden = false;
     public Script script = null;
+    @Getter
+    @Setter
+    private @Nullable I18nModule i18nObject = null;
+    private String prettyName;
+    private String prettyInfo = "";
+    @Getter
+    @Setter
+    private boolean enabled;
+    @Getter
+    private int keycode;
+    private boolean isToggled = false;
 
     public Module(String moduleName, Module.category moduleCategory, int keycode) {
         this(moduleName, moduleCategory, keycode, null);
@@ -90,8 +88,7 @@ public class Module {
                 } else if ((this.keycode >= 1000 ? !Mouse.isButtonDown(this.keycode - 1000) : !Keyboard.isKeyDown(this.keycode))) {
                     this.isToggled = false;
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
                 Utils.sendMessage("&cFailed to check keybinding. Setting to none");
                 this.keycode = 0;
@@ -118,8 +115,7 @@ public class Module {
 
         if (this.script != null) {
             Raven.scriptManager.onEnable(script);
-        }
-        else {
+        } else {
             try {
                 MinecraftForge.EVENT_BUS.register(this);
                 this.onEnable();
@@ -136,8 +132,7 @@ public class Module {
         ModuleManager.organizedModules.remove(this);
         if (this.script != null) {
             Raven.scriptManager.onDisable(script);
-        }
-        else {
+        } else {
             try {
                 MinecraftForge.EVENT_BUS.unregister(this);
                 this.onDisable();
@@ -156,6 +151,11 @@ public class Module {
                 : getInfo();
     }
 
+    public final void setPrettyInfo(String name) {
+        this.prettyInfo = name;
+        ModuleManager.sort();
+    }
+
     public String getName() {
         return this.moduleName;
     }
@@ -164,6 +164,11 @@ public class Module {
         return ModuleManager.customName.isEnabled()
                 ? getRawPrettyName()
                 : i18nObject != null ? i18nObject.getName() : getName();
+    }
+
+    public final void setPrettyName(String name) {
+        this.prettyName = name;
+        ModuleManager.sort();
     }
 
     public @Nullable String getToolTip() {
@@ -180,16 +185,6 @@ public class Module {
 
     public String getRawPrettyInfo() {
         return prettyInfo.isEmpty() ? getInfo() : prettyInfo;
-    }
-
-    public final void setPrettyName(String name) {
-        this.prettyName = name;
-        ModuleManager.sort();
-    }
-
-    public final void setPrettyInfo(String name) {
-        this.prettyInfo = name;
-        ModuleManager.sort();
     }
 
     public void registerSetting(Setting setting) {

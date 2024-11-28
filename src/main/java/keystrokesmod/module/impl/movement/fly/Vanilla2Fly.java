@@ -32,8 +32,7 @@ public class Vanilla2Fly extends SubMode<Fly> {
             } else {
                 mc.thePlayer.motionY = 0.0;
             }
-        }
-        else {
+        } else {
             mc.thePlayer.motionY = 0.0;
         }
         if (MoveUtil.isMoving())

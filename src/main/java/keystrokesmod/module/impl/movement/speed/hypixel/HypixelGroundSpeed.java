@@ -2,11 +2,9 @@ package keystrokesmod.module.impl.movement.speed.hypixel;
 
 import keystrokesmod.event.PrePlayerInputEvent;
 import keystrokesmod.module.impl.movement.speed.HypixelSpeed;
-import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.MoveUtil;
 import keystrokesmod.utility.Utils;
-import keystrokesmod.utility.movement.MoveCorrect;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 

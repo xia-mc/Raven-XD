@@ -1,6 +1,7 @@
 package keystrokesmod.module.impl.movement.speed;
 
-import keystrokesmod.event.*;
+import keystrokesmod.event.MoveInputEvent;
+import keystrokesmod.event.PreUpdateEvent;
 import keystrokesmod.module.impl.movement.Speed;
 import keystrokesmod.module.impl.other.RotationHandler;
 import keystrokesmod.module.setting.impl.ButtonSetting;

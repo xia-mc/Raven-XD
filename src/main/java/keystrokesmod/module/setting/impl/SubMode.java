@@ -12,8 +12,8 @@ import org.jetbrains.annotations.NotNull;
  * @param <T> the type of the parent module
  */
 public abstract class SubMode<T extends Module> extends Module {
-    protected final String name;
     public final T parent;
+    protected final String name;
 
     public SubMode(String name, @NotNull T parent) {
         super(parent.getName() + "$" + name, parent.moduleCategory());

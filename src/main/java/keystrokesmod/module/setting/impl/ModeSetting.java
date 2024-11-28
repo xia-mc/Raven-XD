@@ -7,7 +7,6 @@ import keystrokesmod.module.setting.interfaces.InputSetting;
 import keystrokesmod.utility.i18n.I18nModule;
 import keystrokesmod.utility.i18n.settings.I18nModeSetting;
 import keystrokesmod.utility.i18n.settings.I18nSetting;
-import keystrokesmod.utility.i18n.settings.I18nSliderSetting;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
@@ -39,6 +38,12 @@ public class ModeSetting extends Setting implements InputSetting {
         this.options = options;
         this.value = defaultValue;
         this.max = options.length - 1;
+    }
+
+    public static double correctValue(double v, double i, double a) {
+        v = Math.max(i, v);
+        v = Math.min(a, v);
+        return v;
     }
 
     public void setOptions(String @NotNull [] options) {
@@ -118,12 +123,6 @@ public class ModeSetting extends Setting implements InputSetting {
 
     public void setValueRaw(int n) {
         this.value = n;
-    }
-
-    public static double correctValue(double v, double i, double a) {
-        v = Math.max(i, v);
-        v = Math.min(a, v);
-        return v;
     }
 
     @Override

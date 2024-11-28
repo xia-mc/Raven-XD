@@ -5,7 +5,6 @@ import keystrokesmod.mixins.impl.network.S08PacketPlayerPosLookAccessor;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.other.RotationHandler;
 import keystrokesmod.module.setting.impl.ModeSetting;
-import keystrokesmod.utility.Reflection;
 import keystrokesmod.utility.Utils;
 import net.minecraft.network.play.server.S08PacketPlayerPosLook;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;

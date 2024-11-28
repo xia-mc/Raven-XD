@@ -1,8 +1,8 @@
 package keystrokesmod.module.impl.movement;
 
 import keystrokesmod.module.Module;
-import keystrokesmod.module.impl.movement.wallclimb.TestWallClimb;
 import keystrokesmod.module.impl.movement.wallclimb.IntaveWallClimb;
+import keystrokesmod.module.impl.movement.wallclimb.TestWallClimb;
 import keystrokesmod.module.impl.movement.wallclimb.VulcanWallClimb;
 import keystrokesmod.module.setting.impl.ModeValue;
 

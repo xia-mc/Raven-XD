@@ -18,14 +18,13 @@ import org.jetbrains.annotations.Nullable;
 public class TargetHUD extends Module {
     public static int posX = 70;
     public static int posY = 30;
-    private static ModeValue mode;
-    private final ButtonSetting onlyKillAura;
-
     public static int current$minX;
     public static int current$maxX;
     public static int current$minY;
     public static int current$maxY;
+    private static ModeValue mode;
     private static @Nullable EntityLivingBase target = null;
+    private final ButtonSetting onlyKillAura;
     private long lastTargetTime = -1;
 
     public TargetHUD() {
@@ -39,6 +38,26 @@ public class TargetHUD extends Module {
                 .add(new MyauTargetHUD("Myau", this))
         );
         this.registerSetting(onlyKillAura = new ButtonSetting("Only killAura", true));
+    }
+
+    private static void render(EntityLivingBase target) {
+        if (target != null) {
+            final ScaledResolution scaledResolution = new ScaledResolution(mc);
+            final int n2 = 8;
+            final int n3 = mc.fontRendererObj.getStringWidth(target.getDisplayName().getFormattedText()) + n2;
+            final int n4 = scaledResolution.getScaledWidth() / 2 - n3 / 2 + posX;
+            final int n5 = scaledResolution.getScaledHeight() / 2 + 15 + posY;
+            current$minX = n4 - n2;
+            current$minY = n5 - n2;
+            current$maxX = n4 + n3;
+            current$maxY = n5 + (mc.fontRendererObj.FONT_HEIGHT + 5) - 6 + n2;
+
+            ((ITargetVisual) mode.getSubModeValues().get((int) mode.getInput())).render(target);
+        }
+    }
+
+    public static void renderExample() {
+        render(mc.thePlayer);
     }
 
     @Override
@@ -103,25 +122,5 @@ public class TargetHUD extends Module {
             return;
         }
         render(target);
-    }
-
-    private static void render(EntityLivingBase target) {
-        if (target != null) {
-            final ScaledResolution scaledResolution = new ScaledResolution(mc);
-            final int n2 = 8;
-            final int n3 = mc.fontRendererObj.getStringWidth(target.getDisplayName().getFormattedText()) + n2;
-            final int n4 = scaledResolution.getScaledWidth() / 2 - n3 / 2 + posX;
-            final int n5 = scaledResolution.getScaledHeight() / 2 + 15 + posY;
-            current$minX = n4 - n2;
-            current$minY = n5 - n2;
-            current$maxX = n4 + n3;
-            current$maxY = n5 + (mc.fontRendererObj.FONT_HEIGHT + 5) - 6 + n2;
-
-            ((ITargetVisual) mode.getSubModeValues().get((int) mode.getInput())).render(target);
-        }
-    }
-
-    public static void renderExample() {
-        render(mc.thePlayer);
     }
 }

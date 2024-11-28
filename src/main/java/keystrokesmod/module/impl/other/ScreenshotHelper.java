@@ -23,7 +23,7 @@ public class ScreenshotHelper extends Module {
     private static final String DuelWinMessage = "YOU WON! Want to play again? CLICK HERE!";
 
     private final SliderSetting delay;
-//    private static final ButtonSetting AntiLag = new ButtonSetting("Anti Lag", true); // Unfinished, but you can use the Essential mod to take Anti-Lag screenshots.
+    //    private static final ButtonSetting AntiLag = new ButtonSetting("Anti Lag", true); // Unfinished, but you can use the Essential mod to take Anti-Lag screenshots.
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
     public ScreenshotHelper() {

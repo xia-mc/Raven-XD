@@ -21,7 +21,6 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -29,9 +28,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class LatencyFakeLag extends SubMode<FakeLag> {
     private final SliderSetting delay;
     private final ButtonSetting drawRealPosition;
-
-    private Vec3 vec3 = null;
     private final Queue<TimedPacket> packetQueue = new ConcurrentLinkedQueue<>();
+    private Vec3 vec3 = null;
 
     public LatencyFakeLag(String name, @NotNull FakeLag parent) {
         super(name, parent);
@@ -53,6 +51,7 @@ public class LatencyFakeLag extends SubMode<FakeLag> {
             Blink.drawBox(vec3.toVec3());
         }
     }
+
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onRenderTick(TickEvent.RenderTickEvent ev) {
         if (!Utils.nullCheck()) {
@@ -61,6 +60,7 @@ public class LatencyFakeLag extends SubMode<FakeLag> {
         }
         sendPacket(true);
     }
+
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onSendPacket(@NotNull SendPacketEvent e) {
         if (!Utils.nullCheck()) return;

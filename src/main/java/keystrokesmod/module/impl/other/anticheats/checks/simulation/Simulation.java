@@ -24,7 +24,7 @@ public class Simulation extends Check {
         for (float forward = -1; forward <= 1; forward++) {
             for (float strafe = -1; strafe <= 1; strafe++) {
                 for (boolean jump : BOOLEANS) {
-                    for (boolean sneak: BOOLEANS) {
+                    for (boolean sneak : BOOLEANS) {
                         MovementInput input = new MovementInput();
                         input.moveForward = forward;
                         input.moveStrafe = strafe;
@@ -32,8 +32,8 @@ public class Simulation extends Check {
                         input.sneak = sneak;
 
                         if (input.sneak) {
-                            input.moveStrafe = (float)((double) input.moveStrafe * 0.3);
-                            input.moveForward = (float)((double) input.moveForward * 0.3);
+                            input.moveStrafe = (float) ((double) input.moveStrafe * 0.3);
+                            input.moveForward = (float) ((double) input.moveForward * 0.3);
                         }
 
                         MOVEMENTS.add(input);

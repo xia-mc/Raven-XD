@@ -28,8 +28,7 @@ public class NameHider extends Module {
                     }
                     s = s.replace(networkPlayerInfo.getGameProfile().getName(), n);
                 }
-            }
-            else {
+            } else {
                 s = s.replace(Utils.getServerName(), n);
             }
         }

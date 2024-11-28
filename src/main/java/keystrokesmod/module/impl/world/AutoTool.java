@@ -19,6 +19,7 @@ public class AutoTool extends Module {
     private int previousSlot = -1;
     private int ticksHovered;
     private BlockPos currentBlock;
+
     public AutoTool() {
         super("AutoTool", category.world);
         this.registerSetting(hoverDelay = new SliderSetting("Hover delay", 0.0, 0.0, 20.0, 1.0));
@@ -56,8 +57,7 @@ public class AutoTool extends Module {
         }
         if (over.getBlockPos().equals(currentBlock)) {
             ticksHovered++;
-        }
-        else {
+        } else {
             ticksHovered = 0;
         }
         currentBlock = over.getBlockPos();

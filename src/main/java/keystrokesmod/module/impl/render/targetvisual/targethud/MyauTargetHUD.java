@@ -17,7 +17,9 @@ import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.EntityLivingBase;
 import org.jetbrains.annotations.NotNull;
+
 import java.awt.*;
+
 import static keystrokesmod.module.impl.render.TargetHUD.*;
 
 public class MyauTargetHUD extends SubMode<TargetHUD> implements ITargetVisual {
@@ -62,7 +64,7 @@ public class MyauTargetHUD extends SubMode<TargetHUD> implements ITargetVisual {
         String TargetHealth = String.format("%.1f", target.getHealth()) + "§c❤ ";
 
         if (showStatus.isToggled() && mc.thePlayer != null) {
-            String status = (health <= Utils.getCompleteHealth(mc.thePlayer) / mc.thePlayer.getMaxHealth())? " §aW" : " §cL";
+            String status = (health <= Utils.getCompleteHealth(mc.thePlayer) / mc.thePlayer.getMaxHealth()) ? " §aW" : " §cL";
             TargetName = TargetName + status;
         }
 
@@ -89,7 +91,7 @@ public class MyauTargetHUD extends SubMode<TargetHUD> implements ITargetVisual {
 
         RenderUtils.drawRect(n13, n15, n14, n15 + 4, Utils.merge(Color.black.getRGB(), n11));
 
-        float healthBar = (float) (int) (n14 + (n13 - n14) * (1.0 - ((health < 0.01)? 0 : health)));
+        float healthBar = (float) (int) (n14 + (n13 - n14) * (1.0 - ((health < 0.01) ? 0 : health)));
         if (healthBar - n13 < 1) {
             healthBar = n13;
         }

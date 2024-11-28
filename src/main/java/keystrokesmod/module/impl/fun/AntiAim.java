@@ -3,7 +3,6 @@ package keystrokesmod.module.impl.fun;
 import keystrokesmod.event.PreMotionEvent;
 import keystrokesmod.event.RotationEvent;
 import keystrokesmod.module.Module;
-import keystrokesmod.module.impl.combat.ragebot.rapidfire.StoreRapidFire;
 import keystrokesmod.module.impl.fun.antiaim.BackwardAntiAim;
 import keystrokesmod.module.impl.fun.antiaim.SnapAntiAim;
 import keystrokesmod.module.impl.fun.antiaim.SpinAntiAim;

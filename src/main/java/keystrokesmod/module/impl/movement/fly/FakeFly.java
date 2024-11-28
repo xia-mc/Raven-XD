@@ -18,9 +18,8 @@ import java.util.Set;
 import static keystrokesmod.module.ModuleManager.scaffold;
 
 public class FakeFly extends SubMode<Fly> {
-    private final ButtonSetting keep;
-
     private static final Set<BlockPos> hiddenPos = new HashSet<>();
+    private final ButtonSetting keep;
 
     public FakeFly(String name, @NotNull Fly parent) {
         super(name, parent);

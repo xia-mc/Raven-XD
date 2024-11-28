@@ -20,13 +20,11 @@ public class ModeValue extends Setting implements InputSetting {
     @Getter
     private final Module parent;
     private final List<SubMode<?>> subModes = new ArrayList<>();
+    private final Queue<Setting> subSettings = new ConcurrentLinkedQueue<>();
     private int selected = 0;
-
     @Getter
     @Setter
     private @Nullable Integer indexInSetting = null;
-
-    private final Queue<Setting> subSettings = new ConcurrentLinkedQueue<>();
 
     public ModeValue(String settingName, Module parent) {
         this(settingName, parent, () -> true);
@@ -71,9 +69,11 @@ public class ModeValue extends Setting implements InputSetting {
         }
         return this;
     }
+
     public List<SubMode<?>> getSubModeValues() {
         return subModes;
     }
+
     public ModeValue setDefaultValue(String name) {
         Optional<SubMode<?>> subMode = subModes.stream().filter(mode -> Objects.equals(mode.getName(), name)).findFirst();
         if (!subMode.isPresent()) return this;
@@ -81,6 +81,7 @@ public class ModeValue extends Setting implements InputSetting {
         setValueRaw(subModes.indexOf(subMode.get()));
         return this;
     }
+
     @Override
     public void loadProfile(@NotNull JsonObject profile) {
         if (profile.has(getName()) && profile.get(getName()).isJsonPrimitive()) {
@@ -108,16 +109,20 @@ public class ModeValue extends Setting implements InputSetting {
             this.subModes.get(selected).enable();
         }
     }
+
     public void setValueRaw(int n) {
         disable();
         this.setValue(n);
     }
+
     public double getMax() {
         return subModes.size() - 1;
     }
+
     public double getMin() {
         return 0;
     }
+
     public void nextValue() {
         if (getInput() >= getMax()) {
             setValueRaw((int) getMin());

@@ -4,7 +4,7 @@ import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.player.nofall.*;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.ModeValue;
-import keystrokesmod.utility.*;
+import keystrokesmod.utility.Utils;
 
 public class NoFall extends Module {
     private final ModeValue mode;

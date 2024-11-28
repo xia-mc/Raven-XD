@@ -10,16 +10,14 @@ import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
-import static keystrokesmod.module.ModuleManager.blink;
 import static keystrokesmod.module.ModuleManager.scaffold;
 
 public class HypixelBlinkNoFall extends SubMode<NoFall> {
     private final SliderSetting minFallDistance;
-
+    private final NormalBlink blink = new NormalBlink("Blink", this);
     private boolean blinked = false;
     private boolean prevOnGround = false;
     private double fallDistance = 0;
-    private final NormalBlink blink = new NormalBlink("Blink", this);
 
     public HypixelBlinkNoFall(String name, @NotNull NoFall parent) {
         super(name, parent);

@@ -16,20 +16,92 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DuelsStats extends Module {
+    private static final String[] thr_lvl;
     public static ModeSetting mode;
     public static ButtonSetting a;
     public static ButtonSetting threatLevel;
     public static String nick = "";
+
+    static {
+        thr_lvl = new String[]{"§4VERY HIGH", "§cHIGH", "§6MODERATE", "§aLOW", "§2VERY LOW"};
+    }
+
     private String ign = "";
     private String en = "";
-    private static final String[] thr_lvl;
-    private List<String> q = new ArrayList<>();
+    private final List<String> q = new ArrayList<>();
 
     public DuelsStats() {
         super("Duels Stats", Module.category.minigames, 0);
         this.registerSetting(mode = new ModeSetting("Mode", thr_lvl, 0));
         this.registerSetting(a = new ButtonSetting("Send ign on join", false));
         this.registerSetting(threatLevel = new ButtonSetting("Threat Level", true));
+    }
+
+    public static String gtl(int w, int l, double wlr, int ws) {
+        int t = 0;
+        int m = w + l;
+        if (m <= 13) {
+            t += 2;
+        }
+
+        if (ws >= 30) {
+            t += 9;
+        } else if (ws >= 15) {
+            t += 7;
+        } else if (ws >= 8) {
+            t += 5;
+        } else if (ws >= 4) {
+            t += 3;
+        } else if (ws >= 1) {
+            ++t;
+        }
+
+        if (wlr >= 20.0D) {
+            t += 8;
+        } else if (wlr >= 10.0D) {
+            t += 5;
+        } else if (wlr >= 5.0D) {
+            t += 4;
+        } else if (wlr >= 3.0D) {
+            t += 2;
+        } else if (wlr >= 0.8D) {
+            ++t;
+        }
+
+        if (w >= 20000) {
+            t += 4;
+        } else if (w >= 10000) {
+            t += 3;
+        } else if (w >= 5000) {
+            t += 2;
+        } else if (w >= 1000) {
+            ++t;
+        }
+
+        if (l == 0) {
+            if (w == 0) {
+                t += 3;
+            } else {
+                t += 4;
+            }
+        } else if (l <= 10 && wlr >= 4.0D) {
+            t += 2;
+        }
+
+        String thr;
+        if (t == 0) {
+            thr = thr_lvl[4];
+        } else if (t <= 3) {
+            thr = thr_lvl[3];
+        } else if (t <= 6) {
+            thr = thr_lvl[2];
+        } else if (t <= 10) {
+            thr = thr_lvl[1];
+        } else {
+            thr = thr_lvl[0];
+        }
+
+        return thr;
     }
 
     public void onEnable() {
@@ -155,76 +227,5 @@ public class DuelsStats extends Module {
         } else {
             return false;
         }
-    }
-
-    public static String gtl(int w, int l, double wlr, int ws) {
-        int t = 0;
-        int m = w + l;
-        if (m <= 13) {
-            t += 2;
-        }
-
-        if (ws >= 30) {
-            t += 9;
-        } else if (ws >= 15) {
-            t += 7;
-        } else if (ws >= 8) {
-            t += 5;
-        } else if (ws >= 4) {
-            t += 3;
-        } else if (ws >= 1) {
-            ++t;
-        }
-
-        if (wlr >= 20.0D) {
-            t += 8;
-        } else if (wlr >= 10.0D) {
-            t += 5;
-        } else if (wlr >= 5.0D) {
-            t += 4;
-        } else if (wlr >= 3.0D) {
-            t += 2;
-        } else if (wlr >= 0.8D) {
-            ++t;
-        }
-
-        if (w >= 20000) {
-            t += 4;
-        } else if (w >= 10000) {
-            t += 3;
-        } else if (w >= 5000) {
-            t += 2;
-        } else if (w >= 1000) {
-            ++t;
-        }
-
-        if (l == 0) {
-            if (w == 0) {
-                t += 3;
-            } else {
-                t += 4;
-            }
-        } else if (l <= 10 && wlr >= 4.0D) {
-            t += 2;
-        }
-
-        String thr;
-        if (t == 0) {
-            thr = thr_lvl[4];
-        } else if (t <= 3) {
-            thr = thr_lvl[3];
-        } else if (t <= 6) {
-            thr = thr_lvl[2];
-        } else if (t <= 10) {
-            thr = thr_lvl[1];
-        } else {
-            thr = thr_lvl[0];
-        }
-
-        return thr;
-    }
-
-    static {
-        thr_lvl = new String[]{"§4VERY HIGH", "§cHIGH", "§6MODERATE", "§aLOW", "§2VERY LOW"};
     }
 }

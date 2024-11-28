@@ -38,7 +38,8 @@ public class ReachA extends Check {
                 if (distance < 6 && distance > AdvancedConfig.reachADefaultReach) {  // 满足标记条件
                     flag(String.format("target: %s  distance: %.2f", possibleTarget.getName(), distance));
                 }
-            } catch (NoSuchElementException ignored) {}
+            } catch (NoSuchElementException ignored) {
+            }
         }, AdvancedConfig.reachACheckDelay * 50L, TimeUnit.MILLISECONDS);
 
     }
