@@ -3,6 +3,7 @@ package keystrokesmod.module.impl.combat.criticals;
 import keystrokesmod.event.PostVelocityEvent;
 import keystrokesmod.event.PreMotionEvent;
 import keystrokesmod.event.PreMoveEvent;
+import keystrokesmod.event.PreVelocityEvent;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.combat.Criticals;
 import keystrokesmod.module.impl.combat.KillAura;
@@ -97,7 +98,7 @@ public class AirStuckCriticals extends SubMode<Criticals> {
     }
 
     @SubscribeEvent
-    public void onPostVelocity(PostVelocityEvent event) {
+    public void onPreVelocity(PreVelocityEvent event) {
         disableTicks += (int) pauseOnVelocity.getInput();
     }
 }

@@ -3,6 +3,7 @@ package keystrokesmod.module.impl.movement.fly;
 import keystrokesmod.event.BlockAABBEvent;
 import keystrokesmod.event.MoveInputEvent;
 import keystrokesmod.event.ReceivePacketEvent;
+import keystrokesmod.module.impl.client.Notifications;
 import keystrokesmod.module.impl.movement.Fly;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.BlockUtils;
@@ -46,7 +47,7 @@ public class MatrixFly extends SubMode<Fly> {
     @SubscribeEvent
     public void onReceivePacket(@NotNull ReceivePacketEvent event) {
         if (event.getPacket() instanceof S08PacketPlayerPosLook) {
-            Utils.sendMessage("Anti-cheat flagged.");
+            Notifications.sendNotification(Notifications.NotificationTypes.INFO, "Anti-cheat flagged.");
             parent.disable();
         }
     }

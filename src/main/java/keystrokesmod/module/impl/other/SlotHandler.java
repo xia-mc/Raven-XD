@@ -19,7 +19,7 @@ public final class SlotHandler extends Module {
     private static final AtomicInteger currentSlot = new AtomicInteger(-1);
     private static final CoolDown coolDown = new CoolDown(-1);
     private final ModeSetting mode = new ModeSetting("Mode", new String[]{"Default", "Silent"}, 0);
-    private final SliderSetting switchBackDelay = new SliderSetting("Switch back delay", 100, 0, 1000, 10, "ms", new ModeOnly(mode, 1));
+    private final SliderSetting switchBackDelay = new SliderSetting("Switch back delay", 100, 50, 1000, 10, "ms", new ModeOnly(mode, 1));
 
     public SlotHandler() {
         super("SlotHandler", category.other);

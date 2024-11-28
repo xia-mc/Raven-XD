@@ -62,7 +62,7 @@ configurations {
 }
 
 dependencies {
-    implementation group: 'commons-io', name: 'commons-io', version: '2.11.0'
+    implementation group: 'commons-io', name: 'commons-io', version: '2.14.0'
     embed('org.spongepowered:mixin:0.6-SNAPSHOT') {
         exclude module: 'gson'
         exclude module: 'guava'
