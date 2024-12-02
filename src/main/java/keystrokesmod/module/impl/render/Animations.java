@@ -30,8 +30,9 @@ public class Animations extends Module {
     private final ModeSetting otherAnimation = new ModeSetting("Other animation", new String[]{"None", "1.7"}, 1);
     private final ButtonSetting fakeSlotReset = new ButtonSetting("Fake slot reset", false);
 
-    private final SliderSetting staticStartSwingProgress = new SliderSetting("Starting Swing Progress", 0, -1, 2.5, 0.05);
-
+    private final ButtonSetting modifyAnimations = new ButtonSetting("Customize Animations", false);
+    private final SliderSetting staticStartSwingProgress = new SliderSetting("Starting Swing Progress", 0, -1, 2.5, 0.1, modifyAnimations::isToggled);
+    private final SliderSetting swingSpeed = new SliderSetting("Swing speed", 0, -200, 50, 5, modifyAnimations::isToggled);
     //translation
     private final SliderSetting translatex = new SliderSetting("X", 0, -4, 4, 0.05);
     private final SliderSetting translatey = new SliderSetting("Y", 0, -2, 2, 0.05);
@@ -51,26 +52,29 @@ public class Animations extends Module {
     private final SliderSetting rotatex = new SliderSetting("rotation x", 0, -180, 180, 1, customrotation::isToggled);
     private final SliderSetting rotatey = new SliderSetting("rotation y", 0, -180, 180, 1, customrotation::isToggled);
     private final SliderSetting rotatez = new SliderSetting("rotation z", 0, -180, 180, 1, customrotation::isToggled);
-    private final SliderSetting swingSpeed = new SliderSetting("Swing speed", 0, -200, 50, 5);
+
 
     private int swing;
 
     private static final double staticscalemultiplier_x = 1;
     private static final double staticscalemultiplier_y = 1;
     private static final double staticscalemultiplier_z = 1;
+    float staticStartSwingProgressFloat;
 
 
     public Animations() {
         super("Animations", category.render);
         this.registerSetting(blockAnimation, swingAnimation, otherAnimation, swingWhileDigging, clientSide, fakeSlotReset);
-        //this.registerSetting(customanimation);
-        this.registerSetting(staticStartSwingProgress);
+
+        this.registerSetting(modifyAnimations);
+        this.registerSetting(staticStartSwingProgress, swingSpeed);
         this.registerSetting(new DescriptionSetting("Custom Translation"));
         this.registerSetting(translatex, translatey, translatez);
         this.registerSetting(precustomtranslation, pretranslatex, pretranslatey, pretranslatez);
         this.registerSetting(customscaling, scalex, scaley, scalez);
         this.registerSetting(customrotation, rotatex, rotatey, rotatez);
-        this.registerSetting(swingSpeed);    }
+
+    }
 
     @SubscribeEvent
     public void onSendPacket(SendPacketEvent event) {
@@ -113,7 +117,12 @@ public class Animations extends Module {
             float swingProgress = event.getSwingProgress();
             final float convertedProgress = MathHelper.sin(MathHelper.sqrt_float(swingProgress) * (float) Math.PI);
 
-            float staticStartSwingProgressFloat = ((float) staticStartSwingProgress.getInput());
+
+            if(modifyAnimations.isToggled()) {
+                staticStartSwingProgressFloat = ((float) staticStartSwingProgress.getInput());
+            } else{
+                staticStartSwingProgressFloat = 0.0F;
+            }
 
             if(precustomtranslation.isToggled()) {
                 this.pretranslate(pretranslatex.getInput(), pretranslatey.getInput(), pretranslatez.getInput());
@@ -357,7 +366,9 @@ public class Animations extends Module {
 
     @SubscribeEvent
     public void onSwingAnimation(@NotNull SwingAnimationEvent event) {
-        event.setAnimationEnd(event.getAnimationEnd() * (int) ((-swingSpeed.getInput() / 100) + 1));
+        if(modifyAnimations.isToggled()) {
+            event.setAnimationEnd(event.getAnimationEnd() * (int) ((-swingSpeed.getInput() / 100) + 1));
+        }
     }
 
 
