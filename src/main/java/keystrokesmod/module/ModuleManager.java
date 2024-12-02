@@ -60,6 +60,7 @@ public class ModuleManager {
     public static NoCameraClip noCameraClip;
     public static AutoPlay autoPlay;
     public static CustomName customName;
+    public static CustomFOV customFOV;
     public static CommandChat commandChat;
     public static Phase phase;
     public static PingSpoof pingSpoof;
@@ -272,6 +273,7 @@ public class ModuleManager {
         this.addModule(new ChestESP());
         this.addModule(customCape = new CustomCape());
         this.addModule(customName = new CustomName());
+        this.addModule(customFOV = new CustomFOV());
         this.addModule(freeLook = new FreeLook());
         this.addModule(fullBright = new FullBright());
         this.addModule(hud = new HUD());

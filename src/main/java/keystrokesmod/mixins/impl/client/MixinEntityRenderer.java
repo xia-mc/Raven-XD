@@ -2,6 +2,8 @@ package keystrokesmod.mixins.impl.client;
 
 
 import com.google.common.base.Predicates;
+import keystrokesmod.module.ModuleManager;
+import keystrokesmod.module.impl.render.CustomFOV;
 import keystrokesmod.module.impl.other.RotationHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.EntityRenderer;
@@ -9,12 +11,14 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItemFrame;
 import net.minecraft.util.*;
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.List;
 
@@ -111,4 +115,26 @@ public class MixinEntityRenderer {
 
         ci.cancel();
     }
+
+
+    /**
+     * @author kefpull
+     * @reason attempt 1 have an option for CustomFOV to do the same thing as optifine's "Dynamic FOV:off". Hopefully this does not break the whole entire client :).
+     * I know we're supposed to use an event or something like that, so I will do that if I can.
+     * <p>
+     * Source for method: line 412 in EntityRenderer.class
+     */
+    @Inject(method = "getFOVModifier", at = @At("RETURN"), cancellable = true)
+    public void onGetFOVModifier(@NotNull CallbackInfoReturnable<Float> cir) {
+
+        if (ModuleManager.customFOV != null && ModuleManager.customFOV.forceStatic != null) {
+
+            if (ModuleManager.customFOV.isEnabled() && ModuleManager.customFOV.forceStatic.isToggled()) {
+                cir.setReturnValue(CustomFOV.getDesiredFOV());
+            }
+
+        }
+    }
+
+
 }
