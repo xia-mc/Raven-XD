@@ -11,6 +11,8 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItemFrame;
 import net.minecraft.util.*;
+import net.minecraftforge.client.event.FOVUpdateEvent;
+import net.minecraftforge.common.MinecraftForge;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
@@ -124,17 +126,21 @@ public class MixinEntityRenderer {
      * <p>
      * Source for method: line 412 in EntityRenderer.class
      */
+
     @Inject(method = "getFOVModifier", at = @At("RETURN"), cancellable = true)
     public void onGetFOVModifier(@NotNull CallbackInfoReturnable<Float> cir) {
 
-        if (ModuleManager.customFOV != null && ModuleManager.customFOV.forceStatic != null) {
+        if (ModuleManager.customFOV != null && ModuleManager.customFOV.forceStaticFOV != null) {
 
-            if (ModuleManager.customFOV.isEnabled() && ModuleManager.customFOV.forceStatic.isToggled()) {
+            if (ModuleManager.customFOV.isEnabled() && ModuleManager.customFOV.forceStaticFOV.isToggled()) {
+
                 cir.setReturnValue(CustomFOV.getDesiredFOV());
+
             }
 
         }
     }
+
 
 
 }
