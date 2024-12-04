@@ -1,6 +1,6 @@
 package keystrokesmod.module.impl.movement.speed.hypixel.lowhop;
 
-import keystrokesmod.event.PrePlayerInputEvent;
+import keystrokesmod.event.PreUpdateEvent;
 import keystrokesmod.module.impl.movement.speed.hypixel.HypixelLowHopSpeed;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.MoveUtil;
@@ -14,7 +14,7 @@ public class HypixelLowHopPredictSpeed extends SubMode<HypixelLowHopSpeed> {
     }
 
     @SubscribeEvent
-    public void onPrePlayerInput(PrePlayerInputEvent event) {
+    public void onPreUpdate(PreUpdateEvent event) {
         if (!MoveUtil.isMoving() || parent.parent.parent.noAction()) return;
         if (parent.parent.parent.offGroundTicks == 0) {
             if (!Utils.jumpDown()) {

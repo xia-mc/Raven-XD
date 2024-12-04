@@ -32,12 +32,13 @@ public class Animations extends Module {
     private final SliderSetting y = new SliderSetting("Y", 0, -1, 1, 0.05);
     private final SliderSetting z = new SliderSetting("Z", 0, -1, 1, 0.05);
     private final SliderSetting swingSpeed = new SliderSetting("Swing speed", 0, -200, 50, 5);
+    private final SliderSetting swingSpeedWhileBlocking = new SliderSetting("Swing speed while blocking", 0, -200, 50, 5);
 
     private int swing;
 
     public Animations() {
         super("Animations", category.render);
-        this.registerSetting(blockAnimation, swingAnimation, otherAnimation, swingWhileDigging, clientSide, fakeSlotReset, x, y, z, swingSpeed);
+        this.registerSetting(blockAnimation, swingAnimation, otherAnimation, swingWhileDigging, clientSide, fakeSlotReset, x, y, z, swingSpeed, swingSpeedWhileBlocking);
     }
 
     @SubscribeEvent
@@ -56,13 +57,13 @@ public class Animations extends Module {
         if (Utils.nullCheck()
                 && fakeSlotReset.isToggled()
                 && event.getPacket() instanceof S0BPacketAnimation
-                && SlotHandler.getHeldItem() != null
-                && SlotHandler.getCurrentSlot() == mc.thePlayer.inventory.currentItem
+                && !SlotHandler.isSilentSlot()
                 && KillAura.target != null
         ) {
             final S0BPacketAnimation packet = (S0BPacketAnimation) event.getPacket();
             if (packet.getAnimationType() == 1 && packet.getEntityID() == KillAura.target.getEntityId()) {
                 mc.getItemRenderer().resetEquippedProgress();
+                Utils.sendMessage("reset.");
             }
         }
     }
@@ -280,7 +281,11 @@ public class Animations extends Module {
 
     @SubscribeEvent
     public void onSwingAnimation(@NotNull SwingAnimationEvent event) {
-        event.setAnimationEnd(event.getAnimationEnd() * (int) ((-swingSpeed.getInput() / 100) + 1));
+        if (mc.thePlayer.isUsingItem()) {
+            event.setAnimationEnd((int) (event.getAnimationEnd() * ((-swingSpeedWhileBlocking.getInput() / 100) + 1)));
+        } else {
+            event.setAnimationEnd((int) (event.getAnimationEnd() * ((-swingSpeed.getInput() / 100) + 1)));
+        }
     }
 
     private void translate(double x, double y, double z) {

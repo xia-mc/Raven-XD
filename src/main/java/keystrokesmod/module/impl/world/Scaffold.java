@@ -211,6 +211,13 @@ public class Scaffold extends IAutoClicker {
         return false;
     }
 
+    @SubscribeEvent
+    public void onSprint(SprintEvent event) {
+        if (!sprint()) {
+            event.setSprint(false);
+        }
+    }
+
     public static int getSlot() {
         int slot = -1;
         int highestStack = -1;
