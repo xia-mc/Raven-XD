@@ -85,7 +85,6 @@ public class Scaffold extends IAutoClicker {
     private final ButtonSetting autoSwap;
     private final ButtonSetting useBiggestStack;
     private final ButtonSetting fastOnRMB;
-    private final ButtonSetting highlightBlocks;
     private final ButtonSetting multiPlace;
     private final ButtonSetting showBlockCount;
     private final ButtonSetting delayOnJump;
@@ -98,6 +97,9 @@ public class Scaffold extends IAutoClicker {
     private final ButtonSetting postPlace;
     private final ButtonSetting lookView;
     private final ButtonSetting stopSprintAtStart;
+    private final ButtonSetting esp;
+    private final ButtonSetting outline;
+    private final ButtonSetting shade;
 
     private final Map<BlockPos, Timer> highlight = new HashMap<>();
     public @Nullable MovingObjectPosition rayCasted = null;
@@ -186,7 +188,6 @@ public class Scaffold extends IAutoClicker {
         this.registerSetting(useBiggestStack = new ButtonSetting("Use biggest stack", true, autoSwap::isToggled));
         this.registerSetting(delayOnJump = new ButtonSetting("Delay on jump", true));
         this.registerSetting(fastOnRMB = new ButtonSetting("Fast on RMB", false));
-        this.registerSetting(highlightBlocks = new ButtonSetting("Highlight blocks", true));
         this.registerSetting(multiPlace = new ButtonSetting("Multi-place", false));
         this.registerSetting(safeWalk = new ButtonSetting("Safewalk", true));
         this.registerSetting(safeWalkOnNoBlocks = new ButtonSetting("Safewalk on no blocks", true));
@@ -203,6 +204,10 @@ public class Scaffold extends IAutoClicker {
         this.registerSetting(polar = new ButtonSetting("Polar", false, expand::isToggled));
         this.registerSetting(postPlace = new ButtonSetting("Post place", false, "Place on PostUpdate."));
         this.registerSetting(lookView = new ButtonSetting("Look view", false));
+        this.registerSetting(new DescriptionSetting("Rendering"));
+        this.registerSetting(esp = new ButtonSetting("ESP", false));
+        this.registerSetting(outline = new ButtonSetting("Outline", true, esp::isToggled));
+        this.registerSetting(shade = new ButtonSetting("Shade", false, esp::isToggled));
     }
 
     public static boolean sprint() {
@@ -779,7 +784,7 @@ public class Scaffold extends IAutoClicker {
 
     @SubscribeEvent
     public void onRenderWorld(RenderWorldLastEvent e) {
-        if (!Utils.nullCheck() || !highlightBlocks.isToggled() || highlight.isEmpty()) {
+        if (!Utils.nullCheck() || !esp.isToggled() || highlight.isEmpty()) {
             return;
         }
         Iterator<Map.Entry<BlockPos, Timer>> iterator = highlight.entrySet().iterator();
@@ -794,7 +799,7 @@ public class Scaffold extends IAutoClicker {
                 iterator.remove();
                 continue;
             }
-            RenderUtils.renderBlock(entry.getKey(), Utils.merge(Theme.getGradient((int) HUD.theme.getInput(), 0), alpha), true, false);
+            RenderUtils.renderBlock(entry.getKey(), Utils.merge(Theme.getGradient((int) HUD.theme.getInput(), 0), alpha), outline.isToggled(), shade.isToggled());
         }
     }
 
