@@ -26,7 +26,6 @@ public class Speed extends Module {
                 .add(new BlocksMCSpeed("BlocksMC", this))
                 .add(new VulcanSpeed("Vulcan", this))
                 .add(new GrimACSpeed("GrimAC", this))
-                .add(new IntaveSpeed("Intave", this))
                 .add(new StrafeSpeed("Strafe", this))
         );
         this.registerSetting(liquidDisable = new ButtonSetting("Disable in liquid", true));

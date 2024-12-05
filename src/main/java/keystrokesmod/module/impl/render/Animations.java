@@ -16,7 +16,6 @@ import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemMap;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.client.C0APacketAnimation;
-import net.minecraft.network.play.server.S0BPacketAnimation;
 import net.minecraft.util.MathHelper;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
@@ -33,6 +32,7 @@ public class Animations extends Module {
     private final ButtonSetting modifyAnimations = new ButtonSetting("Customize Animations", false);
     private final SliderSetting staticStartSwingProgress = new SliderSetting("Starting Swing Progress", 0, -1, 2.5, 0.1, modifyAnimations::isToggled);
     private final SliderSetting swingSpeed = new SliderSetting("Swing speed", 0, -200, 50, 5, modifyAnimations::isToggled);
+    private final SliderSetting swingSpeedWhileBlocking = new SliderSetting("Swing speed while blocking", 0, -200, 50, 5);
     //translation
     private final SliderSetting translatex = new SliderSetting("X", 0, -4, 4, 0.05);
     private final SliderSetting translatey = new SliderSetting("Y", 0, -2, 2, 0.05);
@@ -54,6 +54,7 @@ public class Animations extends Module {
     private final SliderSetting rotatez = new SliderSetting("rotation z", 0, -180, 180, 1, customrotation::isToggled);
 
 
+
     private int swing;
 
     private static final double staticscalemultiplier_x = 1;
@@ -64,15 +65,16 @@ public class Animations extends Module {
 
     public Animations() {
         super("Animations", category.render);
+      
         this.registerSetting(blockAnimation, swingAnimation, otherAnimation, swingWhileDigging, clientSide, fakeSlotReset);
-
         this.registerSetting(modifyAnimations);
-        this.registerSetting(staticStartSwingProgress, swingSpeed);
+        this.registerSetting(staticStartSwingProgress, swingSpeed, swingSpeedWhileBlocking);
         this.registerSetting(new DescriptionSetting("Custom Translation"));
         this.registerSetting(translatex, translatey, translatez);
         this.registerSetting(precustomtranslation, pretranslatex, pretranslatey, pretranslatez);
         this.registerSetting(customscaling, scalex, scaley, scalez);
         this.registerSetting(customrotation, rotatex, rotatey, rotatez);
+
 
     }
 
@@ -88,18 +90,15 @@ public class Animations extends Module {
     }
 
     @SubscribeEvent
-    public void onReceivePacket(ReceivePacketEvent event) {
+    public void onPreUpdate(PreUpdateEvent event) {
         if (Utils.nullCheck()
                 && fakeSlotReset.isToggled()
-                && event.getPacket() instanceof S0BPacketAnimation
-                && SlotHandler.getHeldItem() != null
-                && SlotHandler.getCurrentSlot() == mc.thePlayer.inventory.currentItem
+                && !SlotHandler.isSilentSlot()
                 && KillAura.target != null
+                && KillAura.target.hurtTime != 0
+                && KillAura.target.hurtTime == KillAura.target.maxHurtTime
         ) {
-            final S0BPacketAnimation packet = (S0BPacketAnimation) event.getPacket();
-            if (packet.getAnimationType() == 1 && packet.getEntityID() == KillAura.target.getEntityId()) {
-                mc.getItemRenderer().resetEquippedProgress();
-            }
+            mc.getItemRenderer().resetEquippedProgress();
         }
     }
 
@@ -366,8 +365,11 @@ public class Animations extends Module {
 
     @SubscribeEvent
     public void onSwingAnimation(@NotNull SwingAnimationEvent event) {
-        if(modifyAnimations.isToggled()) {
-            event.setAnimationEnd(event.getAnimationEnd() * (int) ((-swingSpeed.getInput() / 100) + 1));
+
+        if ((mc.thePlayer.getItemInUseCount() == 1 || mc.thePlayer.isUsingItem()) && modifyAnimations.isToggled()) {
+            event.setAnimationEnd((int) (event.getAnimationEnd() * ((-swingSpeedWhileBlocking.getInput() / 100) + 1)));
+        } else {
+            event.setAnimationEnd((int) (event.getAnimationEnd() * ((-swingSpeed.getInput() / 100) + 1)));
         }
     }
 

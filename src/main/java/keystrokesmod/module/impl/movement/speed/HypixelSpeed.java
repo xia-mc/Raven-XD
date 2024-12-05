@@ -18,6 +18,7 @@ import org.jetbrains.annotations.NotNull;
 public class HypixelSpeed extends SubMode<Speed> {
     private final ModeValue mode;
     private final ButtonSetting strafe;
+    private final SliderSetting slowdown;
     private final SliderSetting minAngle;
     private final ButtonSetting fullStrafe;
 
@@ -31,6 +32,7 @@ public class HypixelSpeed extends SubMode<Speed> {
                 .add(new HypixelLowHopSpeed("LowHop", this))
         );
         this.registerSetting(strafe = new ButtonSetting("Strafe", false));
+        this.registerSetting(slowdown = new SliderSetting("Slowdown", 1, 1, 2, 0.01, strafe::isToggled));
         this.registerSetting(minAngle = new SliderSetting("Min angle", 30, 15, 90, 15, strafe::isToggled));
         this.registerSetting(fullStrafe = new ButtonSetting("Full strafe", false, strafe::isToggled));
     }
@@ -39,16 +41,16 @@ public class HypixelSpeed extends SubMode<Speed> {
     public void onPreUpdate(PreUpdateEvent event) {
         if (strafe.isToggled() && canStrafe()) {
             if (parent.offGroundTicks == 9) {
-                MoveUtil.strafe(0.2);
+                MoveUtil.strafe(Math.min(0.2 * slowdown.getInput(), MoveUtil.speed()));
                 mc.thePlayer.motionY += 0.1;
             } else {
-                MoveUtil.strafe(0.11);
+                MoveUtil.strafe(Math.min(0.11 * slowdown.getInput(), MoveUtil.speed()));
             }
         }
     }
 
     private boolean canStrafe() {
-        if (mc.thePlayer.onGround)
+        if (mc.thePlayer.onGround || !MoveUtil.isMoving())
             return false;
         final double curAngle = Move.fromMovement(mc.thePlayer.moveForward, mc.thePlayer.moveStrafing).getDeltaYaw()
                 + TargetStrafe.getMovementYaw();
@@ -58,8 +60,8 @@ public class HypixelSpeed extends SubMode<Speed> {
         lastAngle = curAngle;
 
         if (fullStrafe.isToggled())
-            return parent.offGroundTicks >= 4 && parent.offGroundTicks <= 9;
-        return parent.offGroundTicks == 4 || parent.offGroundTicks == 9;
+            return parent.offGroundTicks == 1 || (parent.offGroundTicks >= 4 && parent.offGroundTicks <= 9);
+        return parent.offGroundTicks == 1 || parent.offGroundTicks == 4 || parent.offGroundTicks == 9;
     }
 
     @Override

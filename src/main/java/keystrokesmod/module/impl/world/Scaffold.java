@@ -10,7 +10,6 @@ import keystrokesmod.module.impl.combat.autoclicker.NormalAutoClicker;
 import keystrokesmod.module.impl.other.RotationHandler;
 import keystrokesmod.module.impl.other.SlotHandler;
 import keystrokesmod.module.impl.other.anticheats.utils.world.PlayerRotation;
-import keystrokesmod.module.impl.render.HUD;
 import keystrokesmod.module.impl.world.scaffold.IScaffoldRotation;
 import keystrokesmod.module.impl.world.scaffold.IScaffoldSprint;
 import keystrokesmod.module.impl.world.scaffold.rotation.*;
@@ -49,11 +48,13 @@ import java.util.concurrent.TimeUnit;
 
 public class Scaffold extends IAutoClicker {
     private static final String[] precisionModes = new String[]{"Very low", "Low", "Moderate", "High", "Very high", "Unlimited"};
-    public final SliderSetting motion;
-    public final ButtonSetting safeWalk;
+
+    private final SliderSetting motion;
+    private final ButtonSetting safeWalk;
+    private final ButtonSetting safeWalkOnNoBlocks;
     public final ButtonSetting tower;
-    public final ButtonSetting sameY;
-    public final ButtonSetting autoJump;
+    private final ButtonSetting sameY;
+    private final ButtonSetting autoJump;
     private final ModeValue clickMode;
     private final ButtonSetting alwaysPlaceIfPossible;
     private final SliderSetting aimSpeed;
@@ -83,7 +84,6 @@ public class Scaffold extends IAutoClicker {
     private final ButtonSetting autoSwap;
     private final ButtonSetting useBiggestStack;
     private final ButtonSetting fastOnRMB;
-    private final ButtonSetting highlightBlocks;
     private final ButtonSetting multiPlace;
     private final ButtonSetting showBlockCount;
     private final ButtonSetting delayOnJump;
@@ -95,7 +95,13 @@ public class Scaffold extends IAutoClicker {
     private final ButtonSetting polar;
     private final ButtonSetting postPlace;
     private final ButtonSetting lookView;
-    private final ButtonSetting cancelSprintAtStart;
+    private final ButtonSetting stopSprintAtStart;
+    private final ButtonSetting esp;
+    private final ModeSetting theme;
+    private final ButtonSetting raytrace;
+    private final SliderSetting alpha;
+    private final ButtonSetting outline;
+    private final ButtonSetting shade;
 
     private final Map<BlockPos, Timer> highlight = new HashMap<>();
     public @Nullable MovingObjectPosition rayCasted = null;
@@ -123,6 +129,7 @@ public class Scaffold extends IAutoClicker {
     private HoverState hoverState = HoverState.DONE;
     private boolean stopMoving = false;
     private double lastOffsetToMid = -1;
+    private MovingObjectPosition lastESPRaytrace = null;
 
     public Scaffold() {
         super("Scaffold", category.world);
@@ -184,11 +191,12 @@ public class Scaffold extends IAutoClicker {
         this.registerSetting(useBiggestStack = new ButtonSetting("Use biggest stack", true, autoSwap::isToggled));
         this.registerSetting(delayOnJump = new ButtonSetting("Delay on jump", true));
         this.registerSetting(fastOnRMB = new ButtonSetting("Fast on RMB", false));
-        this.registerSetting(highlightBlocks = new ButtonSetting("Highlight blocks", true));
         this.registerSetting(multiPlace = new ButtonSetting("Multi-place", false));
         this.registerSetting(safeWalk = new ButtonSetting("Safewalk", true));
+        this.registerSetting(safeWalkOnNoBlocks = new ButtonSetting("Safewalk on no blocks", true));
         this.registerSetting(showBlockCount = new ButtonSetting("Show block count", true));
         this.registerSetting(stopAtStart = new ButtonSetting("Stop at start", false));
+        this.registerSetting(stopSprintAtStart = new ButtonSetting("Stop sprint at start", false));
         this.registerSetting(silentSwing = new ButtonSetting("Silent swing", false));
         this.registerSetting(noSwing = new ButtonSetting("No swing", false, silentSwing::isToggled));
         this.registerSetting(tower = new ButtonSetting("Tower", false));
@@ -199,7 +207,13 @@ public class Scaffold extends IAutoClicker {
         this.registerSetting(polar = new ButtonSetting("Polar", false, expand::isToggled));
         this.registerSetting(postPlace = new ButtonSetting("Post place", false, "Place on PostUpdate."));
         this.registerSetting(lookView = new ButtonSetting("Look view", false));
-        this.registerSetting(cancelSprintAtStart = new ButtonSetting("Cancel sprint at start", false));
+        this.registerSetting(new DescriptionSetting("Rendering"));
+        this.registerSetting(esp = new ButtonSetting("ESP", false));
+        this.registerSetting(theme = new ModeSetting("Theme", Theme.themes, 0));
+        this.registerSetting(raytrace = new ButtonSetting("Raytrace", false, esp::isToggled));
+        this.registerSetting(alpha = new SliderSetting("Alpha", 200, 0, 255, 1, () -> esp.isToggled() && raytrace.isToggled()));
+        this.registerSetting(outline = new ButtonSetting("Outline", true, esp::isToggled));
+        this.registerSetting(shade = new ButtonSetting("Shade", false, esp::isToggled));
     }
 
     public static boolean sprint() {
@@ -209,6 +223,13 @@ public class Scaffold extends IAutoClicker {
             return ((IScaffoldSprint) ModuleManager.scaffold.sprint.getSelected()).isSprint();
         }
         return false;
+    }
+
+    @SubscribeEvent
+    public void onSprint(SprintEvent event) {
+        if (!sprint()) {
+            event.setSprint(false);
+        }
     }
 
     public static int getSlot() {
@@ -250,6 +271,7 @@ public class Scaffold extends IAutoClicker {
         lastYaw = lastPitch = null;
         polar$waitingForExpand = false;
         lastOffsetToMid = -1;
+        lastESPRaytrace = null;
         Utils.resetTimer();
     }
 
@@ -273,7 +295,7 @@ public class Scaffold extends IAutoClicker {
             stopMoving = true;
         }
 
-        if (cancelSprintAtStart.isToggled()) {
+        if (stopSprintAtStart.isToggled()) {
             mc.thePlayer.setSprinting(false);
         }
 
@@ -769,22 +791,50 @@ public class Scaffold extends IAutoClicker {
 
     @SubscribeEvent
     public void onRenderWorld(RenderWorldLastEvent e) {
-        if (!Utils.nullCheck() || !highlightBlocks.isToggled() || highlight.isEmpty()) {
+        if (!Utils.nullCheck() || !esp.isToggled()) {
             return;
         }
-        Iterator<Map.Entry<BlockPos, Timer>> iterator = highlight.entrySet().iterator();
-        while (iterator.hasNext()) {
-            Map.Entry<BlockPos, Timer> entry = iterator.next();
-            if (entry.getValue() == null) {
-                entry.setValue(new Timer(750));
-                entry.getValue().start();
+        if (!highlight.isEmpty()) {
+            Iterator<Map.Entry<BlockPos, Timer>> iterator = highlight.entrySet().iterator();
+            while (iterator.hasNext()) {
+                Map.Entry<BlockPos, Timer> entry = iterator.next();
+                if (entry.getValue() == null) {
+                    entry.setValue(new Timer(750));
+                    entry.getValue().start();
+                }
+                int alpha = entry.getValue() == null ? 210 : 210 - entry.getValue().getValueInt(0, 210, 1);
+                if (alpha == 0) {
+                    iterator.remove();
+                    continue;
+                }
+
+                if (!raytrace.isToggled()) {
+                    RenderUtils.renderBlock(entry.getKey(),
+                            Utils.merge(Theme.getGradient((int) theme.getInput(), 0), alpha),
+                            outline.isToggled(), shade.isToggled()
+                    );
+                }
             }
-            int alpha = entry.getValue() == null ? 210 : 210 - entry.getValue().getValueInt(0, 210, 1);
-            if (alpha == 0) {
-                iterator.remove();
-                continue;
+        }
+
+        if (raytrace.isToggled()) {
+            MovingObjectPosition hitResult = mc.objectMouseOver;
+            if (hitResult.typeOfHit == MovingObjectPosition.MovingObjectType.MISS) {
+                hitResult = lastESPRaytrace;
+            } else {
+                lastESPRaytrace = hitResult;
             }
-            RenderUtils.renderBlock(entry.getKey(), Utils.merge(Theme.getGradient((int) HUD.theme.getInput(), 0), alpha), true, false);
+
+            if (hitResult == null) {
+                hitResult = placeBlock;
+            }
+
+            if (hitResult != null && hitResult.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
+                RenderUtils.renderBlock(hitResult.getBlockPos(),
+                        Utils.merge(Theme.getGradient((int) theme.getInput(), 0), (int) alpha.getInput()),
+                        outline.isToggled(), shade.isToggled()
+                );
+            }
         }
     }
 
@@ -798,7 +848,7 @@ public class Scaffold extends IAutoClicker {
     }
 
     public boolean safewalk() {
-        return this.isEnabled() && safeWalk.isToggled();
+        return this.isEnabled() && (safeWalk.isToggled() || (safeWalkOnNoBlocks.isToggled() && totalBlocks() == 0));
     }
 
     public boolean stopRotation() {

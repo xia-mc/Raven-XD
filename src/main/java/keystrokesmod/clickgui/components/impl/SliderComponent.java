@@ -3,6 +3,7 @@ package keystrokesmod.clickgui.components.impl;
 import keystrokesmod.Raven;
 import keystrokesmod.clickgui.components.Component;
 import keystrokesmod.module.ModuleManager;
+import keystrokesmod.module.impl.client.Gui;
 import keystrokesmod.module.setting.Setting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.utility.Utils;
@@ -43,7 +44,7 @@ public class SliderComponent extends Component {
             r = l + 84;
         }
 
-        RenderUtils.drawRoundedRectangle(l, this.parent.categoryComponent.getY() + this.o + 11, r, this.parent.categoryComponent.getY() + this.o + 15, 3, Color.getHSBColor((float) (System.currentTimeMillis() % 11000L) / 11000.0F, 0.75F, 0.9F).getRGB());
+        RenderUtils.drawRoundedRectangle(l, this.parent.categoryComponent.getY() + this.o + 11, r, this.parent.categoryComponent.getY() + this.o + 15, 3, Gui.getColor());
         GL11.glPushMatrix();
         GL11.glScaled(0.5D, 0.5D, 0.5D);
         String value;

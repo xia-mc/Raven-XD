@@ -31,8 +31,8 @@ public class Sprint extends Module {
 
     public static boolean omni() {
         final SprintEvent event = new SprintEvent(
-                MoveUtil.isMoving(),
-                omni || ModuleManager.sprint != null && ModuleManager.sprint.isEnabled() && ModuleManager.sprint.mode.getInput() == 1
+                MoveUtil.canSprint(true),
+                omni || (ModuleManager.sprint != null && ModuleManager.sprint.isEnabled() && ModuleManager.sprint.mode.getInput() == 1)
         );
 
         return event.isSprint() && event.isOmni();
@@ -48,10 +48,9 @@ public class Sprint extends Module {
     public void p(PlayerTickEvent e) {
         if (Utils.nullCheck() && mc.inGameHasFocus) {
 
-            if(ModuleManager.scaffold.isEnabled() && disableWhileScaffold.isToggled()) {
+            if (ModuleManager.scaffold.isEnabled() && disableWhileScaffold.isToggled()) {
                 KeyBinding.setKeyBindState(mc.gameSettings.keyBindSprint.getKeyCode(), false);
-            }
-            else {
+            } else {
                 KeyBinding.setKeyBindState(mc.gameSettings.keyBindSprint.getKeyCode(), true);
             }
 
