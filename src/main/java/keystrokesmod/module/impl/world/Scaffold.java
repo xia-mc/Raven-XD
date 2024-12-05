@@ -10,7 +10,6 @@ import keystrokesmod.module.impl.combat.autoclicker.NormalAutoClicker;
 import keystrokesmod.module.impl.other.RotationHandler;
 import keystrokesmod.module.impl.other.SlotHandler;
 import keystrokesmod.module.impl.other.anticheats.utils.world.PlayerRotation;
-import keystrokesmod.module.impl.render.HUD;
 import keystrokesmod.module.impl.world.scaffold.IScaffoldRotation;
 import keystrokesmod.module.impl.world.scaffold.IScaffoldSprint;
 import keystrokesmod.module.impl.world.scaffold.rotation.*;
@@ -98,7 +97,8 @@ public class Scaffold extends IAutoClicker {
     private final ButtonSetting lookView;
     private final ButtonSetting stopSprintAtStart;
     private final ButtonSetting esp;
-    private final ButtonSetting single;
+    private final ModeSetting theme;
+    private final ButtonSetting raytrace;
     private final SliderSetting alpha;
     private final ButtonSetting outline;
     private final ButtonSetting shade;
@@ -208,8 +208,9 @@ public class Scaffold extends IAutoClicker {
         this.registerSetting(lookView = new ButtonSetting("Look view", false));
         this.registerSetting(new DescriptionSetting("Rendering"));
         this.registerSetting(esp = new ButtonSetting("ESP", false));
-        this.registerSetting(single = new ButtonSetting("Single", false, esp::isToggled));
-        this.registerSetting(alpha = new SliderSetting("Alpha", 200, 0, 255, 1, () -> esp.isToggled() && single.isToggled()));
+        this.registerSetting(theme = new ModeSetting("Theme", Theme.themes, 0));
+        this.registerSetting(raytrace = new ButtonSetting("Raytrace", false, esp::isToggled));
+        this.registerSetting(alpha = new SliderSetting("Alpha", 200, 0, 255, 1, () -> esp.isToggled() && raytrace.isToggled()));
         this.registerSetting(outline = new ButtonSetting("Outline", true, esp::isToggled));
         this.registerSetting(shade = new ButtonSetting("Shade", false, esp::isToggled));
     }
@@ -788,41 +789,41 @@ public class Scaffold extends IAutoClicker {
 
     @SubscribeEvent
     public void onRenderWorld(RenderWorldLastEvent e) {
-        if (!Utils.nullCheck() || !esp.isToggled() || highlight.isEmpty()) {
+        if (!Utils.nullCheck() || !esp.isToggled()) {
             return;
         }
-        Iterator<Map.Entry<BlockPos, Timer>> iterator = highlight.entrySet().iterator();
-        while (iterator.hasNext()) {
-            Map.Entry<BlockPos, Timer> entry = iterator.next();
-            if (entry.getValue() == null) {
-                entry.setValue(new Timer(750));
-                entry.getValue().start();
-            }
-            int alpha = entry.getValue() == null ? 210 : 210 - entry.getValue().getValueInt(0, 210, 1);
-            if (alpha == 0) {
-                iterator.remove();
-                continue;
-            }
+        if (!highlight.isEmpty()) {
+            Iterator<Map.Entry<BlockPos, Timer>> iterator = highlight.entrySet().iterator();
+            while (iterator.hasNext()) {
+                Map.Entry<BlockPos, Timer> entry = iterator.next();
+                if (entry.getValue() == null) {
+                    entry.setValue(new Timer(750));
+                    entry.getValue().start();
+                }
+                int alpha = entry.getValue() == null ? 210 : 210 - entry.getValue().getValueInt(0, 210, 1);
+                if (alpha == 0) {
+                    iterator.remove();
+                    continue;
+                }
 
-            if (!single.isToggled()) {
-                RenderUtils.renderBlock(entry.getKey(),
-                        Utils.merge(Theme.getGradient((int) HUD.theme.getInput(), 0), alpha),
-                        outline.isToggled(), shade.isToggled()
-                );
+                if (!raytrace.isToggled()) {
+                    RenderUtils.renderBlock(entry.getKey(),
+                            Utils.merge(Theme.getGradient((int) theme.getInput(), 0), alpha),
+                            outline.isToggled(), shade.isToggled()
+                    );
+                }
             }
         }
 
-        if (single.isToggled()) {
-            MovingObjectPosition hitResult;
-            if (placeBlock != null) {
+        if (raytrace.isToggled()) {
+            MovingObjectPosition hitResult = mc.objectMouseOver;
+            if (hitResult.typeOfHit == MovingObjectPosition.MovingObjectType.MISS) {
                 hitResult = placeBlock;
-            } else {
-                hitResult = RotationUtils.rayCast(4.5, RotationHandler.getRotationYaw(), RotationHandler.getRotationPitch());
             }
 
-            if (hitResult != null) {
+            if (hitResult != null && hitResult.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
                 RenderUtils.renderBlock(hitResult.getBlockPos(),
-                        Utils.merge(Theme.getGradient((int) HUD.theme.getInput(), 0), (int) alpha.getInput()),
+                        Utils.merge(Theme.getGradient((int) theme.getInput(), 0), (int) alpha.getInput()),
                         outline.isToggled(), shade.isToggled()
                 );
             }
