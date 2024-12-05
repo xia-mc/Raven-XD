@@ -23,7 +23,6 @@ public class HypixelLowHopPredictSpeed extends SubMode<HypixelLowHopSpeed> {
             }
         } else if (parent.parent.parent.offGroundTicks == 5 && !parent.noLowHop()) {
             mc.thePlayer.motionY = MoveUtil.predictedMotion(mc.thePlayer.motionY, 2);
-            Utils.sendMessage(String.valueOf(mc.thePlayer.motionY));
         }
     }
 }
