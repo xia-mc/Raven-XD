@@ -129,6 +129,7 @@ public class Scaffold extends IAutoClicker {
     private HoverState hoverState = HoverState.DONE;
     private boolean stopMoving = false;
     private double lastOffsetToMid = -1;
+    private MovingObjectPosition lastESPRaytrace = null;
 
     public Scaffold() {
         super("Scaffold", category.world);
@@ -270,6 +271,7 @@ public class Scaffold extends IAutoClicker {
         lastYaw = lastPitch = null;
         polar$waitingForExpand = false;
         lastOffsetToMid = -1;
+        lastESPRaytrace = null;
         Utils.resetTimer();
     }
 
@@ -818,6 +820,12 @@ public class Scaffold extends IAutoClicker {
         if (raytrace.isToggled()) {
             MovingObjectPosition hitResult = mc.objectMouseOver;
             if (hitResult.typeOfHit == MovingObjectPosition.MovingObjectType.MISS) {
+                hitResult = lastESPRaytrace;
+            } else {
+                lastESPRaytrace = hitResult;
+            }
+
+            if (hitResult == null) {
                 hitResult = placeBlock;
             }
 
