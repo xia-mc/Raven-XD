@@ -32,7 +32,7 @@ public class Animations extends Module {
     private final ButtonSetting modifyAnimations = new ButtonSetting("Customize Animations", false);
     private final SliderSetting staticStartSwingProgress = new SliderSetting("Starting Swing Progress", 0, -1, 2.5, 0.1, modifyAnimations::isToggled);
     private final SliderSetting swingSpeed = new SliderSetting("Swing speed", 0, -200, 50, 5, modifyAnimations::isToggled);
-    private final SliderSetting swingSpeedWhileBlocking = new SliderSetting("Swing speed while blocking", 0, -200, 50, 5);
+    private final SliderSetting swingSpeedWhileBlocking = new SliderSetting("Swing speed while blocking", 0, -200, 50, 5, modifyAnimations::isToggled);
     //translation
     private final SliderSetting translatex = new SliderSetting("X", 0, -4, 4, 0.05);
     private final SliderSetting translatey = new SliderSetting("Y", 0, -2, 2, 0.05);
