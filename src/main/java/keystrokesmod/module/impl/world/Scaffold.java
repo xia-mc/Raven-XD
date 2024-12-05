@@ -98,6 +98,8 @@ public class Scaffold extends IAutoClicker {
     private final ButtonSetting lookView;
     private final ButtonSetting stopSprintAtStart;
     private final ButtonSetting esp;
+    private final ButtonSetting single;
+    private final SliderSetting alpha;
     private final ButtonSetting outline;
     private final ButtonSetting shade;
 
@@ -206,6 +208,8 @@ public class Scaffold extends IAutoClicker {
         this.registerSetting(lookView = new ButtonSetting("Look view", false));
         this.registerSetting(new DescriptionSetting("Rendering"));
         this.registerSetting(esp = new ButtonSetting("ESP", false));
+        this.registerSetting(single = new ButtonSetting("Single", false, esp::isToggled));
+        this.registerSetting(alpha = new SliderSetting("Alpha", 200, 0, 255, 1, () -> esp.isToggled() && single.isToggled()));
         this.registerSetting(outline = new ButtonSetting("Outline", true, esp::isToggled));
         this.registerSetting(shade = new ButtonSetting("Shade", false, esp::isToggled));
     }
@@ -799,7 +803,29 @@ public class Scaffold extends IAutoClicker {
                 iterator.remove();
                 continue;
             }
-            RenderUtils.renderBlock(entry.getKey(), Utils.merge(Theme.getGradient((int) HUD.theme.getInput(), 0), alpha), outline.isToggled(), shade.isToggled());
+
+            if (!single.isToggled()) {
+                RenderUtils.renderBlock(entry.getKey(),
+                        Utils.merge(Theme.getGradient((int) HUD.theme.getInput(), 0), alpha),
+                        outline.isToggled(), shade.isToggled()
+                );
+            }
+        }
+
+        if (single.isToggled()) {
+            MovingObjectPosition hitResult;
+            if (placeBlock != null) {
+                hitResult = placeBlock;
+            } else {
+                hitResult = RotationUtils.rayCast(4.5, RotationHandler.getRotationYaw(), RotationHandler.getRotationPitch());
+            }
+
+            if (hitResult != null) {
+                RenderUtils.renderBlock(hitResult.getBlockPos(),
+                        Utils.merge(Theme.getGradient((int) HUD.theme.getInput(), 0), (int) alpha.getInput()),
+                        outline.isToggled(), shade.isToggled()
+                );
+            }
         }
     }
 

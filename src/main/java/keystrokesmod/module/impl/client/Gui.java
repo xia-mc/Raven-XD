@@ -26,7 +26,7 @@ public class Gui extends Module {
     }
 
     public static int getColor() {
-        return Theme.getGradient((int) theme.getInput(), System.currentTimeMillis() / 2.0);
+        return Theme.getGradient((int) theme.getInput(), 12);
     }
 
     public void onEnable() {
