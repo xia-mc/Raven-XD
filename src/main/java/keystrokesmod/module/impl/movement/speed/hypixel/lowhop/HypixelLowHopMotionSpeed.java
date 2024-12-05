@@ -8,21 +8,35 @@ import keystrokesmod.utility.Utils;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
-public class HypixelLowHopPredictSpeed extends SubMode<HypixelLowHopSpeed> {
-    public HypixelLowHopPredictSpeed(String name, @NotNull HypixelLowHopSpeed parent) {
+public class HypixelLowHopMotionSpeed extends SubMode<HypixelLowHopSpeed> {
+
+    public HypixelLowHopMotionSpeed(String name, @NotNull HypixelLowHopSpeed parent) {
         super(name, parent);
     }
 
     @SubscribeEvent
     public void onPreUpdate(PreUpdateEvent event) {
         if (!MoveUtil.isMoving() || parent.parent.parent.noAction()) return;
+
         if (parent.parent.parent.offGroundTicks == 0) {
             if (!Utils.jumpDown()) {
                 MoveUtil.strafe(MoveUtil.getAllowedHorizontalDistance() - Math.random() / 100f);
                 mc.thePlayer.jump();
             }
-        } else if (parent.parent.parent.offGroundTicks == 5 && !parent.noLowHop()) {
-            mc.thePlayer.motionY = MoveUtil.predictedMotion(mc.thePlayer.motionY, 2);
+        } else if (parent.noLowHop() || MoveUtil.getJumpEffect() != 0) {
+            return;
+        }
+
+        switch (parent.parent.parent.offGroundTicks) {
+            case 1:
+                mc.thePlayer.motionY = 0.39;
+                break;
+            case 3:
+                mc.thePlayer.motionY -= 0.13;
+                break;
+            case 4:
+                mc.thePlayer.motionY -= 0.2;
+                break;
         }
     }
 }

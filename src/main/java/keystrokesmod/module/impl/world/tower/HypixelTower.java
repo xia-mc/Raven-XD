@@ -43,7 +43,7 @@ public class HypixelTower extends SubMode<Tower> {
     public HypixelTower(String name, @NotNull Tower parent) {
         super(name, parent);
         this.registerSetting(notWhileMoving = new ButtonSetting("Not while moving", true));
-        this.registerSetting(airStrafeAmount = new SliderSetting("Air strafe amount", 20, 15, 90, 5));
+        this.registerSetting(airStrafeAmount = new SliderSetting("Air strafe amount", 0, 0, 15, 5));
         this.registerSetting(stopOnBlocks = new SliderSetting("Stop on blocks", 6, 6, 10, 1));
     }
 

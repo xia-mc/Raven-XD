@@ -74,9 +74,6 @@ public class HypixelNoSlow extends INoSlow {
 
     @Override
     public float getSlowdown() {
-        ItemStack item = SlotHandler.getHeldItem();
-        if (item != null && item.getItem() instanceof ItemSword)
-            return 0.8f;
         return 1;
     }
 }

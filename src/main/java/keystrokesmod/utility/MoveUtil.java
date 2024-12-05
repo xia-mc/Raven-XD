@@ -218,12 +218,17 @@ public class MoveUtil {
         return 0;
     }
 
+    public static int getJumpEffect() {
+        if (mc.thePlayer.isPotionActive(Potion.jump))
+            return mc.thePlayer.getActivePotionEffect(Potion.jump).getAmplifier() + 1;
+        return 0;
+    }
+
     /**
      * Checks if the player is moving
      *
      * @return player moving
      */
-    @Contract(pure = true)
     public static boolean isMoving() {
         return isMoving(mc.thePlayer);
     }
@@ -233,7 +238,6 @@ public class MoveUtil {
         return entity.moveForward != 0 || entity.moveStrafing != 0;
     }
 
-    @Contract(pure = true)
     public static boolean isRealMoving() {
         return mc.thePlayer.motionX != 0 || (mc.thePlayer.motionY != 0 && !mc.thePlayer.onGround) || mc.thePlayer.motionZ != 0;
     }
