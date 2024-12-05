@@ -2,6 +2,7 @@ package keystrokesmod.module.impl.movement.speed.hypixel;
 
 import keystrokesmod.module.impl.exploit.disabler.hypixel.HypixelMotionDisabler;
 import keystrokesmod.module.impl.movement.speed.HypixelSpeed;
+import keystrokesmod.module.impl.movement.speed.hypixel.lowhop.HypixelLowHopMotionSpeed;
 import keystrokesmod.module.impl.movement.speed.hypixel.lowhop.HypixelLowHopPredictSpeed;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.DescriptionSetting;
@@ -21,6 +22,7 @@ public class HypixelLowHopSpeed extends SubMode<HypixelSpeed> {
         this.registerSetting(new DescriptionSetting("Motion disabler only."));
         this.registerSetting(mode = new ModeValue("Mode", this)
                 .add(new HypixelLowHopPredictSpeed("Predict", this))
+                .add(new HypixelLowHopMotionSpeed("7 Tick", this))
         );
         this.registerSetting(stopOnHurt = new ButtonSetting("Stop on hurt", true));
     }

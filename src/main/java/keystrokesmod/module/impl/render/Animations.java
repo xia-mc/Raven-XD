@@ -15,7 +15,6 @@ import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemMap;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.client.C0APacketAnimation;
-import net.minecraft.network.play.server.S0BPacketAnimation;
 import net.minecraft.util.MathHelper;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
@@ -53,18 +52,15 @@ public class Animations extends Module {
     }
 
     @SubscribeEvent
-    public void onReceivePacket(ReceivePacketEvent event) {
+    public void onPreUpdate(PreUpdateEvent event) {
         if (Utils.nullCheck()
                 && fakeSlotReset.isToggled()
-                && event.getPacket() instanceof S0BPacketAnimation
                 && !SlotHandler.isSilentSlot()
                 && KillAura.target != null
+                && KillAura.target.hurtTime != 0
+                && KillAura.target.hurtTime == KillAura.target.maxHurtTime
         ) {
-            final S0BPacketAnimation packet = (S0BPacketAnimation) event.getPacket();
-            if (packet.getAnimationType() == 1 && packet.getEntityID() == KillAura.target.getEntityId()) {
-                mc.getItemRenderer().resetEquippedProgress();
-                Utils.sendMessage("reset.");
-            }
+            mc.getItemRenderer().resetEquippedProgress();
         }
     }
 

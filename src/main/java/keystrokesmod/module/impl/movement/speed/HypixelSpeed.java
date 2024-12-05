@@ -32,7 +32,7 @@ public class HypixelSpeed extends SubMode<Speed> {
                 .add(new HypixelLowHopSpeed("LowHop", this))
         );
         this.registerSetting(strafe = new ButtonSetting("Strafe", false));
-        this.registerSetting(slowdown = new SliderSetting("Slowdown", 1, 1, 2, 0.01));
+        this.registerSetting(slowdown = new SliderSetting("Slowdown", 1, 1, 2, 0.01, strafe::isToggled));
         this.registerSetting(minAngle = new SliderSetting("Min angle", 30, 15, 90, 15, strafe::isToggled));
         this.registerSetting(fullStrafe = new ButtonSetting("Full strafe", false, strafe::isToggled));
     }
@@ -43,8 +43,6 @@ public class HypixelSpeed extends SubMode<Speed> {
             if (parent.offGroundTicks == 9) {
                 MoveUtil.strafe(Math.min(0.2 * slowdown.getInput(), MoveUtil.speed()));
                 mc.thePlayer.motionY += 0.1;
-            } else if (parent.offGroundTicks == 1) {
-                MoveUtil.strafe();
             } else {
                 MoveUtil.strafe(Math.min(0.11 * slowdown.getInput(), MoveUtil.speed()));
             }
