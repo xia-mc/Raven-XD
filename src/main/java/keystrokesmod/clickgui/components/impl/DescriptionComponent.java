@@ -1,6 +1,7 @@
 package keystrokesmod.clickgui.components.impl;
 
 import keystrokesmod.clickgui.components.Component;
+import keystrokesmod.module.impl.client.Gui;
 import keystrokesmod.module.setting.Setting;
 import keystrokesmod.module.setting.impl.DescriptionSetting;
 import keystrokesmod.utility.Theme;
@@ -28,7 +29,7 @@ public class DescriptionComponent extends Component {
     public void render() {
         GL11.glPushMatrix();
         GL11.glScaled(0.5D, 0.5D, 0.5D);
-        getFont().drawString(this.desc.getPrettyDesc(), (float) ((this.parent.categoryComponent.getX() + 4) * 2), (float) ((this.parent.categoryComponent.getY() + this.o + 4) * 2), Theme.getGradient(10, 0), true);
+        getFont().drawString(this.desc.getPrettyDesc(), (float) ((this.parent.categoryComponent.getX() + 4) * 2), (float) ((this.parent.categoryComponent.getY() + this.o + 4) * 2), Gui.getColor(), true);
         GL11.glPopMatrix();
     }
 

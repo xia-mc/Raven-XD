@@ -49,11 +49,13 @@ import java.util.concurrent.TimeUnit;
 
 public class Scaffold extends IAutoClicker {
     private static final String[] precisionModes = new String[]{"Very low", "Low", "Moderate", "High", "Very high", "Unlimited"};
-    public final SliderSetting motion;
-    public final ButtonSetting safeWalk;
+
+    private final SliderSetting motion;
+    private final ButtonSetting safeWalk;
+    private final ButtonSetting safeWalkOnNoBlocks;
     public final ButtonSetting tower;
-    public final ButtonSetting sameY;
-    public final ButtonSetting autoJump;
+    private final ButtonSetting sameY;
+    private final ButtonSetting autoJump;
     private final ModeValue clickMode;
     private final ButtonSetting alwaysPlaceIfPossible;
     private final SliderSetting aimSpeed;
@@ -95,7 +97,7 @@ public class Scaffold extends IAutoClicker {
     private final ButtonSetting polar;
     private final ButtonSetting postPlace;
     private final ButtonSetting lookView;
-    private final ButtonSetting cancelSprintAtStart;
+    private final ButtonSetting stopSprintAtStart;
 
     private final Map<BlockPos, Timer> highlight = new HashMap<>();
     public @Nullable MovingObjectPosition rayCasted = null;
@@ -187,8 +189,10 @@ public class Scaffold extends IAutoClicker {
         this.registerSetting(highlightBlocks = new ButtonSetting("Highlight blocks", true));
         this.registerSetting(multiPlace = new ButtonSetting("Multi-place", false));
         this.registerSetting(safeWalk = new ButtonSetting("Safewalk", true));
+        this.registerSetting(safeWalkOnNoBlocks = new ButtonSetting("Safewalk on no blocks", true));
         this.registerSetting(showBlockCount = new ButtonSetting("Show block count", true));
         this.registerSetting(stopAtStart = new ButtonSetting("Stop at start", false));
+        this.registerSetting(stopSprintAtStart = new ButtonSetting("Stop sprint at start", false));
         this.registerSetting(silentSwing = new ButtonSetting("Silent swing", false));
         this.registerSetting(noSwing = new ButtonSetting("No swing", false, silentSwing::isToggled));
         this.registerSetting(tower = new ButtonSetting("Tower", false));
@@ -199,7 +203,6 @@ public class Scaffold extends IAutoClicker {
         this.registerSetting(polar = new ButtonSetting("Polar", false, expand::isToggled));
         this.registerSetting(postPlace = new ButtonSetting("Post place", false, "Place on PostUpdate."));
         this.registerSetting(lookView = new ButtonSetting("Look view", false));
-        this.registerSetting(cancelSprintAtStart = new ButtonSetting("Cancel sprint at start", false));
     }
 
     public static boolean sprint() {
@@ -280,7 +283,7 @@ public class Scaffold extends IAutoClicker {
             stopMoving = true;
         }
 
-        if (cancelSprintAtStart.isToggled()) {
+        if (stopSprintAtStart.isToggled()) {
             mc.thePlayer.setSprinting(false);
         }
 
@@ -805,7 +808,7 @@ public class Scaffold extends IAutoClicker {
     }
 
     public boolean safewalk() {
-        return this.isEnabled() && safeWalk.isToggled();
+        return this.isEnabled() && (safeWalk.isToggled() || (safeWalkOnNoBlocks.isToggled() && totalBlocks() == 0));
     }
 
     public boolean stopRotation() {

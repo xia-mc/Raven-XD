@@ -5,11 +5,13 @@ import keystrokesmod.clickgui.ClickGui;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.ModeSetting;
+import keystrokesmod.utility.Theme;
 import keystrokesmod.utility.Utils;
 
 public class Gui extends Module {
     public static ButtonSetting removePlayerModel, resetPosition, translucentBackground, removeWatermark, rainBowOutlines, toolTip;
     public static ModeSetting font;
+    public static ModeSetting theme;
 
     public Gui() {
         super("Gui", Module.category.client, 54);
@@ -20,6 +22,11 @@ public class Gui extends Module {
         this.registerSetting(toolTip = new ButtonSetting("Tool tip", true));
         this.registerSetting(resetPosition = new ButtonSetting("Reset position", ClickGui::resetPosition));
         this.registerSetting(font = new ModeSetting("Font", new String[]{"Minecraft", "Product Sans", "Tenacity"}, 0));
+        this.registerSetting(theme = new ModeSetting("Theme", Theme.themes, 0));
+    }
+
+    public static int getColor() {
+        return Theme.getGradient((int) theme.getInput(), System.currentTimeMillis() / 2.0);
     }
 
     public void onEnable() {

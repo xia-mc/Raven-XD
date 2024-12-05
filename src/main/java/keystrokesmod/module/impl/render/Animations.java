@@ -277,7 +277,7 @@ public class Animations extends Module {
 
     @SubscribeEvent
     public void onSwingAnimation(@NotNull SwingAnimationEvent event) {
-        if (mc.thePlayer.isUsingItem()) {
+        if (mc.thePlayer.getItemInUseCount() == 1 || mc.thePlayer.isUsingItem()) {
             event.setAnimationEnd((int) (event.getAnimationEnd() * ((-swingSpeedWhileBlocking.getInput() / 100) + 1)));
         } else {
             event.setAnimationEnd((int) (event.getAnimationEnd() * ((-swingSpeed.getInput() / 100) + 1)));
