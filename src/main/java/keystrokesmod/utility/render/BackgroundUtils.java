@@ -55,7 +55,7 @@ public class BackgroundUtils {
 
         if (shadow != 0) {
             ScaledResolution resolution = new ScaledResolution(mc);
-            RenderUtils.drawBloomShadow(0, 0, resolution.getScaledWidth(), resolution.getScaledHeight(), 4,
+            RenderUtils.drawBloomShadow(-16, -16, resolution.getScaledWidth() + 16, resolution.getScaledHeight() + 16, 4,
                     new Color(0, 0, 0, shadow), false
             );
         }
