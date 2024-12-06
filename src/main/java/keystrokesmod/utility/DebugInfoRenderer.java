@@ -57,8 +57,7 @@ public class DebugInfoRenderer extends net.minecraft.client.gui.Gui {
         }
 
         if (mc.currentScreen == null) {
-            RenderUtils.renderBPS("Client speed", true, true);
-            RenderUtils.renderBPS("Server speed:", PlayerMove.getXzSecSpeed(lastServerPos, curServerPos), true, true);
+            RenderUtils.renderBPS(String.format("Server speed: %.2fbps  Client speed: ", PlayerMove.getXzSecSpeed(lastServerPos, curServerPos)), true, true);
             if (avgSpeedFromJump != -1) {
                 ScaledResolution scaledResolution = new ScaledResolution(Raven.mc);
 

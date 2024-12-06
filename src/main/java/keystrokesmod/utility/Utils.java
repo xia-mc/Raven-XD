@@ -145,7 +145,7 @@ public class Utils {
     }
 
     public static int randomizeInt(double min, double max) {
-        return (int) randomizeDouble(min, max);
+        return (int) Math.round(randomizeDouble(min, max));
     }
 
     public static double randomizeDouble(double min, double max) {
