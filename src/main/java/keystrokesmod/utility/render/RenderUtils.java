@@ -187,28 +187,26 @@ public class RenderUtils {
         RenderUtils.renderBPS(true, false);
     }
 
-    public static void renderBPS(final boolean b, final boolean b2) {
-        final ScaledResolution scaledResolution = new ScaledResolution(mc);
-        String s = "";
+    public static void renderBPS(String text, final double bps, final boolean b, final boolean b2) {
+        String s = text;
         int n = -1;
         if (b) {
-            final double t = Utils.gbps((Freecam.freeEntity == null) ? mc.thePlayer : Freecam.freeEntity, 2);
-            if (t < 10.0) {
+            if (bps < 10.0) {
                 n = Color.green.getRGB();
             }
-            else if (t < 30.0) {
+            else if (bps < 30.0) {
                 n = Color.yellow.getRGB();
             }
-            else if (t < 60.0) {
+            else if (bps < 60.0) {
                 n = Color.orange.getRGB();
             }
-            else if (t < 160.0) {
+            else if (bps < 160.0) {
                 n = Color.red.getRGB();
             }
             else {
                 n = Color.black.getRGB();
             }
-            s = s + t + "bps";
+            s = s + bps + "bps";
         }
         if (b2) {
             final double h = Utils.getHorizontalSpeed() * (Utils.getTimer().timerSpeed / 2);
@@ -218,6 +216,14 @@ public class RenderUtils {
             s += Utils.rnd(h, 3);
         }
         drawText(s, n);
+    }
+
+    public static void renderBPS(final boolean b, final boolean b2) {
+        renderBPS("", Utils.gbps((Freecam.freeEntity == null) ? mc.thePlayer : Freecam.freeEntity, 2), b, b2);
+    }
+
+    public static void renderBPS(String text, final boolean b, final boolean b2) {
+        renderBPS(text, Utils.gbps((Freecam.freeEntity == null) ? mc.thePlayer : Freecam.freeEntity, 2), b, b2);
     }
 
     public static void drawText(final String text, final int color) {
