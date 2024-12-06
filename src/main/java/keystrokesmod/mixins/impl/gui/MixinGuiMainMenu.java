@@ -42,7 +42,7 @@ public abstract class MixinGuiMainMenu extends GuiScreen {
 
         BackgroundUtils.renderBackground(this);
 
-        FontManager.tenacity80.drawCenteredString("Raven XD", width / 2.0, height * 0.2, LOGO_COLOR);
+        FontManager.getFont(FontManager.Fonts.MAPLESTORY, 80).drawCenteredString("Raven XD", width / 2.0, height * 0.2, LOGO_COLOR);
 
         List<String> branding = Lists.reverse(FMLCommonHandler.instance().getBrandings(true));
 
