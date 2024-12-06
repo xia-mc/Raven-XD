@@ -88,6 +88,7 @@ public class Raven {
         MinecraftForge.EVENT_BUS.register(ModuleManager.slotHandler);
         MinecraftForge.EVENT_BUS.register(ModuleManager.dynamicManager);
         MinecraftForge.EVENT_BUS.register(new MoveableManager());
+        MinecraftForge.EVENT_BUS.register(profileManager);
 
         I18nManager.init();
         AutoUpdate.init();
