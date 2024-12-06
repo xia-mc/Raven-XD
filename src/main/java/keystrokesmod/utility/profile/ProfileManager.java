@@ -4,6 +4,7 @@ import com.google.gson.*;
 import keystrokesmod.Raven;
 import keystrokesmod.clickgui.ClickGui;
 import keystrokesmod.clickgui.components.impl.CategoryComponent;
+import keystrokesmod.event.WorldChangeEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.client.Gui;
 import keystrokesmod.module.impl.other.KillMessage;
@@ -17,7 +18,9 @@ import keystrokesmod.module.setting.interfaces.InputSetting;
 import keystrokesmod.script.Manager;
 import keystrokesmod.utility.Utils;
 import net.minecraft.client.Minecraft;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
+import org.lwjgl.opengl.GL11;
 
 import java.io.File;
 import java.io.FileReader;
@@ -26,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 public class ProfileManager {
     public static Minecraft mc = Minecraft.getMinecraft();
@@ -45,13 +49,24 @@ public class ProfileManager {
             // create a new default profile
             saveProfile(new Profile("default", 0));
         }
+
+        Raven.getExecutor().schedule(this::updateLatest, 5, TimeUnit.MINUTES);
     }
 
-    public void saveProfile(Profile profile) {
+    @SubscribeEvent
+    public void onWorldChange(WorldChangeEvent event) {
+        updateLatest();
+    }
+
+    public void updateLatest() {
+        saveToLatest(fromCurrentState(-1));
+    }
+
+    private @NotNull JsonObject fromCurrentState(int keyBind) {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("clientName", Watermark.customName);
         jsonObject.addProperty("killmessage", KillMessage.killMessage);
-        jsonObject.addProperty("keybind", profile.getModule().getKeycode());
+        jsonObject.addProperty("keybind", keyBind);
         JsonArray jsonArray = new JsonArray();
         for (Module module : Raven.moduleManager.getModules()) {
             if (module.ignoreOnSave) {
@@ -70,6 +85,11 @@ public class ProfileManager {
             }
         }
         jsonObject.add("modules", jsonArray);
+        return jsonObject;
+    }
+
+    public void saveProfile(@NotNull Profile profile) {
+        JsonObject jsonObject = fromCurrentState(profile.getModule().getKeycode());
         try (FileWriter fileWriter = new FileWriter(new File(directory, profile.getName() + ".json"))) {
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
             gson.toJson(jsonObject, fileWriter);
@@ -78,6 +98,10 @@ public class ProfileManager {
             Utils.log.error(e);
         }
 
+        saveToLatest(jsonObject);
+    }
+
+    public synchronized void saveToLatest(JsonObject jsonObject) {
         deleteProfile("latest");
         try (FileWriter fileWriter = new FileWriter(new File(directory, "latest.json"))) {
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -219,12 +243,7 @@ public class ProfileManager {
                 }
 
                 if (!Objects.equals(name, "latest")) {
-                    deleteProfile("latest");
-                    try (FileWriter fileWriter = new FileWriter(new File(directory, "latest.json"))) {
-                        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-                        gson.toJson(profileJson, fileWriter);
-                    } catch (Exception ignored) {
-                    }
+                    saveToLatest(profileJson);
                 }
             } catch (Exception e) {
                 failedMessage("load", name);
