@@ -11,7 +11,6 @@ import org.jetbrains.annotations.NotNull;
 
 import static keystrokesmod.Raven.mc;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class FontManager {
@@ -67,7 +66,8 @@ public class FontManager {
         PRODUCT_SANS_REGULAR("ProductSans regular", "product_sans_regular.ttf"),
         PRODUCT_SANS_LIGHT("ProductSans light", "product_sans_light.ttf"),
         PRODUCT_SANS_MEDIUM("ProductSans medium", "product_sans_medium.ttf"),
-        TENACITY("Tenacity", "tenacity.ttf");
+        TENACITY("Tenacity", "tenacity.ttf"),
+        MAPLESTORY("Maplestory", "MAPLESTORY_OTF_BOLD.OTF");
 
         @Getter
         private final String prettyName;
