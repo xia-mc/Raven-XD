@@ -13,4 +13,9 @@ import net.minecraftforge.fml.common.eventhandler.Event;
 @AllArgsConstructor
 public class SendPacketEvent extends Event {
     private Packet<?> packet;
+
+    public Packet getPacket() {
+        return packet;
+    }
+
 }
