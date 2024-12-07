@@ -58,6 +58,6 @@ public class SpeedA extends Check {
 
     @Override
     public boolean isDisabled() {
-        return !Anticheat.getMovementCheck().isToggled();
+        return !Anticheat.getMovementCheck().isToggled() || !Anticheat.getMovementCheckSpeedA().isToggled();
     }
 }

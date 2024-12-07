@@ -38,14 +38,59 @@ public class Anticheat extends Module {
     private static ModeSetting pingSound;
     @Getter
     private static ModeSetting autoReport;
+
+
     @Getter
     private static ButtonSetting experimentalMode;
+
+
     @Getter
     private static ButtonSetting combatCheck;
+
+    @Getter
+    private static ButtonSetting combatCheckAutoBlockA;
+    @Getter
+    private static ButtonSetting combatCheckAutoClickerA;
+    @Getter
+    private static ButtonSetting combatCheckNoSlowA;
+    @Getter
+    private static ButtonSetting combatCheckReachA;
+
+
     @Getter
     private static ButtonSetting movementCheck;
+
+    @Getter
+    private static ButtonSetting movementCheckBlinkA;
+    @Getter
+    private static ButtonSetting movementCheckFlyA;
+    @Getter
+    private static ButtonSetting movementCheckGroundSpoofA;
+    @Getter
+    private static ButtonSetting movementCheckGroundSpoofB;
+    @Getter
+    private static ButtonSetting movementCheckMotionA;
+    @Getter
+    private static ButtonSetting movementCheckNoFallA;
+    @Getter
+    private static ButtonSetting movementCheckSpeedA;
+    @Getter
+    private static ButtonSetting movementCheckSpeedB;
+    @Getter
+    private static ButtonSetting movementCheckSpeedC;
+
+
     @Getter
     private static ButtonSetting scaffoldingCheck;
+
+    @Getter
+    private static ButtonSetting scaffoldingCheckScaffoldA;
+    @Getter
+    private static ButtonSetting scaffoldingCheckScaffoldB;
+    @Getter
+    private static ButtonSetting scaffoldingCheckScaffoldC;
+
+
     @Getter
     private static ButtonSetting simulationCheck;
 
@@ -65,10 +110,39 @@ public class Anticheat extends Module {
         this.registerSetting(pingSound = new ModeSetting("Ping sound", new String[]{"Note", "Augustus"}, 0, shouldPing::isToggled));
         this.registerSetting(autoReport = new ModeSetting("Auto report", new String[]{"None", "/wdr", "/report"}, 0));
         this.registerSetting(experimentalMode = new ButtonSetting("Experimental mode", false));
+
+
         this.registerSetting(combatCheck = new ButtonSetting("Combat checks", true));
+
+        this.registerSetting(combatCheckAutoBlockA = new ButtonSetting("AutoBlockA", true, combatCheck::isToggled));
+        this.registerSetting(combatCheckAutoClickerA = new ButtonSetting("AutoClickerA", true, combatCheck::isToggled));
+        this.registerSetting(combatCheckNoSlowA = new ButtonSetting("NoSlowA", true, combatCheck::isToggled));
+        this.registerSetting(combatCheckReachA = new ButtonSetting("ReachA", false, () -> (combatCheck.isToggled() && experimentalMode.isToggled())));
+
+
         this.registerSetting(movementCheck = new ButtonSetting("Movement checks", true));
+
+        this.registerSetting(movementCheckBlinkA = new ButtonSetting("BlinkA", true, movementCheck::isToggled));
+        this.registerSetting(movementCheckFlyA = new ButtonSetting("FlyA", true, movementCheck::isToggled));
+        this.registerSetting(movementCheckGroundSpoofA = new ButtonSetting("GroundSpoofA", true, movementCheck::isToggled));
+        this.registerSetting(movementCheckGroundSpoofB = new ButtonSetting("GroundSpoofB", true, movementCheck::isToggled));
+        this.registerSetting(movementCheckMotionA = new ButtonSetting("MotionA", false, () -> (movementCheck.isToggled() && experimentalMode.isToggled())));
+        this.registerSetting(new DescriptionSetting("<!> MotionA is not finished", () -> (movementCheck.isToggled() && movementCheckMotionA.isToggled() && experimentalMode.isToggled())));
+        this.registerSetting(movementCheckNoFallA = new ButtonSetting("NoFallA", true, movementCheck::isToggled));
+        this.registerSetting(movementCheckSpeedA = new ButtonSetting("SpeedA", true, movementCheck::isToggled));
+        this.registerSetting(movementCheckSpeedB = new ButtonSetting("SpeedB", true, movementCheck::isToggled));
+        this.registerSetting(movementCheckSpeedC = new ButtonSetting("SpeedC", true, movementCheck::isToggled));
+
+
         this.registerSetting(scaffoldingCheck = new ButtonSetting("Scaffolding checks", true));
+
+        this.registerSetting(scaffoldingCheckScaffoldA = new ButtonSetting("ScaffoldA", false, () -> (scaffoldingCheck.isToggled() && experimentalMode.isToggled())));
+        this.registerSetting(scaffoldingCheckScaffoldB = new ButtonSetting("ScaffoldB", true, scaffoldingCheck::isToggled));
+        this.registerSetting(scaffoldingCheckScaffoldC = new ButtonSetting("ScaffoldC", true, scaffoldingCheck::isToggled));
+
+
         this.registerSetting(simulationCheck = new ButtonSetting("Simulation checks", false));
+
     }
 
     public void onUpdate() {
