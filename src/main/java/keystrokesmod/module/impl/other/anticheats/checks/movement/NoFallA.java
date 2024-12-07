@@ -36,6 +36,6 @@ public class NoFallA extends Check {
 
     @Override
     public boolean isDisabled() {
-        return !Anticheat.getMovementCheck().isToggled();
+        return !Anticheat.getMovementCheck().isToggled() || !Anticheat.getMovementCheckNoFallA().isToggled();
     }
 }

@@ -46,6 +46,6 @@ public class AutoClickerA extends Check {
 
     @Override
     public boolean isDisabled() {
-        return !Anticheat.getCombatCheck().isToggled();
+        return !Anticheat.getCombatCheck().isToggled() || !Anticheat.getCombatCheckAutoClickerA().isToggled();
     }
 }

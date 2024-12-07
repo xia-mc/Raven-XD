@@ -19,6 +19,7 @@ import static net.minecraft.world.WorldSettings.GameType;
 
 /**
  * 管理玩家信息的类。每个有效玩家都应有一个TRPlayer实例。
+ * Classes that manage player information. Each active player should have one instance of TRPlayer.
  */
 public class TRPlayer {
     public AbstractClientPlayer fabricPlayer;

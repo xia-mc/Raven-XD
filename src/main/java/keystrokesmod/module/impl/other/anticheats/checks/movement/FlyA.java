@@ -29,6 +29,6 @@ public class FlyA extends Check {
 
     @Override
     public boolean isDisabled() {
-        return !Anticheat.getMovementCheck().isToggled();
+        return !Anticheat.getMovementCheck().isToggled() || !Anticheat.getMovementCheckFlyA().isToggled();
     }
 }
