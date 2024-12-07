@@ -49,6 +49,6 @@ public class AutoBlockA extends Check {
 
     @Override
     public boolean isDisabled() {
-        return !Anticheat.getCombatCheck().isToggled();
+        return !Anticheat.getCombatCheck().isToggled() || !Anticheat.getCombatCheckAutoBlockA().isToggled();
     }
 }

@@ -30,6 +30,6 @@ public class BlinkA extends Check {
 
     @Override
     public boolean isDisabled() {
-        return !Anticheat.getMovementCheck().isToggled();
+        return !Anticheat.getMovementCheck().isToggled() || !Anticheat.getMovementCheckBlinkA().isToggled();
     }
 }
