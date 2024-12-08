@@ -41,13 +41,19 @@ public abstract class MixinGuiMainMenu extends GuiScreen {
     protected abstract boolean func_183501_a();
 
     static{
-        if(clientTheme.highResMainMenuBackgrounds.isToggled()) {
-            BackgroundUtils.loadBackgroundImages(true);
-        }
-        else{
+        try {
+            if(clientTheme.highResMainMenuBackgrounds.isToggled()) {
+                BackgroundUtils.loadBackgroundImages(true);
+            }
+            else{
+                BackgroundUtils.loadBackgroundImages(false);
+            }
+        } catch (Exception e) {
+            // Log error and load default backgrounds
             BackgroundUtils.loadBackgroundImages(false);
         }
     }
+    
     @Inject(method = "drawScreen", at = @At("HEAD"), cancellable = true)
     public void onDrawScreen(int p_drawScreen_1_, int p_drawScreen_2_, float p_drawScreen_3_, CallbackInfo ci) {
         if (!clientTheme.isEnabled() || !clientTheme.mainMenu.isToggled()) {
