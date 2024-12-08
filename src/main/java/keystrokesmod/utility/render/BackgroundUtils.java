@@ -1,6 +1,8 @@
 package keystrokesmod.utility.render;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import keystrokesmod.module.ModuleManager;
+//import keystrokesmod.module.impl.render.ClientTheme;
 import keystrokesmod.utility.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
@@ -15,25 +17,42 @@ import java.util.List;
 import static keystrokesmod.Raven.mc;
 
 public class BackgroundUtils {
-    public static final ResourceLocation RES_LOGO = new ResourceLocation("keystrokesmod:textures/backgrounds/ravenxd.png");
+    public static final ResourceLocation RES_LOGO = new ResourceLocation("keystrokesmod:textures/backgrounds/logobloombg.png");
     private static final List<ResourceLocation> BACKGROUNDS = new ObjectArrayList<>();
-    private static final int MAX_INDEX;
+    private static int MAX_INDEX = 0;
 
     private static long lastRenderTime = -1;
     private static ResourceLocation lastBackground;
     private static int shadow = 0;
 
-    static {
+    public static void loadBackgroundImages(Boolean highResolutionOnly){
         BACKGROUNDS.add(new ResourceLocation("keystrokesmod:textures/backgrounds/1.png"));
         BACKGROUNDS.add(new ResourceLocation("keystrokesmod:textures/backgrounds/2.png"));
         BACKGROUNDS.add(new ResourceLocation("keystrokesmod:textures/backgrounds/3.png"));
         BACKGROUNDS.add(new ResourceLocation("keystrokesmod:textures/backgrounds/4.png"));
         BACKGROUNDS.add(new ResourceLocation("keystrokesmod:textures/backgrounds/5.png"));
+
+        if(!highResolutionOnly) {
+        //added from youtube thumbnails, low res due to heavy compression
+        BACKGROUNDS.add(new ResourceLocation("keystrokesmod:textures/backgrounds/6.jpg"));
+        BACKGROUNDS.add(new ResourceLocation("keystrokesmod:textures/backgrounds/7.jpg"));
+        BACKGROUNDS.add(new ResourceLocation("keystrokesmod:textures/backgrounds/8.jpg"));
+        BACKGROUNDS.add(new ResourceLocation("keystrokesmod:textures/backgrounds/9.jpg"));
+        BACKGROUNDS.add(new ResourceLocation("keystrokesmod:textures/backgrounds/10.jpg"));
+        BACKGROUNDS.add(new ResourceLocation("keystrokesmod:textures/backgrounds/11.jpg"));
+        BACKGROUNDS.add(new ResourceLocation("keystrokesmod:textures/backgrounds/12.jpg"));
+        BACKGROUNDS.add(new ResourceLocation("keystrokesmod:textures/backgrounds/13.jpg"));
+        BACKGROUNDS.add(new ResourceLocation("keystrokesmod:textures/backgrounds/14.jpg"));
+        BACKGROUNDS.add(new ResourceLocation("keystrokesmod:textures/backgrounds/15.jpg"));
+        BACKGROUNDS.add(new ResourceLocation("keystrokesmod:textures/backgrounds/16.jpg"));
+        BACKGROUNDS.add(new ResourceLocation("keystrokesmod:textures/backgrounds/17.jpg"));
+        BACKGROUNDS.add(new ResourceLocation("keystrokesmod:textures/backgrounds/18.jpg"));
+        }
+
         MAX_INDEX = BACKGROUNDS.size() - 1;
 
         lastBackground = BACKGROUNDS.get(Utils.randomizeInt(0, MAX_INDEX));
     }
-
     public static void renderBackground(@NotNull GuiScreen screen) {
         updateShadow(0);
         renderBackground(screen.width, screen.height);
@@ -46,7 +65,7 @@ public class BackgroundUtils {
 
     private static void renderBackground(final int width, final int height) {
         final long time = System.currentTimeMillis();
-        if (time - lastRenderTime > 30000) {
+        if (time - lastRenderTime > 32000) {
             lastBackground = BACKGROUNDS.get(Utils.randomizeInt(0, MAX_INDEX));
         }
         lastRenderTime = time;

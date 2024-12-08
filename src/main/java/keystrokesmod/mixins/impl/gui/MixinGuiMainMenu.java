@@ -3,6 +3,7 @@ package keystrokesmod.mixins.impl.gui;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import keystrokesmod.Raven;
+import keystrokesmod.module.impl.render.ClientTheme;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.utility.font.FontManager;
 import keystrokesmod.utility.render.BackgroundUtils;
@@ -21,11 +22,15 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.awt.*;
 import java.util.List;
 
+import static keystrokesmod.module.ModuleManager.clientTheme;
+
 
 @Mixin(value = GuiMainMenu.class, priority = 1983)
 public abstract class MixinGuiMainMenu extends GuiScreen {
     @Unique
-    private static final int LOGO_COLOR = new Color(255, 255, 255, 200).getRGB();
+    private static final int LOGO_COLOR = new Color(245, 245, 245, 255).getRGB();
+    //@Unique
+    //private static final int LOGO_COLOR2 = new Color(0, 0, 0, 112).getRGB();
 
     @Shadow
     private int field_92022_t;
@@ -35,14 +40,24 @@ public abstract class MixinGuiMainMenu extends GuiScreen {
     @Shadow
     protected abstract boolean func_183501_a();
 
+    static{
+        if(clientTheme.highResMainMenuBackgrounds.isToggled()) {
+            BackgroundUtils.loadBackgroundImages(true);
+        }
+        else{
+            BackgroundUtils.loadBackgroundImages(false);
+        }
+    }
     @Inject(method = "drawScreen", at = @At("HEAD"), cancellable = true)
     public void onDrawScreen(int p_drawScreen_1_, int p_drawScreen_2_, float p_drawScreen_3_, CallbackInfo ci) {
-        if (!ModuleManager.clientTheme.isEnabled() || !ModuleManager.clientTheme.mainMenu.isToggled())
+        if (!clientTheme.isEnabled() || !clientTheme.mainMenu.isToggled()) {
             return;
+        }
 
         BackgroundUtils.renderBackground(this);
 
-        FontManager.getFont(FontManager.Fonts.MAPLESTORY, 80).drawCenteredString("Raven XD", width / 2.0, height * 0.2, LOGO_COLOR);
+        FontManager.tenacity80.drawCenteredString("Raven XD", width / 2.0, height * 0.2, LOGO_COLOR);
+
 
         List<String> branding = Lists.reverse(FMLCommonHandler.instance().getBrandings(true));
 
@@ -69,7 +84,7 @@ public abstract class MixinGuiMainMenu extends GuiScreen {
 
     @Inject(method = "initGui", at = @At("HEAD"), cancellable = true)
     public void onInitGui(CallbackInfo ci) {
-        if (!ModuleManager.clientTheme.isEnabled() || !ModuleManager.clientTheme.mainMenu.isToggled())
+        if (!clientTheme.isEnabled() || !clientTheme.mainMenu.isToggled())
             return;
 
         int j = this.height / 4 + 54;
