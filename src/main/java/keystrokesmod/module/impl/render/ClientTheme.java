@@ -18,6 +18,7 @@ public class ClientTheme extends Module {
     public final ButtonSetting buttonLowerCase;
     public final ButtonSetting background;
     public final ButtonSetting mainMenu;
+    public final ButtonSetting highResMainMenuBackgrounds;
     public final ButtonSetting clickGui;
     public final ButtonSetting test;
     public final ModeSetting colorType;
@@ -40,6 +41,8 @@ public class ClientTheme extends Module {
         this.registerSetting(buttonLowerCase = new ButtonSetting("Button lower case", false, button::isToggled));
         this.registerSetting(background = new ButtonSetting("Background", true));
         this.registerSetting(mainMenu = new ButtonSetting("Main menu", true));
+        this.registerSetting(highResMainMenuBackgrounds = new ButtonSetting("Only High Res Backgrounds", false, mainMenu::isToggled));
+
         this.registerSetting(clickGui = new ButtonSetting("ClickGui", true));
         this.registerSetting(test = new ButtonSetting("Test", false, clickGui::isToggled));
         this.registerSetting(new DescriptionSetting("Custom Theme"));
