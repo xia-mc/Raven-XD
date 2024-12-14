@@ -45,15 +45,14 @@ import static org.lwjgl.opengl.GL11.*;
 public class RenderUtils {
     public static final int WHITE = new Color(255, 255, 255).getRGB();
     public static boolean ring_c = false;
-    private static final float renderPartialTicks = 0.0f;
 
-    private static final Int2IntOpenHashMap shadowCache = new Int2IntOpenHashMap(5);
+    private static final Int2IntOpenHashMap shadowCache = new Int2IntOpenHashMap(10);
 
-    public static void renderBlock(BlockPos blockPos, int color, boolean outline, boolean shade) {
+    public static void renderBlock(@NotNull BlockPos blockPos, int color, boolean outline, boolean shade) {
         renderBox(blockPos.getX(), blockPos.getY(), blockPos.getZ(), 1, 1, 1, color, outline, shade);
     }
 
-    public static void renderBlock(BlockPos blockPos, int color, double y2, boolean outline, boolean shade) {
+    public static void renderBlock(@NotNull BlockPos blockPos, int color, double y2, boolean outline, boolean shade) {
         renderBox(blockPos.getX(), blockPos.getY(), blockPos.getZ(), 1, y2, 1, color, outline, shade);
     }
 

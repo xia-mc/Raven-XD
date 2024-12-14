@@ -12,6 +12,7 @@ import keystrokesmod.module.impl.render.AntiShuffle;
 import keystrokesmod.utility.i18n.I18nManager;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.util.Timer;
 import net.minecraftforge.client.event.MouseEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
@@ -42,7 +43,6 @@ import net.minecraft.potion.Potion;
 import net.minecraft.scoreboard.*;
 import net.minecraft.util.*;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -401,11 +401,18 @@ public class Utils {
                 && (mc.getCurrentServerData().serverIP.contains("pika-network.net") || mc.getCurrentServerData().serverIP.contains("pikasys.net") || mc.getCurrentServerData().serverIP.contains("pika.host") || mc.getCurrentServerData().serverIP.contains("jartexsys.net") || mc.getCurrentServerData().serverIP.contains("jartexnetwork.com"));
     }
 
-    public static net.minecraft.util.Timer getTimer() {
-        return ObfuscationReflectionHelper.getPrivateValue(Minecraft.class, Minecraft.getMinecraft(), "timer", "field_71428_T");
+    private static Timer timer = null;
+
+    // bro this method is too fucking slow, so I improve it
+    public static Timer getTimer() {
+        if (timer == null) {
+            timer = Reflection.get(mc, "field_71428_T", Timer.class);
+            return timer;
+        }
+        return timer;
     }
 
-    public static String getHitsToKill(final EntityPlayer entityPlayer, final ItemStack itemStack) {
+    public static @NotNull String getHitsToKill(final EntityPlayer entityPlayer, final ItemStack itemStack) {
         final int n = (int) Math.ceil(ap(entityPlayer, itemStack));
         return "§" + ((n <= 1) ? "c" : ((n <= 3) ? "6" : ((n <= 5) ? "e" : "a"))) + n;
     }
@@ -746,13 +753,13 @@ public class Utils {
     public static void setMouseButtonState(int mouseButton, boolean held) {
         MouseEvent m = new MouseEvent();
 
-        ObfuscationReflectionHelper.setPrivateValue(MouseEvent.class, m, mouseButton, "button");
-        ObfuscationReflectionHelper.setPrivateValue(MouseEvent.class, m, held, "buttonstate");
+        Reflection.set(m, "button", mouseButton);
+        Reflection.set(m, "buttonstate", held);
         MinecraftForge.EVENT_BUS.post(m);
 
-        ByteBuffer buttons = ObfuscationReflectionHelper.getPrivateValue(Mouse.class, null, "buttons");
+        ByteBuffer buttons = Reflection.get(Mouse.class, "buttons", ByteBuffer.class);
         buttons.put(mouseButton, (byte) (held ? 1 : 0));
-        ObfuscationReflectionHelper.setPrivateValue(Mouse.class, null, buttons, "buttons");
+        Reflection.set(Mouse.class, "buttons", buttons);
 
     }
 

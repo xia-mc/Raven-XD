@@ -1,5 +1,6 @@
 package keystrokesmod.module.impl.render;
 
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import keystrokesmod.Raven;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.player.ChestStealer;
@@ -23,12 +24,12 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class Watermark extends Module {
-    public static final String VERSION = "2.13";
-    public static final HashMap<String, ResourceLocation> WATERMARK = new HashMap<>();
+    public static final String VERSION = "2.14";
+    public static final Map<String, ResourceLocation> WATERMARK = new Object2ObjectOpenHashMap<>();
 
     public static String customName = "CustomClient";
 

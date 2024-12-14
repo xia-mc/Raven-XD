@@ -424,7 +424,7 @@ public class Reflection {
         return type.cast(get(object, field));
     }
 
-    public static <T> T getDeclared(@NotNull Class<?> aClass, @NotNull String field, @NotNull Class<T> type) {
+    public static <T> T get(@NotNull Class<?> aClass, @NotNull String field, @NotNull Class<T> type) {
         return type.cast(getDeclared(aClass, field));
     }
 

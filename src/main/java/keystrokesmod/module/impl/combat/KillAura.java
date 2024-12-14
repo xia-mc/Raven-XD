@@ -393,12 +393,13 @@ public class KillAura extends IAutoClicker {
                 case 9:
                     if (lag) {
                         blinking = true;
-                        unBlock();
+                        unBlock();  // unblock while blinking
                         lag = false;
                     } else {
                         attackAndInteract(target, true, Utils.getEyePos(target)); // attack while blinked
                         releasePackets(); // release
-                        sendBlock(); // block after releasing unblock
+                        blinking = false;
+                        sendBlock(); // send block without blinking
                         lag = true;
                     }
                     break;
@@ -768,7 +769,7 @@ public class KillAura extends IAutoClicker {
     }
 
     private void sendBlock() {
-        mc.getNetHandler().addToSendQueue(new C08PacketPlayerBlockPlacement(SlotHandler.getHeldItem()));
+        PacketUtils.sendPacket(new C08PacketPlayerBlockPlacement(SlotHandler.getHeldItem()));
     }
 
     private boolean isMining() {
@@ -779,7 +780,7 @@ public class KillAura extends IAutoClicker {
         if (!Utils.holdingSword()) {
             return;
         }
-        mc.thePlayer.sendQueue.addToSendQueue(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, DOWN));
+        PacketUtils.sendPacket(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, DOWN));
         blockingTime = 0;
     }
 

@@ -51,7 +51,8 @@ public class BackgroundUtils {
         }
         lastRenderTime = time;
 
-        RenderUtils.drawImage(lastBackground, 0, 0, width, height);
+        if (!Utils.nullCheck())
+            RenderUtils.drawImage(lastBackground, 0, 0, width, height);
 
         if (shadow != 0) {
             ScaledResolution resolution = new ScaledResolution(mc);
