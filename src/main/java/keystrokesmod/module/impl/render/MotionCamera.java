@@ -58,21 +58,19 @@ public class MotionCamera extends Module {
         }
 
         if (animationCamera.isToggled() && mc.gameSettings.thirdPersonView == 1) {
-            if (Double.isNaN(y)) {
-                animation.setValue(y);
-            }
-
             double targetY = mc.thePlayer.posY + offset.getInput();
             animation.run(Utils.limit(targetY, curY - maxOffset.getInput(), curY + maxOffset.getInput()));
 
             if (smooth.isToggled()) {
                 targetY = animation.getValue();
-            }
 
-            event.setY(Utils.limit(targetY, curY - maxOffset.getInput(), curY + maxOffset.getInput()));
-        } else {
-            animation.setValue(y);
-            event.setY(Utils.limit(y + offset.getInput(), curY - maxOffset.getInput(), curY + maxOffset.getInput()));
+                event.setY(Utils.limit(targetY, curY - maxOffset.getInput(), curY + maxOffset.getInput()));
+            } else {
+                animation.setValue(y);
+
+                event.setY(Utils.limit(y + offset.getInput(), curY - maxOffset.getInput(), curY + maxOffset.getInput()));
+            }
         }
     }
 }
+
