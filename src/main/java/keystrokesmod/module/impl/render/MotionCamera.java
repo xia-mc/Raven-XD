@@ -24,8 +24,8 @@ public class MotionCamera extends Module {
 
     public MotionCamera() {
         super("MotionCamera", category.render);
-        this.registerSetting(offset = new SliderSetting("Offset", 0, -1, 1, 0));
-        this.registerSetting(maxOffset = new SliderSetting("Max offset", 1.5, 0, 5, 5));
+        this.registerSetting(offset = new SliderSetting("Offset", 0, -1, 1, 0.01));
+        this.registerSetting(maxOffset = new SliderSetting("Max offset", 5, 0, 5, 0.1));
         this.registerSetting(smooth = new ButtonSetting("Smooth", true));
         this.registerSetting(onlyThirdPerson = new ButtonSetting("Only third person", true));
         this.registerSetting(animationCamera = new ButtonSetting("Animation Camera", true));
