@@ -13,8 +13,6 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import static keystrokesmod.Raven.mc;
-import static keystrokesmod.module.ModuleManager.scaffold;
-import static keystrokesmod.utility.Utils.isMoving;
 
 public class MoveUtil {
     public static final double WALK_SPEED = 0.221;
@@ -157,6 +155,14 @@ public class MoveUtil {
                 && !mc.thePlayer.isUsingItem()
                 && !mc.thePlayer.isSneaking()
                 : enoughMovementForSprinting());
+    }
+
+    public static double getBaseMoveSpeed() {
+        double baseSpeed = 0.2873;
+        if (mc.thePlayer.isPotionActive(Potion.moveSpeed)) {
+            baseSpeed *= 1.0 + 0.2 * (mc.thePlayer.getActivePotionEffect(Potion.moveSpeed).getAmplifier() + 1);
+        }
+        return baseSpeed;
     }
 
     /**

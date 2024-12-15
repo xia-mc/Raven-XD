@@ -396,7 +396,10 @@ public class KillAura extends IAutoClicker {
                         unBlock();  // unblock while blinking
                         lag = false;
                     } else {
-                        attackAndInteract(target, true, Utils.getEyePos(target)); // attack while blinked
+                        // attack while blinked
+                        if (!attackAndInteract(target, true, Utils.getEyePos(target))) {
+                            break;  // perfect hit support
+                        }
                         releasePackets(); // release
                         blinking = false;
                         sendBlock(); // send block without blinking
@@ -739,20 +742,24 @@ public class KillAura extends IAutoClicker {
         attackAndInteract(target, sendInteractAt, aimSimulator.getHitPos());
     }
 
-    private void attackAndInteract(EntityLivingBase target, boolean sendInteractAt, Vec3 hitVec) {
+    private boolean attackAndInteract(EntityLivingBase target, boolean sendInteractAt, Vec3 hitVec) {
         if (target != null && attack) {
-            if (!attack(target)) return;
+            if (!attack(target)) return false;
             if (sendInteractAt) {
                 if (hitVec != null) {
                     hitVec = new Vec3(hitVec.x - target.posX, hitVec.y - target.posY, hitVec.z - target.posZ);
                     mc.thePlayer.sendQueue.addToSendQueue(new C02PacketUseEntity(target, hitVec.toVec3()));
                 }
             }
-            mc.thePlayer.sendQueue.addToSendQueue(new C02PacketUseEntity(target, C02PacketUseEntity.Action.INTERACT));
+            PacketUtils.sendPacket(new C02PacketUseEntity(target, C02PacketUseEntity.Action.INTERACT));
+            return true;
         } else if (ModuleManager.antiFireball != null && ModuleManager.antiFireball.isEnabled() && ModuleManager.antiFireball.fireball != null && ModuleManager.antiFireball.attack) {
             doAttack(ModuleManager.antiFireball.fireball, !ModuleManager.antiFireball.silentSwing.isToggled());
-            mc.thePlayer.sendQueue.addToSendQueue(new C02PacketUseEntity(ModuleManager.antiFireball.fireball, C02PacketUseEntity.Action.INTERACT));
+            PacketUtils.sendPacket(new C02PacketUseEntity(ModuleManager.antiFireball.fireball, C02PacketUseEntity.Action.INTERACT));
+            return true;
         }
+
+        return false;
     }
 
     private boolean attack(EntityLivingBase target) {

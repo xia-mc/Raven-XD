@@ -491,10 +491,7 @@ public class Utils {
     }
 
     public static void resetTimer() {
-        try {
-            getTimer().timerSpeed = 1.0F;
-        } catch (NullPointerException var1) {
-        }
+        getTimer().timerSpeed = 1.0F;
     }
 
     public static boolean inInventory() {

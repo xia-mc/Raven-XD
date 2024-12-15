@@ -5,9 +5,7 @@ import keystrokesmod.event.*;
 import keystrokesmod.module.impl.client.Notifications;
 import keystrokesmod.module.impl.movement.LongJump;
 import keystrokesmod.module.impl.other.SlotHandler;
-import keystrokesmod.module.impl.player.blink.NormalBlink;
 import keystrokesmod.module.setting.impl.ButtonSetting;
-import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.MoveUtil;
 import keystrokesmod.utility.PacketUtils;
@@ -17,6 +15,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.client.C07PacketPlayerDigging;
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
 import net.minecraft.network.play.server.S12PacketEntityVelocity;
+import net.minecraft.potion.Potion;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -25,15 +24,13 @@ import org.jetbrains.annotations.NotNull;
 import java.util.concurrent.TimeUnit;
 
 public class HypixelBowLongJump extends SubMode<LongJump> {
-    private final SliderSetting speed;
     private final ButtonSetting autoDisable;
 
     private State state = State.SELF_DAMAGE;
-    private final NormalBlink blink = new NormalBlink("Blink", this);
+    private int tick = 0;
 
     public HypixelBowLongJump(String name, @NotNull LongJump parent) {
         super(name, parent);
-        this.registerSetting(speed = new SliderSetting("Speed", 1, 0, 1.5, 0.1));
         this.registerSetting(autoDisable = new ButtonSetting("Auto disable", true));
     }
 
@@ -41,27 +38,16 @@ public class HypixelBowLongJump extends SubMode<LongJump> {
     public void onEnable() throws Throwable {
         MoveUtil.stop();
         state = State.SELF_DAMAGE;
-    }
-
-    @Override
-    public void onDisable() throws Throwable {
-        blink.disable();
-    }
-
-    @SubscribeEvent
-    public void onMoveInput(MoveInputEvent event) {
-        if (state == State.SELF_DAMAGE || state == State.SELF_DAMAGE_POST) {
-            event.setCanceled(true);
-        }
+        tick = 0;
     }
 
     @SubscribeEvent
     public void onReceivePacket(@NotNull ReceivePacketEvent event) {
-        if (event.getPacket() instanceof S12PacketEntityVelocity && (state == State.JUMP)) {
+        if (event.getPacket() instanceof S12PacketEntityVelocity && (state == State.SELF_DAMAGE_POST)) {
             S12PacketEntityVelocity packet = (S12PacketEntityVelocity) event.getPacket();
             if (packet.getEntityID() != mc.thePlayer.getEntityId()) return;
 
-            state = State.APPLY;
+            state = State.JUMP;
         }
     }
 
@@ -82,39 +68,66 @@ public class HypixelBowLongJump extends SubMode<LongJump> {
             case SELF_DAMAGE:
                 if (SlotHandler.getCurrentSlot() == slot) {
                     PacketUtils.sendPacketNoEvent(new C08PacketPlayerBlockPlacement(SlotHandler.getHeldItem()));
-                    Raven.getExecutor().schedule(() -> {
-                        PacketUtils.sendPacketNoEvent(new C07PacketPlayerDigging(
-                                C07PacketPlayerDigging.Action.RELEASE_USE_ITEM,
-                                BlockPos.ORIGIN, EnumFacing.UP
-                        ));
-                        Raven.getExecutor().schedule(() -> state = State.JUMP, 300, TimeUnit.MILLISECONDS);
-                    }, 150, TimeUnit.MILLISECONDS);
+                    Raven.getExecutor().schedule(() -> PacketUtils.sendPacketNoEvent(new C07PacketPlayerDigging(
+                            C07PacketPlayerDigging.Action.RELEASE_USE_ITEM,
+                            BlockPos.ORIGIN, EnumFacing.UP
+                    )), 200, TimeUnit.MILLISECONDS);
                     state = State.SELF_DAMAGE_POST;
                 }
                 SlotHandler.setCurrentSlot(slot);
+                event.setCanceled(true);
+                MoveUtil.stop();
                 break;
             case SELF_DAMAGE_POST:
                 SlotHandler.setCurrentSlot(slot);
+                event.setCanceled(true);
+                MoveUtil.stop();
                 break;
             case JUMP:
+                tick++;
                 if (!Utils.jumpDown() && mc.thePlayer.onGround) {
-                    blink.enable();
-                    MoveUtil.strafe(MoveUtil.getAllowedHorizontalDistance() - Math.random() / 100f);
+                    MoveUtil.strafe(MoveUtil.getAllowedHorizontalDistance() *
+                            (mc.thePlayer.isPotionActive(Potion.moveSpeed) ? 0.75 : 0.7) - Math.random() / 10000f);
                     mc.thePlayer.jump();
+                }
+
+                if (tick == 8) {
+                    state = State.APPLY;
                 }
                 break;
             case APPLY:
-                blink.disable();
+                tick++;
+                MoveUtil.strafe((mc.thePlayer.isPotionActive(Potion.moveSpeed) ? 0.8 : 0.7) - Math.random() / 10000f);
                 state = State.BOOST;
                 break;
             case BOOST:
-                if (speed.getInput() > 0)
-                    MoveUtil.strafe(speed.getInput());
-                state = State.NONE;
+                tick++;
+                if (tick > 50) {
+                    state = State.NONE;
+                    break;
+                }
+
+                mc.thePlayer.motionY += 0.028;
+
+                if (mc.thePlayer.isPotionActive(Potion.moveSpeed)) {
+                    mc.thePlayer.motionX *= 1.038;
+                    mc.thePlayer.motionZ *= 1.038;
+                } else {
+                    if (tick == 12 || tick == 13) {
+                        mc.thePlayer.motionX *= 1.1;
+                        mc.thePlayer.motionZ *= 1.1;
+                    }
+                    mc.thePlayer.motionX *= 1.019;
+                    mc.thePlayer.motionZ *= 1.019;
+                }
                 break;
             case NONE:
                 if (autoDisable.isToggled())
                     parent.disable();
+        }
+
+        if (tick < 19) {
+            MoveUtil.strafe();
         }
     }
 
