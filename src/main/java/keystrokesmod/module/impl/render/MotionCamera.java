@@ -52,6 +52,9 @@ public class MotionCamera extends Module {
         double curY = event.getY();
 
         if (camera.isToggled() && mc.gameSettings.thirdPersonView != 0) {
+            if (Double.isNaN(y)) {
+                animation.setValue(y);
+            }
             double targetY = mc.thePlayer.posY + offset.getInput();
             animation.run(Utils.limit(targetY, curY - maxOffset.getInput(), curY + maxOffset.getInput()));
 
