@@ -16,8 +16,7 @@ public class MotionCamera extends Module {
     private final SliderSetting offset;
     private final SliderSetting maxOffset;
     private final ButtonSetting smooth;
-    private final ButtonSetting onlyThirdPerson;
-    private final ButtonSetting animationCamera;
+    private final ButtonSetting camera;
 
     private double y = Double.NaN;
     private final Animation animation = new Animation(Easing.EASE_OUT_CUBIC, 1000);
@@ -25,10 +24,9 @@ public class MotionCamera extends Module {
     public MotionCamera() {
         super("MotionCamera", category.render);
         this.registerSetting(offset = new SliderSetting("Offset", 0, -1, 1, 0.01));
-        this.registerSetting(maxOffset = new SliderSetting("Max offset", 5, 0, 5, 0.1));
+        this.registerSetting(maxOffset = new SliderSetting("Max offset", 1.5, 0, 5, 0.1));
         this.registerSetting(smooth = new ButtonSetting("Smooth", true));
-        this.registerSetting(onlyThirdPerson = new ButtonSetting("Only third person", true));
-        this.registerSetting(animationCamera = new ButtonSetting("Animation Camera", true));
+        this.registerSetting(camera = new ButtonSetting("Camera", true));
     }
 
     @SubscribeEvent
@@ -52,12 +50,8 @@ public class MotionCamera extends Module {
     public void onEyeHeightEvent(@NotNull EyeHeightEvent event) {
         if (Double.isNaN(y)) return;
         double curY = event.getY();
-        if (onlyThirdPerson.isToggled() && mc.gameSettings.thirdPersonView != 1) {
-            animation.setValue(y);
-            return;
-        }
 
-        if (animationCamera.isToggled() && mc.gameSettings.thirdPersonView == 1) {
+        if (camera.isToggled() && mc.gameSettings.thirdPersonView != 0) {
             double targetY = mc.thePlayer.posY + offset.getInput();
             animation.run(Utils.limit(targetY, curY - maxOffset.getInput(), curY + maxOffset.getInput()));
 
