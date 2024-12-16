@@ -128,14 +128,18 @@ public final class RotationHandler extends Module {
         if (isSet && mc.currentScreen == null) {
             float viewYaw = RotationUtils.normalize(mc.thePlayer.rotationYaw);
             float viewPitch = RotationUtils.normalize(mc.thePlayer.rotationPitch);
+
+            float serverYaw = RotationUtils.normalize(getRotationYaw());
+            float serverPitch = RotationUtils.normalize(getRotationPitch());
+
             switch ((int) smoothBack.getInput()) {
                 case 0:
                     rotationYaw = null;
                     rotationPitch = null;
                     break;
                 case 1:
-                    setRotationYaw(AimSimulator.rotMove(viewYaw, getRotationYaw(), (float) aimSpeed.getInput()));
-                    setRotationPitch(AimSimulator.rotMove(viewPitch, getRotationPitch(), (float) aimSpeed.getInput()));
+                    setRotationYaw(AimSimulator.rotMove(viewYaw, serverYaw, (float) aimSpeed.getInput()));
+                    setRotationPitch(AimSimulator.rotMove(viewPitch, serverPitch, (float) aimSpeed.getInput()));
                     break;
             }
         }
