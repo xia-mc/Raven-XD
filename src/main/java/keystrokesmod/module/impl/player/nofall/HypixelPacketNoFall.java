@@ -61,7 +61,7 @@ public class HypixelPacketNoFall extends SubMode<NoFall> {
             }
         }
 
-        if (fallDistance >= minFallDistance.getInput() && !parent.noAction() && !(notWhileKillAura.isToggled() && KillAura.target != null) && !ModuleManager.scaffold.isEnabled()) {
+        if (fallDistance >= minFallDistance.getInput() && !parent.noAction() && !(notWhileKillAura.isToggled() && KillAura.target != null) && !(ModuleManager.scaffold.isEnabled() && ModuleManager.scaffold.placeBlock != null && ModuleManager.scaffold.totalBlocks() > 0)) {
             switch ((int) packetMode.getInput()) {
                 case 0:
                     Utils.getTimer().timerSpeed = (float) 0.5;

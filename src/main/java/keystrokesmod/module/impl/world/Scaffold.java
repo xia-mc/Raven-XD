@@ -102,7 +102,6 @@ public class Scaffold extends IAutoClicker {
     private final SliderSetting alpha;
     private final ButtonSetting outline;
     private final ButtonSetting shade;
-    private final ButtonSetting visualKeepY;
 
     private final Map<BlockPos, Timer> highlight = new HashMap<>();
     public @Nullable MovingObjectPosition rayCasted = null;
@@ -118,7 +117,7 @@ public class Scaffold extends IAutoClicker {
     public int onGroundTicks = 0;
     public boolean telly$noBlockPlace = false;
     private int lastSlot;
-    private double startPos = -1;
+    public double startPos = -1;
     private boolean forceStrict;
     private boolean down;
     private int add = 0;
@@ -215,7 +214,6 @@ public class Scaffold extends IAutoClicker {
         this.registerSetting(alpha = new SliderSetting("Alpha", 200, 0, 255, 1, () -> esp.isToggled() && raytrace.isToggled()));
         this.registerSetting(outline = new ButtonSetting("Outline", true, esp::isToggled));
         this.registerSetting(shade = new ButtonSetting("Shade", false, esp::isToggled));
-        this.registerSetting(visualKeepY = new ButtonSetting("Visual keep-y", false));
     }
 
     public static boolean sprint() {
@@ -1008,18 +1006,6 @@ public class Scaffold extends IAutoClicker {
     public void onSafeWalk(@NotNull SafeWalkEvent event) {
         if (safewalk())
             event.setSafeWalk(true);
-    }
-
-    @SubscribeEvent
-    public void onEyeHeightEvent(@NotNull EyeHeightEvent event) {
-        if (!visualKeepY.isToggled()) return;
-        if (ModuleManager.motionCamera.isEnabled() && mc.gameSettings.thirdPersonView == 1) return;
-
-        double curY = event.getY();
-        double targetY = startPos == -1 ? mc.thePlayer.posY : startPos;
-        if (targetY != event.getY() && !ModuleManager.tower.canTower()) {
-            event.setY(Utils.limit(targetY, curY - 3, curY + 3));
-        }
     }
 
     enum HoverState {

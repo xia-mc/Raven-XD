@@ -82,7 +82,7 @@ public class NormalBlink extends SubMode<Module> {
 
     @SubscribeEvent
     public void onSendPacket(SendPacketEvent e) {
-        if (!Utils.nullCheck()) {
+        if (!Utils.nullCheck() || mc.thePlayer.isDead) {
             this.disable();
             return;
         }

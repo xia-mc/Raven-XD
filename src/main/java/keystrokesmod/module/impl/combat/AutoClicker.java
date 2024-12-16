@@ -71,8 +71,6 @@ public class AutoClicker extends IAutoClicker {
 
     @Override
     public void onUpdate() {
-        ((MinecraftAccessor) mc).setLeftClickCounter(-1);
-
         if (!coolDown.hasFinished() && this.jitter.isToggled()) {
             mc.thePlayer.rotationYaw += (float) (((Math.random() - 0.5) * 400 / Minecraft.getDebugFPS()) * directionX);
             mc.thePlayer.rotationPitch += (float) (((Math.random() - 0.5) * 400 / Minecraft.getDebugFPS()) * directionY) * mc.gameSettings.mouseSensitivity * 2;

@@ -3,6 +3,7 @@ package keystrokesmod.module.impl.render;
 import keystrokesmod.event.EyeHeightEvent;
 import keystrokesmod.event.PreMotionEvent;
 import keystrokesmod.module.Module;
+import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.utility.Utils;
@@ -17,6 +18,8 @@ public class MotionCamera extends Module {
     private final SliderSetting maxOffset;
     private final ButtonSetting smooth;
     private final ButtonSetting onlyThirdPerson;
+    private final ButtonSetting scaffold;
+    private final ButtonSetting notWhileTower;
 
     private double y = Double.NaN;
     private final Animation animation = new Animation(Easing.EASE_OUT_CIRC, 300);
@@ -27,6 +30,8 @@ public class MotionCamera extends Module {
         this.registerSetting(maxOffset = new SliderSetting("Max offset", 1.5, 0, 5, 0.1));
         this.registerSetting(smooth = new ButtonSetting("Smooth", true));
         this.registerSetting(onlyThirdPerson = new ButtonSetting("Only third person", true));
+        this.registerSetting(scaffold = new ButtonSetting("Scaffold", false));
+        this.registerSetting(notWhileTower = new ButtonSetting("Not while tower", true, scaffold::isToggled));
     }
 
     @SubscribeEvent
@@ -49,7 +54,7 @@ public class MotionCamera extends Module {
     @SubscribeEvent(priority = EventPriority.LOW)
     public void onEyeHeightEvent(@NotNull EyeHeightEvent event) {
         if (Double.isNaN(y)) return;
-        if (onlyThirdPerson.isToggled() && mc.gameSettings.thirdPersonView != 1) {
+        if (!canMotion()) {
             animation.setValue(y);
             return;
         }
@@ -60,5 +65,14 @@ public class MotionCamera extends Module {
         if (smooth.isToggled())
             targetY = animation.getValue();
         event.setY(Utils.limit(targetY, curY - maxOffset.getInput() + offset.getInput(), curY + maxOffset.getInput() + offset.getInput()));
+    }
+
+    private boolean canMotion() {
+        if (scaffold.isToggled() && ModuleManager.scaffold.isEnabled())
+            return !notWhileTower.isToggled() || !ModuleManager.tower.canTower();
+        if (onlyThirdPerson.isToggled() && mc.gameSettings.thirdPersonView == 0)
+            return false;
+
+        return true;
     }
 }

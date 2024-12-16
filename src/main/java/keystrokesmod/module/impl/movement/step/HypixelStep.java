@@ -24,6 +24,7 @@ public class HypixelStep extends SubMode<Step> {
     private final SliderSetting timer;
 
     private long lastStep = -1;
+    private boolean stepped = false;
 
     public HypixelStep(String name, @NotNull Step parent) {
         super(name, parent);
@@ -34,6 +35,7 @@ public class HypixelStep extends SubMode<Step> {
     @Override
     public void onDisable() throws Throwable {
         mc.thePlayer.stepHeight = 0.6f;
+        Utils.resetTimer();
     }
 
     @SubscribeEvent
@@ -43,6 +45,7 @@ public class HypixelStep extends SubMode<Step> {
             if (block instanceof BlockStairs || block instanceof BlockSlab) return;
 
             Utils.getTimer().timerSpeed = (float) timer.getInput();
+            stepped = true;
             for (double motion : MOTION) {
                 MoveUtil.strafe(MoveUtil.getBaseMoveSpeed());
                 PacketUtils.sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(
@@ -59,7 +62,10 @@ public class HypixelStep extends SubMode<Step> {
 
     @SubscribeEvent
     public void onPreTick(PreTickEvent event) {
-        Utils.resetTimer();
+        if (stepped) {
+            Utils.resetTimer();
+            stepped = false;
+        }
         if (System.currentTimeMillis() - lastStep > delay.getInput())
             mc.thePlayer.stepHeight = 1;
     }

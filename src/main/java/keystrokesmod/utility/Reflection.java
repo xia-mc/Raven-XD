@@ -41,8 +41,6 @@ public class Reflection {
     public static Field button;
     public static Field buttonstate;
     public static Field buttons;
-    public static Field leftClickCounter;
-    public static Field jumpTicks;
     public static Field rightClickDelayTimerField;
     public static Field curBlockDamageMP;
     public static Field blockHitDelay;
@@ -85,18 +83,6 @@ public class Reflection {
             button = MouseEvent.class.getDeclaredField("button");
             buttonstate = MouseEvent.class.getDeclaredField("buttonstate");
             buttons = Mouse.class.getDeclaredField("buttons");
-
-            leftClickCounter = ReflectionHelper.findField(Minecraft.class, "field_71429_W", "leftClickCounter");
-
-            if (leftClickCounter != null) {
-                leftClickCounter.setAccessible(true);
-            }
-
-            jumpTicks = ReflectionHelper.findField(EntityLivingBase.class, "field_70773_bE", "jumpTicks");
-
-            if (jumpTicks != null) {
-                jumpTicks.setAccessible(true);
-            }
 
             rightClickDelayTimerField = ReflectionHelper.findField(Minecraft.class, "field_71467_ac", "rightClickDelayTimer");
 

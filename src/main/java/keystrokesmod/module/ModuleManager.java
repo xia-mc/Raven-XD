@@ -254,7 +254,7 @@ public class ModuleManager {
         this.addModule(backtrack = new Backtrack());
         this.addModule(blink = new Blink());
         this.addModule(chestStealer = new ChestStealer());
-        this.addModule(new DelayRemover());
+        this.addModule(new NoJumpDelay());
         this.addModule(new FakeLag());
         this.addModule(new Freecam());
         this.addModule(invManager = new InvManager());
