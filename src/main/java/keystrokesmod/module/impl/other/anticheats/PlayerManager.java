@@ -17,9 +17,9 @@ import java.util.Map;
 import java.util.UUID;
 
 public class PlayerManager {
-    public Map<UUID, Boolean> activeMap;  // 实时活动玩家(可被检查)列表
+    public Map<UUID, Boolean> activeMap;  // 实时活动玩家(可被检查)列表 || List of active players in real time (can be checked)
 
-    public Map<UUID, TRPlayer> dataMap;  // 玩家数据列表
+    public Map<UUID, TRPlayer> dataMap;  // 玩家数据列表 || Player data list
 
     public PlayerManager() {
         activeMap = new Object2ObjectOpenHashMap<>();
@@ -30,7 +30,7 @@ public class PlayerManager {
         if (client.theWorld == null || client.thePlayer == null) return;
         activeMap.forEach((uuid, aBoolean) -> activeMap.replace(uuid, false));
 
-        // 遍历活动玩家
+        // 遍历活动玩家 || Active player movement
         try {
             for (AbstractClientPlayer player : LevelUtils.getPlayers()) {
                 final UUID uuid = player.getUniqueID();
@@ -53,7 +53,7 @@ public class PlayerManager {
                     dataMap.put(uuid, trPlayer);
                 }
 
-                // 更新
+                // 更新 || Update
                 activeMap.replace(uuid, true);
                 try {
                     final TRPlayer trPlayer = dataMap.get(uuid);

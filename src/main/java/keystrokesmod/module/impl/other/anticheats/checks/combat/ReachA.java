@@ -51,6 +51,6 @@ public class ReachA extends Check {
 
     @Override
     public boolean isDisabled() {
-        return !Anticheat.getCombatCheck().isToggled() || !Anticheat.getExperimentalMode().isToggled();
+        return !Anticheat.getCombatCheck().isToggled() || !Anticheat.getCombatCheckReachA().isToggled() || !Anticheat.getExperimentalMode().isToggled();
     }
 }

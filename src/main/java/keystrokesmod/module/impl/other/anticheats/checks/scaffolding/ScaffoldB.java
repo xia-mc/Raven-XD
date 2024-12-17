@@ -43,6 +43,6 @@ public class ScaffoldB extends Check {
 
     @Override
     public boolean isDisabled() {
-        return !Anticheat.getScaffoldingCheck().isToggled();
+        return !Anticheat.getScaffoldingCheck().isToggled() || !Anticheat.getScaffoldingCheckScaffoldB().isToggled();
     }
 }
