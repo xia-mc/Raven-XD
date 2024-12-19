@@ -39,9 +39,9 @@ public class Animations extends Module {
     private final SliderSetting translatez = new SliderSetting("Z", 0, -10, 10, 0.05);
 
     private final ButtonSetting precustomtranslation = new ButtonSetting("Custom Translation (pre)", false);
-    private final SliderSetting pretranslatex = new SliderSetting("X", 0, -4, 4, 0.05, precustomtranslation::isToggled);
-    private final SliderSetting pretranslatey = new SliderSetting("Y", 0, -2, 2, 0.05, precustomtranslation::isToggled);
-    private final SliderSetting pretranslatez = new SliderSetting("Z", 0, -6, 3, 0.05, precustomtranslation::isToggled);
+    private final SliderSetting pretranslatex = new SliderSetting("Pre-X", 0, -4, 4, 0.05, precustomtranslation::isToggled);
+    private final SliderSetting pretranslatey = new SliderSetting("Pre-Y", 0, -2, 2, 0.05, precustomtranslation::isToggled);
+    private final SliderSetting pretranslatez = new SliderSetting("Pre-Z", 0, -6, 3, 0.05, precustomtranslation::isToggled);
 
     private final ButtonSetting customscaling = new ButtonSetting("Custom Scaling", false);
     private final SliderSetting scalex = new SliderSetting("ScaleX", 1, -1, 5, 0.05, customscaling::isToggled);
