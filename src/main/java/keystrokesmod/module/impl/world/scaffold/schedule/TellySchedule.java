@@ -1,46 +1,45 @@
-package keystrokesmod.module.impl.world.scaffold.rotation;
+package keystrokesmod.module.impl.world.scaffold.schedule;
 
 import keystrokesmod.event.JumpEvent;
 import keystrokesmod.event.PreUpdateEvent;
-import keystrokesmod.event.RotationEvent;
 import keystrokesmod.event.ScaffoldPlaceEvent;
 import keystrokesmod.module.impl.world.Scaffold;
-import keystrokesmod.module.impl.world.scaffold.IScaffoldRotation;
+import keystrokesmod.module.impl.world.scaffold.IScaffoldSchedule;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.utility.BlockUtils;
 import keystrokesmod.utility.MoveUtil;
 import keystrokesmod.utility.Utils;
-import keystrokesmod.utility.aim.RotationData;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
-public class TellyRotation extends IScaffoldRotation {
+public class TellySchedule extends IScaffoldSchedule {
     private final SliderSetting straightTicks;
     private final SliderSetting diagonalTicks;
     private final SliderSetting jumpDownTicks;
 
     private boolean noPlace = false;
 
-    public TellyRotation(String name, @NotNull Scaffold parent) {
+    public TellySchedule(String name, @NotNull Scaffold parent) {
         super(name, parent);
-        this.registerSetting(straightTicks = new SliderSetting("Straight ticks", 6, 1, 8, 1));
-        this.registerSetting(diagonalTicks = new SliderSetting("Diagonal ticks", 4, 1, 8, 1));
-        this.registerSetting(jumpDownTicks = new SliderSetting("Jump down ticks", 1, 1, 8, 1));
+        this.registerSetting(straightTicks = new SliderSetting("Straight ticks", 6, 0, 8, 1));
+        this.registerSetting(diagonalTicks = new SliderSetting("Diagonal ticks", 4, 0, 8, 1));
+        this.registerSetting(jumpDownTicks = new SliderSetting("Jump down ticks", 1, 0, 8, 1));
+    }
+
+    @Override
+    public boolean noPlace() {
+        return noPlace || mc.thePlayer.onGround && parent.placeBlock == null;
+    }
+
+    @Override
+    public boolean noRotation() {
+        return noPlace();
     }
 
     @Override
     public void onEnable() throws Throwable {
         noPlace = false;
-    }
-
-    @Override
-    public @NotNull RotationData onRotation(float placeYaw, float placePitch, boolean forceStrict, @NotNull RotationEvent event) {
-        if (noPlace || parent.placeBlock == null) {
-            return new RotationData(event.getYaw(), event.getPitch());
-        } else {
-            return new RotationData(placeYaw, placePitch);
-        }
     }
 
     @SubscribeEvent

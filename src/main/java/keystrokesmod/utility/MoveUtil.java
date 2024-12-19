@@ -74,6 +74,10 @@ public class MoveUtil {
      * Gets the players' movement yaw
      */
     public static double direction() {
+        return Math.toRadians(directionYaw());
+    }
+
+    public static float directionYaw() {
         float rotationYaw = TargetStrafe.getMovementYaw();
 
         if (mc.thePlayer.moveForward < 0) {
@@ -95,8 +99,7 @@ public class MoveUtil {
         if (mc.thePlayer.moveStrafing < 0) {
             rotationYaw += 70 * forward;
         }
-
-        return Math.toRadians(rotationYaw);
+        return rotationYaw;
     }
 
     /**

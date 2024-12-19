@@ -242,6 +242,7 @@ public class ModuleManager {
         this.addModule(viewPackets = new ViewPackets());
         this.addModule(new FlagDetector());
         this.addModule(chatAI = new ChatAI());
+        this.addModule(new Test());
 
         // player
         this.addModule(new AntiAFK());

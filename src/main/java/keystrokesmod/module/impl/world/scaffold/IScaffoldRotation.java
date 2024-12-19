@@ -21,11 +21,4 @@ public abstract class IScaffoldRotation extends SubMode<Scaffold> {
      * @return the final rotation data
      */
     public abstract @NotNull RotationData onRotation(float placeYaw, float placePitch, boolean forceStrict, @NotNull RotationEvent event);
-
-    /**
-     * @return true means runs normally, false means stop scheduling.
-     */
-    public boolean onPreSchedulePlace() {
-        return true;
-    }
 }

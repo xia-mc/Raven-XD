@@ -198,6 +198,8 @@ public class AimSimulator {
         }
 
         delta = RotationUtils.normalize(delta);
+        double gcd = getGCD();
+        delta = (float) (Math.round(delta / gcd) * gcd);
 
         if (Math.abs(delta) < 0.1 * Math.random() + 0.1) {
             return current;
@@ -220,5 +222,10 @@ public class AimSimulator {
 
     public static boolean equals(@NotNull Vec2 rot1, @NotNull Vec2 rot2) {
         return yawEquals(rot1.x, rot2.x) && Math.abs(rot1.y - rot2.y) < 0.1;
+    }
+
+    private static double getGCD() {
+        double f = mc.gameSettings.mouseSensitivity * 0.6 + 0.2;
+        return f * f * f * 8.0 * 0.15;
     }
 }

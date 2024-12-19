@@ -11,8 +11,12 @@ import keystrokesmod.module.impl.other.RotationHandler;
 import keystrokesmod.module.impl.other.SlotHandler;
 import keystrokesmod.module.impl.other.anticheats.utils.world.PlayerRotation;
 import keystrokesmod.module.impl.world.scaffold.IScaffoldRotation;
+import keystrokesmod.module.impl.world.scaffold.IScaffoldSchedule;
 import keystrokesmod.module.impl.world.scaffold.IScaffoldSprint;
 import keystrokesmod.module.impl.world.scaffold.rotation.*;
+import keystrokesmod.module.impl.world.scaffold.schedule.NormalSchedule;
+import keystrokesmod.module.impl.world.scaffold.schedule.SimpleTellySchedule;
+import keystrokesmod.module.impl.world.scaffold.schedule.TellySchedule;
 import keystrokesmod.module.impl.world.scaffold.sprint.*;
 import keystrokesmod.module.setting.impl.*;
 import keystrokesmod.module.setting.utils.ModeOnly;
@@ -58,6 +62,7 @@ public class Scaffold extends IAutoClicker {
     private final ModeValue clickMode;
     private final ButtonSetting alwaysPlaceIfPossible;
     private final SliderSetting aimSpeed;
+    public final ModeValue schedule;
     private final ModeValue rotation;
     private final ButtonSetting moveFix;
     private final SliderSetting strafe;
@@ -139,15 +144,18 @@ public class Scaffold extends IAutoClicker {
                 .setDefaultValue("Basic")
         );
         this.registerSetting(alwaysPlaceIfPossible = new ButtonSetting("Always place if possible", false));
+        this.registerSetting(schedule = new ModeValue("Schedule", this)
+                .add(new NormalSchedule("Normal", this))
+                .add(new TellySchedule("Telly", this))
+                .add(new SimpleTellySchedule("Simple telly", this))
+                .setDefaultValue("Normal")
+        );
         this.registerSetting(rotation = new ModeValue("Rotation", this)
                 .add(new NoneRotation("None", this))
                 .add(new BackwardsRotation("Backwards", this))
                 .add(new StrictRotation("Strict", this))
                 .add(new PreciseRotation("Precise", this))
-                .add(new SimpleTellyRotation("SimpleTelly", this))
-                .add(new TellyRotation("Telly", this))
                 .add(new ConstantRotation("Constant", this))
-                .add(new SnapRotation("Snap", this))
                 .setDefaultValue("Backwards")
         );
         this.registerSetting(aimSpeed = new SliderSetting("Aim speed", 20, 5, 20, 0.1, new ModeOnly(rotation, 0).reserve()));
@@ -165,6 +173,7 @@ public class Scaffold extends IAutoClicker {
                 .add(new JumpSprint("JumpC", this))
                 .add(new HypixelJumpSprint("HypixelJump", this))
                 .add(new HypixelJump2Sprint("HypixelJump2", this))
+                .add(new HypixelJump3Sprint("HypixelJump3", this))
                 .add(new HypixelSprint("Hypixel", this))
                 .add(new LegitSprint("Legit", this))
                 .add(new SneakSprint("Sneak", this))
@@ -249,6 +258,7 @@ public class Scaffold extends IAutoClicker {
 
     public void onDisable() {
         clickMode.disable();
+        schedule.disable();
         rotation.disable();
         sprint.disable();
 
@@ -277,6 +287,7 @@ public class Scaffold extends IAutoClicker {
 
     public void onEnable() {
         clickMode.enable();
+        schedule.enable();
         rotation.enable();
         sprint.enable();
 
@@ -310,20 +321,18 @@ public class Scaffold extends IAutoClicker {
             return;
 
         final RotationData data = ((IScaffoldRotation) rotation.getSelected()).onRotation(placeYaw, placePitch, forceStrict, event);
-        float yaw = data.getYaw();
-        float pitch = data.getPitch();
-
-        if ((!isDiagonal() || !notWhileDiagonal.isToggled()) && (!ModuleManager.tower.canTower() || !notWhileTower.isToggled())) {
-            if (isDiagonal()) {
-                yaw += (float) strafe.getInput();
-            } else {
-                double offsetToMid = EnumFacing.fromAngle(getYaw()).getAxis() == EnumFacing.Axis.X ? Math.abs(mc.thePlayer.posZ % 1) : Math.abs(mc.thePlayer.posX % 1);
-                if (offsetToMid > 0.6 || offsetToMid < 0.4 || lastOffsetToMid == -1) {
-                    lastOffsetToMid = offsetToMid;
-                }
-                yaw += (float) (lastOffsetToMid >= 0.5 ? strafe.getInput() : -strafe.getInput());
-            }
+        float yaw;
+        float pitch;
+        if (!((IScaffoldSchedule) schedule.getSelected()).noRotation()) {
+            yaw = data.getYaw();
+            pitch = data.getPitch();
+        } else {
+            yaw = event.getYaw();
+            pitch = event.getPitch();
         }
+
+        if (strafe.getInput() != 0)
+            yaw = applyStrafe(yaw, (float) strafe.getInput());
 
         boolean instant = aimSpeed.getInput() == aimSpeed.getMax();
 
@@ -374,6 +383,21 @@ public class Scaffold extends IAutoClicker {
 
         if (clickMode.getInput() == 0)
             place = true;
+    }
+
+    public float applyStrafe(float yaw, float strafeVal) {
+        if ((!isDiagonal() || !notWhileDiagonal.isToggled()) && (!ModuleManager.tower.canTower() || !notWhileTower.isToggled())) {
+            if (isDiagonal()) {
+                yaw += strafeVal;
+            } else {
+                double offsetToMid = EnumFacing.fromAngle(yaw).getAxis() == EnumFacing.Axis.X ? Math.abs(mc.thePlayer.posZ % 1) : Math.abs(mc.thePlayer.posX % 1);
+                if (offsetToMid > 0.6 || offsetToMid < 0.4 || lastOffsetToMid == -1) {
+                    lastOffsetToMid = offsetToMid;
+                }
+                yaw += (float) (lastOffsetToMid >= 0.5 ? strafe.getInput() : -strafe.getInput());
+            }
+        }
+        return yaw;
     }
 
     @Override
@@ -521,11 +545,6 @@ public class Scaffold extends IAutoClicker {
             }
         }
 
-        if (!((IScaffoldRotation) rotation.getSelected()).onPreSchedulePlace())
-            return;
-        if (!((IScaffoldSprint) sprint.getSelected()).onPreSchedulePlace())
-            return;
-
         double original = startPos;
         if (sprint.getInput() == 3) {
             if (groundDistance() >= 2 && add == 0) {
@@ -657,6 +676,10 @@ public class Scaffold extends IAutoClicker {
                 break;
             }
         }
+
+        if (((IScaffoldSchedule) schedule.getSelected()).noPlace())
+            return;
+
         if (place) {
             KeyBinding.setKeyBindState(mc.gameSettings.keyBindUseItem.getKeyCode(), false);
 
@@ -843,7 +866,7 @@ public class Scaffold extends IAutoClicker {
     }
 
     public boolean keepYPosition() {
-        boolean sameYSca = sprint.getInput() == 4 || sprint.getInput() == 3 || sprint.getInput() == 5 || sprint.getInput() == 6 || sprint.getInput() == 7;
+        boolean sameYSca = ((IScaffoldSprint) sprint.getSelected()).isKeepY();
         return this.isEnabled() && Utils.keysDown() && (sameYSca || sameY.isToggled()) && !Utils.jumpDown() && (!fastOnRMB.isToggled() || Mouse.isButtonDown(1)) || hoverState != HoverState.DONE;
     }
 
@@ -865,8 +888,8 @@ public class Scaffold extends IAutoClicker {
 
     public float getYaw() {
         float yaw = 180.0f;
-        double moveForward = mc.thePlayer.movementInput.moveForward;
-        double moveStrafe = mc.thePlayer.movementInput.moveStrafe;
+        double moveForward = mc.thePlayer.moveForward;
+        double moveStrafe = mc.thePlayer.moveStrafing;
         if (rotateWithMovement.isToggled()) {
             if (moveForward > 0.0) {
                 if (moveStrafe > 0.0) {
@@ -999,7 +1022,7 @@ public class Scaffold extends IAutoClicker {
 
     @Override
     public String getInfo() {
-        return sprint.getSelected().getPrettyName();
+        return schedule.getSelected().getPrettyName();
     }
 
     @SubscribeEvent
