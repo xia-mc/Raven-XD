@@ -8,6 +8,7 @@ import keystrokesmod.clickgui.ClickGui;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.client.Settings;
+import keystrokesmod.module.impl.exploit.ClientSpoofer;
 import keystrokesmod.module.impl.fun.NoteBot;
 import keystrokesmod.module.impl.minigames.DuelsStats;
 import keystrokesmod.module.impl.other.ChatAI;
@@ -275,6 +276,14 @@ public class Commands {
 
                 KillMessage.killMessage = c.substring(12);
                 print("&aSet killmessage to " + KillMessage.killMessage, 1);
+            } else if (firstArg.equals("clientspoofer")) {
+                if (!hasArgs) {
+                    print(invSyn, 1);
+                    return;
+                }
+
+                ClientSpoofer.customBrand = c.substring(14);
+                print("&aSet clientspoofer custom brand to " + ClientSpoofer.customBrand, 1);
             } else if (firstArg.equals("binds")) {
                 for (Module module : Raven.getModuleManager().getModules()) {
                     if (module.getKeycode() != 0) {
@@ -541,6 +550,7 @@ public class Commands {
                 print("1 cname [name]", 0);
                 print("2 " + FakeChat.command + " [msg]", 0);
                 print("4 killmessage [message]", 0);
+                print("4 clientspoofer [brand]", 0);
                 print(String.format("5 clientname [name (current is '%s')]", Watermark.customName), 0);
                 print("6 chat <args>", 0);
             }
