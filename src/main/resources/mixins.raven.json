@@ -56,7 +56,7 @@
     "gui.MixinGuiMultiplayer",
     "gui.MixinGuiScreen",
     "gui.MixinGuiSlot",
-    "network.MixinClientSpoofer",
+    "network.MixinFMLCommonHandler",
     "network.MixinNetHandlerPlayClient",
     "render.ItemRendererAccessor",
     "render.MixinBlockRendererDispatcher",

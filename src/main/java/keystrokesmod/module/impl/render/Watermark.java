@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.Objects;
 
 public class Watermark extends Module {
-    public static final String VERSION = "2.14";
+    public static final String VERSION = "2.14.1";
     public static final Map<String, ResourceLocation> WATERMARK = new Object2ObjectOpenHashMap<>();
 
     public static String customName = "CustomClient";
