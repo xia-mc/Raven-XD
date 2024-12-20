@@ -254,6 +254,13 @@ public class BlockUtils {
         return false;
     }
 
+    public static boolean insideBlock(final @NotNull Vec3 pos) {
+        BlockPos blockPos = new BlockPos(pos.x, pos.y, pos.z);
+        IBlockState blockState = getBlockState(blockPos);
+        Block block = blockState.getBlock();
+        return block.getCollisionBoundingBox(mc.theWorld, blockPos, blockState).isVecInside(pos.toVec3());
+    }
+
     public static Block blockRelativeToPlayer(final double offsetX, final double offsetY, final double offsetZ) {
         return mc.theWorld.getBlockState(new BlockPos(mc.thePlayer).add(offsetX, offsetY, offsetZ)).getBlock();
     }

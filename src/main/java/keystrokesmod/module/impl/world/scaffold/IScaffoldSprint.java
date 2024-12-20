@@ -16,10 +16,10 @@ public abstract class IScaffoldSprint extends SubMode<Scaffold> {
     public abstract boolean isSprint();
 
     /**
-     * @return true means runs normally, false means stop scheduling.
+     * Should we force keep-y?
      */
-    public boolean onPreSchedulePlace() {
-        return true;
+    public boolean isKeepY() {
+        return false;
     }
 
     /**

@@ -60,6 +60,7 @@ public class ModuleManager {
     public static NoCameraClip noCameraClip;
     public static AutoPlay autoPlay;
     public static CustomName customName;
+    public static CustomFOV customFOV;
     public static CommandChat commandChat;
     public static Phase phase;
     public static PingSpoof pingSpoof;
@@ -127,6 +128,8 @@ public class ModuleManager {
     public static Regen regen;
     public static ChatAI chatAI;
     public static keystrokesmod.module.impl.render.ArrayList arrayList;
+    public static InvMove invMove;
+    public static MotionCamera motionCamera;
 
     static List<Module> modules = new ArrayList<>();
 
@@ -202,7 +205,7 @@ public class ModuleManager {
 
         // movement
         this.addModule(fly = new Fly());
-        this.addModule(new InvMove());
+        this.addModule(invMove = new InvMove());
         this.addModule(keepSprint = new KeepSprint());
         this.addModule(longJump = new LongJump());
         this.addModule(noSlow = new NoSlow());
@@ -239,6 +242,7 @@ public class ModuleManager {
         this.addModule(viewPackets = new ViewPackets());
         this.addModule(new FlagDetector());
         this.addModule(chatAI = new ChatAI());
+        this.addModule(new Test());
 
         // player
         this.addModule(new AntiAFK());
@@ -251,7 +255,7 @@ public class ModuleManager {
         this.addModule(backtrack = new Backtrack());
         this.addModule(blink = new Blink());
         this.addModule(chestStealer = new ChestStealer());
-        this.addModule(new DelayRemover());
+        this.addModule(new NoJumpDelay());
         this.addModule(new FakeLag());
         this.addModule(new Freecam());
         this.addModule(invManager = new InvManager());
@@ -272,6 +276,7 @@ public class ModuleManager {
         this.addModule(new ChestESP());
         this.addModule(customCape = new CustomCape());
         this.addModule(customName = new CustomName());
+        this.addModule(customFOV = new CustomFOV());
         this.addModule(freeLook = new FreeLook());
         this.addModule(fullBright = new FullBright());
         this.addModule(hud = new HUD());
@@ -298,6 +303,7 @@ public class ModuleManager {
         this.addModule(new KillMessage());
         this.addModule(clientTheme = new ClientTheme());
         this.addModule(arrayList = new keystrokesmod.module.impl.render.ArrayList());
+        this.addModule(motionCamera = new MotionCamera());
 
         // world
         this.addModule(antiBot = new AntiBot());

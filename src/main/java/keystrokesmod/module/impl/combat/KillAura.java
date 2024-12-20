@@ -91,6 +91,9 @@ public class KillAura extends IAutoClicker {
     private final SliderSetting offsetHorizontal;
     private final SliderSetting offsetVertical;
     private final ModeSetting offsetTiming;
+    private final ButtonSetting gcd;
+    private final SliderSetting gcdMultiplier;
+    private final SliderSetting gcdOffset;
     private final ModeSetting sortMode;
     private final SliderSetting switchDelay;
     private final SliderSetting targets;
@@ -165,26 +168,29 @@ public class KillAura extends IAutoClicker {
         this.registerSetting(moveFixMode = new ModeSetting("Move fix", RotationHandler.MoveFix.MODES, 0, new ModeOnly(rotationMode, 1)));
         this.registerSetting(rayCastMode = new ModeSetting("Ray cast", new String[]{"None", "Normal", "Strict"}, 1, doRotation));
         this.registerSetting(nearest = new ButtonSetting("Nearest", false, doRotation));
-        this.registerSetting(nearestAccuracy = new SliderSetting("Nearest accuracy", 1, 0.8, 1, 0.01, doRotation.extend(nearest::isToggled)));
+        this.registerSetting(nearestAccuracy = new SliderSetting("Nearest accuracy", 1, 0.8, 1, 0.01, doRotation.extend(nearest)));
         this.registerSetting(lazy = new ButtonSetting("Lazy", false, doRotation));
-        this.registerSetting(lazyAccuracy = new SliderSetting("Lazy accuracy", 0.95, 0.6, 1, 0.01, doRotation.extend(lazy::isToggled)));
+        this.registerSetting(lazyAccuracy = new SliderSetting("Lazy accuracy", 0.95, 0.6, 1, 0.01, doRotation.extend(lazy)));
         this.registerSetting(constant = new ButtonSetting("Constant", false, doRotation));
-        this.registerSetting(constantOnlyIfNotMoving = new ButtonSetting("Constant only if not moving", false, doRotation.extend(constant::isToggled)));
+        this.registerSetting(constantOnlyIfNotMoving = new ButtonSetting("Constant only if not moving", false, doRotation.extend(constant)));
         this.registerSetting(noise = new ButtonSetting("Noise", false, doRotation));
-        this.registerSetting(noiseHorizontal = new SliderSetting("Noise horizontal", 0.35, 0.01, 1, 0.01, doRotation.extend(noise::isToggled)));
-        this.registerSetting(noiseVertical = new SliderSetting("Noise vertical", 0.5, 0.01, 1.5, 0.01, doRotation.extend(noise::isToggled)));
-        this.registerSetting(noiseAimSpeed = new SliderSetting("Noise aim speed", 0.35, 0.01, 1, 0.01, doRotation.extend(noise::isToggled)));
-        this.registerSetting(noiseDelay = new SliderSetting("Noise delay", 100, 50, 500, 10, doRotation.extend(noise::isToggled)));
+        this.registerSetting(noiseHorizontal = new SliderSetting("Noise horizontal", 0.35, 0.01, 1, 0.01, doRotation.extend(noise)));
+        this.registerSetting(noiseVertical = new SliderSetting("Noise vertical", 0.5, 0.01, 1.5, 0.01, doRotation.extend(noise)));
+        this.registerSetting(noiseAimSpeed = new SliderSetting("Noise aim speed", 0.35, 0.01, 1, 0.01, doRotation.extend(noise)));
+        this.registerSetting(noiseDelay = new SliderSetting("Noise delay", 100, 50, 500, 10, doRotation.extend(noise)));
         this.registerSetting(delayAim = new ButtonSetting("Delay aim", false, doRotation));
-        this.registerSetting(delayAimAmount = new SliderSetting("Delay aim amount", 5, 5, 150, 1, doRotation.extend(delayAim::isToggled)));
+        this.registerSetting(delayAimAmount = new SliderSetting("Delay aim amount", 5, 5, 150, 1, doRotation.extend(delayAim)));
         this.registerSetting(scale = new ButtonSetting("Scale", false, doRotation));
-        this.registerSetting(scaleHorizontal = new SliderSetting("Scale horizontal", 1, 0.5, 1.5, 0.1, doRotation.extend(scale::isToggled)));
-        this.registerSetting(scaleVertical = new SliderSetting("Scale vertical", 1, 0.5, 1.5, 0.1, doRotation.extend(scale::isToggled)));
-        this.registerSetting(scaleChance = new SliderSetting("Scale chance", 100, 0, 100, 1, "%", doRotation.extend(scale::isToggled)));
+        this.registerSetting(scaleHorizontal = new SliderSetting("Scale horizontal", 1, 0.5, 1.5, 0.1, doRotation.extend(scale)));
+        this.registerSetting(scaleVertical = new SliderSetting("Scale vertical", 1, 0.5, 1.5, 0.1, doRotation.extend(scale)));
+        this.registerSetting(scaleChance = new SliderSetting("Scale chance", 100, 0, 100, 1, "%", doRotation.extend(scale)));
         this.registerSetting(offset = new ButtonSetting("Offset", false, doRotation));
-        this.registerSetting(offsetHorizontal = new SliderSetting("Offset horizontal", 0, -1, 1, 0.05, doRotation.extend(offset::isToggled)));
-        this.registerSetting(offsetVertical = new SliderSetting("Offset vertical", -0.5, -1.5, 1, 0.05, doRotation.extend(offset::isToggled)));
-        this.registerSetting(offsetTiming = new ModeSetting("Offset timing", new String[]{"Pre", "Post"}, 0, doRotation.extend(offset::isToggled)));
+        this.registerSetting(offsetHorizontal = new SliderSetting("Offset horizontal", 0, -1, 1, 0.05, doRotation.extend(offset)));
+        this.registerSetting(offsetVertical = new SliderSetting("Offset vertical", -0.5, -1.5, 1, 0.05, doRotation.extend(offset)));
+        this.registerSetting(offsetTiming = new ModeSetting("Offset timing", new String[]{"Pre", "Post"}, 0, doRotation.extend(offset)));
+        this.registerSetting(gcd = new ButtonSetting("GCD", false, doRotation));
+        this.registerSetting(gcdMultiplier = new SliderSetting("GCD multiplier", 1, 0.1, 3, 0.1, doRotation.extend(gcd)));
+        this.registerSetting(gcdOffset = new SliderSetting("GCD Offset", 0, -5, 5, 0.1, doRotation.extend(gcd)));
         this.registerSetting(new DescriptionSetting("Targets"));
         String[] sortModes = new String[]{"Health", "HurtTime", "Distance", "Yaw"};
         this.registerSetting(sortMode = new ModeSetting("Sort mode", sortModes, 0));
@@ -263,9 +269,17 @@ public class KillAura extends IAutoClicker {
         if (rotationSpeed.getInput() == 10)
             return new float[]{result.first(), result.second()};
 
+        Double gcdValue = null;
+
+        if (gcd.isToggled()) {
+            gcdValue = AimSimulator.getGCD();
+            gcdValue *= gcdMultiplier.getInput();
+            gcdValue += gcdOffset.getInput();
+        }
+
         return new float[]{
-                AimSimulator.rotMove(result.first(), rotations[0], (float) rotationSpeed.getInput()),
-                AimSimulator.rotMove(result.second(), rotations[1], (float) rotationSpeed.getInput())
+                AimSimulator.rotMove(result.first(), rotations[0], (float) rotationSpeed.getInput(), gcdValue),
+                AimSimulator.rotMove(result.second(), rotations[1], (float) rotationSpeed.getInput(), gcdValue)
         };
     }
 
@@ -393,12 +407,16 @@ public class KillAura extends IAutoClicker {
                 case 9:
                     if (lag) {
                         blinking = true;
-                        unBlock();
+                        unBlock();  // unblock while blinking
                         lag = false;
                     } else {
-                        attackAndInteract(target, true, Utils.getEyePos(target)); // attack while blinked
+                        // attack while blinked
+                        if (!attackAndInteract(target, true, Utils.getEyePos(target))) {
+                            break;  // perfect hit support
+                        }
                         releasePackets(); // release
-                        sendBlock(); // block after releasing unblock
+                        blinking = false;
+                        sendBlock(); // send block without blinking
                         lag = true;
                     }
                     break;
@@ -738,20 +756,24 @@ public class KillAura extends IAutoClicker {
         attackAndInteract(target, sendInteractAt, aimSimulator.getHitPos());
     }
 
-    private void attackAndInteract(EntityLivingBase target, boolean sendInteractAt, Vec3 hitVec) {
+    private boolean attackAndInteract(EntityLivingBase target, boolean sendInteractAt, Vec3 hitVec) {
         if (target != null && attack) {
-            if (!attack(target)) return;
+            if (!attack(target)) return false;
             if (sendInteractAt) {
                 if (hitVec != null) {
                     hitVec = new Vec3(hitVec.x - target.posX, hitVec.y - target.posY, hitVec.z - target.posZ);
                     mc.thePlayer.sendQueue.addToSendQueue(new C02PacketUseEntity(target, hitVec.toVec3()));
                 }
             }
-            mc.thePlayer.sendQueue.addToSendQueue(new C02PacketUseEntity(target, C02PacketUseEntity.Action.INTERACT));
+            PacketUtils.sendPacket(new C02PacketUseEntity(target, C02PacketUseEntity.Action.INTERACT));
+            return true;
         } else if (ModuleManager.antiFireball != null && ModuleManager.antiFireball.isEnabled() && ModuleManager.antiFireball.fireball != null && ModuleManager.antiFireball.attack) {
             doAttack(ModuleManager.antiFireball.fireball, !ModuleManager.antiFireball.silentSwing.isToggled());
-            mc.thePlayer.sendQueue.addToSendQueue(new C02PacketUseEntity(ModuleManager.antiFireball.fireball, C02PacketUseEntity.Action.INTERACT));
+            PacketUtils.sendPacket(new C02PacketUseEntity(ModuleManager.antiFireball.fireball, C02PacketUseEntity.Action.INTERACT));
+            return true;
         }
+
+        return false;
     }
 
     private boolean attack(EntityLivingBase target) {
@@ -768,7 +790,7 @@ public class KillAura extends IAutoClicker {
     }
 
     private void sendBlock() {
-        mc.getNetHandler().addToSendQueue(new C08PacketPlayerBlockPlacement(SlotHandler.getHeldItem()));
+        PacketUtils.sendPacket(new C08PacketPlayerBlockPlacement(SlotHandler.getHeldItem()));
     }
 
     private boolean isMining() {
@@ -779,7 +801,7 @@ public class KillAura extends IAutoClicker {
         if (!Utils.holdingSword()) {
             return;
         }
-        mc.thePlayer.sendQueue.addToSendQueue(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, DOWN));
+        PacketUtils.sendPacket(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, DOWN));
         blockingTime = 0;
     }
 

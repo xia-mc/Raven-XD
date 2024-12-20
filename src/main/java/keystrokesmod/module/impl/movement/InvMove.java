@@ -35,7 +35,6 @@ public class InvMove extends Module {
     private final ButtonSetting clickGui;
 
     private boolean blinking = false;
-
     private boolean clicked = false;
 
     public InvMove() {
@@ -102,7 +101,7 @@ public class InvMove extends Module {
         }
     }
 
-    private boolean canInvMove() {
+    public boolean canInvMove() {
         if (!nameCheck() || !targetNearbyCheck() || scaffold.isEnabled())
             return false;
         if (clickGui.isToggled() && mc.currentScreen instanceof ClickGui)

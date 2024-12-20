@@ -1,5 +1,6 @@
 package keystrokesmod.mixins.impl.entity;
 
+import keystrokesmod.event.EyeHeightEvent;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.movement.KeepSprint;
 import keystrokesmod.module.impl.render.Particles;
@@ -17,13 +18,17 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
+import net.minecraftforge.common.MinecraftForge;
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import static keystrokesmod.Raven.mc;
 
+@SuppressWarnings("DataFlowIssue")
 @Mixin(value = EntityPlayer.class)
 public abstract class MixinEntityPlayer extends EntityLivingBase {
     public MixinEntityPlayer(World p_i1594_1_) {
@@ -34,6 +39,7 @@ public abstract class MixinEntityPlayer extends EntityLivingBase {
      * @author strangerrrs
      * @reason mixin attack target entity with current item
      */
+    @SuppressWarnings({"UnresolvedMixinReference", "ExtractMethodRecommender"})
     @Inject(method = "attackTargetEntityWithCurrentItem", at = @At("HEAD"), cancellable = true)
     public void attackTargetEntityWithCurrentItem(Entity p_attackTargetEntityWithCurrentItem_1_, CallbackInfo ci) {
         if (ForgeHooks.onPlayerAttackTarget(((EntityPlayer) (Object) this), p_attackTargetEntityWithCurrentItem_1_)) {
@@ -72,7 +78,7 @@ public abstract class MixinEntityPlayer extends EntityLivingBase {
                     boolean flag2 = p_attackTargetEntityWithCurrentItem_1_.attackEntityFrom(DamageSource.causePlayerDamage(((EntityPlayer) (Object) this)), f);
                     if (flag2) {
                         if (i > 0) {
-                            p_attackTargetEntityWithCurrentItem_1_.addVelocity((double) (-MathHelper.sin(this.rotationYaw * 3.1415927F / 180.0F) * (float) i * 0.5F), 0.1, (double) (MathHelper.cos(this.rotationYaw * 3.1415927F / 180.0F) * (float) i * 0.5F));
+                            p_attackTargetEntityWithCurrentItem_1_.addVelocity(-MathHelper.sin(this.rotationYaw * 3.1415927F / 180.0F) * (float) i * 0.5F, 0.1, MathHelper.cos(this.rotationYaw * 3.1415927F / 180.0F) * (float) i * 0.5F);
                             if (ModuleManager.keepSprint != null && ModuleManager.keepSprint.isEnabled()) {
                                 KeepSprint.keepSprint(p_attackTargetEntityWithCurrentItem_1_);
                             }
@@ -110,13 +116,14 @@ public abstract class MixinEntityPlayer extends EntityLivingBase {
 
                         EnchantmentHelper.applyArthropodEnchantments(this, p_attackTargetEntityWithCurrentItem_1_);
                         ItemStack itemstack = mc.thePlayer.getCurrentEquippedItem();
-                        Entity entity = p_attackTargetEntityWithCurrentItem_1_;
+                        Entity entity1 = p_attackTargetEntityWithCurrentItem_1_;
                         if (p_attackTargetEntityWithCurrentItem_1_ instanceof EntityDragonPart) {
                             IEntityMultiPart ientitymultipart = ((EntityDragonPart) p_attackTargetEntityWithCurrentItem_1_).entityDragonObj;
                             if (ientitymultipart instanceof EntityLivingBase) {
-                                entity = (EntityLivingBase) ientitymultipart;
+                                entity1 = (EntityLivingBase) ientitymultipart;
                             }
                         }
+                        Entity entity = entity1;
 
                         if (itemstack != null && entity instanceof EntityLivingBase) {
                             itemstack.hitEntity((EntityLivingBase) entity, ((EntityPlayer) (Object) this));
@@ -143,4 +150,14 @@ public abstract class MixinEntityPlayer extends EntityLivingBase {
         ci.cancel();
     }
 
+    @Inject(method = "getEyeHeight", at = @At("RETURN"), cancellable = true)
+    public void onGetEyeHeight(@NotNull CallbackInfoReturnable<Float> cir) {
+        EyeHeightEvent event = new EyeHeightEvent(cir.getReturnValue());
+        MinecraftForge.EVENT_BUS.post(event);
+        if (event.isSet()) {
+            mc.thePlayer.cameraYaw = 0;
+            mc.thePlayer.cameraPitch = 0;
+            cir.setReturnValue((float) event.getEyeHeight());
+        }
+    }
 }

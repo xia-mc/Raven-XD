@@ -172,44 +172,46 @@ public class AimSimulator {
     }
 
     public static float rotMove(double target, double current, double diff) {
-        return rotMoveNoRandom((float) target, (float) current, (float) diff);
+        return rotMove(target, current, diff, null);
     }
 
-    public static float rotMoveNoRandom(float target, float current, float diff) {
+    public static float rotMove(double target, double current, double diff, Double gcd) {
         float delta;
-        if (target > current) {
-            float dist1 = target - current;
-            float dist2 = current + 360 - target;
+        if ((float) target > (float) current) {
+            float dist1 = (float) target - (float) current;
+            float dist2 = (float) current + 360 - (float) target;
             if (dist1 > dist2) {  // 另一边移动更近
-                delta = -current - 360 + target;
+                delta = -(float) current - 360 + (float) target;
             } else {
                 delta = dist1;
             }
-        } else if (target < current) {
-            float dist1 = current - target;
-            float dist2 = target + 360 - current;
+        } else if ((float) target < (float) current) {
+            float dist1 = (float) current - (float) target;
+            float dist2 = (float) target + 360 - (float) current;
             if (dist1 > dist2) {  // 另一边移动更近
-                delta = current + 360 + target;
+                delta = (float) current + 360 + (float) target;
             } else {
                 delta = -dist1;
             }
         } else {
-            return current;
+            return (float) current;
         }
 
         delta = RotationUtils.normalize(delta);
+        if (gcd != null)
+            delta = (float) (Math.round(delta / gcd) * gcd);
 
         if (Math.abs(delta) < 0.1 * Math.random() + 0.1) {
-            return current;
-        } else if (Math.abs(delta) <= diff) {
-            return current + delta;
+            return (float) current;
+        } else if (Math.abs(delta) <= (float) diff) {
+            return (float) current + delta;
         } else {
             if (delta < 0) {
-                return current - diff;
+                return (float) current - (float) diff;
             } else if (delta > 0) {
-                return current + diff;
+                return (float) current + (float) diff;
             } else {
-                return current;
+                return (float) current;
             }
         }
     }
@@ -220,5 +222,10 @@ public class AimSimulator {
 
     public static boolean equals(@NotNull Vec2 rot1, @NotNull Vec2 rot2) {
         return yawEquals(rot1.x, rot2.x) && Math.abs(rot1.y - rot2.y) < 0.1;
+    }
+
+    public static double getGCD() {
+        double f = mc.gameSettings.mouseSensitivity * 0.6 + 0.2;
+        return f * f * f * 8.0 * 0.15;
     }
 }

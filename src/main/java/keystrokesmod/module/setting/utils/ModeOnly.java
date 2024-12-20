@@ -1,5 +1,6 @@
 package keystrokesmod.module.setting.utils;
 
+import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.interfaces.InputSetting;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -44,6 +45,14 @@ public class ModeOnly implements Supplier<Boolean> {
             return this;
         }
         return () -> this.get() && Arrays.stream(suppliers).allMatch(Supplier::get);
+    }
+
+    @Contract(pure = true)
+    public final @NotNull Supplier<Boolean> extend(ButtonSetting... settings) {
+        if (settings == null || settings.length == 0) {
+            return this;
+        }
+        return () -> this.get() && Arrays.stream(settings).allMatch(ButtonSetting::isToggled);
     }
 
     @Contract("_ -> new")

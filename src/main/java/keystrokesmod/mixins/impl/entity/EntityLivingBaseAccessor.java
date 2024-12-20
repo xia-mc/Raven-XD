@@ -36,4 +36,7 @@ public interface EntityLivingBaseAccessor {
 
     @Accessor("dead")
     boolean isDead();
+
+    @Accessor("jumpTicks")
+    void setJumpTicks(int ticks);
 }

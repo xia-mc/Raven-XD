@@ -8,19 +8,18 @@ import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.utility.Utils;
 
 public class ProfileModule extends Module {
-    private ButtonSetting saveProfile, removeProfile;
-    private Profile profile;
+    private final Profile profile;
     public boolean saved = true;
 
     public ProfileModule(Profile profile, String name, int bind) {
         super(name, category.profiles, bind);
         this.profile = profile;
-        this.registerSetting(saveProfile = new ButtonSetting("Save profile", () -> {
+        this.registerSetting(new ButtonSetting("Save profile", () -> {
             Utils.sendMessage("&7Saved profile: &b" + getName());
             Raven.profileManager.saveProfile(this.profile);
             saved = true;
         }));
-        this.registerSetting(removeProfile = new ButtonSetting("Remove profile", () -> {
+        this.registerSetting(new ButtonSetting("Remove profile", () -> {
             Utils.sendMessage("&7Removed profile: &b" + getName());
             Raven.profileManager.deleteProfile(getName());
         }));
