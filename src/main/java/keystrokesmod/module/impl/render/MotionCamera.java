@@ -18,11 +18,12 @@ public class MotionCamera extends Module {
     private final SliderSetting maxOffset;
     private final ButtonSetting smooth;
     private final ButtonSetting onlyThirdPerson;
+    private final ButtonSetting camera;
     private final ButtonSetting scaffold;
     private final ButtonSetting notWhileTower;
 
     private double y = Double.NaN;
-    private final Animation animation = new Animation(Easing.EASE_OUT_CIRC, 300);
+    private final Animation animation = new Animation(Easing.EASE_OUT_CUBIC, 1000);
 
     public MotionCamera() {
         super("MotionCamera", category.render);
@@ -30,6 +31,7 @@ public class MotionCamera extends Module {
         this.registerSetting(maxOffset = new SliderSetting("Max offset", 1.5, 0, 5, 0.1));
         this.registerSetting(smooth = new ButtonSetting("Smooth", true));
         this.registerSetting(onlyThirdPerson = new ButtonSetting("Only third person", true));
+        this.registerSetting(camera = new ButtonSetting("Camera", true));
         this.registerSetting(scaffold = new ButtonSetting("Scaffold", false));
         this.registerSetting(notWhileTower = new ButtonSetting("Not while tower", true, scaffold::isToggled));
     }
@@ -60,11 +62,24 @@ public class MotionCamera extends Module {
         }
 
         double curY = event.getY();
-        double targetY = y + offset.getInput();
-        animation.run(Utils.limit(targetY, curY - maxOffset.getInput() + offset.getInput(), curY + maxOffset.getInput() + offset.getInput()));
-        if (smooth.isToggled())
-            targetY = animation.getValue();
-        event.setY(Utils.limit(targetY, curY - maxOffset.getInput() + offset.getInput(), curY + maxOffset.getInput() + offset.getInput()));
+        double targetY = mc.thePlayer.posY + offset.getInput();
+
+        if (camera.isToggled() && mc.gameSettings.thirdPersonView != 0) {
+            if (Double.isNaN(y)) {
+                animation.setValue(y);
+            }
+            animation.run(Utils.limit(targetY, curY - maxOffset.getInput(), curY + maxOffset.getInput()));
+
+            if (smooth.isToggled()) {
+                targetY = animation.getValue();
+
+                event.setY(Utils.limit(targetY, curY - maxOffset.getInput(), curY + maxOffset.getInput()));
+            } else {
+                animation.setValue(y);
+
+                event.setY(Utils.limit(y + offset.getInput(), curY - maxOffset.getInput(), curY + maxOffset.getInput()));
+            }
+        }
     }
 
     private boolean canMotion() {
